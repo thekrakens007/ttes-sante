@@ -1,0 +1,262 @@
+<div class="min-h-screen bg-gray-50 px-6 py-10 dark:bg-gray-950">
+
+    <div class="mx-auto max-w-7xl">
+
+        <!-- HEADER -->
+        <div class="mb-8">
+
+            <h1
+                    class="text-3xl font-bold text-gray-900 dark:text-white"
+            >
+                Mon panier
+            </h1>
+
+            <p
+                    class="mt-2 text-gray-500 dark:text-gray-400"
+            >
+                Vérifiez vos produits avant de passer votre commande.
+            </p>
+
+        </div>
+
+
+        <!-- LOADING -->
+        <div
+                *ngIf="loading"
+                class="rounded-2xl bg-white p-10 text-center shadow-sm dark:bg-gray-900"
+        >
+
+            <div class="text-gray-500">
+                Chargement de votre panier...
+            </div>
+
+        </div>
+
+
+        <!-- ERROR -->
+        <div
+                *ngIf="!loading && error"
+                class="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700"
+        >
+
+            {{ error }}
+
+            <button
+                    type="button"
+                    (click)="loadCart()"
+                    class="ml-2 font-semibold underline"
+            >
+                Réessayer
+            </button>
+
+        </div>
+
+
+        <!-- EMPTY -->
+        <div
+                *ngIf="!loading && !error && isEmpty"
+                class="rounded-2xl bg-white p-12 text-center shadow-sm dark:bg-gray-900"
+        >
+
+            <div
+                    class="mb-4 text-5xl"
+            >
+                🛒
+            </div>
+
+            <h2
+                    class="text-xl font-bold text-gray-900 dark:text-white"
+            >
+                Votre panier est vide
+            </h2>
+
+            <p
+                    class="mt-2 text-gray-500 dark:text-gray-400"
+            >
+                Vous n'avez encore ajouté aucun produit.
+            </p>
+
+            <a
+                    routerLink="/"
+                    class="mt-6 inline-flex rounded-lg bg-brand-600 px-6 py-3 font-semibold text-white hover:bg-brand-700"
+            >
+                Continuer mes achats
+            </a>
+
+        </div>
+
+
+        <!-- CART -->
+        <div
+                *ngIf="!loading && !error && !isEmpty"
+                class="grid grid-cols-1 gap-8 lg:grid-cols-3"
+        >
+
+
+            <!-- ITEMS -->
+            <div class="lg:col-span-2">
+
+                <div
+                        class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900"
+                >
+
+                    <!-- ITEM -->
+                    <div
+                            *ngFor="let item of cart?.items; trackBy: trackByItemId"
+                            class="border-b border-gray-200 p-6 last:border-b-0 dark:border-gray-800"
+                    >
+
+                        <div
+                                class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"
+                        >
+
+
+                            <!-- PRODUCT -->
+                            <div>
+
+                                <h3
+                                        class="text-lg font-semibold text-gray-900 dark:text-white"
+                                >
+                                    {{ item.productName }}
+                                </h3>
+
+                                <p
+                                        class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+                                >
+                                    {{ formatPrice(item.price) }} / unité
+                                </p>
+
+                            </div>
+
+
+                            <!-- QUANTITY -->
+                            <div class="flex items-center gap-2">
+
+
+
+
+                                <!-- INPUT -->
+                                <input
+                                        type="number"
+                                        min="1"
+                                        [value]="item.quantity"
+                                        (change)="onQuantityInput(item.id, $any($event.target).value)"
+                                        [disabled]="updatingItemId === item.id"
+                                        class="h-9 w-16 rounded-lg border border-gray-300 bg-white text-center font-semibold text-gray-900 outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                                />
+
+
+
+                            </div>
+
+
+                            <!-- SUBTOTAL -->
+                            <div
+                                    class="text-right"
+                            >
+
+                                <p
+                                        class="font-bold text-brand-600 dark:text-brand-400"
+                                >
+                                    {{ formatPrice(item.subtotal) }}
+                                </p>
+
+
+                                <button
+                                        type="button"
+                                        (click)="removeItem(item.id)"
+                                        class="mt-2 text-sm font-medium text-red-600 hover:underline"
+                                >
+                                    Supprimer
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SUMMARY -->
+            <div>
+
+                <div
+                        class="sticky top-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+                >
+
+                    <h2
+                            class="mb-6 text-xl font-bold text-gray-900 dark:text-white"
+                    >
+                        Résumé de la commande
+                    </h2>
+
+
+                    <div
+                            class="flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-800"
+                    >
+
+            <span
+                    class="text-gray-500 dark:text-gray-400"
+            >
+              Sous-total
+            </span>
+
+                        <span
+                                class="font-semibold text-gray-900 dark:text-white"
+                        >
+              {{ formatPrice(cart?.total || 0) }}
+            </span>
+
+                    </div>
+
+
+                    <div
+                            class="mt-4 flex items-center justify-between"
+                    >
+
+            <span
+                    class="text-lg font-bold text-gray-900 dark:text-white"
+            >
+              Total
+            </span>
+
+                        <span
+                                class="text-xl font-bold text-brand-600 dark:text-brand-400"
+                        >
+              {{ formatPrice(cart?.total || 0) }}
+            </span>
+
+                    </div>
+
+
+                    <!-- COMMANDER -->
+                    <button
+                            type="button"
+                            (click)="checkout()"
+                            [disabled]="!cart || cart.items.length === 0"
+                            class="w-full rounded-lg bg-brand-600 px-6 py-3 font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                        Passer la commande
+                    </button>
+
+
+                    <a
+                            routerLink="/"
+                            class="mt-4 block text-center text-sm font-medium text-gray-500 hover:text-brand-600"
+                    >
+                        Continuer mes achats
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

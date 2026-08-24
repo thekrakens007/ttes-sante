@@ -1,0 +1,73 @@
+<app-page-breadcrumb pageTitle="Catégories" />
+
+<div class="space-y-6">
+
+    <div>
+
+        <!-- HEADER -->
+
+        <div
+                class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+            <div>
+
+                <h2
+                        class="text-lg font-semibold text-gray-800 dark:text-white/90">
+
+                    Gestion des catégories
+
+                </h2>
+
+                <p
+                        class="text-sm text-gray-500 dark:text-gray-400">
+
+                    Gérez les catégories des produits.
+
+                </p>
+
+            </div>
+
+
+            <button
+                    type="button"
+                    routerLink="/admin/categories/new"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600">
+
+                <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none">
+
+                    <path
+                            d="M12 5V19"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                    />
+
+                    <path
+                            d="M5 12H19"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                    />
+
+                </svg>
+
+                Ajouter une catégorie
+
+            </button>
+
+        </div>
+
+
+        <app-component-card title="Liste des catégories">
+
+            <app-category-table />
+
+        </app-component-card>
+
+    </div>
+
+</div>

@@ -1,0 +1,310 @@
+<div
+        class="overflow-hidden rounded-2xl border border-gray-200 bg-white
+         dark:border-gray-800 dark:bg-white/[0.03]"
+>
+
+    <!-- Header -->
+    <div
+            class="flex flex-col gap-3 border-b border-gray-100
+           px-5 py-4 sm:flex-row sm:items-center
+           sm:justify-between dark:border-gray-800"
+    >
+
+        <div>
+
+            <h3
+                    class="text-lg font-semibold text-gray-800
+               dark:text-white/90"
+            >
+                Produits
+            </h3>
+
+            <p
+                    class="text-sm text-gray-500
+               dark:text-gray-400"
+            >
+                Gestion des produits de la pharmacie
+            </p>
+
+        </div>
+
+        <button
+                type="button"
+                (click)="loadProducts()"
+                class="rounded-lg border border-gray-300
+             bg-white px-4 py-2.5 text-sm font-medium
+             text-gray-700 hover:bg-gray-50
+             dark:border-gray-700 dark:bg-gray-800
+             dark:text-gray-400"
+        >
+            Actualiser
+        </button>
+
+    </div>
+
+
+    <!-- Loading -->
+    @if (loading) {
+
+        <div class="p-8 text-center">
+
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                Chargement des produits...
+            </p>
+
+        </div>
+
+    }
+
+
+    <!-- Error -->
+    @if (!loading && errorMessage) {
+
+        <div class="p-8 text-center">
+
+            <p class="text-sm text-red-500">
+                {{ errorMessage }}
+            </p>
+
+        </div>
+
+    }
+
+
+    <!-- Table -->
+    @if (!loading && !errorMessage) {
+
+        <div class="max-w-full overflow-x-auto">
+
+            <table class="w-full text-left">
+
+                <thead
+                        class="border-y border-gray-100
+                 dark:border-gray-800"
+                >
+
+                <tr>
+
+                    <th
+                            class="px-5 py-3 text-xs font-medium
+                     text-gray-500 dark:text-gray-400"
+                    >
+                        Produit
+                    </th>
+
+                    <th
+                            class="px-5 py-3 text-xs font-medium
+                     text-gray-500 dark:text-gray-400"
+                    >
+                        SKU
+                    </th>
+
+                    <th
+                            class="px-5 py-3 text-xs font-medium
+                     text-gray-500 dark:text-gray-400"
+                    >
+                        Prix
+                    </th>
+
+                    <th
+                            class="px-5 py-3 text-xs font-medium
+                     text-gray-500 dark:text-gray-400"
+                    >
+                        Stock
+                    </th>
+
+                    <th
+                            class="px-5 py-3 text-xs font-medium
+                     text-gray-500 dark:text-gray-400"
+                    >
+                        Catégories
+                    </th>
+
+                    <th
+                            class="px-5 py-3 text-xs font-medium
+                     text-gray-500 dark:text-gray-400"
+                    >
+                        Prescription
+                    </th>
+                    <th>Actions</th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody
+                        class="divide-y divide-gray-100
+                 dark:divide-gray-800"
+                >
+
+                    @for (product of products; track product.id) {
+
+                        <tr>
+
+                            <!-- Produit -->
+                            <td class="px-5 py-4">
+
+                                <div class="flex items-center gap-3">
+
+                                    <div
+                                            class="h-[50px] w-[50px]
+                           overflow-hidden rounded-lg
+                           bg-gray-100 dark:bg-gray-800"
+                                    >
+
+                                        <img
+                                                [src]="getMainImage(product)"
+                                                [alt]="product.name"
+                                                class="h-full w-full object-cover"
+                                        />
+
+                                    </div>
+
+                                    <div>
+
+                                        <p
+                                                class="font-medium text-gray-800
+                             dark:text-white/90"
+                                        >
+                                            {{ product.name }}
+                                        </p>
+
+                                        <p
+                                                class="text-xs text-gray-500
+                             dark:text-gray-400"
+                                        >
+                                            {{ product.brand || 'Sans marque' }}
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- SKU -->
+                            <td
+                                    class="px-5 py-4 text-sm
+                       text-gray-500 dark:text-gray-400"
+                            >
+                                {{ product.sku }}
+                            </td>
+
+
+                            <!-- Prix -->
+                            <td
+                                    class="px-5 py-4 text-sm font-medium
+                       text-gray-800 dark:text-white/90"
+                            >
+                                {{ product.price | number:'1.0-2' }} FCFA
+                            </td>
+
+
+                            <!-- Stock -->
+                            <td class="px-5 py-4">
+
+                                <div class="flex flex-col gap-1">
+
+                  <span
+                          class="text-sm font-medium
+                           text-gray-800 dark:text-white/90"
+                  >
+                    {{ product.stock }}
+                  </span>
+
+                                    <app-badge
+                                            size="sm"
+                                            [color]="getStockColor(product.stock)"
+                                    >
+                                        {{ getStockLabel(product.stock) }}
+                                    </app-badge>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- Catégories -->
+                            <td
+                                    class="px-5 py-4 text-sm
+                       text-gray-500 dark:text-gray-400"
+                            >
+
+                                @if (product.categories.length > 0) {
+
+                                    {{ product.categories.join(', ') }}
+
+                                } @else {
+
+                                    -
+
+                                }
+
+                            </td>
+
+
+                            <!-- Prescription -->
+                            <td class="px-5 py-4">
+
+                                <app-badge
+                                        size="sm"
+                                        [color]="product.requiresPrescription
+                    ? 'warning'
+                    : 'success'"
+                                >
+                                    {{
+                                        product.requiresPrescription
+                                            ? 'Oui'
+                                            : 'Non'
+                                    }}
+                                </app-badge>
+
+                            </td>
+                            <td>
+
+                                <button
+                                        [routerLink]="[
+            '/admin/products/edit',
+            product.id
+        ]"
+                                        class="rounded bg-blue-600 px-3 py-1 text-white">
+
+                                    Modifier
+
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+
+                    @if (products.length === 0) {
+
+                        <tr>
+
+                            <td
+                                    colspan="6"
+                                    class="px-5 py-8 text-center
+                       text-sm text-gray-500
+                       dark:text-gray-400"
+                            >
+                                Aucun produit trouvé.
+                            </td>
+
+                        </tr>
+
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    }
+
+</div>

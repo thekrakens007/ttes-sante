@@ -1,0 +1,54 @@
+<app-page-breadcrumb pageTitle="Entreprises" />
+
+<div class="space-y-6">
+
+    <div>
+
+        <!-- HEADER -->
+
+        <div
+                class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+        >
+
+            <div>
+
+                <h2
+                        class="text-lg font-semibold text-gray-800 dark:text-white/90"
+                >
+                    Gestion des entreprises
+                </h2>
+
+                <p
+                        class="text-sm text-gray-500 dark:text-gray-400"
+                >
+                    Gérez les entreprises pharmaceutiques du catalogue.
+                </p>
+
+            </div>
+
+
+            <a
+                    [routerLink]="['/admin/companies/new']"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs transition hover:bg-brand-600"
+            >
+
+                <span class="text-lg">+</span>
+
+                Ajouter une entreprise
+
+            </a>
+
+        </div>
+
+
+        <!-- TABLE -->
+
+        <app-component-card title="Liste des entreprises">
+
+            <app-company-table />
+
+        </app-component-card>
+
+    </div>
+
+</div>

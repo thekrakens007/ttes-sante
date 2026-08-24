@@ -1,0 +1,272 @@
+<div
+        class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+>
+
+    <!-- HEADER -->
+
+    <div
+            class="flex flex-col gap-3 border-b border-gray-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800"
+    >
+
+        <div>
+
+            <h3
+                    class="text-lg font-semibold text-gray-800 dark:text-white/90"
+            >
+                Entreprises
+            </h3>
+
+            <p
+                    class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+            >
+                Liste des entreprises pharmaceutiques
+            </p>
+
+        </div>
+
+        <div class="flex items-center gap-3">
+
+            <span
+                    class="text-sm text-gray-500 dark:text-gray-400"
+            >
+                {{ companies.length }} entreprise(s)
+            </span>
+
+            <button
+                    type="button"
+                    (click)="refresh()"
+                    class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
+            >
+
+                Actualiser
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ERREUR -->
+
+    @if (errorMessage) {
+
+        <div
+                class="m-5 rounded-lg bg-red-50 p-4 text-sm text-red-600 dark:bg-red-500/10 dark:text-red-400"
+        >
+            {{ errorMessage }}
+        </div>
+
+    }
+
+
+    <!-- LOADING -->
+
+    @if (loading) {
+
+        <div class="p-10 text-center">
+
+            <div
+                    class="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-brand-500"
+            ></div>
+
+            <p
+                    class="text-sm text-gray-500 dark:text-gray-400"
+            >
+                Chargement des entreprises...
+            </p>
+
+        </div>
+
+    }
+
+
+    <!-- TABLE -->
+
+    @if (!loading) {
+
+        <div class="max-w-full overflow-x-auto">
+
+            <table class="w-full text-left">
+
+                <thead
+                        class="border-y border-gray-100 dark:border-gray-800"
+                >
+
+                <tr>
+
+                    <th
+                            class="px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                    >
+                        Entreprise
+                    </th>
+
+                    <th
+                            class="px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                    >
+                        Pays
+                    </th>
+
+                    <th
+                            class="px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                    >
+                        Site web
+                    </th>
+
+                    <th
+                            class="px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                    >
+                        Description
+                    </th>
+
+                    <th
+                            class="px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                    >
+                        Actions
+                    </th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody
+                        class="divide-y divide-gray-100 dark:divide-gray-800"
+                >
+
+                    @for (company of companies; track company.id) {
+
+                        <tr
+                                class="hover:bg-gray-50 dark:hover:bg-white/[0.02]"
+                        >
+
+                            <!-- ENTREPRISE -->
+
+                            <td class="px-5 py-4">
+
+                                <div>
+
+                                    <p
+                                            class="font-medium text-gray-800 text-theme-sm dark:text-white/90"
+                                    >
+                                        {{ company.name }}
+                                    </p>
+
+                                    <p
+                                            class="text-gray-500 text-theme-xs dark:text-gray-400"
+                                    >
+                                        ID : {{ company.id }}
+                                    </p>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- PAYS -->
+
+                            <td
+                                    class="px-5 py-4 text-gray-500 text-theme-sm dark:text-gray-400"
+                            >
+                                {{ company.country || '-' }}
+                            </td>
+
+
+                            <!-- WEBSITE -->
+
+                            <td
+                                    class="px-5 py-4 text-gray-500 text-theme-sm dark:text-gray-400"
+                            >
+
+                                @if (company.website) {
+
+                                    <a
+                                            [href]="company.website"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="text-brand-500 hover:underline"
+                                    >
+                                        {{ company.website }}
+                                    </a>
+
+                                } @else {
+
+                                    -
+
+                                }
+
+                            </td>
+
+
+                            <!-- DESCRIPTION -->
+
+                            <td
+                                    class="max-w-xs px-5 py-4 text-gray-500 text-theme-sm dark:text-gray-400"
+                            >
+                                {{ company.description || '-' }}
+                            </td>
+
+
+                            <!-- ACTIONS -->
+
+                            <td class="px-5 py-4">
+
+                                <div class="flex items-center gap-2">
+
+                                    <a
+                                            [routerLink]="[
+                                            '/admin/companies',
+                                            company.id,
+                                            'edit'
+                                        ]"
+                                            class="rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300"
+                                    >
+                                        Modifier
+                                    </a>
+
+                                    <button
+                                            type="button"
+                                            (click)="deleteCompany(company)"
+                                            class="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-900/30 dark:text-red-400"
+                                    >
+                                        Supprimer
+                                    </button>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+                    @empty {
+
+                        <tr>
+
+                            <td
+                                    colspan="5"
+                                    class="px-5 py-10 text-center"
+                            >
+
+                                <p
+                                        class="text-sm text-gray-500 dark:text-gray-400"
+                                >
+                                    Aucune entreprise trouvée.
+                                </p>
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    }
+
+</div>

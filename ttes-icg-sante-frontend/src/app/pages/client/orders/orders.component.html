@@ -1,0 +1,327 @@
+<div
+        class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+>
+
+    <!-- HEADER -->
+
+    <div
+            class="flex flex-col gap-3 border-b border-gray-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800"
+    >
+
+        <div>
+
+            <h3
+                    class="text-lg font-semibold text-gray-800 dark:text-white/90"
+            >
+                Mes commandes
+            </h3>
+
+            <p
+                    class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+            >
+                Consultez l'historique de vos commandes.
+            </p>
+
+        </div>
+
+
+        <div class="flex items-center gap-3">
+
+      <span
+              class="text-sm text-gray-500 dark:text-gray-400"
+      >
+        {{ orders.length }} commande(s)
+      </span>
+
+
+            <button
+                    type="button"
+                    (click)="refresh()"
+                    class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]"
+            >
+
+                <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                >
+
+                    <path
+                            d="M20 11C20 6.58172 16.4183 3 12 3C8.13401 3 4.93176 5.73718 4.20435 9.5"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                    />
+
+                    <path
+                            d="M4 5V9.5H8.5"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                    />
+
+                    <path
+                            d="M4 13C4 17.4183 7.58172 21 12 21C15.866 21 19.0682 18.2628 19.7956 14.5"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                    />
+
+                    <path
+                            d="M20 19V14.5H15.5"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                    />
+
+                </svg>
+
+                Actualiser
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ERREUR -->
+
+    @if (errorMessage) {
+
+        <div
+                class="m-5 rounded-lg bg-red-50 p-4 text-sm text-red-600 dark:bg-red-500/10 dark:text-red-400"
+        >
+            {{ errorMessage }}
+        </div>
+
+    }
+
+
+    <!-- LOADING -->
+
+    @if (loading) {
+
+        <div class="p-10 text-center">
+
+            <div
+                    class="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-brand-500"
+            ></div>
+
+            <p
+                    class="text-sm text-gray-500 dark:text-gray-400"
+            >
+                Chargement de vos commandes...
+            </p>
+
+        </div>
+
+    }
+
+
+    <!-- TABLE -->
+
+    @if (!loading) {
+
+        <div class="max-w-full overflow-x-auto">
+
+            <table class="w-full text-left">
+
+                <thead
+                        class="border-y border-gray-100 dark:border-gray-800"
+                >
+
+                <tr>
+
+                    <th
+                            class="px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                    >
+                        Commande
+                    </th>
+
+                    <th
+                            class="px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                    >
+                        Produits
+                    </th>
+
+                    <th
+                            class="px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                    >
+                        Total
+                    </th>
+
+                    <th
+                            class="px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                    >
+                        Statut
+                    </th>
+
+                    <th
+                            class="px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                    >
+                        Adresse
+                    </th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody
+                        class="divide-y divide-gray-100 dark:divide-gray-800"
+                >
+
+                    @for (order of orders; track order.id) {
+
+                        <tr
+                                class="hover:bg-gray-50 dark:hover:bg-white/[0.02]"
+                        >
+
+                            <!-- COMMANDE -->
+
+                            <td class="px-5 py-4">
+
+                                <p
+                                        class="font-medium text-gray-800 text-theme-sm dark:text-white/90"
+                                >
+                                    #{{ order.id }}
+                                </p>
+
+                            </td>
+
+
+                            <!-- PRODUITS -->
+
+                            <td class="px-5 py-4">
+
+                                <div class="space-y-1">
+
+                                    @for (
+                                        item of order.items;
+                                        track item.id
+                                            ) {
+
+                                        <div
+                                                class="text-sm text-gray-600 dark:text-gray-300"
+                                        >
+
+                                            {{ item.productName }}
+
+                                            <span
+                                                    class="text-gray-400"
+                                            >
+                        × {{ item.quantity }}
+                      </span>
+
+                                        </div>
+
+                                    }
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- TOTAL -->
+
+                            <td
+                                    class="px-5 py-4 font-semibold text-gray-800 text-theme-sm dark:text-white/90"
+                            >
+
+                                {{ order.totalAmount | number:'1.0-2' }}
+                                FCFA
+
+                            </td>
+
+
+                            <!-- STATUT -->
+
+                            <td class="px-5 py-4">
+
+                <span
+                        class="inline-flex rounded-full px-3 py-1 text-xs font-medium"
+                        [ngClass]="{
+                    'bg-yellow-50 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400':
+                      order.status === 'PENDING',
+
+                    'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400':
+                      order.status === 'CONFIRMED' ||
+                      order.status === 'PROCESSING' ||
+                      order.status === 'SHIPPED',
+
+                    'bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400':
+                      order.status === 'DELIVERED',
+
+                    'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400':
+                      order.status === 'CANCELLED'
+                  }"
+                >
+
+                  {{ getStatusLabel(order.status) }}
+
+                </span>
+
+                            </td>
+
+
+                            <!-- ADRESSE -->
+
+                            <td
+                                    class="max-w-xs px-5 py-4 text-sm text-gray-500 dark:text-gray-400"
+                            >
+
+                                {{ order.deliveryAddress }}
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+
+                    @empty {
+
+                        <tr>
+
+                            <td
+                                    colspan="5"
+                                    class="px-5 py-10 text-center"
+                            >
+
+                                <div
+                                        class="mx-auto max-w-sm"
+                                >
+
+                                    <p
+                                            class="text-sm font-medium text-gray-800 dark:text-white/90"
+                                    >
+                                        Aucune commande
+                                    </p>
+
+                                    <p
+                                            class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+                                    >
+                                        Vous n'avez encore passé aucune commande.
+                                    </p>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    }
+
+</div>

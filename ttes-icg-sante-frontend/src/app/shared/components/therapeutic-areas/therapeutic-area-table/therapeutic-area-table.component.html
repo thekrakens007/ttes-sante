@@ -1,0 +1,295 @@
+<div
+        class="overflow-hidden rounded-2xl border border-gray-200 bg-white
+           dark:border-gray-800 dark:bg-white/[0.03]"
+>
+
+    <!-- Header -->
+    <div
+            class="flex flex-col gap-3 border-b border-gray-100
+               px-5 py-4 sm:flex-row sm:items-center
+               sm:justify-between dark:border-gray-800"
+    >
+
+        <div>
+
+            <h3
+                    class="text-lg font-semibold text-gray-800
+                       dark:text-white/90"
+            >
+                Domaines thérapeutiques
+            </h3>
+
+            <p
+                    class="text-sm text-gray-500
+                       dark:text-gray-400"
+            >
+                Gestion des domaines thérapeutiques
+            </p>
+
+        </div>
+
+
+        <!-- Actions -->
+        <div class="flex items-center gap-3">
+
+            <!-- Actualiser -->
+            <button
+                    type="button"
+                    (click)="loadTherapeuticAreas()"
+                    class="rounded-lg border border-gray-300
+                       bg-white px-4 py-2.5 text-sm font-medium
+                       text-gray-700 hover:bg-gray-50
+                       dark:border-gray-700 dark:bg-gray-800
+                       dark:text-gray-400"
+            >
+                Actualiser
+            </button>
+
+
+            <!-- Ajouter -->
+            <button
+                    type="button"
+                    routerLink="/admin/therapeutic-areas/new"
+                    class="inline-flex items-center justify-center gap-2
+                       rounded-lg bg-brand-500 px-4 py-2.5
+                       text-sm font-medium text-white
+                       shadow-theme-xs transition
+                       hover:bg-brand-600"
+            >
+
+                <!-- Icon Plus -->
+                <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                >
+
+                    <path
+                            d="M12 5V19"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                    />
+
+                    <path
+                            d="M5 12H19"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                    />
+
+                </svg>
+
+                Ajouter un domaine
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- Loading -->
+    @if (loading) {
+
+        <div class="p-8 text-center">
+
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                Chargement des domaines thérapeutiques...
+            </p>
+
+        </div>
+
+    }
+
+
+    <!-- Error -->
+    @if (!loading && errorMessage) {
+
+        <div class="p-8 text-center">
+
+            <p class="text-sm text-red-500">
+                {{ errorMessage }}
+            </p>
+
+        </div>
+
+    }
+
+
+    <!-- Table -->
+    @if (!loading && !errorMessage) {
+
+        <div class="max-w-full overflow-x-auto">
+
+            <table class="w-full text-left">
+
+                <thead
+                        class="border-y border-gray-100
+                           dark:border-gray-800"
+                >
+
+                <tr>
+
+                    <th
+                            class="px-5 py-3 text-xs font-medium
+                               text-gray-500 dark:text-gray-400"
+                    >
+                        Nom
+                    </th>
+
+                    <th
+                            class="px-5 py-3 text-xs font-medium
+                               text-gray-500 dark:text-gray-400"
+                    >
+                        Description
+                    </th>
+
+                    <th
+                            class="px-5 py-3 text-xs font-medium
+                               text-gray-500 dark:text-gray-400"
+                    >
+                        Statut
+                    </th>
+
+                    <th
+                            class="px-5 py-3 text-xs font-medium
+                               text-gray-500 dark:text-gray-400"
+                    >
+                        Actions
+                    </th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody
+                        class="divide-y divide-gray-100
+                           dark:divide-gray-800"
+                >
+
+                    @for (
+                        area of therapeuticAreas;
+                        track area.id
+                            ) {
+
+                        <tr>
+
+                            <!-- Nom -->
+                            <td class="px-5 py-4">
+
+                                <p
+                                        class="font-medium text-gray-800
+                                           dark:text-white/90"
+                                >
+                                    {{ area.name }}
+                                </p>
+
+                            </td>
+
+
+                            <!-- Description -->
+                            <td
+                                    class="px-5 py-4 text-sm
+                                       text-gray-500 dark:text-gray-400"
+                            >
+
+                                {{ area.description || '-' }}
+
+                            </td>
+
+
+                            <!-- Statut -->
+                            <td class="px-5 py-4">
+
+                                <app-badge
+                                        size="sm"
+                                        [color]="area.active
+                                        ? 'success'
+                                        : 'error'"
+                                >
+
+                                    {{
+                                        area.active
+                                            ? 'Actif'
+                                            : 'Inactif'
+                                    }}
+
+                                </app-badge>
+
+                            </td>
+
+
+                            <!-- Actions -->
+                            <td class="px-5 py-4">
+
+                                <div class="flex items-center gap-2">
+
+                                    <!-- Modifier -->
+                                    <button
+                                            type="button"
+                                            [routerLink]="[
+                                            '/admin/therapeutic-areas',
+                                            area.id,
+                                            'edit'
+                                        ]"
+                                            class="rounded-lg bg-blue-600
+                                               px-3 py-1.5 text-sm
+                                               font-medium text-white
+                                               hover:bg-blue-700"
+                                    >
+                                        Modifier
+                                    </button>
+
+
+                                    <!-- Supprimer -->
+                                    <button
+                                            type="button"
+                                            (click)="deleteTherapeuticArea(area)"
+                                            class="rounded-lg bg-red-600
+                                               px-3 py-1.5 text-sm
+                                               font-medium text-white
+                                               hover:bg-red-700"
+                                    >
+                                        Supprimer
+                                    </button>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+
+                <!-- Aucun résultat -->
+                    @if (therapeuticAreas.length === 0) {
+
+                        <tr>
+
+                            <td
+                                    colspan="4"
+                                    class="px-5 py-8 text-center
+                                       text-sm text-gray-500
+                                       dark:text-gray-400"
+                            >
+                                Aucun domaine thérapeutique trouvé.
+                            </td>
+
+                        </tr>
+
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    }
+
+</div>

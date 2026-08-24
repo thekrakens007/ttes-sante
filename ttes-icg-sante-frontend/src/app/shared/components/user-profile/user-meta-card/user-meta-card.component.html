@@ -1,0 +1,83 @@
+<div
+        class="p-5 border border-gray-200 rounded-2xl
+         dark:border-gray-800 lg:p-6"
+>
+
+    <div
+            class="flex flex-col gap-6
+           lg:flex-row lg:items-center lg:justify-between"
+    >
+
+        <div class="flex items-center gap-5">
+
+            <!-- Avatar -->
+            <div
+                    class="flex h-20 w-20 items-center justify-center
+               rounded-full bg-brand-500 text-2xl font-semibold
+               text-white"
+            >
+                {{ user.firstName.charAt(0) || '' }}
+                {{ user.lastName.charAt(0) || '' }}
+            </div>
+
+            <!-- Informations -->
+            <div>
+
+                <h4
+                        class="text-xl font-semibold text-gray-800
+                 dark:text-white/90"
+                >
+                    {{ user.firstName || 'Utilisateur' }}
+                    {{ user.lastName }}
+                </h4>
+
+                <p
+                        class="mt-1 text-sm text-gray-500
+                 dark:text-gray-400"
+                >
+                    {{ user.roles }}
+                </p>
+
+                <p
+                        class="mt-1 text-sm text-gray-500
+                 dark:text-gray-400"
+                >
+                    {{ user.email }}
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- Statut -->
+        <div>
+
+            @if (user.enabled) {
+
+                <span
+                        class="inline-flex items-center rounded-full
+                 bg-success-50 px-3 py-1 text-sm font-medium
+                 text-success-600 dark:bg-success-500/10
+                 dark:text-success-400"
+                >
+          Compte actif
+        </span>
+
+            } @else {
+
+                <span
+                        class="inline-flex items-center rounded-full
+                 bg-error-50 px-3 py-1 text-sm font-medium
+                 text-error-600 dark:bg-error-500/10
+                 dark:text-error-400"
+                >
+          Compte désactivé
+        </span>
+
+            }
+
+        </div>
+
+    </div>
+
+</div>

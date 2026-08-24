@@ -1,0 +1,372 @@
+<div
+        class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+>
+
+    <!-- HEADER -->
+
+    <div
+            class="flex flex-col gap-3 border-b border-gray-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800"
+    >
+
+        <div>
+
+            <h3
+                    class="text-lg font-semibold text-gray-800 dark:text-white/90"
+            >
+                Utilisateurs
+            </h3>
+
+            <p
+                    class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+            >
+                Liste des utilisateurs de la plateforme
+            </p>
+
+        </div>
+
+
+        <div class="flex items-center gap-3">
+
+      <span
+              class="text-sm text-gray-500 dark:text-gray-400"
+      >
+        {{ users.length }} utilisateur(s)
+      </span>
+
+
+            <button
+                    type="button"
+                    (click)="refresh()"
+                    class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]"
+            >
+
+                <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                >
+
+                    <path
+                            d="M20 11C20 6.58172 16.4183 3 12 3C8.13401 3 4.93176 5.73718 4.20435 9.5"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                    />
+
+                    <path
+                            d="M4 5V9.5H8.5"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                    />
+
+                    <path
+                            d="M4 13C4 17.4183 7.58172 21 12 21C15.866 21 19.0682 18.2628 19.7956 14.5"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                    />
+
+                    <path
+                            d="M20 19V14.5H15.5"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                    />
+
+                </svg>
+
+                Actualiser
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ERREUR -->
+
+    @if (errorMessage) {
+
+        <div class="m-5 rounded-lg bg-red-50 p-4 text-sm text-red-600 dark:bg-red-500/10 dark:text-red-400">
+
+            {{ errorMessage }}
+
+        </div>
+
+    }
+
+
+    <!-- LOADING -->
+
+    @if (loading) {
+
+        <div class="p-10 text-center">
+
+            <div
+                    class="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-brand-500"
+            ></div>
+
+            <p
+                    class="text-sm text-gray-500 dark:text-gray-400"
+            >
+                Chargement des utilisateurs...
+            </p>
+
+        </div>
+
+    }
+
+
+    <!-- TABLE -->
+
+    @if (!loading) {
+
+        <div class="max-w-full overflow-x-auto">
+
+            <table class="w-full text-left">
+
+                <!-- HEADER TABLE -->
+
+                <thead
+                        class="border-y border-gray-100 dark:border-gray-800"
+                >
+
+                <tr>
+
+                    <th
+                            class="px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                    >
+                        Utilisateur
+                    </th>
+
+                    <th
+                            class="px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                    >
+                        Téléphone
+                    </th>
+
+                    <th
+                            class="px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                    >
+                        Rôle
+                    </th>
+
+                    <th
+                            class="px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                    >
+                        Statut
+                    </th>
+
+                    <th
+                            class="px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                    >
+                        Créé le
+                    </th>
+
+                    <th
+                            class="px-5 py-3 font-medium text-gray-500 text-theme-xs dark:text-gray-400"
+                    >
+                        Actions
+                    </th>
+
+                </tr>
+
+                </thead>
+
+
+                <!-- BODY -->
+
+                <tbody
+                        class="divide-y divide-gray-100 dark:divide-gray-800"
+                >
+
+                    @for (user of users; track user.id) {
+
+                        <tr
+                                class="hover:bg-gray-50 dark:hover:bg-white/[0.02]"
+                        >
+
+                            <!-- UTILISATEUR -->
+
+                            <td class="px-5 py-4">
+
+                                <div class="flex items-center gap-3">
+
+                                    <!-- Avatar -->
+
+                                    <div
+                                            class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-50 text-sm font-semibold text-brand-600 dark:bg-brand-500/10 dark:text-brand-400"
+                                    >
+
+                                        {{ user.firstName.charAt(0) }}
+                                        {{ user.lastName.charAt(0) }}
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <p
+                                                class="font-medium text-gray-800 text-theme-sm dark:text-white/90"
+                                        >
+                                            {{ user.firstName }}
+                                            {{ user.lastName }}
+                                        </p>
+
+                                        <p
+                                                class="text-gray-500 text-theme-xs dark:text-gray-400"
+                                        >
+                                            {{ user.email }}
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- TELEPHONE -->
+
+                            <td
+                                    class="px-5 py-4 text-gray-500 text-theme-sm dark:text-gray-400"
+                            >
+
+                                {{ user.phone || '-' }}
+
+                            </td>
+
+
+                            <!-- ROLE -->
+
+                            <td class="px-5 py-4">
+
+                                <app-badge
+                                        size="sm"
+                                        [color]="getRoleBadgeColor(user)"
+                                >
+
+                                    {{ getRoles(user) }}
+
+                                </app-badge>
+
+                            </td>
+
+
+                            <!-- STATUT -->
+
+                            <td class="px-5 py-4">
+
+                                @if (user.enabled) {
+
+                                    <app-badge
+                                            size="sm"
+                                            color="success"
+                                    >
+                                        Actif
+                                    </app-badge>
+
+                                } @else {
+
+                                    <app-badge
+                                            size="sm"
+                                            color="error"
+                                    >
+                                        Désactivé
+                                    </app-badge>
+
+                                }
+
+                            </td>
+
+
+                            <!-- DATE -->
+
+                            <td
+                                    class="px-5 py-4 text-gray-500 text-theme-sm dark:text-gray-400"
+                            >
+
+                                {{ user.createdAt | date:'dd/MM/yyyy' }}
+
+                            </td>
+
+
+                            <!-- ACTIONS -->
+
+                            <td class="px-5 py-4">
+
+                                <div class="flex items-center gap-2">
+
+                                    <!-- STATUS -->
+
+                                    <button
+                                            type="button"
+                                            (click)="toggleStatus(user)"
+                                            class="rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/[0.03]"
+                                    >
+
+                                        @if (user.enabled) {
+                                            Désactiver
+                                        } @else {
+                                            Activer
+                                        }
+
+                                    </button>
+
+
+                                    <!-- DELETE -->
+
+                                    <button
+                                            type="button"
+                                            (click)="deleteUser(user)"
+                                            class="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-900/30 dark:text-red-400 dark:hover:bg-red-500/10"
+                                    >
+
+                                        Supprimer
+
+                                    </button>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+                    @empty {
+
+                        <tr>
+
+                            <td
+                                    colspan="6"
+                                    class="px-5 py-10 text-center"
+                            >
+
+                                <p
+                                        class="text-sm text-gray-500 dark:text-gray-400"
+                                >
+                                    Aucun utilisateur trouvé.
+                                </p>
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    }
+
+</div>

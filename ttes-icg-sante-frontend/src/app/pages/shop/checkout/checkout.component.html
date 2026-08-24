@@ -1,0 +1,264 @@
+<div
+        class="min-h-screen bg-gray-50 px-6 py-10 dark:bg-gray-950"
+>
+
+    <div class="mx-auto max-w-6xl">
+
+        <!-- HEADER -->
+
+        <div class="mb-8">
+
+            <h1
+                    class="text-3xl font-bold text-gray-900 dark:text-white"
+            >
+                Finaliser ma commande
+            </h1>
+
+            <p
+                    class="mt-2 text-gray-500 dark:text-gray-400"
+            >
+                Vérifiez vos informations avant de confirmer votre commande.
+            </p>
+
+        </div>
+
+
+        <!-- LOADING -->
+
+        <div
+                *ngIf="loading"
+                class="rounded-2xl bg-white p-10 text-center shadow-sm dark:bg-gray-900"
+        >
+
+            Chargement de votre commande...
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        <div
+                *ngIf="!loading && error"
+                class="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700"
+        >
+
+            {{ error }}
+
+            <button
+                    type="button"
+                    (click)="loadCart()"
+                    class="ml-2 font-semibold underline"
+            >
+                Réessayer
+            </button>
+
+        </div>
+
+
+        <!-- CHECKOUT -->
+
+        <div
+                *ngIf="!loading && !error && cart"
+                class="grid grid-cols-1 gap-8 lg:grid-cols-3"
+        >
+
+
+            <!-- DELIVERY -->
+
+            <div class="lg:col-span-2">
+
+                <div
+                        class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+                >
+
+                    <h2
+                            class="mb-6 text-xl font-bold text-gray-900 dark:text-white"
+                    >
+                        Informations de livraison
+                    </h2>
+
+
+                    <!-- TELEPHONE -->
+
+                    <div class="mb-5">
+
+                        <label
+                                class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                            Téléphone
+                        </label>
+
+                        <input
+                                type="tel"
+                                [value]="phone"
+                                disabled
+                                class="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-3 text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                        />
+
+                        <p
+                                class="mt-1 text-xs text-gray-500 dark:text-gray-400"
+                        >
+                            Le numéro associé à votre compte sera utilisé pour cette commande.
+                        </p>
+                    </div>
+
+
+                    <!-- ADDRESS -->
+
+                    <div class="mb-5">
+
+                        <label
+                                class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                            Adresse de livraison
+                            <span class="text-red-500">*</span>
+                        </label>
+
+                        <textarea
+                                [(ngModel)]="deliveryAddress"
+                                rows="4"
+                                placeholder="Ex : Douala, Akwa, Rue..."
+                                class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                        ></textarea>
+
+                    </div>
+
+
+                    <!-- NOTE -->
+
+                    <div>
+
+                        <label
+                                class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                            Note pour la commande
+                        </label>
+
+                        <textarea
+                                [(ngModel)]="customerNote"
+                                rows="3"
+                                placeholder="Informations complémentaires..."
+                                class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SUMMARY -->
+
+            <div>
+
+                <div
+                        class="sticky top-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+                >
+
+                    <h2
+                            class="mb-6 text-xl font-bold text-gray-900 dark:text-white"
+                    >
+                        Résumé de la commande
+                    </h2>
+
+
+                    <!-- ITEMS -->
+
+                    <div class="space-y-4">
+
+                        <div
+                                *ngFor="let item of cart.items"
+                                class="flex justify-between gap-4"
+                        >
+
+                            <div>
+
+                                <p
+                                        class="font-medium text-gray-900 dark:text-white"
+                                >
+                                    {{ item.productName }}
+                                </p>
+
+                                <p
+                                        class="text-sm text-gray-500"
+                                >
+                                    {{ item.quantity }}
+                                    ×
+                                    {{ formatPrice(item.price) }}
+                                </p>
+
+                            </div>
+
+
+                            <span
+                                    class="font-semibold text-gray-900 dark:text-white"
+                            >
+                {{ formatPrice(item.subtotal) }}
+              </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                            class="my-6 border-t border-gray-200 dark:border-gray-800"
+                    ></div>
+
+
+                    <!-- TOTAL -->
+
+                    <div
+                            class="flex items-center justify-between"
+                    >
+
+            <span
+                    class="text-lg font-bold text-gray-900 dark:text-white"
+            >
+              Total
+            </span>
+
+                        <span
+                                class="text-xl font-bold text-brand-600 dark:text-brand-400"
+                        >
+              {{ formatPrice(cart.total || 0) }}
+            </span>
+
+                    </div>
+
+
+                    <!-- CONFIRM -->
+
+                    <button
+                            type="button"
+                            (click)="confirmOrder()"
+                            [disabled]="submitting"
+                            class="mt-6 w-full rounded-lg bg-brand-600 px-6 py-3 font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+
+                        {{
+                            submitting
+                                ? 'Création de la commande...'
+                                : 'Confirmer la commande'
+                        }}
+
+                    </button>
+
+
+                    <a
+                            routerLink="/shop/cart"
+                            class="mt-4 block text-center text-sm font-medium text-gray-500 hover:text-brand-600"
+                    >
+                        Retour au panier
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

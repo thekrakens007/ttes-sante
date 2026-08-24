@@ -1,0 +1,405 @@
+<div
+        class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+
+    <div class="mb-6">
+
+        <h3
+                class="text-lg font-semibold text-gray-800 dark:text-white/90">
+
+            {{ isEditMode
+            ? 'Modifier le produit'
+            : 'Nouveau produit' }}
+
+        </h3>
+
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            {{ isEditMode
+            ? 'Modification du produit.'
+            : 'Ajouter un nouveau produit au catalogue.' }}        </p>
+
+    </div>
+
+
+    @if (successMessage) {
+
+        <div
+                class="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+            {{ successMessage }}
+        </div>
+
+    }
+
+
+    @if (errorMessage) {
+
+        <div
+                class="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {{ errorMessage }}
+        </div>
+
+    }
+
+
+    <form
+            [formGroup]="productForm"
+            (ngSubmit)="submit()"
+            class="space-y-6">
+
+
+        <!-- Informations générales -->
+
+        <div>
+
+            <h4
+                    class="mb-4 text-base font-semibold text-gray-800 dark:text-white/90">
+                Informations générales
+            </h4>
+
+            <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+
+                <!-- Entreprise -->
+
+                <div>
+
+                    <label
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                        Entreprise
+                    </label>
+
+                    <select
+                            formControlName="companyId"
+                            class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+
+                        <option [ngValue]="null">
+                            Sélectionner une entreprise
+                        </option>
+
+                        @for (company of companies; track company.id) {
+
+                            <option [ngValue]="company.id">
+                                {{ company.name }}
+                            </option>
+
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <!-- Nom -->
+
+                <div>
+
+                    <label
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                        Nom du produit
+                    </label>
+
+                    <input
+                            type="text"
+                            formControlName="name"
+                            placeholder="Ex: Paracétamol 500mg"
+                            class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+
+                </div>
+
+
+                <!-- SKU -->
+
+                <div>
+
+                    <label
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                        SKU
+                    </label>
+
+                    <input
+                            type="text"
+                            formControlName="sku"
+                            placeholder="Ex: PARA-500-001"
+                            class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+
+                </div>
+
+
+                <!-- Marque -->
+
+                <div>
+
+                    <label
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                        Marque
+                    </label>
+
+                    <input
+                            type="text"
+                            formControlName="brand"
+                            placeholder="Ex: Sanofi"
+                            class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Informations médicales -->
+
+        <div>
+
+            <h4
+                    class="mb-4 text-base font-semibold text-gray-800 dark:text-white/90">
+                Informations médicales
+            </h4>
+
+            <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+
+                <div>
+
+                    <label
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                        Principe actif
+                    </label>
+
+                    <input
+                            type="text"
+                            formControlName="activeIngredient"
+                            placeholder="Ex: Paracétamol"
+                            class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+
+                </div>
+
+
+                <div>
+
+                    <label
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                        Dosage
+                    </label>
+
+                    <input
+                            type="text"
+                            formControlName="dosage"
+                            placeholder="Ex: 500 mg"
+                            class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+
+                </div>
+
+
+                <div>
+
+                    <label
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                        Forme
+                    </label>
+
+                    <input
+                            type="text"
+                            formControlName="form"
+                            placeholder="Ex: Comprimé"
+                            class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+
+                </div>
+
+
+                <div>
+
+                    <label
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                        Prix
+                    </label>
+
+                    <input
+                            type="number"
+                            formControlName="price"
+                            min="0"
+                            class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Description -->
+
+        <div>
+
+            <label
+                    class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                Description
+            </label>
+
+            <textarea
+                    formControlName="description"
+                    rows="4"
+                    placeholder="Description du produit..."
+                    class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+      </textarea>
+
+        </div>
+
+
+        <!-- Stock -->
+
+        <div>
+
+            <h4
+                    class="mb-4 text-base font-semibold text-gray-800 dark:text-white/90">
+                Stock et prescription
+            </h4>
+
+            <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+
+                <div>
+
+                    <label
+                            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                        Stock initial
+                    </label>
+
+                    <input
+                            type="number"
+                            min="0"
+                            formControlName="stock"
+                            class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+
+                </div>
+
+
+                <label
+                        class="flex cursor-pointer items-center gap-3 pt-8">
+
+                    <input
+                            type="checkbox"
+                            formControlName="requiresPrescription"
+                            class="h-5 w-5 rounded border-gray-300">
+
+                    <span
+                            class="text-sm font-medium text-gray-700 dark:text-gray-400">
+            Prescription obligatoire
+          </span>
+
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- Categories -->
+
+        <div>
+
+            <h4
+                    class="mb-4 text-base font-semibold text-gray-800 dark:text-white/90">
+                Catégories
+            </h4>
+
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+
+                @for (category of categories; track category.id) {
+
+                    <label
+                            class="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
+
+                        <input
+                                type="checkbox"
+                                [checked]="isCategorySelected(category.id)"
+                                (change)="toggleCategory(category.id)"
+                                class="h-4 w-4 rounded">
+
+                        <span class="text-sm text-gray-700 dark:text-gray-300">
+              {{ category.name }}
+            </span>
+
+                    </label>
+
+                }
+
+            </div>
+
+        </div>
+
+
+        <!-- Domaines thérapeutiques -->
+
+        <div>
+
+            <h4
+                    class="mb-4 text-base font-semibold text-gray-800 dark:text-white/90">
+                Domaines thérapeutiques
+            </h4>
+
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+
+                @for (area of therapeuticAreas; track area.id) {
+
+                    <label
+                            class="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
+
+                        <input
+                                type="checkbox"
+                                [checked]="isTherapeuticAreaSelected(area.id)"
+                                (change)="toggleTherapeuticArea(area.id)"
+                                class="h-4 w-4 rounded">
+
+                        <span class="text-sm text-gray-700 dark:text-gray-300">
+              {{ area.name }}
+            </span>
+
+                    </label>
+
+                }
+
+            </div>
+
+        </div>
+
+
+        <!-- Actions -->
+
+        <div
+                class="flex justify-end gap-3 border-t border-gray-200 pt-5 dark:border-gray-800">
+
+            <button
+                    type="button"
+                    class="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400">
+
+                Annuler
+
+            </button>
+
+
+            <button
+                    type="submit"
+                    [disabled]="loading"
+                    class="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-600 disabled:opacity-50">
+
+                @if (loading) {
+
+                    {{ isEditMode
+                    ? 'Mise à jour...'
+                    : 'Création...' }}
+
+                } @else {
+
+                    {{ isEditMode
+                    ? 'Mettre à jour'
+                    : 'Créer le produit' }}
+
+                }
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>

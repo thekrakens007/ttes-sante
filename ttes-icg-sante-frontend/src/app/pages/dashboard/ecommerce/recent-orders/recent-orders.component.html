@@ -1,0 +1,303 @@
+<div
+        class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+>
+
+    <!-- HEADER -->
+
+    <div
+            class="flex flex-col gap-3 border-b border-gray-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800"
+    >
+
+        <div>
+
+            <h3
+                    class="text-lg font-semibold text-gray-800 dark:text-white/90"
+            >
+                Commandes récentes
+            </h3>
+
+            <p
+                    class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+            >
+                Consultez et gérez les commandes des clients.
+            </p>
+
+        </div>
+
+
+        <button
+                type="button"
+                (click)="refresh()"
+                [disabled]="loading"
+                class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/[0.03]"
+        >
+            Actualiser
+        </button>
+
+    </div>
+
+
+    <!-- ERREUR -->
+
+    @if (errorMessage) {
+
+        <div
+                class="m-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/30 dark:bg-red-500/10 dark:text-red-400"
+        >
+
+            {{ errorMessage }}
+
+        </div>
+
+    }
+
+
+    <!-- CHARGEMENT -->
+
+    @if (loading) {
+
+        <div
+                class="flex items-center justify-center px-5 py-12"
+        >
+
+            <p
+                    class="text-sm text-gray-500 dark:text-gray-400"
+            >
+                Chargement des commandes...
+            </p>
+
+        </div>
+
+    }
+
+
+    <!-- AUCUNE COMMANDE -->
+
+    @if (!loading && orders.length === 0) {
+
+        <div
+                class="px-5 py-12 text-center"
+        >
+
+            <p
+                    class="text-sm text-gray-500 dark:text-gray-400"
+            >
+                Aucune commande disponible.
+            </p>
+
+        </div>
+
+    }
+
+
+    <!-- TABLEAU -->
+
+    @if (!loading && orders.length > 0) {
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full min-w-[900px]">
+
+                <thead>
+
+                <tr
+                        class="border-b border-gray-200 dark:border-gray-800"
+                >
+
+                    <th
+                            class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                    >
+                        Commande
+                    </th>
+
+                    <th
+                            class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                    >
+                        Client
+                    </th>
+
+                    <th
+                            class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                    >
+                        Téléphone
+                    </th>
+
+                    <th
+                            class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                    >
+                        Montant
+                    </th>
+
+                    <th
+                            class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                    >
+                        Statut
+                    </th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody
+                        class="divide-y divide-gray-200 dark:divide-gray-800"
+                >
+
+                    @for (
+                        order of orders;
+                        track order.id
+                            ) {
+
+                        <tr
+                                class="transition hover:bg-gray-50 dark:hover:bg-white/[0.02]"
+                        >
+
+                            <!-- ID COMMANDE -->
+
+                            <td
+                                    class="px-5 py-4"
+                            >
+
+                                <span
+                                        class="font-medium text-gray-800 dark:text-white/90"
+                                >
+                                    #{{ order.id }}
+                                </span>
+
+                            </td>
+
+
+                            <!-- CLIENT -->
+
+                            <td
+                                    class="px-5 py-4"
+                            >
+
+                                <div>
+
+                                    <p
+                                            class="font-medium text-gray-800 dark:text-white/90"
+                                    >
+                                        {{ order.customerName }}
+                                    </p>
+
+                                    @if (order.customerEmail) {
+
+                                        <p
+                                                class="mt-1 text-xs text-gray-500 dark:text-gray-400"
+                                        >
+                                            {{ order.customerEmail }}
+                                        </p>
+
+                                    }
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- TELEPHONE -->
+
+                            <td
+                                    class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300"
+                            >
+
+                                {{ order.customerPhone || '-' }}
+
+                            </td>
+
+
+                            <!-- MONTANT -->
+
+                            <td
+                                    class="px-5 py-4"
+                            >
+
+                                <span
+                                        class="font-semibold text-gray-800 dark:text-white/90"
+                                >
+                                    {{ order.totalAmount | number:'1.0-0' }}
+                                    FCFA
+                                </span>
+
+                            </td>
+
+
+                            <!-- STATUT -->
+
+                            <td
+                                    class="px-5 py-4"
+                            >
+
+                                <div
+                                        class="flex items-center gap-2"
+                                >
+
+                                    <select
+                                            [value]="order.status"
+                                            [disabled]="updatingOrderId === order.id"
+                                            (change)="updateStatus(
+        order,
+        $any($event.target).value
+    )"
+                                            class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                                    >
+
+                                        <option value="PENDING">
+                                            En attente
+                                        </option>
+
+                                        <option value="CONFIRMED">
+                                            Confirmée
+                                        </option>
+
+                                        <option value="SHIPPED">
+                                            Expédiée
+                                        </option>
+
+                                        <option value="DELIVERED">
+                                            Livrée
+                                        </option>
+
+                                        <option value="CANCELLED">
+                                            Annulée
+                                        </option>
+
+                                    </select>
+
+
+                                    @if (updatingOrderId === order.id) {
+
+                                        <span
+                                                class="text-xs text-gray-500 dark:text-gray-400"
+                                        >
+                                            Mise à jour...
+                                        </span>
+
+                                    }
+
+                                </div>
+
+
+                                <span
+                                        class="mt-1 inline-block rounded-full px-2.5 py-1 text-xs font-medium"
+                                        [ngClass]="getStatusClass(order.status)"
+                                >
+                                    {{ getStatusLabel(order.status) }}
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    }
+
+</div>

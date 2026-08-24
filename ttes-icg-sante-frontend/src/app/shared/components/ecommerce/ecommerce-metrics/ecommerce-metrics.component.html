@@ -1,0 +1,211 @@
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 md:gap-6">
+
+    <!-- USERS -->
+    <div
+            class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6"
+    >
+
+        <div
+                class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800"
+                [innerHTML]="icons.groupIcon | safeHtml"
+        >
+        </div>
+
+        <div class="flex items-end justify-between mt-5">
+
+            <div>
+
+        <span class="text-sm text-gray-500 dark:text-gray-400">
+          Utilisateurs
+        </span>
+
+                @if (loading) {
+
+                    <div class="w-16 h-8 mt-2 bg-gray-200 rounded animate-pulse dark:bg-gray-700">
+                    </div>
+
+                } @else {
+
+                    <h4
+                            class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90"
+                    >
+                        {{ usersCount | number }}
+                    </h4>
+
+                }
+
+            </div>
+
+            <app-badge color="success">
+
+                <span [innerHTML]="icons.arrowUpIcon | safeHtml"></span>
+
+                Total
+
+            </app-badge>
+
+        </div>
+
+    </div>
+
+
+    <!-- PRODUCTS -->
+    <div
+            class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6"
+    >
+
+        <div
+                class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800"
+                [innerHTML]="icons.boxIconLine | safeHtml"
+        >
+        </div>
+
+        <div class="flex items-end justify-between mt-5">
+
+            <div>
+
+        <span class="text-sm text-gray-500 dark:text-gray-400">
+          Produits
+        </span>
+
+                @if (loading) {
+
+                    <div class="w-16 h-8 mt-2 bg-gray-200 rounded animate-pulse dark:bg-gray-700">
+                    </div>
+
+                } @else {
+
+                    <h4
+                            class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90"
+                    >
+                        {{ productsCount | number }}
+                    </h4>
+
+                }
+
+            </div>
+
+            <app-badge color="success">
+
+                <span [innerHTML]="icons.arrowUpIcon | safeHtml"></span>
+
+                Total
+
+            </app-badge>
+
+        </div>
+
+    </div>
+
+
+    <!-- COMMANDES -->
+    <div
+            class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6"
+    >
+
+        <div
+                class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800"
+                [innerHTML]="icons.boxIconLine | safeHtml"
+        >
+        </div>
+
+        <div class="flex items-end justify-between mt-5">
+
+            <div>
+
+        <span class="text-sm text-gray-500 dark:text-gray-400">
+          Commandes
+        </span>
+
+                @if (loading) {
+
+                    <div class="w-16 h-8 mt-2 bg-gray-200 rounded animate-pulse dark:bg-gray-700">
+                    </div>
+
+                } @else {
+
+                    <h4
+                            class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90"
+                    >
+                        {{ ordersCount | number }}
+                    </h4>
+
+                }
+
+            </div>
+
+            <app-badge color="success">
+
+                <span [innerHTML]="icons.arrowUpIcon | safeHtml"></span>
+
+                Total
+
+            </app-badge>
+
+        </div>
+
+    </div>
+
+
+    <!-- CHIFFRE D'AFFAIRES -->
+    <div
+            class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6"
+    >
+
+        <div
+                class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800"
+                [innerHTML]="icons.boxIconLine | safeHtml"
+        >
+        </div>
+
+        <div class="flex items-end justify-between mt-5">
+
+            <div>
+
+        <span class="text-sm text-gray-500 dark:text-gray-400">
+          Chiffre d'affaires
+        </span>
+
+                @if (loading) {
+
+                    <div class="w-32 h-8 mt-2 bg-gray-200 rounded animate-pulse dark:bg-gray-700">
+                    </div>
+
+                } @else {
+
+                    <h4
+                            class="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90"
+                    >
+                        {{ formatCurrency(totalRevenue) }}
+                    </h4>
+
+                }
+
+            </div>
+
+            <app-badge color="success">
+
+                <span [innerHTML]="icons.arrowUpIcon | safeHtml"></span>
+
+                Total
+
+            </app-badge>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@if (errorMessage) {
+
+    <div
+            class="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-500/10 dark:text-red-400"
+    >
+
+        {{ errorMessage }}
+
+    </div>
+
+}

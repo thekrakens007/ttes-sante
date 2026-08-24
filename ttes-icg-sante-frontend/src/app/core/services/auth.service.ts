@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import {Router} from "@angular/router";
 
 interface LoginRequest {
   email: string;
@@ -21,6 +22,10 @@ export class AuthService {
   private readonly API_URL = 'http://localhost:8080/api/auth';
 
   private readonly TOKEN_KEY = 'ttes_icg_sante_token';
+
+  constructor(
+      private router: Router
+  ) {}
 
   login(email: string, password: string): Observable<LoginResponse> {
 
@@ -53,7 +58,7 @@ export class AuthService {
     localStorage.removeItem(
         this.TOKEN_KEY
     );
-
+    this.router.navigate(['/']);
   }
   register(request: {
     firstName: string;
@@ -175,4 +180,5 @@ export class AuthService {
     return this.hasRole('ROLE_ADMIN');
 
   }
+
 }

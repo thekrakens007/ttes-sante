@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
+import { RouterLink } from '@angular/router';
+
 import { PageBreadcrumbComponent } from '../../shared/components/common/page-breadcrumb/page-breadcrumb.component';
 
 import { UserMetaCardComponent } from '../../shared/components/user-profile/user-meta-card/user-meta-card.component';
@@ -8,9 +10,9 @@ import { UserInfoCardComponent } from '../../shared/components/user-profile/user
 
 import { UserAddressCardComponent } from '../../shared/components/user-profile/user-address-card/user-address-card.component';
 
-import { UserService } from '../../core/services/user.service';
+import { ClientNavbarComponent } from '../../shared/components/client/client-navbar/client-navbar.component';
 
-import { AuthService } from '../../core/services/auth.service';
+import { UserService } from '../../core/services/user.service';
 
 import { User } from '../../core/models/user.model';
 
@@ -18,7 +20,11 @@ import { User } from '../../core/models/user.model';
 @Component({
   selector: 'app-profile',
 
+  standalone: true,
+
   imports: [
+    RouterLink,
+    ClientNavbarComponent,
     PageBreadcrumbComponent,
     UserMetaCardComponent,
     UserInfoCardComponent,
@@ -37,10 +43,11 @@ export class ProfileComponent implements OnInit {
 
   errorMessage = '';
 
+
   constructor(
-      private userService: UserService,
-      private authService: AuthService
+      private userService: UserService
   ) {}
+
 
   ngOnInit(): void {
 
@@ -112,19 +119,6 @@ export class ProfileComponent implements OnInit {
           }
 
         });
-
-  }
-
-
-  // ============================
-  // DECONNEXION
-  // ============================
-
-  logout(): void {
-
-    console.log('Déconnexion...');
-
-    this.authService.logout();
 
   }
 

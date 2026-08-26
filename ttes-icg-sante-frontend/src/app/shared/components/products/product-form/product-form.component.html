@@ -362,7 +362,240 @@
 
         </div>
 
+        <!-- IMAGES DU PRODUIT -->
 
+        @if (isEditMode) {
+
+            <div>
+
+                <h4
+                        class="mb-4 text-base font-semibold
+                       text-gray-800 dark:text-white/90"
+                >
+                    Images du produit
+                </h4>
+
+
+                @if (imageError) {
+
+                    <div
+                            class="mb-4 rounded-lg border border-red-200
+                           bg-red-50 px-4 py-3 text-sm text-red-700"
+                    >
+                        {{ imageError }}
+                    </div>
+
+                }
+
+
+                <!-- Images existantes -->
+
+                @if (images.length > 0) {
+
+                    <div
+                            class="mb-6 grid grid-cols-2 gap-4
+                           sm:grid-cols-3 lg:grid-cols-4"
+                    >
+
+                        @for (
+                            image of images;
+                            track image.id
+                                ) {
+
+                            <div
+                                    class="overflow-hidden rounded-xl
+                                   border border-gray-200
+                                   dark:border-gray-800"
+                            >
+
+                                <div class="relative">
+
+                                    <img
+                                            [src]="image.imageUrl"
+                                            alt="Image produit"
+                                            class="h-40 w-full object-cover"
+                                    />
+
+
+                                    @if (image.main) {
+
+                                        <span
+                                                class="absolute left-2 top-2
+                                               rounded-full bg-green-600
+                                               px-2 py-1 text-xs
+                                               font-medium text-white"
+                                        >
+                                    Principale
+                                </span>
+
+                                    }
+
+                                </div>
+
+
+                                <div
+                                        class="flex items-center
+                                       justify-between gap-2 p-3"
+                                >
+
+                            <span
+                                    class="text-xs text-gray-500"
+                            >
+                                Ordre :
+                                {{ image.displayOrder }}
+                            </span>
+
+
+                                    <button
+                                            type="button"
+                                            (click)="deleteImage(image)"
+                                            [disabled]="imageLoading"
+                                            class="rounded-lg bg-red-500
+                                           px-3 py-1.5 text-xs
+                                           font-medium text-white
+                                           hover:bg-red-600
+                                           disabled:opacity-50"
+                                    >
+                                        Supprimer
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        }
+
+                    </div>
+
+                }
+
+
+                <!-- Ajouter une image -->
+
+                <div
+                        class="rounded-xl border border-gray-200
+                       p-5 dark:border-gray-800"
+                >
+
+                    <h5
+                            class="mb-4 text-sm font-semibold
+                           text-gray-800 dark:text-white/90"
+                    >
+                        Ajouter une image
+                    </h5>
+
+
+                    <div
+                            class="grid grid-cols-1 gap-4
+                           md:grid-cols-3"
+                    >
+
+                        <!-- URL -->
+
+                        <div class="md:col-span-2">
+
+                            <label
+                                    class="mb-2 block text-sm
+                                   font-medium text-gray-700
+                                   dark:text-gray-400"
+                            >
+                                URL de l'image
+                            </label>
+
+                            <input
+                                    type="text"
+                                    [(ngModel)]="newImageUrl"
+                                    [ngModelOptions]="{standalone: true}"
+                                    placeholder="https://..."
+                                    class="h-11 w-full rounded-lg
+                                   border border-gray-300
+                                   bg-transparent px-4 text-sm
+                                   text-gray-800 outline-none
+                                   dark:border-gray-700
+                                   dark:bg-gray-900
+                                   dark:text-white/90"
+                            />
+
+                        </div>
+
+
+                        <!-- Ordre -->
+
+                        <div>
+
+                            <label
+                                    class="mb-2 block text-sm
+                                   font-medium text-gray-700
+                                   dark:text-gray-400"
+                            >
+                                Ordre d'affichage
+                            </label>
+
+                            <input
+                                    type="number"
+                                    [(ngModel)]="newImageDisplayOrder"
+                                    [ngModelOptions]="{standalone: true}"
+                                    min="0"
+                                    class="h-11 w-full rounded-lg
+                                   border border-gray-300
+                                   bg-transparent px-4 text-sm
+                                   text-gray-800 outline-none
+                                   dark:border-gray-700
+                                   dark:bg-gray-900
+                                   dark:text-white/90"
+                            />
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Principale -->
+
+                    <label
+                            class="mt-4 flex cursor-pointer
+                           items-center gap-3"
+                    >
+
+                        <input
+                                type="checkbox"
+                                [(ngModel)]="newImageMain"
+                                [ngModelOptions]="{standalone: true}"
+                                class="h-4 w-4 rounded"
+                        />
+
+                        <span
+                                class="text-sm text-gray-700
+                               dark:text-gray-300"
+                        >
+                    Définir comme image principale
+                </span>
+
+                    </label>
+
+
+                    <button
+                            type="button"
+                            (click)="addImage()"
+                            [disabled]="imageLoading"
+                            class="mt-4 rounded-lg bg-brand-500
+                           px-5 py-2.5 text-sm font-medium
+                           text-white hover:bg-brand-600
+                           disabled:opacity-50"
+                    >
+
+                        {{ imageLoading
+                        ? 'Ajout...'
+                        : 'Ajouter l’image'
+                        }}
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        }
         <!-- Actions -->
 
         <div

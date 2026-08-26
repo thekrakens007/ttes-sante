@@ -48,19 +48,24 @@
             </div>
 
 
-            <!-- Navigation -->
+            <!-- ============================= -->
+            <!-- NAVIGATION -->
+            <!-- ============================= -->
 
             <div class="flex items-center gap-3">
 
-                <!-- ============================= -->
+
+                <!-- ================================= -->
                 <!-- UTILISATEUR NON CONNECTÉ -->
-                <!-- ============================= -->
+                <!-- ================================= -->
 
                 @if (!isLoggedIn()) {
 
                     <a
                             routerLink="/signin"
-                            class="hidden rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 sm:block dark:text-gray-300 dark:hover:bg-gray-800">
+                            class="hidden rounded-lg px-4 py-2 text-sm font-medium
+                       text-gray-700 hover:bg-gray-100
+                       sm:block dark:text-gray-300 dark:hover:bg-gray-800">
 
                         Se connecter
 
@@ -69,7 +74,9 @@
 
                     <a
                             routerLink="/signup"
-                            class="hidden rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600 sm:block">
+                            class="hidden rounded-lg bg-brand-500 px-4 py-2
+                       text-sm font-medium text-white
+                       hover:bg-brand-600 sm:block">
 
                         Créer un compte
 
@@ -78,15 +85,36 @@
                 }
 
 
-                <!-- ============================= -->
-                <!-- UTILISATEUR CONNECTÉ -->
-                <!-- ============================= -->
+                <!-- ================================= -->
+                <!-- ADMIN CONNECTÉ -->
+                <!-- ================================= -->
 
-                @if (isLoggedIn()) {
+                @if (isLoggedIn() && isAdmin()) {
+
+                    <a
+                            routerLink="/admin"
+                            class="hidden rounded-lg bg-purple-600 px-4 py-2
+                       text-sm font-medium text-white
+                       hover:bg-purple-700 sm:block">
+
+                        ⚙️ Dashboard Admin
+
+                    </a>
+
+                }
+
+
+                <!-- ================================= -->
+                <!-- UTILISATEUR CONNECTÉ NON ADMIN -->
+                <!-- ================================= -->
+
+                @if (isLoggedIn() && !isAdmin()) {
 
                     <a
                             routerLink="/profile"
-                            class="hidden rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600 sm:block">
+                            class="hidden rounded-lg bg-brand-500 px-4 py-2
+                       text-sm font-medium text-white
+                       hover:bg-brand-600 sm:block">
 
                         👤 Mon profil
 
@@ -95,18 +123,19 @@
                 }
 
 
-                <!-- ============================= -->
+                <!-- ================================= -->
                 <!-- PANIER -->
-                <!-- ============================= -->
+                <!-- ================================= -->
 
                 @if (isLoggedIn()) {
 
                     <a
                             routerLink="/cart"
-                            class="hidden rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600 sm:block">
+                            class="hidden rounded-lg bg-brand-500 px-4 py-2
+                       text-sm font-medium text-white
+                       hover:bg-brand-600 sm:block">
 
-                        🛒
-                        Mon panier
+                        🛒 Mon panier
 
                     </a>
 

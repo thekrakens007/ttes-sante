@@ -4,9 +4,7 @@ import {
     inject
 } from '@angular/core';
 
-import {
-    CommonModule
-} from '@angular/common';
+import { CommonModule } from '@angular/common';
 
 import {
     ActivatedRoute,
@@ -65,6 +63,34 @@ export class OrderSuccessComponent implements OnInit {
         return new Intl.NumberFormat(
             'fr-FR'
         ).format(price) + ' FCFA';
+
+    }
+
+
+    goToShop(): void {
+
+        this.router.navigate(['/']);
+
+    }
+
+
+    goToCart(): void {
+
+        this.router.navigate(['/cart']);
+
+    }
+
+
+    goToProfile(): void {
+
+        this.router.navigate(['/profile']);
+
+    }
+
+
+    goToOrders(): void {
+
+        this.router.navigate(['/my-orders']);
 
     }
 

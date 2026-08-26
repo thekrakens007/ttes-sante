@@ -67,9 +67,20 @@ export class AuthService {
     phone:string;
     password: string;
   }) {
-    return this.http.post(
+    return this.http.post<LoginResponse>(
         `${this.API_URL}/register`,
         request
+    ).pipe(
+        tap(response => {
+
+          if (response.token) {
+            localStorage.setItem(
+                this.TOKEN_KEY,
+                response.token
+            );
+          }
+
+        })
     );
   }
 
@@ -107,7 +118,7 @@ export class AuthService {
     }
   }
   isLoggedIn(): boolean {
-
+console.log(this.getToken())
     return !!this.getToken();
 
   }

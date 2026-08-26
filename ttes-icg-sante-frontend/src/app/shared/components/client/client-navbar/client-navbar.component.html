@@ -1,0 +1,264 @@
+<header
+        class="sticky top-0 z-50 border-b border-gray-200
+           bg-white dark:border-gray-800 dark:bg-gray-900">
+
+    <div
+            class="mx-auto flex max-w-7xl items-center
+               justify-between gap-6 px-4 py-4
+               sm:px-6 lg:px-8">
+
+
+        <!-- ================================================= -->
+        <!-- LOGO -->
+        <!-- ================================================= -->
+
+        <a
+                routerLink="/"
+                class="flex shrink-0 items-center gap-3">
+
+            <img
+                    src="/images/logo/logo.svg"
+                    alt="TTES-ICG Santé"
+                    class="h-10 w-auto">
+
+        </a>
+
+
+        <!-- ================================================= -->
+        <!-- RECHERCHE DESKTOP -->
+        <!-- ================================================= -->
+
+        <div
+                class="hidden flex-1 max-w-xl md:block">
+
+            <div class="relative">
+
+                <input
+                        type="text"
+                        [(ngModel)]="searchTerm"
+                        (input)="search()"
+                        placeholder="Rechercher un produit..."
+                        class="h-11 w-full rounded-lg
+                           border border-gray-300
+                           bg-gray-50 px-4 pr-12
+                           text-sm text-gray-800
+                           outline-none
+                           transition
+                           focus:border-brand-500
+                           focus:ring-2
+                           focus:ring-brand-500/20
+                           dark:border-gray-700
+                           dark:bg-gray-800
+                           dark:text-white">
+
+                <span
+                        class="absolute right-4 top-1/2
+                           -translate-y-1/2
+                           text-gray-400">
+
+                    🔍
+
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- NAVIGATION -->
+        <!-- ================================================= -->
+
+        <nav
+                class="flex items-center gap-2 sm:gap-3">
+
+
+            <!-- ================================================= -->
+            <!-- VISITEUR -->
+            <!-- ================================================= -->
+
+            @if (!isLoggedIn()) {
+
+                <a
+                        routerLink="/signin"
+                        routerLinkActive="bg-gray-100"
+                        [routerLinkActiveOptions]="{ exact: true }"
+                        class="hidden rounded-lg px-4 py-2
+                           text-sm font-medium
+                           text-gray-700
+                           hover:bg-gray-100
+                           sm:block
+                           dark:text-gray-300
+                           dark:hover:bg-gray-800">
+
+                    Se connecter
+
+                </a>
+
+
+                <a
+                        routerLink="/signup"
+                        routerLinkActive="bg-brand-600"
+                        [routerLinkActiveOptions]="{ exact: true }"
+                        class="hidden rounded-lg
+                           bg-brand-500 px-4 py-2
+                           text-sm font-medium
+                           text-white
+                           hover:bg-brand-600
+                           sm:block">
+
+                    Créer un compte
+
+                </a>
+
+            }
+
+
+            <!-- ================================================= -->
+            <!-- UTILISATEUR CONNECTÉ -->
+            <!-- ================================================= -->
+
+            @if (isLoggedIn()) {
+
+
+                <!-- ============================== -->
+                        <!-- DASHBOARD ADMIN -->
+                        <!-- ============================== -->
+
+                @if (isAdmin()) {
+
+                    <a
+                            routerLink="/admin"
+                            routerLinkActive="ring-2 ring-brand-300"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                            class="hidden items-center gap-2
+                               rounded-lg
+                               bg-purple-600
+                               px-4 py-2
+                               text-sm font-medium
+                               text-white
+                               transition
+                               hover:bg-purple-700
+                               sm:inline-flex">
+
+                        ⚙️
+
+                        Dashboard Admin
+
+                    </a>
+
+                }
+
+
+                <!-- ============================== -->
+                        <!-- MON PROFIL -->
+                        <!-- Seulement si on n'est pas déjà dessus -->
+                        <!-- ============================== -->
+
+                @if (!isProfilePage()) {
+
+                    <a
+                            routerLink="/profile"
+                            routerLinkActive="ring-2 ring-brand-300"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                            class="hidden items-center gap-2
+                               rounded-lg
+                               bg-brand-500
+                               px-4 py-2
+                               text-sm font-medium
+                               text-white
+                               transition
+                               hover:bg-brand-600
+                               sm:inline-flex">
+
+                        👤
+
+                        Mon profil
+
+                    </a>
+
+                }
+
+
+                <!-- ============================== -->
+                        <!-- PANIER -->
+                        <!-- ============================== -->
+
+                <a
+                        routerLink="/cart"
+                        routerLinkActive="ring-2 ring-brand-300"
+                        [routerLinkActiveOptions]="{ exact: true }"
+                        class="hidden items-center gap-2
+                           rounded-lg
+                           bg-brand-500
+                           px-4 py-2
+                           text-sm font-medium
+                           text-white
+                           transition
+                           hover:bg-brand-600
+                           sm:inline-flex">
+
+                    🛒
+
+                    Mon panier
+
+                </a>
+
+
+                <!-- ============================== -->
+                        <!-- DECONNEXION -->
+                        <!-- ============================== -->
+
+                <button
+                        type="button"
+                        (click)="logout()"
+                        class="hidden rounded-lg
+                           border border-red-200
+                           bg-white px-4 py-2
+                           text-sm font-medium
+                           text-red-600
+                           transition
+                           hover:bg-red-50
+                           sm:block
+                           dark:border-red-900
+                           dark:bg-gray-900
+                           dark:hover:bg-red-950">
+
+                    Déconnexion
+
+                </button>
+
+            }
+
+        </nav>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- RECHERCHE MOBILE -->
+    <!-- ================================================= -->
+
+    <div
+            class="px-4 pb-4 md:hidden">
+
+        <input
+                type="text"
+                [(ngModel)]="searchTerm"
+                (input)="search()"
+                placeholder="Rechercher un produit..."
+                class="h-11 w-full rounded-lg
+                   border border-gray-300
+                   bg-gray-50 px-4
+                   text-sm text-gray-800
+                   outline-none
+                   focus:border-brand-500
+                   focus:ring-2
+                   focus:ring-brand-500/20
+                   dark:border-gray-700
+                   dark:bg-gray-800
+                   dark:text-white">
+
+    </div>
+
+</header>

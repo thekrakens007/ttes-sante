@@ -262,20 +262,48 @@
                                 </app-badge>
 
                             </td>
-                            <td>
 
-                                <button
-                                        [routerLink]="[
-            '/admin/products/edit',
-            product.id
-        ]"
-                                        class="rounded bg-blue-600 px-3 py-1 text-white">
 
-                                    Modifier
+                                <!-- ACTIONS -->
+                            <td class="px-5 py-4">
 
-                                </button>
+                                <div class="flex items-center gap-2">
+
+                                    <!-- MODIFIER -->
+                                    <button
+                                            type="button"
+                                            [routerLink]="[
+                    '/admin/products/edit',
+                    product.id
+                ]"
+                                            class="rounded-lg bg-blue-600 px-3 py-2
+                       text-sm font-medium text-white
+                       hover:bg-blue-700"
+                                    >
+
+                                        Modifier
+
+                                    </button>
+
+
+                                    <!-- SUPPRIMER -->
+                                    <button
+                                            type="button"
+                                            (click)="deleteProduct(product.id)"
+                                            class="rounded-lg bg-red-600 px-3 py-2
+                       text-sm font-medium text-white
+                       hover:bg-red-700"
+                                    >
+
+                                        Supprimer
+
+                                    </button>
+
+                                </div>
 
                             </td>
+
+
 
                         </tr>
 
@@ -287,7 +315,7 @@
                         <tr>
 
                             <td
-                                    colspan="6"
+                                    colspan="7"
                                     class="px-5 py-8 text-center
                        text-sm text-gray-500
                        dark:text-gray-400"

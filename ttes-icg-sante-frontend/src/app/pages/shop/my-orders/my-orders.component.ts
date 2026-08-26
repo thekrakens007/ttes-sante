@@ -13,8 +13,14 @@ import {
 import {
     OrderService
 } from '../../../core/services/order.service';
-import {OrderResponse} from "../../../core/interfaces/order-response.interface";
-import {Order} from "../../../core/models/order.model";
+
+import {
+    AuthService
+} from '../../../core/services/auth.service';
+
+import {
+    Order
+} from '../../../core/models/order.model';
 
 
 @Component({
@@ -32,6 +38,8 @@ export class MyOrdersComponent implements OnInit {
 
     private orderService = inject(OrderService);
 
+    private authService = inject(AuthService);
+
 
     orders: Order[] = [];
 
@@ -47,18 +55,25 @@ export class MyOrdersComponent implements OnInit {
     }
 
 
+    /**
+     * Charger les commandes
+     */
     loadOrders(): void {
 
         this.loading = true;
 
         this.error = '';
 
-
         this.orderService
             .getMyOrders()
             .subscribe({
 
                 next: (orders) => {
+
+                    console.log(
+                        'Commandes récupérées :',
+                        orders
+                    );
 
                     this.orders = orders;
 
@@ -86,6 +101,21 @@ export class MyOrdersComponent implements OnInit {
     }
 
 
+    /**
+     * Déconnexion
+     */
+    logout(): void {
+
+        console.log('Déconnexion...');
+
+        this.authService.logout();
+
+    }
+
+
+    /**
+     * Format prix
+     */
     formatPrice(price: number): string {
 
         return new Intl.NumberFormat(

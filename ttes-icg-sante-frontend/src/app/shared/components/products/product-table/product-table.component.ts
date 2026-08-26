@@ -59,6 +59,46 @@ export class ProductTableComponent implements OnInit {
         });
     }
 
+    deleteProduct(productId: number): void {
+
+        const confirmed = confirm(
+            'Êtes-vous sûr de vouloir supprimer ce produit ? Cette action est irréversible.'
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        this.adminService.deleteProduct(productId).subscribe({
+
+            next: () => {
+
+                console.log(
+                    'Produit supprimé avec succès :',
+                    productId
+                );
+
+                // Recharger la liste
+                this.loadProducts();
+
+            },
+
+            error: (error) => {
+
+                console.error(
+                    'Erreur lors de la suppression du produit :',
+                    error
+                );
+
+                this.errorMessage =
+                    error?.error?.message
+                    ?? 'Impossible de supprimer le produit.';
+
+            }
+
+        });
+
+    }
     getMainImage(product: ProductResponse): string {
 
         if (!product.images || product.images.length === 0) {

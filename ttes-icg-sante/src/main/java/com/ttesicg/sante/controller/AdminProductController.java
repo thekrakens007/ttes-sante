@@ -10,7 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -67,5 +67,14 @@ public class AdminProductController {
         return productService.findById(id);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(
+            @PathVariable Long id
+    ) {
+
+        productService.deleteProduct(id);
+
+        return ResponseEntity.noContent().build();
+    }
 
 }

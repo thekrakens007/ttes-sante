@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -39,6 +41,22 @@ public class ProductService {
                         new RuntimeException("Produit introuvable"));
 
         return map(product);
+    }
+
+
+    @Transactional
+    public void deleteProduct(Long productId) {
+
+        Product product = productRepository
+                .findById(productId)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Produit introuvable"
+                        )
+                );
+
+        productRepository.delete(product);
     }
 
     public ProductResponse create(ProductRequest request){

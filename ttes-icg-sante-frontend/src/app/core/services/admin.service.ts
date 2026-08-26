@@ -11,6 +11,7 @@ import {CompanyResponse} from "../interfaces/company-response.interface";
 import {TherapeuticAreaRequest} from "../interfaces/therapeutic-area-request.interface";
 import {InventoryResponse} from "../interfaces/inventory-response.interface";
 import {InventoryRequest} from "../interfaces/inventory-request.interface";
+import {ProductImageResponse} from "../interfaces/product-image-response.interface";
 
 @Injectable({
     providedIn: 'root'
@@ -33,7 +34,11 @@ export class AdminService {
         );
 
     }
-
+    getProductImages(productId: number) {
+        return this.http.get<ProductImageResponse[]>(
+            `${this.API_URL}/products/${productId}/images`
+        );
+    }
 
     getUser(id: number): Observable<UserAdminResponse> {
 
@@ -41,6 +46,36 @@ export class AdminService {
             `${this.API_URL}/users/${id}`
         );
 
+    }
+
+    deleteProduct(productId: number): Observable<void> {
+
+        return this.http.delete<void>(
+            `${this.API_URL}/products/${productId}`
+        );
+
+    }
+
+
+    addProductImage(
+        productId: number,
+        request: {
+            imageUrl: string;
+            main: boolean;
+            displayOrder: number;
+        }
+    ) {
+
+        return this.http.post<ProductImageResponse>(
+            `${this.API_URL}/products/${productId}/images`,
+            request
+        );
+    }
+
+    deleteProductImage(imageId: number) {
+        return this.http.delete(
+            `${this.API_URL}/products/images/${imageId}`
+        );
     }
 
 

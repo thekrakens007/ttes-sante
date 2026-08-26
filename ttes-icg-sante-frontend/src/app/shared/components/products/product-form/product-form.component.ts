@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-    FormBuilder,
+    FormBuilder, FormsModule,
     ReactiveFormsModule,
     Validators
 } from '@angular/forms';
@@ -14,12 +14,14 @@ import { TherapeuticAreaResponse } from '../../../../core/interfaces/therapeutic
 import { ProductRequest } from '../../../../core/interfaces/product-request.interface';
 import {ActivatedRoute, Router} from "@angular/router";
 import {ProductResponse} from "../../../../core/interfaces/product-response.interface";
+import {ProductImageResponse} from "../../../../core/interfaces/product-image-response.interface";
 
 @Component({
     selector: 'app-product-form',
     imports: [
         CommonModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        FormsModule
     ],
     templateUrl: './product-form.component.html'
 })
@@ -32,6 +34,19 @@ export class ProductFormComponent implements OnInit {
     companies: CompanyResponse[] = [];
     categories: CategoryResponse[] = [];
     therapeuticAreas: TherapeuticAreaResponse[] = [];
+
+    images: ProductImageResponse[] = [];
+
+    newImageUrl = '';
+
+    newImageMain = false;
+
+    newImageDisplayOrder = 0;
+
+    imageLoading = false;
+
+    imageError = '';
+
     isEditMode = false;
 
     productId!: number;
@@ -104,40 +119,38 @@ export class ProductFormComponent implements OnInit {
 
                     this.productForm.patchValue({
 
-                        companyId: null, // à ajuster si disponible
+                        companyId: null,
 
                         name: product.name,
 
                         sku: product.sku,
 
-                        description:
-                        product.description,
+                        description: product.description,
 
-                        brand:
-                        product.brand,
+                        brand: product.brand,
 
-                        activeIngredient:
-                        product.activeIngredient,
+                        activeIngredient: product.activeIngredient,
 
-                        dosage:
-                        product.dosage,
+                        dosage: product.dosage,
 
-                        form:
-                        product.form,
+                        form: product.form,
 
-                        price:
-                        product.price,
+                        price: product.price,
 
-                        requiresPrescription:
-                        product.requiresPrescription,
+                        requiresPrescription: product.requiresPrescription,
 
-                        stock:
-                        product.stock
+                        stock: product.stock,
+
+                        categoryIds: [],
+
+                        therapeuticAreaIds: []
 
                     });
 
-                },
 
+                    this.loadProductImages();
+
+                },
                 error: err => {
 
                     console.error(err);
@@ -150,6 +163,40 @@ export class ProductFormComponent implements OnInit {
             });
 
     }
+
+    loadProductImages(): void {
+
+        if (!this.productId) {
+            return;
+        }
+
+        this.adminService
+            .getProductImages(this.productId)
+            .subscribe({
+
+                next: (images) => {
+
+                    this.images = images;
+
+                },
+
+                error: (error) => {
+
+                    console.error(
+                        'Erreur chargement images :',
+                        error
+                    );
+
+                    this.imageError =
+                        'Impossible de charger les images du produit.';
+
+                }
+
+            });
+
+    }
+
+
 
 
     loadCompanies(): void {
@@ -168,6 +215,70 @@ export class ProductFormComponent implements OnInit {
 
     }
 
+    addImage(): void {
+
+        if (!this.isEditMode || !this.productId) {
+
+            this.imageError =
+                'Enregistrez d’abord le produit avant d’ajouter une image.';
+
+            return;
+        }
+
+        if (!this.newImageUrl.trim()) {
+
+            this.imageError =
+                'Veuillez renseigner l’URL de l’image.';
+
+            return;
+        }
+
+        this.imageLoading = true;
+        this.imageError = '';
+
+        const request = {
+            imageUrl: this.newImageUrl.trim(),
+            main: this.newImageMain,
+            displayOrder: this.newImageDisplayOrder
+        };
+
+        this.adminService
+            .addProductImage(this.productId, request)
+            .subscribe({
+
+                next: (image) => {
+
+                    this.images = [
+                        ...this.images,
+                        image
+                    ];
+
+                    this.newImageUrl = '';
+
+                    this.newImageMain = false;
+
+                    this.newImageDisplayOrder =
+                        this.images.length;
+
+                    this.imageLoading = false;
+                },
+
+                error: (error) => {
+
+                    console.error(
+                        'Erreur ajout image :',
+                        error
+                    );
+
+                    this.imageError =
+                        error?.error?.message ??
+                        'Impossible d’ajouter cette image.';
+
+                    this.imageLoading = false;
+                }
+
+            });
+    }
 
     loadCategories(): void {
 
@@ -247,7 +358,55 @@ export class ProductFormComponent implements OnInit {
         return this.productForm.value.therapeuticAreaIds?.includes(id) ?? false;
 
     }
+    deleteImage(image: ProductImageResponse): void {
 
+        if (!image.id) {
+            return;
+        }
+
+        const confirmed = confirm(
+            'Voulez-vous vraiment supprimer cette image ?'
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        this.imageLoading = true;
+        this.imageError = '';
+
+        this.adminService
+            .deleteProductImage(image.id)
+            .subscribe({
+
+                next: () => {
+
+                    this.images =
+                        this.images.filter(
+                            img => img.id !== image.id
+                        );
+
+                    this.imageLoading = false;
+
+                },
+
+                error: (error) => {
+
+                    console.error(
+                        'Erreur suppression image :',
+                        error
+                    );
+
+                    this.imageError =
+                        error?.error?.message ??
+                        'Impossible de supprimer cette image.';
+
+                    this.imageLoading = false;
+
+                }
+
+            });
+    }
 
     submit(): void {
 

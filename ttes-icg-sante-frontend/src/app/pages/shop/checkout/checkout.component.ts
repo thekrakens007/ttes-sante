@@ -6,11 +6,9 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 import { CartService } from '../../../core/services/cart.service';
-
 import { OrderService } from '../../../core/services/order.service';
 
 import {
@@ -26,10 +24,13 @@ import { UserService } from '../../../core/services/user.service';
 @Component({
     selector: 'app-checkout',
     standalone: true,
+
     imports: [
         CommonModule,
-        FormsModule
+        FormsModule,
+        RouterModule
     ],
+
     templateUrl: './checkout.component.html'
 })
 export class CheckoutComponent implements OnInit {
@@ -60,11 +61,7 @@ export class CheckoutComponent implements OnInit {
 
     customerNote = '';
 
-    /**
-     * Téléphone de l'utilisateur connecté
-     */
     phone = '';
-
 
 
     ngOnInit(): void {
@@ -74,7 +71,6 @@ export class CheckoutComponent implements OnInit {
         this.loadCart();
 
     }
-
 
 
     /**
@@ -111,7 +107,9 @@ export class CheckoutComponent implements OnInit {
     }
 
 
-
+    /**
+     * Charger le panier
+     */
     loadCart(): void {
 
         this.loading = true;
@@ -153,37 +151,41 @@ export class CheckoutComponent implements OnInit {
     }
 
 
+    /**
+     * Créer la commande
+     */
+    confirmOrder(): void {
 
-    submitOrder(): void {
+        if (!this.cart) {
+            return;
+        }
 
-        if (!this.cart || this.cart.items.length === 0) {
+        if (
+            !this.cart.items ||
+            this.cart.items.length === 0
+        ) {
+
+            alert('Votre panier est vide.');
 
             return;
 
         }
-
 
         if (!this.deliveryAddress.trim()) {
 
-            this.error =
-                'Veuillez renseigner votre adresse de livraison.';
+            alert(
+                'Veuillez saisir votre adresse de livraison.'
+            );
 
             return;
 
         }
-
 
         if (this.submitting) {
-
             return;
-
         }
 
-
-        this.error = '';
-
         this.submitting = true;
-
 
         const request: CreateOrderRequest = {
 
@@ -191,10 +193,14 @@ export class CheckoutComponent implements OnInit {
                 this.deliveryAddress.trim(),
 
             customerNote:
-                this.customerNote.trim()
+                this.customerNote.trim() || undefined
 
         };
 
+        console.log(
+            'Création commande :',
+            request
+        );
 
         this.orderService
             .createOrder(request)
@@ -203,38 +209,43 @@ export class CheckoutComponent implements OnInit {
                 next: (order) => {
 
                     console.log(
-                        '✅ Commande créée',
+                        'Commande créée :',
                         order
                     );
 
-                    this.order = order;
-
-                    this.success = true;
-
                     this.submitting = false;
+
+                    this.router.navigate(
+                        ['/order-success', order.id],
+                        {
+                            state: {
+                                order: order
+                            }
+                        }
+                    );
 
                 },
 
                 error: (error) => {
 
                     console.error(
-                        '❌ Erreur création commande',
+                        'Erreur création commande',
                         error
                     );
 
                     this.submitting = false;
 
-                    this.error =
+                    alert(
                         error?.error?.message
                         ??
-                        'Impossible de créer la commande.';
+                        'Impossible de créer la commande.'
+                    );
 
                 }
 
             });
 
     }
-
 
 
     formatPrice(
@@ -248,7 +259,6 @@ export class CheckoutComponent implements OnInit {
     }
 
 
-
     goToShop(): void {
 
         this.router.navigate(['/shop']);
@@ -256,121 +266,9 @@ export class CheckoutComponent implements OnInit {
     }
 
 
-
     goToOrders(): void {
 
         this.router.navigate(['/orders']);
-
-    }
-
-
-
-    confirmOrder(): void {
-
-        if (!this.cart) {
-
-            return;
-
-        }
-
-
-        if (
-            !this.cart.items ||
-            this.cart.items.length === 0
-        ) {
-
-            alert('Votre panier est vide.');
-
-            return;
-
-        }
-
-
-        if (!this.deliveryAddress.trim()) {
-
-            alert(
-                'Veuillez saisir votre adresse de livraison.'
-            );
-
-            return;
-
-        }
-
-
-        if (this.submitting) {
-
-            return;
-
-        }
-
-
-        this.submitting = true;
-
-
-        const request = {
-
-            deliveryAddress:
-                this.deliveryAddress.trim(),
-
-            customerNote:
-                this.customerNote.trim() || undefined
-
-        };
-
-
-        console.log(
-            'Création commande :',
-            request
-        );
-
-
-        this.orderService
-            .createOrder(request)
-            .subscribe({
-
-                next: (order) => {
-
-                    console.log(
-                        'Commande créée :',
-                        order
-                    );
-
-
-                    this.submitting = false;
-
-
-                    this.router.navigate(
-                        ['/order-success', order.id],
-                        {
-                            state: {
-                                order: order
-                            }
-                        }
-                    );
-
-                },
-
-
-                error: (error) => {
-
-                    console.error(
-                        'Erreur création commande',
-                        error
-                    );
-
-
-                    this.submitting = false;
-
-
-                    alert(
-                        error?.error?.message
-                        ??
-                        'Impossible de créer la commande.'
-                    );
-
-                }
-
-            });
 
     }
 

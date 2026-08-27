@@ -6,19 +6,61 @@ export interface ProductImage {
 }
 
 export interface Product {
+
     id: number;
+
     name: string;
+
     sku: string;
-    description: string;
-    brand: string;
-    activeIngredient: string;
-    dosage: string;
-    form: string;
+
+    description?: string;
+
+    brand?: string;
+
+    activeIngredient?: string;
+
+    dosage?: string;
+
+    form?: string;
+
     price: number;
-    requiresPrescription: boolean;
-    companyName: string;
+
+    requiresPrescription?: boolean;
+
     stock: number;
-    categories: string[];
-    therapeuticAreas: string[];
-    images: ProductImage[];
+
+
+    // ==========================================
+    // ENTREPRISE
+    // ==========================================
+
+    companyId?: number;
+
+    companyName?: string;
+
+
+    // ==========================================
+    // CATEGORIES
+    // ==========================================
+
+    categoryIds?: number[];
+
+    categories?: string[];
+
+
+    // ==========================================
+    // DOMAINES THERAPEUTIQUES
+    // ==========================================
+
+    therapeuticAreaIds?: number[];
+
+    therapeuticAreas?: string[];
+
+
+    // ==========================================
+    // IMAGES
+    // ==========================================
+
+    images?: ProductImage[];
+
 }

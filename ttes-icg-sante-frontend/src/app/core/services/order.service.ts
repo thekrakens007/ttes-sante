@@ -14,8 +14,9 @@ export class OrderService {
 
     private http = inject(HttpClient);
 
-    private readonly API_URL =
-        'http://localhost:8080/api/orders';
+    private readonly API_URL = 'http://10.141.71.113:8080/api/orders';
+
+    //private readonly API_URL = 'http://localhost:8080/api/orders';
 
 
     createOrder(

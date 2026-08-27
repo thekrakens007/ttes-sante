@@ -19,7 +19,9 @@ export class AuthService {
 
   private http = inject(HttpClient);
 
-  private readonly API_URL = 'http://localhost:8080/api/auth';
+  private readonly API_URL = 'http://10.141.71.113:8080/api/auth';
+
+  //private readonly API_URL = 'http://localhost:8080/api/auth';
 
   private readonly TOKEN_KEY = 'ttes_icg_sante_token';
 
@@ -118,7 +120,6 @@ export class AuthService {
     }
   }
   isLoggedIn(): boolean {
-console.log(this.getToken())
     return !!this.getToken();
 
   }

@@ -1,6 +1,5 @@
 package com.ttesicg.sante.service;
 
-
 import com.ttesicg.sante.dto.ProductImageResponse;
 import com.ttesicg.sante.dto.ProductRequest;
 import com.ttesicg.sante.dto.ProductResponse;
@@ -10,12 +9,13 @@ import com.ttesicg.sante.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.stereotype.Service;
-
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -33,44 +33,50 @@ public class ProductService {
 
     private final InventoryRepository inventoryRepository;
 
+
+    // =====================================================
+    // FIND BY ID
+    // =====================================================
+
     public ProductResponse findById(Long id) {
 
-        Product product = productRepository
-                .findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Produit introuvable"));
+        Product product =
+                productRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Produit introuvable"
+                                )
+                        );
 
         return map(product);
     }
 
 
+    // =====================================================
+    // CREATE
+    // =====================================================
+
     @Transactional
-    public void deleteProduct(Long productId) {
+    public ProductResponse create(ProductRequest request) {
 
-        Product product = productRepository
-                .findById(productId)
-                .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Produit introuvable"
-                        )
-                );
-
-        productRepository.delete(product);
-    }
-
-    public ProductResponse create(ProductRequest request){
-
+        // ================================================
+        // ENTREPRISE
+        // ================================================
 
         Company company =
-                companyRepository.findById(request.getCompanyId())
-                        .orElseThrow(
-                                () -> new RuntimeException(
+                companyRepository
+                        .findById(request.getCompanyId())
+                        .orElseThrow(() ->
+                                new RuntimeException(
                                         "Entreprise introuvable"
                                 )
                         );
 
 
+        // ================================================
+        // PRODUIT
+        // ================================================
 
         Product product =
                 Product.builder()
@@ -85,7 +91,9 @@ public class ProductService {
 
                         .brand(request.getBrand())
 
-                        .activeIngredient(request.getActiveIngredient())
+                        .activeIngredient(
+                                request.getActiveIngredient()
+                        )
 
                         .dosage(request.getDosage())
 
@@ -100,22 +108,37 @@ public class ProductService {
                         .build();
 
 
+        // ================================================
+        // CATEGORIES
+        // ================================================
 
-        if(request.getCategoryIds()!=null){
+        if (
+                request.getCategoryIds() != null
+                        &&
+                        !request.getCategoryIds().isEmpty()
+        ) {
 
             product.setCategories(
                     categoryRepository
-                            .findAllById(request.getCategoryIds())
-                            .stream()
-                            .collect(
-                                    java.util.stream.Collectors.toSet()
+                            .findAllById(
+                                    request.getCategoryIds()
                             )
+                            .stream()
+                            .collect(Collectors.toSet())
             );
+
         }
 
 
+        // ================================================
+        // DOMAINES THERAPEUTIQUES
+        // ================================================
 
-        if(request.getTherapeuticAreaIds()!=null){
+        if (
+                request.getTherapeuticAreaIds() != null
+                        &&
+                        !request.getTherapeuticAreaIds().isEmpty()
+        ) {
 
             product.setTherapeuticAreas(
                     therapeuticAreaRepository
@@ -123,16 +146,26 @@ public class ProductService {
                                     request.getTherapeuticAreaIds()
                             )
                             .stream()
-                            .collect(
-                                    java.util.stream.Collectors.toSet()
-                            )
+                            .collect(Collectors.toSet())
             );
+
         }
 
 
+        // ================================================
+        // SAUVEGARDE PRODUIT
+        // ================================================
 
         productRepository.save(product);
 
+
+        // ================================================
+        // STOCK
+        // ================================================
+
+        int stock = request.getStock() != null
+                ? request.getStock()
+                : 0;
 
 
         Inventory inventory =
@@ -140,45 +173,57 @@ public class ProductService {
 
                         .product(product)
 
-                        .quantity(0)
+                        .quantity(stock)
 
                         .minimumQuantity(0)
 
                         .build();
 
 
-
         inventoryRepository.save(inventory);
-
 
 
         return map(product);
     }
 
 
-    @Transactional
-    public ProductResponse update(Long id, ProductRequest request){
+    // =====================================================
+    // UPDATE
+    // =====================================================
 
+    @Transactional
+    public ProductResponse update(
+            Long id,
+            ProductRequest request
+    ) {
+
+        // ================================================
+        // PRODUIT
+        // ================================================
 
         Product product =
-                productRepository.findById(id)
-                        .orElseThrow(
-                                () -> new RuntimeException(
+                productRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
                                         "Produit introuvable"
                                 )
                         );
 
 
+        // ================================================
+        // ENTREPRISE
+        // ================================================
 
-        // Modification de l'entreprise
-        if(request.getCompanyId()!=null){
+        if (request.getCompanyId() != null) {
 
             Company company =
-                    companyRepository.findById(
+                    companyRepository
+                            .findById(
                                     request.getCompanyId()
                             )
-                            .orElseThrow(
-                                    () -> new RuntimeException(
+                            .orElseThrow(() ->
+                                    new RuntimeException(
                                             "Entreprise introuvable"
                                     )
                             );
@@ -187,12 +232,17 @@ public class ProductService {
         }
 
 
+        // ================================================
+        // INFORMATIONS GENERALES
+        // ================================================
 
-        // Informations générales
+        product.setName(
+                request.getName()
+        );
 
-        product.setName(request.getName());
-
-        product.setSku(request.getSku());
+        product.setSku(
+                request.getSku()
+        );
 
         product.setDescription(
                 request.getDescription()
@@ -223,71 +273,195 @@ public class ProductService {
         );
 
 
+        // ================================================
+        // CATEGORIES
+        // ================================================
 
-        // Mise à jour des catégories
-
-        if(request.getCategoryIds()!=null){
+        if (request.getCategoryIds() != null) {
 
             product.getCategories().clear();
 
-            product.getCategories()
-                    .addAll(
-                            categoryRepository
-                                    .findAllById(
-                                            request.getCategoryIds()
-                                    )
-                    );
+            if (!request.getCategoryIds().isEmpty()) {
+
+                product.getCategories().addAll(
+                        categoryRepository
+                                .findAllById(
+                                        request.getCategoryIds()
+                                )
+                );
+
+            }
+
         }
 
 
+        // ================================================
+        // DOMAINES THERAPEUTIQUES
+        // ================================================
 
-        // Mise à jour des domaines thérapeutiques
+        if (
+                request.getTherapeuticAreaIds() != null
+        ) {
 
-        if(request.getTherapeuticAreaIds()!=null){
+            product
+                    .getTherapeuticAreas()
+                    .clear();
 
-            product.getTherapeuticAreas().clear();
+            if (
+                    !request
+                            .getTherapeuticAreaIds()
+                            .isEmpty()
+            ) {
 
-            product.getTherapeuticAreas()
-                    .addAll(
-                            therapeuticAreaRepository
-                                    .findAllById(
-                                            request.getTherapeuticAreaIds()
-                                    )
-                    );
+                product
+                        .getTherapeuticAreas()
+                        .addAll(
+                                therapeuticAreaRepository
+                                        .findAllById(
+                                                request
+                                                        .getTherapeuticAreaIds()
+                                        )
+                        );
+
+            }
+
         }
 
 
+        // ================================================
+        // SAUVEGARDE PRODUIT
+        // ================================================
 
         Product saved =
                 productRepository.save(product);
 
+
+        // ================================================
+        // STOCK
+        // ================================================
+
+        if (request.getStock() != null) {
+
+            Inventory inventory =
+                    inventoryRepository
+                            .findByProductId(id)
+                            .orElseGet(() ->
+                                    Inventory.builder()
+
+                                            .product(saved)
+
+                                            .quantity(0)
+
+                                            .minimumQuantity(0)
+
+                                            .build()
+                            );
+
+
+            inventory.setQuantity(
+                    request.getStock()
+            );
+
+
+            inventoryRepository.save(
+                    inventory
+            );
+
+        }
 
 
         return map(saved);
     }
 
 
-    public List<ProductResponse> findAll(){
-
-        return productRepository.findAll()
-                .stream()
-                .map(this::map)
-                .toList();
-
-    }
-
-
-
+    // =====================================================
+    // MAP PRODUCT -> RESPONSE
+    // =====================================================
 
     private ProductResponse map(Product product) {
 
-        Inventory inventory = inventoryRepository
-                .findByProductId(product.getId())
-                .orElse(null);
+        // ================================================
+        // STOCK
+        // ================================================
 
-        Integer stock = inventory != null
-                ? inventory.getQuantity()
-                : 0;
+        Inventory inventory =
+                inventoryRepository
+                        .findByProductId(
+                                product.getId()
+                        )
+                        .orElse(null);
+
+
+        Integer stock =
+                inventory != null
+                        ? inventory.getQuantity()
+                        : 0;
+
+
+        // ================================================
+        // COMPANY ID
+        // ================================================
+
+        Long companyId =
+                product.getCompany() != null
+                        ? product.getCompany().getId()
+                        : null;
+
+
+        String companyName =
+                product.getCompany() != null
+                        ? product.getCompany().getName()
+                        : null;
+
+
+        // ================================================
+        // CATEGORY IDS
+        // ================================================
+
+        Set<Long> categoryIds =
+                product.getCategories()
+                        .stream()
+                        .map(Category::getId)
+                        .collect(Collectors.toSet());
+
+
+        // ================================================
+        // CATEGORY NAMES
+        // ================================================
+
+        Set<String> categories =
+                product.getCategories()
+                        .stream()
+                        .map(Category::getName)
+                        .collect(Collectors.toSet());
+
+
+        // ================================================
+        // THERAPEUTIC AREA IDS
+        // ================================================
+
+        Set<Long> therapeuticAreaIds =
+                product.getTherapeuticAreas()
+                        .stream()
+                        .map(TherapeuticArea::getId)
+                        .collect(Collectors.toSet());
+
+
+        // ================================================
+        // THERAPEUTIC AREA NAMES
+        // ================================================
+
+        Set<String> therapeuticAreas =
+                product.getTherapeuticAreas()
+                        .stream()
+                        .map(TherapeuticArea::getName)
+                        .collect(Collectors.toSet());
+
+
+
+        // ================================================
+        // RESPONSE
+        // ================================================
 
         return ProductResponse.builder()
 
@@ -305,11 +479,17 @@ public class ProductService {
                         product.getActiveIngredient()
                 )
 
-                .dosage(product.getDosage())
+                .dosage(
+                        product.getDosage()
+                )
 
-                .form(product.getForm())
+                .form(
+                        product.getForm()
+                )
 
-                .price(product.getPrice())
+                .price(
+                        product.getPrice()
+                )
 
                 .requiresPrescription(
                         product.getRequiresPrescription()
@@ -317,37 +497,42 @@ public class ProductService {
 
                 .stock(stock)
 
-                .companyName(
-                        product.getCompany().getName()
-                )
+                // COMPANY
+                .companyId(companyId)
 
-                .categories(
-                        product.getCategories()
-                                .stream()
-                                .map(Category::getName)
-                                .collect(
-                                        java.util.stream.Collectors.toSet()
-                                )
+                .companyName(companyName)
+
+                // CATEGORIES
+                .categoryIds(categoryIds)
+
+                .categories(categories)
+
+                // THERAPEUTIC AREAS
+                .therapeuticAreaIds(
+                        therapeuticAreaIds
                 )
 
                 .therapeuticAreas(
-                        product.getTherapeuticAreas()
-                                .stream()
-                                .map(TherapeuticArea::getName)
-                                .collect(
-                                        java.util.stream.Collectors.toSet()
-                                )
+                        therapeuticAreas
                 )
 
+                // IMAGES
                 .images(
                         product.getImages()
                                 .stream()
                                 .map(image ->
-                                        ProductImageResponse.builder()
+                                        ProductImageResponse
+                                                .builder()
                                                 .id(image.getId())
-                                                .imageUrl(image.getImageUrl())
-                                                .main(image.getMain())
-                                                .displayOrder(image.getDisplayOrder())
+                                                .imageUrl(
+                                                        image.getImageUrl()
+                                                )
+                                                .main(
+                                                        image.getMain()
+                                                )
+                                                .displayOrder(
+                                                        image.getDisplayOrder()
+                                                )
                                                 .build()
                                 )
                                 .toList()
@@ -357,20 +542,45 @@ public class ProductService {
     }
 
 
-    public List<ProductResponse> getAllProducts() {
+    // =====================================================
+    // FIND ALL
+    // =====================================================
 
-        return productRepository.findAll()
+    public List<ProductResponse> findAll() {
+
+        return productRepository
+                .findAll()
                 .stream()
                 .map(this::map)
                 .toList();
     }
 
+
+    // =====================================================
+    // GET ALL PRODUCTS
+    // =====================================================
+
+    public List<ProductResponse> getAllProducts() {
+
+        return productRepository
+                .findAll()
+                .stream()
+                .map(this::map)
+                .toList();
+    }
+
+
+    // =====================================================
+    // GET PRODUCT BY ID
+    // =====================================================
+
     public ProductResponse getProductById(Long id) {
 
         Product product =
-                productRepository.findById(id)
-                        .orElseThrow(
-                                () -> new RuntimeException(
+                productRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
                                         "Produit introuvable"
                                 )
                         );
@@ -378,40 +588,79 @@ public class ProductService {
         return map(product);
     }
 
-    public List<ProductResponse> searchProducts(String keyword) {
+
+    // =====================================================
+    // SEARCH
+    // =====================================================
+
+    public List<ProductResponse> searchProducts(
+            String keyword
+    ) {
 
         return productRepository
-                .findByNameContainingIgnoreCase(keyword)
+                .findByNameContainingIgnoreCase(
+                        keyword
+                )
                 .stream()
                 .map(this::map)
                 .toList();
     }
 
-    public List<ProductResponse> getProductsByCompany(Long companyId) {
 
+    // =====================================================
+    // PRODUCTS BY COMPANY
+    // =====================================================
+
+    public List<ProductResponse> getProductsByCompany(
+            Long companyId
+    ) {
 
         return productRepository
                 .findByCompanyId(companyId)
                 .stream()
                 .map(this::map)
                 .toList();
-
     }
 
+
+    // =====================================================
+    // DELETE
+    // =====================================================
+
     @Transactional
-    public void delete(Long id){
+    public void delete(Long id) {
 
         Product product =
-                productRepository.findById(id)
-                        .orElseThrow(
-                                () -> new RuntimeException(
+                productRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
                                         "Produit introuvable"
                                 )
                         );
 
+        productRepository.delete(product);
+    }
+
+
+    // =====================================================
+    // DELETE PRODUCT
+    // =====================================================
+
+    @Transactional
+    public void deleteProduct(Long productId) {
+
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() ->
+                                new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Produit introuvable"
+                                )
+                        );
 
         productRepository.delete(product);
-
     }
 
 }

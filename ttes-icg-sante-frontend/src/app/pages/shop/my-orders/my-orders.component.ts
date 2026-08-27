@@ -7,7 +7,10 @@ import {
 import { CommonModule } from '@angular/common';
 
 import {
-    RouterModule
+    Router,
+    RouterModule,
+    RouterLink,
+    RouterLinkActive
 } from '@angular/router';
 
 import {
@@ -29,24 +32,56 @@ import {
 
     imports: [
         CommonModule,
-        RouterModule
+        RouterModule,
+        RouterLink,
+        RouterLinkActive
     ],
 
     templateUrl: './my-orders.component.html'
 })
 export class MyOrdersComponent implements OnInit {
 
-    private orderService = inject(OrderService);
 
-    private authService = inject(AuthService);
+    // ==========================================
+    // SERVICES
+    // ==========================================
 
+    private orderService =
+        inject(OrderService);
+
+    private authService =
+        inject(AuthService);
+
+    private router =
+        inject(Router);
+
+
+    // ==========================================
+    // COMMANDES
+    // ==========================================
 
     orders: Order[] = [];
+
+
+    // ==========================================
+    // ETAT
+    // ==========================================
 
     loading = true;
 
     error = '';
 
+
+    // ==========================================
+    // MENU MOBILE
+    // ==========================================
+
+    mobileMenuOpen = false;
+
+
+    // ==========================================
+    // INITIALISATION
+    // ==========================================
 
     ngOnInit(): void {
 
@@ -55,14 +90,35 @@ export class MyOrdersComponent implements OnInit {
     }
 
 
-    /**
-     * Charger les commandes
-     */
+    // ==========================================
+    // MENU MOBILE
+    // ==========================================
+
+    toggleMobileMenu(): void {
+
+        this.mobileMenuOpen =
+            !this.mobileMenuOpen;
+
+    }
+
+
+    closeMobileMenu(): void {
+
+        this.mobileMenuOpen = false;
+
+    }
+
+
+    // ==========================================
+    // CHARGER LES COMMANDES
+    // ==========================================
+
     loadOrders(): void {
 
         this.loading = true;
 
         this.error = '';
+
 
         this.orderService
             .getMyOrders()
@@ -90,7 +146,8 @@ export class MyOrdersComponent implements OnInit {
 
                     this.error =
                         error?.error?.message
-                        ?? 'Impossible de charger vos commandes.';
+                        ??
+                        'Impossible de charger vos commandes.';
 
                     this.loading = false;
 
@@ -101,26 +158,39 @@ export class MyOrdersComponent implements OnInit {
     }
 
 
-    /**
-     * Déconnexion
-     */
+    // ==========================================
+    // DECONNEXION
+    // ==========================================
+
     logout(): void {
 
-        console.log('Déconnexion...');
+        console.log(
+            'Déconnexion...'
+        );
+
+        this.mobileMenuOpen = false;
 
         this.authService.logout();
+
+        this.router.navigate([
+            '/'
+        ]);
 
     }
 
 
-    /**
-     * Format prix
-     */
-    formatPrice(price: number): string {
+    // ==========================================
+    // FORMAT PRIX
+    // ==========================================
+
+    formatPrice(
+        price: number
+    ): string {
 
         return new Intl.NumberFormat(
-            'fr-FR'
-        ).format(price) + ' FCFA';
+                'fr-FR'
+            ).format(price)
+            + ' FCFA';
 
     }
 

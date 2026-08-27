@@ -1,7 +1,5 @@
 package com.ttesicg.sante.service;
 
-
-import com.ttesicg.sante.dto.OrderResponse;
 import com.ttesicg.sante.entity.Order;
 import org.springframework.stereotype.Service;
 
@@ -9,27 +7,52 @@ import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-
 @Service
 public class WhatsAppService {
 
+    /**
+     * Numéro WhatsApp de l'administration.
+     *
+     * IMPORTANT :
+     * format international sans +
+     * Exemple Cameroun : 237691085447
+     */
+    private final String ADMIN_NUMBER = "237691085447";
 
-    private final String ADMIN_NUMBER =
-            "+237691085447"; // numéro WhatsApp admin
 
+    // ==========================================================
+    // GENERER LE MESSAGE DE COMMANDE
+    // ==========================================================
 
     public String generateOrderMessage(Order order) {
 
         StringBuilder message = new StringBuilder();
 
-        message.append("🛒 *Nouvelle commande TTES ICG SANTE*")
+        message.append("🛒 *NOUVELLE COMMANDE TTES-ICG SANTE*")
                 .append("\n\n");
 
-        message.append("Commande N° : ")
+
+        // ======================================================
+        // COMMANDE
+        // ======================================================
+
+        message.append("📦 *Commande N° :* ")
                 .append(order.getId())
+                .append("\n");
+
+        message.append("📌 *Statut :* ")
+                .append(order.getStatus())
                 .append("\n\n");
 
-        message.append("👤 Client : ")
+
+        // ======================================================
+        // CLIENT
+        // ======================================================
+
+        message.append("👤 *CLIENT*")
+                .append("\n");
+
+        message.append("Nom : ")
                 .append(order.getUser().getFirstName())
                 .append(" ")
                 .append(order.getUser().getLastName())
@@ -47,6 +70,11 @@ public class WhatsAppService {
                 .append(order.getDeliveryAddress())
                 .append("\n");
 
+
+        // ======================================================
+        // NOTE CLIENT
+        // ======================================================
+
         if (order.getCustomerNote() != null
                 && !order.getCustomerNote().isBlank()) {
 
@@ -55,86 +83,85 @@ public class WhatsAppService {
                     .append("\n");
         }
 
-        message.append("\n🛍️ Produits :\n");
 
-        order.getItems()
-                .forEach(item -> {
+        // ======================================================
+        // PRODUITS
+        // ======================================================
 
-                    message.append("- ")
-                            .append(item.getProduct().getName())
-                            .append(" x ")
-                            .append(item.getQuantity())
-                            .append(" = ")
-                            .append(
-                                    item.getPrice()
-                                            .multiply(
-                                                    BigDecimal.valueOf(
-                                                            item.getQuantity()
-                                                    )
-                                            )
-                            )
-                            .append(" FCFA\n");
-                });
+        message.append("\n")
+                .append("🛍️ *PRODUITS*")
+                .append("\n\n");
 
-        message.append("\n💰 Total : ")
+
+        order.getItems().forEach(item -> {
+
+            BigDecimal subtotal =
+                    item.getPrice()
+                            .multiply(
+                                    BigDecimal.valueOf(
+                                            item.getQuantity()
+                                    )
+                            );
+
+            message.append("• ")
+                    .append(item.getProduct().getName())
+                    .append("\n");
+
+            message.append("  Quantité : ")
+                    .append(item.getQuantity())
+                    .append("\n");
+
+            message.append("  Prix unitaire : ")
+                    .append(item.getPrice())
+                    .append(" FCFA")
+                    .append("\n");
+
+            message.append("  Sous-total : ")
+                    .append(subtotal)
+                    .append(" FCFA")
+                    .append("\n\n");
+        });
+
+
+        // ======================================================
+        // TOTAL
+        // ======================================================
+
+        message.append("💰 *TOTAL :* ")
                 .append(order.getTotalAmount())
-                .append(" FCFA");
+                .append(" FCFA")
+                .append("\n\n");
 
-        message.append("\n\n📦 Statut : ")
+
+        message.append("📦 *Statut :* ")
                 .append(order.getStatus());
+
 
         return message.toString();
     }
 
 
-    public String generateWhatsAppLink(Order order){
+    // ==========================================================
+    // GENERER LE LIEN WHATSAPP
+    // ==========================================================
 
+    public String generateWhatsAppLink(Order order) {
 
         String message =
                 generateOrderMessage(order);
 
 
-        return "https://wa.me/"
-                + ADMIN_NUMBER
-                + "?text="
-                + message.replace(" ", "%20");
-
-    }
-
-    public String sendOrderNotification(Order order) {
-
-
-        String message =
-                "Nouvelle commande TTES ICG SANTE\n\n"
-                        + "Commande N° : " + order.getId() + "\n"
-                        + "Client : "
-                        + order.getUser().getFirstName()
-                        + " "
-                        + order.getUser().getLastName()
-                        + "\n\n"
-                        + "Montant : "
-                        + order.getTotalAmount()
-                        + " FCFA\n\n"
-                        + "Statut : "
-                        + order.getStatus();
+        String encodedMessage =
+                URLEncoder.encode(
+                        message,
+                        StandardCharsets.UTF_8
+                );
 
 
         return "https://wa.me/"
                 + ADMIN_NUMBER
                 + "?text="
-                + URLEncoder.encode(
-                message,
-                StandardCharsets.UTF_8
-        );
-    }
-
-    public void sendOrderToAdmin(OrderResponse order){
-
-        String message =
-                "Nouvelle commande\n"+
-                        "Client : "+order.getCustomerName()+"\n"+
-                        "Téléphone : "+order.getCustomerPhone();
-
+                + encodedMessage;
     }
 
 }

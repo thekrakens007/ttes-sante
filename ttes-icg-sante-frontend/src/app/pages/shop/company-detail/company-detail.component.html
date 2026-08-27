@@ -1,0 +1,722 @@
+<div
+        class="min-h-screen
+               bg-gray-50
+               dark:bg-gray-950">
+
+
+    <!-- ================================================= -->
+    <!-- HEADER -->
+    <!-- ================================================= -->
+
+    <header
+            class="sticky top-0 z-50
+                   border-b
+                   border-gray-200
+                   bg-white
+                   dark:border-gray-800
+                   dark:bg-gray-900">
+
+
+        <div
+                class="mx-auto flex max-w-7xl
+                       items-center
+                       justify-between
+                       px-4 py-4
+                       sm:px-6
+                       lg:px-8">
+
+
+            <!-- LOGO -->
+
+            <a
+                    routerLink="/"
+                    class="flex items-center gap-3">
+
+                <img
+                        src="/images/logo/logo.svg"
+                        alt="TTES-ICG Santé"
+                        class="h-10 w-auto">
+
+            </a>
+
+
+            <!-- RETOUR -->
+
+            <a
+                    routerLink="/companies"
+                    class="rounded-lg
+                           border
+                           border-gray-300
+                           px-4 py-2
+                           text-sm
+                           font-medium
+                           text-gray-700
+                           transition
+                           hover:bg-gray-50
+                           dark:border-gray-700
+                           dark:text-gray-300
+                           dark:hover:bg-gray-800">
+
+                ← Entreprises
+
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- ================================================= -->
+    <!-- LOADING -->
+    <!-- ================================================= -->
+
+    @if (loading) {
+
+        <main
+                class="mx-auto max-w-7xl
+                       px-4 py-20
+                       sm:px-6
+                       lg:px-8">
+
+
+            <div
+                    class="flex justify-center">
+
+
+                <div
+                        class="h-12 w-12
+                               animate-spin
+                               rounded-full
+                               border-4
+                               border-gray-200
+                               border-t-brand-500">
+                </div>
+
+            </div>
+
+
+            <p
+                    class="mt-4
+                           text-center
+                           text-sm
+                           text-gray-500">
+
+                Chargement de l'entreprise...
+
+            </p>
+
+        </main>
+
+    }
+
+
+    <!-- ================================================= -->
+    <!-- ERREUR -->
+    <!-- ================================================= -->
+
+    @else if (error) {
+
+        <main
+                class="mx-auto max-w-3xl
+                       px-4 py-16
+                       sm:px-6
+                       lg:px-8">
+
+
+            <div
+                    class="rounded-2xl
+                           border
+                           border-red-200
+                           bg-red-50
+                           p-8
+                           text-center">
+
+
+                <div class="text-5xl">
+
+                    ⚠️
+
+                </div>
+
+
+                <h1
+                        class="mt-4
+                               text-xl
+                               font-bold
+                               text-red-700">
+
+                    Entreprise introuvable
+
+                </h1>
+
+
+                <p
+                        class="mt-2
+                               text-sm
+                               text-red-600">
+
+                    {{ error }}
+
+                </p>
+
+
+                <a
+                        routerLink="/companies"
+                        class="mt-6
+                               inline-flex
+                               rounded-lg
+                               bg-brand-500
+                               px-6 py-3
+                               font-semibold
+                               text-white
+                               hover:bg-brand-600">
+
+                    Retour aux entreprises
+
+                </a>
+
+            </div>
+
+        </main>
+
+    }
+
+
+    <!-- ================================================= -->
+    <!-- ENTREPRISE -->
+    <!-- ================================================= -->
+
+    @else if (company) {
+
+        <main
+                class="mx-auto max-w-7xl
+                       px-4 py-10
+                       sm:px-6
+                       lg:px-8">
+
+
+            <!-- ================================================= -->
+            <!-- BREADCRUMB -->
+            <!-- ================================================= -->
+
+            <div class="mb-8">
+
+                <a
+                        routerLink="/companies"
+                        class="text-sm
+                               font-medium
+                               text-brand-600
+                               hover:underline">
+
+                    ← Toutes les entreprises
+
+                </a>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- INFORMATIONS ENTREPRISE -->
+            <!-- ================================================= -->
+
+            <section
+                    class="overflow-hidden
+                           rounded-2xl
+                           border
+                           border-gray-200
+                           bg-white
+                           dark:border-gray-800
+                           dark:bg-gray-900">
+
+
+                <div
+                        class="bg-brand-950
+                               px-6 py-10
+                               sm:px-10">
+
+
+                    <div
+                            class="max-w-3xl">
+
+
+                        <p
+                                class="text-sm
+                                       font-semibold
+                                       uppercase
+                                       tracking-wider
+                                       text-brand-300">
+
+                            Entreprise partenaire
+
+                        </p>
+
+
+                        <h1
+                                class="mt-2
+                                       text-3xl
+                                       font-bold
+                                       text-white
+                                       sm:text-4xl">
+
+                            {{ company.name }}
+
+                        </h1>
+
+
+                        @if (company.country) {
+
+                            <p
+                                    class="mt-3
+                                           text-gray-300">
+
+                                🌍 {{ company.country }}
+
+                            </p>
+
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <!-- DETAILS -->
+
+                <div
+                        class="grid grid-cols-1
+                               gap-8
+                               p-6
+                               sm:p-10
+                               lg:grid-cols-2">
+
+
+                    <!-- DESCRIPTION -->
+
+                    <div>
+
+                        <h2
+                                class="text-lg
+                                       font-semibold
+                                       text-gray-900
+                                       dark:text-white">
+
+                            À propos de l'entreprise
+
+                        </h2>
+
+
+                        @if (company.description) {
+
+                            <p
+                                    class="mt-4
+                                           leading-7
+                                           text-gray-600
+                                           dark:text-gray-400">
+
+                                {{ company.description }}
+
+                            </p>
+
+                        } @else {
+
+                            <p
+                                    class="mt-4
+                                           text-sm
+                                           text-gray-500">
+
+                                Aucune description disponible.
+
+                            </p>
+
+                        }
+
+                    </div>
+
+
+                    <!-- INFORMATIONS -->
+
+                    <div>
+
+                        <h2
+                                class="text-lg
+                                       font-semibold
+                                       text-gray-900
+                                       dark:text-white">
+
+                            Informations
+
+                        </h2>
+
+
+                        <div
+                                class="mt-4
+                                       space-y-4">
+
+
+                            @if (company.country) {
+
+                                <div
+                                        class="rounded-lg
+                                               bg-gray-50
+                                               p-4
+                                               dark:bg-gray-800">
+
+                                    <p
+                                            class="text-xs
+                                                   text-gray-500">
+
+                                        Pays
+
+                                    </p>
+
+                                    <p
+                                            class="mt-1
+                                                   font-medium
+                                                   text-gray-900
+                                                   dark:text-white">
+
+                                        {{ company.country }}
+
+                                    </p>
+
+                                </div>
+
+                            }
+
+
+                            @if (company.website) {
+
+                                <div
+                                        class="rounded-lg
+                                               bg-gray-50
+                                               p-4
+                                               dark:bg-gray-800">
+
+                                    <p
+                                            class="text-xs
+                                                   text-gray-500">
+
+                                        Site internet
+
+                                    </p>
+
+                                    <a
+                                            [href]="company.website"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="mt-1
+                                                   inline-block
+                                                   font-medium
+                                                   text-brand-600
+                                                   hover:underline">
+
+                                        Visiter le site
+
+                                    </a>
+
+                                </div>
+
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- PRODUITS -->
+            <!-- ================================================= -->
+
+            <section class="mt-12">
+
+
+                <div
+                        class="mb-6
+                               flex items-center
+                               justify-between">
+
+
+                    <div>
+
+                        <h2
+                                class="text-2xl
+                                       font-bold
+                                       text-gray-900
+                                       dark:text-white">
+
+                            Produits de {{ company.name }}
+
+                        </h2>
+
+
+                        <p
+                                class="mt-1
+                                       text-sm
+                                       text-gray-500
+                                       dark:text-gray-400">
+
+                            {{ products.length }}
+                            produit(s)
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- AUCUN PRODUIT -->
+
+                @if (products.length === 0) {
+
+                    <div
+                            class="rounded-2xl
+                                   border
+                                   border-gray-200
+                                   bg-white
+                                   py-16
+                                   text-center
+                                   dark:border-gray-800
+                                   dark:bg-gray-900">
+
+
+                        <div class="text-5xl">
+
+                            📦
+
+                        </div>
+
+
+                        <h3
+                                class="mt-4
+                                       text-lg
+                                       font-semibold
+                                       text-gray-900
+                                       dark:text-white">
+
+                            Aucun produit disponible
+
+                        </h3>
+
+
+                        <p
+                                class="mt-2
+                                       text-sm
+                                       text-gray-500">
+
+                            Cette entreprise n'a actuellement
+                            aucun produit disponible.
+
+                        </p>
+
+                    </div>
+
+                }
+
+
+                <!-- PRODUITS -->
+
+                @else {
+
+                    <div
+                            class="grid
+                                   grid-cols-1
+                                   gap-6
+                                   sm:grid-cols-2
+                                   lg:grid-cols-3
+                                   xl:grid-cols-4">
+
+
+                        @for (
+                            product of products;
+                            track product.id
+                                ) {
+
+
+                            <div
+                                    class="group
+                                           overflow-hidden
+                                           rounded-2xl
+                                           border
+                                           border-gray-200
+                                           bg-white
+                                           transition
+                                           hover:-translate-y-1
+                                           hover:shadow-lg
+                                           dark:border-gray-800
+                                           dark:bg-gray-900">
+
+
+                                <!-- IMAGE -->
+
+                                <div
+                                        class="flex h-48
+                                               items-center
+                                               justify-center
+                                               bg-gray-50
+                                               dark:bg-gray-800">
+
+
+                                    @if (
+                                        product.images &&
+                                        product.images.length > 0
+                                            ) {
+
+                                        <img
+                                                [src]="product.images[0].imageUrl"
+                                                [alt]="product.name"
+                                                class="h-full
+                                                       w-full
+                                                       object-contain
+                                                       p-4">
+
+                                    } @else {
+
+                                        <span
+                                                class="text-6xl">
+
+                                            💊
+
+                                        </span>
+
+                                    }
+
+                                </div>
+
+
+                                <!-- INFORMATIONS -->
+
+                                <div class="p-5">
+
+
+                                    @if (product.brand) {
+
+                                        <p
+                                                class="text-xs
+                                                       font-semibold
+                                                       uppercase
+                                                       tracking-wide
+                                                       text-brand-600">
+
+                                            {{ product.brand }}
+
+                                        </p>
+
+                                    }
+
+
+                                    <h3
+                                            class="mt-1
+                                                   text-lg
+                                                   font-semibold
+                                                   text-gray-900
+                                                   dark:text-white">
+
+                                        {{ product.name }}
+
+                                    </h3>
+
+
+                                    @if (product.description) {
+
+                                        <p
+                                                class="mt-2
+                                                       line-clamp-2
+                                                       text-sm
+                                                       text-gray-500
+                                                       dark:text-gray-400">
+
+                                            {{ product.description }}
+
+                                        </p>
+
+                                    }
+
+
+                                    <div
+                                            class="mt-4
+                                                   flex items-center
+                                                   justify-between">
+
+
+                                        <span
+                                                class="font-bold
+                                                       text-brand-600">
+
+                                            {{ formatPrice(product.price) }}
+
+                                        </span>
+
+
+                                        @if (product.stock > 0) {
+
+                                            <span
+                                                    class="text-xs
+                                                           font-medium
+                                                           text-green-600">
+
+                                                En stock
+
+                                            </span>
+
+                                        } @else {
+
+                                            <span
+                                                    class="text-xs
+                                                           font-medium
+                                                           text-red-600">
+
+                                                Rupture
+
+                                            </span>
+
+                                        }
+
+                                    </div>
+
+
+                                    <!-- DETAILS -->
+
+                                    <a
+                                            [routerLink]="[
+                                                '/products',
+                                                product.id
+                                            ]"
+                                            class="mt-4
+                                                   flex w-full
+                                                   items-center
+                                                   justify-center
+                                                   rounded-lg
+                                                   bg-brand-500
+                                                   px-4 py-2.5
+                                                   text-sm
+                                                   font-semibold
+                                                   text-white
+                                                   transition
+                                                   hover:bg-brand-600">
+
+                                        Voir le produit →
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        }
+
+                    </div>
+
+                }
+
+            </section>
+
+        </main>
+
+    }
+
+</div>

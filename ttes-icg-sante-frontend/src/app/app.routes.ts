@@ -40,6 +40,9 @@ import {CheckoutComponent} from "./pages/shop/checkout/checkout.component";
 import {OrderSuccessComponent} from "./pages/shop/order-success/order-success.component";
 import {MyOrdersComponent} from "./pages/shop/my-orders/my-orders.component";
 import {adminGuard} from "./core/guards/admin.guard";
+import {ProductDetailComponent} from "./pages/shop/product-detail/product-detail.component";
+import {CompanyListComponent} from "./pages/shop/company-list/company-list.component";
+import {CompanyDetailComponent} from "./pages/shop/company-detail/company-detail.component";
 
 export const routes: Routes = [
   // =====================================================
@@ -55,6 +58,19 @@ export const routes: Routes = [
     path: 'profile',
     component: ProfileComponent,
     canActivate: [authGuard]
+  },
+  {
+    path: 'companies',
+    component: CompanyListComponent
+  },
+
+  {
+    path: 'companies/:id',
+    component: CompanyDetailComponent
+  },
+  {
+    path: 'products/:id',
+    component: ProductDetailComponent
   },
   {
     path: 'checkout',
@@ -170,6 +186,7 @@ export const routes: Routes = [
         path: 'products/new',
         component: CreateProductComponent
       },
+
       {
         path: 'products/edit/:id',
         component: CreateProductComponent

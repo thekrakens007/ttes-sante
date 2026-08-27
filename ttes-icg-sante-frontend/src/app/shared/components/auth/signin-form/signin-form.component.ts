@@ -3,7 +3,7 @@ import { LabelComponent } from '../../form/label/label.component';
 import { CheckboxComponent } from '../../form/input/checkbox.component';
 import { ButtonComponent } from '../../ui/button/button.component';
 import { InputFieldComponent } from '../../form/input/input-field.component';
-import { RouterModule, Router } from '@angular/router';
+import {RouterModule, Router, ActivatedRoute} from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { AuthService } from '../../../../core/services/auth.service';
@@ -32,9 +32,11 @@ export class SigninFormComponent {
   loading = false;
   errorMessage = '';
 
+
   constructor(
       private authService: AuthService,
-      private router: Router
+      private router: Router,
+      private route: ActivatedRoute
   ) {}
 
   togglePasswordVisibility(): void {
@@ -84,7 +86,12 @@ export class SigninFormComponent {
             );
 
             // Redirection selon le rôle
-            if (this.authService.isAdmin()) {
+            const returnUrl =
+                this.route.snapshot.queryParamMap.get('returnUrl');
+
+            if (returnUrl && returnUrl.startsWith('/')) {
+              this.router.navigateByUrl(returnUrl);
+            } else if (this.authService.isAdmin()) {
               this.router.navigate(['/admin']);
             } else {
               this.router.navigate(['/']);

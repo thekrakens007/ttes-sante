@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { LabelComponent } from '../../form/label/label.component';
@@ -36,7 +36,8 @@ export class SignupFormComponent {
 
   constructor(
       private authService: AuthService,
-      private router: Router
+      private router: Router,
+      private route: ActivatedRoute
   ) {}
 
   togglePasswordVisibility(): void {
@@ -127,7 +128,20 @@ export class SignupFormComponent {
             'Votre compte a été créé avec succès. Redirection vers la connexion...';
 
         setTimeout(() => {
-          this.router.navigate(['/']);
+
+          const returnUrl =
+              this.route.snapshot.queryParamMap.get('returnUrl');
+
+          if (returnUrl && returnUrl.startsWith('/')) {
+            this.router.navigate(['/signin'], {
+              queryParams: {
+                returnUrl: returnUrl
+              }
+            });
+          } else {
+            this.router.navigate(['/signin']);
+          }
+
         }, 1500);
       },
 

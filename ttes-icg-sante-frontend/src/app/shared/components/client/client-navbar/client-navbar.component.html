@@ -1,11 +1,23 @@
+<!-- ================================================= -->
+<!-- HEADER -->
+<!-- ================================================= -->
+
 <header
         class="sticky top-0 z-50 border-b border-gray-200
-           bg-white dark:border-gray-800 dark:bg-gray-900">
+           bg-white dark:border-gray-800
+           dark:bg-gray-900">
+
+
+    <!-- ================================================= -->
+    <!-- HEADER PRINCIPAL -->
+    <!-- ================================================= -->
 
     <div
-            class="mx-auto flex max-w-7xl items-center
-               justify-between gap-6 px-4 py-4
-               sm:px-6 lg:px-8">
+            class="mx-auto flex max-w-7xl
+               items-center justify-between
+               gap-3 px-4 py-3
+               sm:gap-6 sm:px-6 sm:py-4
+               lg:px-8">
 
 
         <!-- ================================================= -->
@@ -14,12 +26,13 @@
 
         <a
                 routerLink="/"
-                class="flex shrink-0 items-center gap-3">
+                (click)="closeMobileMenu()"
+                class="flex shrink-0 items-center">
 
             <img
                     src="/images/logo/logo.svg"
                     alt="TTES-ICG Santé"
-                    class="h-10 w-auto">
+                    class="h-9 w-auto sm:h-10">
 
         </a>
 
@@ -29,30 +42,39 @@
         <!-- ================================================= -->
 
         <div
-                class="hidden flex-1 max-w-xl md:block">
+                class="hidden max-w-xl flex-1 md:block">
 
-            <div class="relative">
+            <div
+                    class="relative">
 
                 <input
                         type="text"
                         [(ngModel)]="searchTerm"
-                        (input)="search()"
+                        [ngModelOptions]="{standalone: true}"
+                        (ngModelChange)="search()"
                         placeholder="Rechercher un produit..."
                         class="h-11 w-full rounded-lg
                            border border-gray-300
-                           bg-gray-50 px-4 pr-12
+                           bg-gray-50
+                           px-4 pr-12
                            text-sm text-gray-800
                            outline-none
                            transition
+
                            focus:border-brand-500
                            focus:ring-2
                            focus:ring-brand-500/20
+
                            dark:border-gray-700
                            dark:bg-gray-800
                            dark:text-white">
 
+
+                <!-- ICÔNE RECHERCHE -->
+
                 <span
-                        class="absolute right-4 top-1/2
+                        class="pointer-events-none
+                           absolute right-4 top-1/2
                            -translate-y-1/2
                            text-gray-400">
 
@@ -66,11 +88,12 @@
 
 
         <!-- ================================================= -->
-        <!-- NAVIGATION -->
+        <!-- NAVIGATION DESKTOP -->
         <!-- ================================================= -->
 
         <nav
-                class="flex items-center gap-2 sm:gap-3">
+                class="hidden items-center
+                   gap-2 md:flex lg:gap-3">
 
 
             <!-- ================================================= -->
@@ -79,33 +102,45 @@
 
             @if (!isLoggedIn()) {
 
+
+                <!-- SE CONNECTER -->
+
                 <a
                         routerLink="/signin"
                         routerLinkActive="bg-gray-100"
                         [routerLinkActiveOptions]="{ exact: true }"
-                        class="hidden rounded-lg px-4 py-2
+                        class="rounded-lg
+                           px-3 py-2
                            text-sm font-medium
                            text-gray-700
+                           transition
                            hover:bg-gray-100
-                           sm:block
+
                            dark:text-gray-300
-                           dark:hover:bg-gray-800">
+                           dark:hover:bg-gray-800
+
+                           lg:px-4">
 
                     Se connecter
 
                 </a>
 
 
+                <!-- CREER COMPTE -->
+
                 <a
                         routerLink="/signup"
                         routerLinkActive="bg-brand-600"
                         [routerLinkActiveOptions]="{ exact: true }"
-                        class="hidden rounded-lg
-                           bg-brand-500 px-4 py-2
+                        class="rounded-lg
+                           bg-brand-500
+                           px-3 py-2
                            text-sm font-medium
                            text-white
+                           transition
                            hover:bg-brand-600
-                           sm:block">
+
+                           lg:px-4">
 
                     Créer un compte
 
@@ -121,9 +156,9 @@
             @if (isLoggedIn()) {
 
 
-                <!-- ============================== -->
-                        <!-- DASHBOARD ADMIN -->
-                        <!-- ============================== -->
+                <!-- ================================================= -->
+                        <!-- ADMIN -->
+                        <!-- ================================================= -->
 
                 @if (isAdmin()) {
 
@@ -131,29 +166,34 @@
                             routerLink="/admin"
                             routerLinkActive="ring-2 ring-brand-300"
                             [routerLinkActiveOptions]="{ exact: true }"
-                            class="hidden items-center gap-2
+                            class="inline-flex items-center
+                               gap-2
                                rounded-lg
                                bg-purple-600
-                               px-4 py-2
+                               px-3 py-2
                                text-sm font-medium
                                text-white
                                transition
                                hover:bg-purple-700
-                               sm:inline-flex">
 
-                        ⚙️
+                               lg:px-4">
 
-                        Dashboard Admin
+                        <span>
+                            ⚙️
+                        </span>
+
+                        <span>
+                            Dashboard Admin
+                        </span>
 
                     </a>
 
                 }
 
 
-                <!-- ============================== -->
+                <!-- ================================================= -->
                         <!-- MON PROFIL -->
-                        <!-- Seulement si on n'est pas déjà dessus -->
-                        <!-- ============================== -->
+                        <!-- ================================================= -->
 
                 @if (!isProfilePage()) {
 
@@ -161,68 +201,83 @@
                             routerLink="/profile"
                             routerLinkActive="ring-2 ring-brand-300"
                             [routerLinkActiveOptions]="{ exact: true }"
-                            class="hidden items-center gap-2
+                            class="inline-flex items-center
+                               gap-2
                                rounded-lg
                                bg-brand-500
-                               px-4 py-2
+                               px-3 py-2
                                text-sm font-medium
                                text-white
                                transition
                                hover:bg-brand-600
-                               sm:inline-flex">
 
-                        👤
+                               lg:px-4">
 
-                        Mon profil
+                        <span>
+                            👤
+                        </span>
+
+                        <span>
+                            Mon profil
+                        </span>
 
                     </a>
 
                 }
 
 
-                <!-- ============================== -->
+                <!-- ================================================= -->
                         <!-- PANIER -->
-                        <!-- ============================== -->
+                        <!-- ================================================= -->
 
                 <a
                         routerLink="/cart"
                         routerLinkActive="ring-2 ring-brand-300"
                         [routerLinkActiveOptions]="{ exact: true }"
-                        class="hidden items-center gap-2
+                        class="inline-flex items-center
+                           gap-2
                            rounded-lg
                            bg-brand-500
-                           px-4 py-2
+                           px-3 py-2
                            text-sm font-medium
                            text-white
                            transition
                            hover:bg-brand-600
-                           sm:inline-flex">
 
-                    🛒
+                           lg:px-4">
 
-                    Mon panier
+                    <span>
+                        🛒
+                    </span>
+
+                    <span>
+                        Mon panier
+                    </span>
 
                 </a>
 
 
-                <!-- ============================== -->
+                <!-- ================================================= -->
                         <!-- DECONNEXION -->
-                        <!-- ============================== -->
+                        <!-- ================================================= -->
 
                 <button
                         type="button"
                         (click)="logout()"
-                        class="hidden rounded-lg
+                        class="rounded-lg
                            border border-red-200
-                           bg-white px-4 py-2
+                           bg-white
+                           px-3 py-2
                            text-sm font-medium
                            text-red-600
                            transition
                            hover:bg-red-50
-                           sm:block
+
                            dark:border-red-900
                            dark:bg-gray-900
-                           dark:hover:bg-red-950">
+                           dark:hover:bg-red-950
+
+                           lg:px-4">
 
                     Déconnexion
 
@@ -232,6 +287,52 @@
 
         </nav>
 
+
+        <!-- ================================================= -->
+        <!-- BOUTON MENU MOBILE -->
+        <!-- ================================================= -->
+
+        <button
+                type="button"
+                (click)="toggleMobileMenu()"
+                [attr.aria-expanded]="mobileMenuOpen"
+                aria-label="Ouvrir le menu"
+                class="flex h-10 w-10
+                   shrink-0
+                   items-center
+                   justify-center
+                   rounded-lg
+                   border border-gray-300
+                   bg-white
+                   text-xl
+                   text-gray-700
+                   transition
+                   hover:bg-gray-100
+
+                   md:hidden
+
+                   dark:border-gray-700
+                   dark:bg-gray-800
+                   dark:text-white
+                   dark:hover:bg-gray-700">
+
+
+            @if (mobileMenuOpen) {
+
+                <span>
+                    ✕
+                </span>
+
+            } @else {
+
+                <span>
+                    ☰
+                </span>
+
+            }
+
+        </button>
+
     </div>
 
 
@@ -240,25 +341,291 @@
     <!-- ================================================= -->
 
     <div
-            class="px-4 pb-4 md:hidden">
+            class="border-t border-gray-100
+               px-4 pb-4 pt-3
+               md:hidden
 
-        <input
-                type="text"
-                [(ngModel)]="searchTerm"
-                (input)="search()"
-                placeholder="Rechercher un produit..."
-                class="h-11 w-full rounded-lg
-                   border border-gray-300
-                   bg-gray-50 px-4
-                   text-sm text-gray-800
-                   outline-none
-                   focus:border-brand-500
-                   focus:ring-2
-                   focus:ring-brand-500/20
-                   dark:border-gray-700
-                   dark:bg-gray-800
-                   dark:text-white">
+               dark:border-gray-800">
+
+
+        <div
+                class="relative">
+
+            <input
+                    type="text"
+                    [(ngModel)]="searchTerm"
+                    [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="search()"
+                    placeholder="Rechercher un produit..."
+                    class="h-11 w-full
+                       rounded-lg
+                       border border-gray-300
+                       bg-gray-50
+                       px-4 pr-12
+                       text-sm
+                       text-gray-800
+                       outline-none
+                       transition
+
+                       focus:border-brand-500
+                       focus:ring-2
+                       focus:ring-brand-500/20
+
+                       dark:border-gray-700
+                       dark:bg-gray-800
+                       dark:text-white">
+
+
+            <span
+                    class="pointer-events-none
+                       absolute right-4 top-1/2
+                       -translate-y-1/2
+                       text-gray-400">
+
+                🔍
+
+            </span>
+
+        </div>
 
     </div>
+
+
+    <!-- ================================================= -->
+    <!-- MENU MOBILE -->
+    <!-- ================================================= -->
+
+    @if (mobileMenuOpen) {
+
+        <div
+                class="border-t
+                   border-gray-200
+                   bg-white
+                   px-4 py-4
+                   shadow-lg
+                   md:hidden
+
+                   dark:border-gray-800
+                   dark:bg-gray-900">
+
+
+            <nav
+                    class="flex flex-col gap-2">
+
+
+                <!-- ================================================= -->
+                <!-- VISITEUR -->
+                <!-- ================================================= -->
+
+                @if (!isLoggedIn()) {
+
+
+                    <!-- CONNEXION -->
+
+                    <a
+                            routerLink="/signin"
+                            (click)="closeMobileMenu()"
+                            routerLinkActive="bg-gray-100 text-brand-600"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                            class="flex items-center
+                               gap-3
+                               rounded-lg
+                               px-4 py-3
+                               text-sm font-medium
+                               text-gray-700
+                               transition
+                               hover:bg-gray-100
+
+                               dark:text-gray-300
+                               dark:hover:bg-gray-800">
+
+                        <span>
+                            🔐
+                        </span>
+
+                        <span>
+                            Se connecter
+                        </span>
+
+                    </a>
+
+
+                    <!-- CREER COMPTE -->
+
+                    <a
+                            routerLink="/signup"
+                            (click)="closeMobileMenu()"
+                            routerLinkActive="bg-brand-600"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                            class="flex items-center
+                               gap-3
+                               rounded-lg
+                               bg-brand-500
+                               px-4 py-3
+                               text-sm font-medium
+                               text-white
+                               transition
+                               hover:bg-brand-600">
+
+                        <span>
+                            📝
+                        </span>
+
+                        <span>
+                            Créer un compte
+                        </span>
+
+                    </a>
+
+                }
+
+
+                <!-- ================================================= -->
+                <!-- UTILISATEUR CONNECTÉ -->
+                <!-- ================================================= -->
+
+                @if (isLoggedIn()) {
+
+
+                    <!-- ================================================= -->
+                            <!-- ADMIN -->
+                            <!-- ================================================= -->
+
+                    @if (isAdmin()) {
+
+                        <a
+                                routerLink="/admin"
+                                (click)="closeMobileMenu()"
+                                routerLinkActive="bg-purple-100 text-purple-700"
+                                [routerLinkActiveOptions]="{ exact: true }"
+                                class="flex items-center
+                                   gap-3
+                                   rounded-lg
+                                   bg-purple-600
+                                   px-4 py-3
+                                   text-sm font-medium
+                                   text-white
+                                   transition
+                                   hover:bg-purple-700">
+
+                            <span>
+                                ⚙️
+                            </span>
+
+                            <span>
+                                Dashboard Admin
+                            </span>
+
+                        </a>
+
+                    }
+
+
+                    <!-- ================================================= -->
+                            <!-- PROFIL -->
+                            <!-- ================================================= -->
+
+                    @if (!isProfilePage()) {
+
+                        <a
+                                routerLink="/profile"
+                                (click)="closeMobileMenu()"
+                                routerLinkActive="bg-brand-100 text-brand-700"
+                                [routerLinkActiveOptions]="{ exact: true }"
+                                class="flex items-center
+                                   gap-3
+                                   rounded-lg
+                                   bg-brand-500
+                                   px-4 py-3
+                                   text-sm font-medium
+                                   text-white
+                                   transition
+                                   hover:bg-brand-600">
+
+                            <span>
+                                👤
+                            </span>
+
+                            <span>
+                                Mon profil
+                            </span>
+
+                        </a>
+
+                    }
+
+
+                    <!-- ================================================= -->
+                            <!-- PANIER -->
+                            <!-- ================================================= -->
+
+                    <a
+                            routerLink="/cart"
+                            (click)="closeMobileMenu()"
+                            routerLinkActive="bg-brand-100 text-brand-700"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                            class="flex items-center
+                               gap-3
+                               rounded-lg
+                               bg-brand-500
+                               px-4 py-3
+                               text-sm font-medium
+                               text-white
+                               transition
+                               hover:bg-brand-600">
+
+                        <span>
+                            🛒
+                        </span>
+
+                        <span>
+                            Mon panier
+                        </span>
+
+                    </a>
+
+
+                    <!-- ================================================= -->
+                            <!-- DECONNEXION -->
+                            <!-- ================================================= -->
+
+                    <button
+                            type="button"
+                            (click)="logout()"
+                            class="flex w-full
+                               items-center
+                               gap-3
+                               rounded-lg
+                               border
+                               border-red-200
+                               bg-white
+                               px-4 py-3
+                               text-left
+                               text-sm font-medium
+                               text-red-600
+                               transition
+                               hover:bg-red-50
+
+                               dark:border-red-900
+                               dark:bg-gray-900
+                               dark:hover:bg-red-950">
+
+                        <span>
+                            🚪
+                        </span>
+
+                        <span>
+                            Déconnexion
+                        </span>
+
+                    </button>
+
+                }
+
+            </nav>
+
+        </div>
+
+    }
 
 </header>

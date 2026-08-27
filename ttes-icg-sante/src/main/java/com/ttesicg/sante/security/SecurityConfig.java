@@ -41,6 +41,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/inventory/product/**")
                 .permitAll()
 
+                .requestMatchers("/api/companies/**")
+                .permitAll()
+
                 .requestMatchers("/api/inventory/**")
                 .hasRole("ADMIN")
 

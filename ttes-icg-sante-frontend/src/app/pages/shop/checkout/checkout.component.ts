@@ -35,6 +35,10 @@ import { UserService } from '../../../core/services/user.service';
 })
 export class CheckoutComponent implements OnInit {
 
+    // ==========================================
+    // SERVICES
+    // ==========================================
+
     private cartService = inject(CartService);
 
     private orderService = inject(OrderService);
@@ -44,18 +48,31 @@ export class CheckoutComponent implements OnInit {
     private userService = inject(UserService);
 
 
+    // ==========================================
+    // DONNEES
+    // ==========================================
+
     cart: Cart | null = null;
+
+    order: Order | null = null;
+
+
+    // ==========================================
+    // ETAT
+    // ==========================================
 
     loading = true;
 
     submitting = false;
 
-    error = '';
-
     success = false;
 
-    order: Order | null = null;
+    error = '';
 
+
+    // ==========================================
+    // FORMULAIRE
+    // ==========================================
 
     deliveryAddress = '';
 
@@ -63,6 +80,10 @@ export class CheckoutComponent implements OnInit {
 
     phone = '';
 
+
+    // ==========================================
+    // INITIALISATION
+    // ==========================================
 
     ngOnInit(): void {
 
@@ -73,46 +94,53 @@ export class CheckoutComponent implements OnInit {
     }
 
 
-    /**
-     * Récupérer le profil de l'utilisateur connecté
-     */
+    // ==========================================
+    // PROFIL
+    // ==========================================
+
     loadProfile(): void {
 
-        this.userService.getMyProfile().subscribe({
+        this.userService
+            .getMyProfile()
+            .subscribe({
 
-            next: (profile) => {
+                next: (profile) => {
 
-                console.log(
-                    'Profil utilisateur checkout :',
-                    profile
-                );
+                    console.log(
+                        'Profil utilisateur checkout :',
+                        profile
+                    );
 
-                this.phone = profile.phone ?? '';
+                    this.phone =
+                        profile.phone ?? '';
 
-            },
+                },
 
-            error: (error) => {
+                error: (error) => {
 
-                console.error(
-                    'Erreur récupération profil checkout :',
-                    error
-                );
+                    console.error(
+                        'Erreur récupération profil checkout :',
+                        error
+                    );
 
-                this.phone = '';
+                    this.phone = '';
 
-            }
+                }
 
-        });
+            });
 
     }
 
 
-    /**
-     * Charger le panier
-     */
+    // ==========================================
+    // PANIER
+    // ==========================================
+
     loadCart(): void {
 
         this.loading = true;
+
+        this.error = '';
 
         this.cartService
             .getCart()
@@ -124,9 +152,16 @@ export class CheckoutComponent implements OnInit {
 
                     this.loading = false;
 
-                    if (!cart.items.length) {
 
-                        this.router.navigate(['/cart']);
+                    // Panier vide
+                    if (
+                        !cart.items ||
+                        cart.items.length === 0
+                    ) {
+
+                        this.router.navigate([
+                            '/cart'
+                        ]);
 
                     }
 
@@ -140,6 +175,8 @@ export class CheckoutComponent implements OnInit {
                     );
 
                     this.error =
+                        error?.error?.message
+                        ??
                         'Impossible de charger votre panier.';
 
                     this.loading = false;
@@ -151,27 +188,38 @@ export class CheckoutComponent implements OnInit {
     }
 
 
-    /**
-     * Créer la commande
-     */
+    // ==========================================
+    // CONFIRMER LA COMMANDE
+    // ==========================================
+
     confirmOrder(): void {
 
+        // Vérification panier
         if (!this.cart) {
+
             return;
+
         }
+
 
         if (
             !this.cart.items ||
             this.cart.items.length === 0
         ) {
 
-            alert('Votre panier est vide.');
+            alert(
+                'Votre panier est vide.'
+            );
 
             return;
 
         }
 
-        if (!this.deliveryAddress.trim()) {
+
+        // Vérification adresse
+        if (
+            !this.deliveryAddress.trim()
+        ) {
 
             alert(
                 'Veuillez saisir votre adresse de livraison.'
@@ -181,11 +229,23 @@ export class CheckoutComponent implements OnInit {
 
         }
 
+
+        // Empêcher double clic
         if (this.submitting) {
+
             return;
+
         }
 
+
         this.submitting = true;
+
+        this.error = '';
+
+
+        // ==========================================
+        // REQUEST
+        // ==========================================
 
         const request: CreateOrderRequest = {
 
@@ -193,14 +253,21 @@ export class CheckoutComponent implements OnInit {
                 this.deliveryAddress.trim(),
 
             customerNote:
-                this.customerNote.trim() || undefined
+                this.customerNote.trim()
+                || undefined
 
         };
+
 
         console.log(
             'Création commande :',
             request
         );
+
+
+        // ==========================================
+        // CREATION COMMANDE
+        // ==========================================
 
         this.orderService
             .createOrder(request)
@@ -213,10 +280,54 @@ export class CheckoutComponent implements OnInit {
                         order
                     );
 
+
+                    this.order = order;
+
+                    this.success = true;
+
                     this.submitting = false;
 
+
+                    // ==================================
+                    // WHATSAPP
+                    // ==================================
+
+                    if (order.whatsappLink) {
+
+                        console.log(
+                            'Redirection WhatsApp :',
+                            order.whatsappLink
+                        );
+
+
+                        /*
+                         * Le backend a généré le lien
+                         * WhatsApp avec les informations
+                         * complètes de la commande.
+                         */
+
+                        window.location.href =
+                            order.whatsappLink;
+
+                        return;
+
+                    }
+
+
+                    // ==================================
+                    // PAS DE LIEN WHATSAPP
+                    // ==================================
+
+                    console.warn(
+                        'Aucun lien WhatsApp reçu par le backend.'
+                    );
+
+
                     this.router.navigate(
-                        ['/order-success', order.id],
+                        [
+                            '/order-success',
+                            order.id
+                        ],
                         {
                             state: {
                                 order: order
@@ -226,6 +337,11 @@ export class CheckoutComponent implements OnInit {
 
                 },
 
+
+                // =====================================
+                // ERREUR
+                // =====================================
+
                 error: (error) => {
 
                     console.error(
@@ -233,12 +349,18 @@ export class CheckoutComponent implements OnInit {
                         error
                     );
 
+
                     this.submitting = false;
 
-                    alert(
+
+                    this.error =
                         error?.error?.message
                         ??
-                        'Impossible de créer la commande.'
+                        'Impossible de créer la commande.';
+
+
+                    alert(
+                        this.error
                     );
 
                 }
@@ -248,27 +370,40 @@ export class CheckoutComponent implements OnInit {
     }
 
 
+    // ==========================================
+    // FORMAT PRIX
+    // ==========================================
+
     formatPrice(
         price: number | undefined
     ): string {
 
         return new Intl.NumberFormat(
-            'fr-FR'
-        ).format(price ?? 0) + ' FCFA';
+                'fr-FR'
+            ).format(price ?? 0)
+            + ' FCFA';
 
     }
 
 
+    // ==========================================
+    // NAVIGATION
+    // ==========================================
+
     goToShop(): void {
 
-        this.router.navigate(['/shop']);
+        this.router.navigate([
+            '/shop'
+        ]);
 
     }
 
 
     goToOrders(): void {
 
-        this.router.navigate(['/orders']);
+        this.router.navigate([
+            '/orders'
+        ]);
 
     }
 

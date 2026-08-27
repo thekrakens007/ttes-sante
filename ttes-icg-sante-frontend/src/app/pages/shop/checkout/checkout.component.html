@@ -7,62 +7,60 @@
 
     <header
             class="sticky top-0 z-50 border-b border-gray-200
-                   bg-white dark:border-gray-800 dark:bg-gray-900"
-    >
+               bg-white dark:border-gray-800
+               dark:bg-gray-900">
 
         <div
-                class="mx-auto flex max-w-7xl items-center
-                       justify-between gap-6 px-4 py-4
-                       sm:px-6 lg:px-8"
-        >
+                class="mx-auto flex max-w-7xl
+                   items-center justify-between
+                   gap-3 px-4 py-3
+                   sm:px-6 sm:py-4
+                   lg:px-8">
 
 
-            <!-- LOGO -->
+            <!-- ================= LOGO ================= -->
 
             <a
                     routerLink="/"
-                    class="flex items-center gap-3"
-            >
+                    class="flex shrink-0 items-center">
 
                 <img
                         src="/images/logo/logo.svg"
                         alt="TTES-ICG Santé"
-                        class="h-10 w-auto"
-                >
+                        class="h-9 w-auto sm:h-10">
 
             </a>
 
 
-            <!-- RECHERCHE -->
+            <!-- ================= RECHERCHE DESKTOP ================= -->
 
             <div
-                    class="hidden flex-1 max-w-xl md:block"
-            >
+                    class="hidden flex-1 md:block md:max-w-xl md:px-4">
 
                 <div class="relative">
 
                     <input
                             type="text"
                             placeholder="Rechercher un produit..."
-                            class="h-11 w-full rounded-lg
-                                   border border-gray-300
-                                   bg-gray-50 px-4 pr-12
-                                   text-sm text-gray-800
-                                   outline-none transition
-                                   focus:border-brand-500
-                                   focus:ring-2
-                                   focus:ring-brand-500/20
-                                   dark:border-gray-700
-                                   dark:bg-gray-800
-                                   dark:text-white"
-                    >
+                            class="h-10 w-full rounded-lg
+                               border border-gray-300
+                               bg-gray-50 px-4 pr-11
+                               text-sm text-gray-800
+                               outline-none transition
+                               focus:border-brand-500
+                               focus:ring-2
+                               focus:ring-brand-500/20
+                               dark:border-gray-700
+                               dark:bg-gray-800
+                               dark:text-white">
 
                     <span
                             class="absolute right-4 top-1/2
-                                   -translate-y-1/2
-                                   text-gray-400"
-                    >
+                               -translate-y-1/2
+                               text-gray-400">
+
                         🔍
+
                     </span>
 
                 </div>
@@ -70,9 +68,10 @@
             </div>
 
 
-            <!-- NAVIGATION -->
+            <!-- ================= NAVIGATION ================= -->
 
-            <div class="flex items-center gap-3">
+            <nav
+                    class="flex shrink-0 items-center gap-2 sm:gap-3">
 
 
                 <!-- PROFIL -->
@@ -80,14 +79,17 @@
                 <a
                         routerLink="/profile"
                         class="hidden rounded-lg
-                               bg-brand-500 px-4 py-2
-                               text-sm font-medium
-                               text-white
-                               hover:bg-brand-600
-                               sm:block"
-                >
+                           bg-brand-500
+                           px-3 py-2
+                           text-sm font-medium
+                           text-white
+                           hover:bg-brand-600
+                           sm:inline-flex">
 
-                    👤 Mon profil
+                    👤
+                    <span class="ml-1 hidden md:inline">
+                        Mon profil
+                    </span>
 
                 </a>
 
@@ -96,39 +98,58 @@
 
                 <a
                         routerLink="/cart"
-                        class="hidden rounded-lg
-                               bg-brand-500 px-4 py-2
-                               text-sm font-medium
-                               text-white
-                               hover:bg-brand-600
-                               sm:block"
-                >
+                        class="inline-flex items-center
+                           rounded-lg
+                           bg-brand-500
+                           px-3 py-2
+                           text-sm font-medium
+                           text-white
+                           hover:bg-brand-600">
 
-                    🛒 Mon panier
+                    🛒
+
+                    <span class="ml-1 hidden sm:inline">
+                        Mon panier
+                    </span>
 
                 </a>
 
-            </div>
+            </nav>
 
         </div>
 
 
-        <!-- RECHERCHE MOBILE -->
+        <!-- ================= RECHERCHE MOBILE ================= -->
 
-        <div class="px-4 pb-4 md:hidden">
+        <div
+                class="px-4 pb-3 md:hidden">
 
-            <input
-                    type="text"
-                    placeholder="Rechercher un produit..."
-                    class="h-11 w-full rounded-lg
+            <div class="relative">
+
+                <input
+                        type="text"
+                        placeholder="Rechercher un produit..."
+                        class="h-10 w-full rounded-lg
                            border border-gray-300
-                           bg-gray-50 px-4
-                           text-sm outline-none
+                           bg-gray-50
+                           px-4 pr-10
+                           text-sm text-gray-800
+                           outline-none
                            focus:border-brand-500
                            dark:border-gray-700
                            dark:bg-gray-800
-                           dark:text-white"
-            >
+                           dark:text-white">
+
+                <span
+                        class="absolute right-3 top-1/2
+                           -translate-y-1/2
+                           text-gray-400">
+
+                    🔍
+
+                </span>
+
+            </div>
 
         </div>
 

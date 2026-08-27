@@ -40,7 +40,6 @@ public class OrderService {
             CreateOrderRequest request
     ) {
 
-
         User user =
                 userRepository.findById(userId)
                         .orElseThrow(
@@ -48,7 +47,6 @@ public class OrderService {
                                         "Utilisateur introuvable"
                                 )
                         );
-
 
 
         Cart cart =
@@ -60,14 +58,12 @@ public class OrderService {
                         );
 
 
-
-        if(cart.getItems().isEmpty()){
+        if (cart.getItems().isEmpty()) {
 
             throw new RuntimeException(
                     "Le panier est vide"
             );
         }
-
 
 
         Order order =
@@ -94,15 +90,14 @@ public class OrderService {
                         .build();
 
 
-
         BigDecimal total =
                 BigDecimal.ZERO;
 
 
-
-        for(CartItem cartItem : cart.getItems()){
+        for (CartItem cartItem : cart.getItems()) {
 
             checkAndUpdateStock(cartItem);
+
 
             OrderItem item =
                     OrderItem.builder()
@@ -124,10 +119,8 @@ public class OrderService {
                             .build();
 
 
-
             order.getItems()
                     .add(item);
-
 
 
             BigDecimal subtotal =
@@ -144,39 +137,52 @@ public class OrderService {
         }
 
 
-
         order.setTotalAmount(total);
 
 
+        // ==========================================================
+        // ENREGISTRER LA COMMANDE
+        // ==========================================================
 
         Order saved =
                 orderRepository.save(order);
 
 
+        // ==========================================================
+        // GENERER LE LIEN WHATSAPP
+        // ==========================================================
+
         String whatsappLink =
                 whatsappService.generateWhatsAppLink(saved);
 
-        // vider le panier après commande
+
+        // ==========================================================
+        // VIDER LE PANIER
+        // ==========================================================
 
         cartItemRepository.deleteAll(
                 cart.getItems()
         );
 
-
-        cart.getItems()
-                .clear();
+        cart.getItems().clear();
 
         cartRepository.save(cart);
 
 
-        OrderResponse response = map(saved);
+        // ==========================================================
+        // REPONSE
+        // ==========================================================
+
+        OrderResponse response =
+                map(saved);
+
 
         response.setWhatsappLink(
-                whatsappService.generateWhatsAppLink(saved)
+                whatsappLink
         );
 
-        return response;
 
+        return response;
     }
 
     private OrderResponse map(Order order){

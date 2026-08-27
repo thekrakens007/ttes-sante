@@ -1,13 +1,20 @@
-import { Component, inject } from '@angular/core';
+import {
+    Component,
+    inject
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
+
 import {
     Router,
     RouterLink,
     RouterLinkActive
 } from '@angular/router';
+
 import { FormsModule } from '@angular/forms';
 
 import { AuthService } from '../../../../core/services/auth.service';
+
 
 @Component({
     selector: 'app-client-navbar',
@@ -24,7 +31,13 @@ import { AuthService } from '../../../../core/services/auth.service';
 })
 export class ClientNavbarComponent {
 
+
+    // ==========================================
+    // SERVICES
+    // ==========================================
+
     private authService = inject(AuthService);
+
     private router = inject(Router);
 
 
@@ -33,6 +46,13 @@ export class ClientNavbarComponent {
     // ==========================================
 
     searchTerm = '';
+
+
+    // ==========================================
+    // MENU MOBILE
+    // ==========================================
+
+    mobileMenuOpen = false;
 
 
     // ==========================================
@@ -52,7 +72,9 @@ export class ClientNavbarComponent {
 
     isAdmin(): boolean {
 
-        return this.authService.hasRole('ROLE_ADMIN');
+        return this.authService.hasRole(
+            'ROLE_ADMIN'
+        );
 
     }
 
@@ -64,6 +86,29 @@ export class ClientNavbarComponent {
     isProfilePage(): boolean {
 
         return this.router.url === '/profile';
+
+    }
+
+
+    // ==========================================
+    // OUVRIR / FERMER MENU MOBILE
+    // ==========================================
+
+    toggleMobileMenu(): void {
+
+        this.mobileMenuOpen =
+            !this.mobileMenuOpen;
+
+    }
+
+
+    // ==========================================
+    // FERMER MENU MOBILE
+    // ==========================================
+
+    closeMobileMenu(): void {
+
+        this.mobileMenuOpen = false;
 
     }
 
@@ -83,16 +128,22 @@ export class ClientNavbarComponent {
 
 
     // ==========================================
-    // DECONNEXION
+    // DÉCONNEXION
     // ==========================================
 
     logout(): void {
 
-        console.log('Déconnexion...');
+        console.log(
+            'Déconnexion...'
+        );
+
+        this.mobileMenuOpen = false;
 
         this.authService.logout();
 
-        this.router.navigate(['/']);
+        this.router.navigate([
+            '/'
+        ]);
 
     }
 

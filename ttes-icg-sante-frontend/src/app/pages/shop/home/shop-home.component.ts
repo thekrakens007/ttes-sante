@@ -10,59 +10,146 @@ import { FormsModule } from '@angular/forms';
 
 import { ProductService } from '../../../core/services/product.service';
 import { Product } from '../../../core/models/product.model';
-import { ProductCardComponent } from "../../../shared/components/client/product-card/product-card.component";
-import { CartService } from "../../../core/services/cart.service";
-import { CartResponse } from "../../../core/interfaces/cart.interface";
+
+import { ProductCardComponent } from '../../../shared/components/client/product-card/product-card.component';
+
+import { CartService } from '../../../core/services/cart.service';
+import { CartResponse } from '../../../core/interfaces/cart.interface';
+
 import { AuthService } from '../../../core/services/auth.service';
+
 
 @Component({
     selector: 'app-shop-home',
+
     standalone: true,
+
     imports: [
         CommonModule,
         RouterModule,
         FormsModule,
         ProductCardComponent
     ],
+
     templateUrl: './shop-home.component.html'
 })
 export class ShopHomeComponent implements OnInit {
 
-    private productService = inject(ProductService);
-    private cartService = inject(CartService);
-    private authService = inject(AuthService);
+
+    // =====================================================
+    // SERVICES
+    // =====================================================
+
+    private productService =
+        inject(ProductService);
+
+    private cartService =
+        inject(CartService);
+
+    private authService =
+        inject(AuthService);
+
+
+    // =====================================================
+    // PANIER
+    // =====================================================
 
     cart: CartResponse | null = null;
+
+
+    // =====================================================
+    // PRODUITS
+    // =====================================================
 
     products: Product[] = [];
 
     filteredProducts: Product[] = [];
 
+
+    // =====================================================
+    // RECHERCHE
+    // =====================================================
+
     searchTerm = '';
+
+
+    // =====================================================
+    // FILTRES
+    // =====================================================
+
+    selectedCategory = '';
+
+    selectedCompany = '';
+
+    selectedTherapeuticArea = '';
+
+
+    // =====================================================
+    // LISTES FILTRES
+    // =====================================================
+
+    categories: string[] = [];
+
+    companies: string[] = [];
+
+    therapeuticAreas: string[] = [];
+
+
+    // =====================================================
+    // ETAT
+    // =====================================================
 
     loading = true;
 
     error = '';
 
 
+    // =====================================================
+    // MENU MOBILE
+    // =====================================================
+
+    mobileMenuOpen = false;
+
+
+    // =====================================================
+    // INITIALISATION
+    // =====================================================
+
     ngOnInit(): void {
 
         this.loadProducts();
 
-        /*
-         * On ne charge le panier que si
-         * l'utilisateur est connecté.
-         */
         if (this.isLoggedIn()) {
+
             this.loadCart();
+
         }
 
     }
 
 
-    // ==========================================
+    // =====================================================
+    // MENU MOBILE
+    // =====================================================
+
+    toggleMobileMenu(): void {
+
+        this.mobileMenuOpen =
+            !this.mobileMenuOpen;
+
+    }
+
+
+    closeMobileMenu(): void {
+
+        this.mobileMenuOpen = false;
+
+    }
+
+
+    // =====================================================
     // AUTHENTIFICATION
-    // ==========================================
+    // =====================================================
 
     isLoggedIn(): boolean {
 
@@ -71,20 +158,18 @@ export class ShopHomeComponent implements OnInit {
     }
 
 
-    // ==========================================
-    // ADMIN
-    // ==========================================
-
     isAdmin(): boolean {
 
-        return this.authService.hasRole('ROLE_ADMIN');
+        return this.authService.hasRole(
+            'ROLE_ADMIN'
+        );
 
     }
 
 
-    // ==========================================
+    // =====================================================
     // PANIER
-    // ==========================================
+    // =====================================================
 
     loadCart(): void {
 
@@ -96,8 +181,8 @@ export class ShopHomeComponent implements OnInit {
 
         }
 
-
-        this.cartService.getCart()
+        this.cartService
+            .getCart()
             .subscribe({
 
                 next: (cart) => {
@@ -127,24 +212,30 @@ export class ShopHomeComponent implements OnInit {
     }
 
 
-    // ==========================================
+    // =====================================================
     // PRODUITS
-    // ==========================================
+    // =====================================================
 
     loadProducts(): void {
 
         this.loading = true;
 
-        this.productService.getProducts()
+        this.productService
+            .getProducts()
             .subscribe({
 
                 next: (products) => {
 
-                    this.products = products.filter(
-                        product => product.stock > 0
-                    );
+                    this.products =
+                        products.filter(
+                            product =>
+                                product.stock > 0
+                        );
 
-                    this.filteredProducts = this.products;
+                    this.filteredProducts =
+                        this.products;
+
+                    this.buildFilters();
 
                     this.loading = false;
 
@@ -169,93 +260,234 @@ export class ShopHomeComponent implements OnInit {
     }
 
 
-    // ==========================================
-    // RECHERCHE
-    // ==========================================
+    // =====================================================
+    // CONSTRUCTION DES FILTRES
+    // =====================================================
+
+    buildFilters(): void {
+
+        const categories =
+            this.products.flatMap(
+                product =>
+                    product.categories ?? []
+            );
+
+        const companies =
+            this.products
+                .map(
+                    product =>
+                        product.companyName
+                )
+                .filter(
+                    value =>
+                        !!value
+                );
+
+        const therapeuticAreas =
+            this.products.flatMap(
+                product =>
+                    product.therapeuticAreas ?? []
+            );
+
+
+        this.categories =
+            [...new Set(categories)]
+                .sort();
+
+        //this.companies =
+        //    [...new Set(companies)]
+        //        .sort();
+
+        console.log('compqnie:',companies);
+
+        this.therapeuticAreas =
+            [...new Set(therapeuticAreas)]
+                .sort();
+
+    }
+
+
+    // =====================================================
+    // RECHERCHE + FILTRES
+    // =====================================================
 
     search(): void {
 
         const term =
-            this.searchTerm.trim().toLowerCase();
-
-
-        if (!term) {
-
-            this.filteredProducts =
-                this.products;
-
-            return;
-
-        }
+            this.searchTerm
+                .trim()
+                .toLowerCase();
 
 
         this.filteredProducts =
-            this.products.filter(product =>
+            this.products.filter(product => {
 
-                product.name
-                    ?.toLowerCase()
-                    .includes(term)
 
-                ||
+                // -----------------------------------------
+                // RECHERCHE TEXTUELLE
+                // -----------------------------------------
 
-                product.brand
-                    ?.toLowerCase()
-                    .includes(term)
+                const matchesSearch =
+                    !term ||
 
-                ||
+                    product.name
+                        ?.toLowerCase()
+                        .includes(term)
 
-                product.description
-                    ?.toLowerCase()
-                    .includes(term)
+                    ||
 
-                ||
+                    product.brand
+                        ?.toLowerCase()
+                        .includes(term)
 
-                product.categories?.some(category =>
-                    category.toLowerCase().includes(term)
-                )
+                    ||
 
-            );
+                    product.description
+                        ?.toLowerCase()
+                        .includes(term)
+
+                    ||
+
+                    product.categories?.some(
+                        category =>
+                            category
+                                .toLowerCase()
+                                .includes(term)
+                    )
+
+                    ||
+
+                    product.companyName
+                        ?.toLowerCase()
+                        .includes(term)
+
+                    ||
+
+                    product.therapeuticAreas?.some(
+                        area =>
+                            area
+                                .toLowerCase()
+                                .includes(term)
+                    );
+
+
+                // -----------------------------------------
+                // CATEGORIE
+                // -----------------------------------------
+
+                const matchesCategory =
+                    !this.selectedCategory ||
+
+                    product.categories?.includes(
+                        this.selectedCategory
+                    );
+
+
+                // -----------------------------------------
+                // ENTREPRISE
+                // -----------------------------------------
+
+                const matchesCompany =
+                    !this.selectedCompany ||
+
+                    product.companyName ===
+                    this.selectedCompany;
+
+
+                // -----------------------------------------
+                // DOMAINE THERAPEUTIQUE
+                // -----------------------------------------
+
+                const matchesTherapeuticArea =
+                    !this.selectedTherapeuticArea ||
+
+                    product.therapeuticAreas?.includes(
+                        this.selectedTherapeuticArea
+                    );
+
+
+                return (
+                    matchesSearch &&
+                    matchesCategory &&
+                    matchesCompany &&
+                    matchesTherapeuticArea
+                );
+
+            });
 
     }
 
 
-    // ==========================================
-    // PANIER PRODUIT
-    // ==========================================
+    // =====================================================
+    // RESET FILTRES
+    // =====================================================
 
-    isProductInCart(productId: number): boolean {
+    resetFilters(): void {
+
+        this.searchTerm = '';
+
+        this.selectedCategory = '';
+
+        this.selectedCompany = '';
+
+        this.selectedTherapeuticArea = '';
+
+        this.filteredProducts =
+            this.products;
+
+    }
+
+
+    // =====================================================
+    // PANIER PRODUIT
+    // =====================================================
+
+    isProductInCart(
+        productId: number
+    ): boolean {
 
         if (!this.cart?.items) {
+
             return false;
+
         }
 
         return this.cart.items.some(
-            item => item.productId === productId
+            item =>
+                item.productId === productId
         );
 
     }
 
 
-    getProductQuantity(productId: number): number {
+    getProductQuantity(
+        productId: number
+    ): number {
 
         if (!this.cart?.items) {
+
             return 0;
+
         }
 
-        const item = this.cart.items.find(
-            item => item.productId === productId
-        );
+        const item =
+            this.cart.items.find(
+                item =>
+                    item.productId === productId
+            );
 
         return item?.quantity ?? 0;
 
     }
 
 
-    // ==========================================
+    // =====================================================
     // IMAGE
-    // ==========================================
+    // =====================================================
 
-    getMainImage(product: Product): string {
+    getMainImage(
+        product: Product
+    ): string {
 
         if (
             !product.images ||
@@ -266,28 +498,35 @@ export class ShopHomeComponent implements OnInit {
 
         }
 
-
         const mainImage =
             product.images.find(
-                image => image.main
+                image =>
+                    image.main
             );
 
 
-        return mainImage?.imageUrl
-            || product.images[0].imageUrl;
+        return (
+            mainImage?.imageUrl
+            ||
+            product.images[0].imageUrl
+        );
 
     }
 
 
-    // ==========================================
+    // =====================================================
     // PRIX
-    // ==========================================
+    // =====================================================
 
-    formatPrice(price: number): string {
+    formatPrice(
+        price: number | undefined
+    ): string {
 
         return new Intl.NumberFormat(
             'fr-FR'
-        ).format(price) + ' FCFA';
+        ).format(
+            price ?? 0
+        ) + ' FCFA';
 
     }
 

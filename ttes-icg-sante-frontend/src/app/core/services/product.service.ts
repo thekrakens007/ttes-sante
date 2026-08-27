@@ -10,7 +10,9 @@ export class ProductService {
 
     private http = inject(HttpClient);
 
-    private readonly API_URL = 'http://localhost:8080/api/products';
+    private readonly API_URL = 'http://10.141.71.113:8080/api/products';
+
+    //private readonly API_URL = 'http://localhost:8080/api/products';
 
     getProducts(): Observable<Product[]> {
         return this.http.get<Product[]>(this.API_URL);

@@ -1,0 +1,11 @@
+target/*
+!target/ttes-icg-sante-1.0-SNAPSHOT.jar
+
+.git/
+.gitignore
+.idea/
+.vscode/
+*.iml
+*.log
+README.md
+.docker-runtime/

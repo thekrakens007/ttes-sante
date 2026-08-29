@@ -19,7 +19,7 @@ import {ProductImageResponse} from "../interfaces/product-image-response.interfa
 export class AdminService {
 
     private http = inject(HttpClient);
-    private readonly API_URL = 'http://10.141.71.113:8080/api/admin';
+    private readonly API_URL = '/api/admin';
     //private readonly API_URL = 'http://localhost:8080/api/admin';
 
 

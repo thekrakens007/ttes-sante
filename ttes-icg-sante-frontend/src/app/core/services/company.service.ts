@@ -13,7 +13,7 @@ export class CompanyService {
     private http = inject(HttpClient);
 
     private readonly API_URL =
-        'http://localhost:8080/api/companies';
+        '/api/companies';
 
 
     // =====================================================

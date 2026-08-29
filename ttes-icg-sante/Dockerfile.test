@@ -1,0 +1,9 @@
+FROM maven:3.9-eclipse-temurin-21
+
+RUN echo "=== RESOLV.CONF ===" && cat /etc/resolv.conf
+
+RUN echo "=== DNS repo1 ===" && getent hosts repo1.maven.org
+
+RUN echo "=== DNS Maven ===" && getent hosts repo.maven.apache.org
+
+RUN echo "=== DNS Google ===" && getent hosts google.com

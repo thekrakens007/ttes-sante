@@ -20,7 +20,6 @@ export class AdminService {
 
     private http = inject(HttpClient);
     private readonly API_URL = '/api/admin';
-    //private readonly API_URL = 'http://localhost:8080/api/admin';
 
 
     // =========================
@@ -205,7 +204,7 @@ export class AdminService {
     ): Observable<InventoryResponse> {
 
         return this.http.get<InventoryResponse>(
-            `http://localhost:8080/api/inventory/product/${productId}`
+            `${this.API_URL}/api/inventory/product/${productId}`
         );
 
     }
@@ -217,7 +216,7 @@ export class AdminService {
     ): Observable<InventoryResponse> {
 
         return this.http.put<InventoryResponse>(
-            `http://localhost:8080/api/inventory/product/${productId}`,
+            `${this.API_URL}/api/inventory/product/${productId}`,
             request
         );
 

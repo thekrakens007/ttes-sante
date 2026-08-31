@@ -21,7 +21,6 @@ export class AuthService {
 
   private readonly API_URL = '/api/auth';
 
-  //private readonly API_URL = 'http://localhost:8080/api/auth';
 
   private readonly TOKEN_KEY = 'ttes_icg_sante_token';
 

@@ -16,7 +16,6 @@ export class OrderService {
 
     private readonly API_URL = '/api/orders';
 
-    //private readonly API_URL = 'http://localhost:8080/api/orders';
 
 
     createOrder(

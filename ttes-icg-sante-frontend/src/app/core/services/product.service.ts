@@ -12,7 +12,6 @@ export class ProductService {
 
     private readonly API_URL = '/api/products';
 
-    //private readonly API_URL = 'http://localhost:8080/api/products';
 
     getProducts(): Observable<Product[]> {
         return this.http.get<Product[]>(this.API_URL);

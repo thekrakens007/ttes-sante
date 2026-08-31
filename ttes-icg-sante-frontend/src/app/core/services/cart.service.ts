@@ -12,7 +12,6 @@ export class CartService {
 
     private readonly API_URL = '/api/cart';
 
-    //private readonly API_URL = 'http://localhost:8080/api/cart';
 
 
     /**

@@ -13,7 +13,6 @@ export class UserService {
 
     private readonly API_URL = '/api/user';
 
-    //private readonly API_URL = 'http://localhost:8080/api/user';
 
 
     /**

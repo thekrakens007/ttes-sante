@@ -6,4 +6,6 @@ dist/
 .vscode/
 .idea/
 *.log
+.angular
+npm-debug.log
 README.md

@@ -1,126 +1,279 @@
-<div class="space-y-6">
+<div
+        class="min-h-full space-y-6
+           bg-gray-50
+           text-gray-900
+           dark:bg-gray-950
+           dark:text-white">
 
-    <!-- En-tête du dashboard -->
-    <div>
+    <!-- ================================================= -->
+    <!-- EN-TÊTE DU DASHBOARD -->
+    <!-- ================================================= -->
+
+    <div
+            class="rounded-2xl
+               border border-gray-200
+               bg-white
+               p-6
+               shadow-sm
+               dark:border-gray-800
+               dark:bg-gray-900">
 
         @if (isAdmin) {
 
             <h1
-                    class="text-2xl font-semibold text-gray-800 dark:text-white"
-            >
+                    class="text-2xl font-semibold
+                       text-gray-800
+                       dark:text-white">
+
                 Dashboard Administrateur
+
             </h1>
 
             <p
-                    class="mt-1 text-sm text-gray-500 dark:text-gray-400"
-            >
+                    class="mt-1 text-sm
+                       text-gray-500
+                       dark:text-gray-400">
+
                 Gestion et suivi de TTES-ICG Santé
+
             </p>
 
         } @else {
 
             <h1
-                    class="text-2xl font-semibold text-gray-800 dark:text-white"
-            >
+                    class="text-2xl font-semibold
+                       text-gray-800
+                       dark:text-white">
+
                 Mon espace
+
             </h1>
 
             <p
-                    class="mt-1 text-sm text-gray-500 dark:text-gray-400"
-            >
+                    class="mt-1 text-sm
+                       text-gray-500
+                       dark:text-gray-400">
+
                 Bienvenue dans votre espace TTES-ICG Santé
+
             </p>
 
         }
 
         @if (userEmail) {
 
-            <p
-                    class="mt-2 text-xs text-gray-400"
-            >
-                Connecté en tant que :
-                <span class="font-medium">
-          {{ userEmail }}
-        </span>
-            </p>
+            <div
+                    class="mt-4 inline-flex
+                       items-center
+                       rounded-lg
+                       border border-gray-200
+                       bg-gray-50
+                       px-3 py-2
+                       dark:border-gray-700
+                       dark:bg-gray-800">
+
+                <span
+                        class="text-xs text-gray-500
+                           dark:text-gray-400">
+
+                    Connecté en tant que :
+
+                </span>
+
+                <span
+                        class="ml-1 text-xs font-medium
+                           text-gray-700
+                           dark:text-gray-200">
+
+                    {{ userEmail }}
+
+                </span>
+
+            </div>
 
         }
 
     </div>
 
 
-    <!-- Dashboard Admin -->
+    <!-- ================================================= -->
+    <!-- DASHBOARD ADMIN -->
+    <!-- ================================================= -->
+
     @if (isAdmin) {
 
-        <div class="grid grid-cols-12 gap-4 md:gap-6">
+        <div
+                class="grid grid-cols-12
+                   gap-4 md:gap-6">
 
-            <!-- Statistiques -->
-            <div class="col-span-12 space-y-6 xl:col-span-7">
+            <!-- ========================================= -->
+            <!-- STATISTIQUES + VENTES -->
+            <!-- ========================================= -->
 
-                <div>
+            <div
+                    class="col-span-12
+                       space-y-6
+                       xl:col-span-7">
+
+                <!-- Statistiques -->
+
+                <div
+                        class="rounded-2xl
+                           border border-gray-200
+                           bg-white
+                           shadow-sm
+                           dark:border-gray-800
+                           dark:bg-gray-900">
+
                     <app-ecommerce-metrics />
+
                 </div>
 
-                <div>
+
+                <!-- Ventes mensuelles -->
+
+                <div
+                        class="rounded-2xl
+                           border border-gray-200
+                           bg-white
+                           shadow-sm
+                           dark:border-gray-800
+                           dark:bg-gray-900">
+
                     <app-monthly-sales-chart />
+
                 </div>
 
             </div>
 
 
-            <!-- Objectif mensuel -->
-            <div class="col-span-12 xl:col-span-5">
+            <!-- ========================================= -->
+            <!-- OBJECTIF MENSUEL -->
+            <!-- ========================================= -->
 
-                <app-monthly-target />
+            <div
+                    class="col-span-12
+                       xl:col-span-5">
+
+                <div
+                        class="h-full
+                           rounded-2xl
+                           border border-gray-200
+                           bg-white
+                           shadow-sm
+                           dark:border-gray-800
+                           dark:bg-gray-900">
+
+                    <app-monthly-target />
+
+                </div>
 
             </div>
 
 
-            <!-- Statistiques -->
-            <div class="col-span-12">
+            <!-- ========================================= -->
+            <!-- STATISTIQUES -->
+            <!-- ========================================= -->
 
-                <app-statics-chart />
+            <div
+                    class="col-span-12">
+
+                <div
+                        class="rounded-2xl
+                           border border-gray-200
+                           bg-white
+                           shadow-sm
+                           dark:border-gray-800
+                           dark:bg-gray-900">
+
+                    <app-statics-chart />
+
+                </div>
 
             </div>
 
 
-            <!-- Répartition -->
-            <div class="col-span-12 xl:col-span-5">
+            <!-- ========================================= -->
+            <!-- RÉPARTITION -->
+            <!-- ========================================= -->
 
-                <app-demographic-card />
+            <div
+                    class="col-span-12
+                       xl:col-span-5">
+
+                <div
+                        class="h-full
+                           rounded-2xl
+                           border border-gray-200
+                           bg-white
+                           shadow-sm
+                           dark:border-gray-800
+                           dark:bg-gray-900">
+
+                    <app-demographic-card />
+
+                </div>
 
             </div>
 
 
-            <!-- Commandes -->
-            <div class="col-span-12 xl:col-span-7">
+            <!-- ========================================= -->
+            <!-- COMMANDES RÉCENTES -->
+            <!-- ========================================= -->
 
-                <app-recent-orders />
+            <div
+                    class="col-span-12
+                       xl:col-span-7">
+
+                <div
+                        class="h-full
+                           rounded-2xl
+                           border border-gray-200
+                           bg-white
+                           shadow-sm
+                           dark:border-gray-800
+                           dark:bg-gray-900">
+
+                    <app-recent-orders />
+
+                </div>
 
             </div>
 
         </div>
 
 
+        <!-- ================================================= -->
+                <!-- DASHBOARD CLIENT -->
+                <!-- ================================================= -->
 
-
-    <!-- Dashboard Client -->
     } @else {
 
         <div
-                class="rounded-xl border border-gray-200 bg-white p-8 dark:border-gray-800 dark:bg-white/[0.03]"
-        >
+                class="rounded-2xl
+                   border border-gray-200
+                   bg-white
+                   p-8
+                   shadow-sm
+                   dark:border-gray-800
+                   dark:bg-gray-900">
 
             <h2
-                    class="text-lg font-semibold text-gray-800 dark:text-white"
-            >
+                    class="text-lg font-semibold
+                       text-gray-800
+                       dark:text-white">
+
                 Bienvenue dans votre espace client
+
             </h2>
 
             <p
-                    class="mt-2 text-sm text-gray-500 dark:text-gray-400"
-            >
+                    class="mt-2 text-sm
+                       text-gray-500
+                       dark:text-gray-400">
+
                 Votre espace personnel sera bientôt disponible.
+
             </p>
 
         </div>

@@ -42,18 +42,27 @@ layer(base);
   --color-white: #ffffff;
   --color-black: #101828;
 
-  --color-brand-25: #f2f7ff;
-  --color-brand-50: #ecf3ff;
-  --color-brand-100: #dde9ff;
-  --color-brand-200: #c2d6ff;
-  --color-brand-300: #9cb9ff;
-  --color-brand-400: #7592ff;
-  --color-brand-500: #465fff;
-  --color-brand-600: #3641f5;
-  --color-brand-700: #2a31d8;
-  --color-brand-800: #252dae;
-  --color-brand-900: #262e89;
-  --color-brand-950: #161950;
+  /* =====================================================
+     TES-ICG SANTÉ
+     COULEUR PRINCIPALE — VERT MÉDICAL
+     ===================================================== */
+
+  --color-brand-25: #f4fbf7;
+  --color-brand-50: #eaf7ef;
+  --color-brand-100: #d5efdf;
+  --color-brand-200: #b0dfc1;
+  --color-brand-300: #7bc79a;
+  --color-brand-400: #3fa96b;
+  --color-brand-500: #00843d;
+  --color-brand-600: #007536;
+  --color-brand-700: #00652f;
+  --color-brand-800: #005528;
+  --color-brand-900: #004520;
+  --color-brand-950: #002b14;
+
+  /* =====================================================
+     BLEU CLAIR
+     ===================================================== */
 
   --color-blue-light-25: #f5fbff;
   --color-blue-light-50: #f0f9ff;
@@ -67,6 +76,10 @@ layer(base);
   --color-blue-light-800: #065986;
   --color-blue-light-900: #0b4a6f;
   --color-blue-light-950: #062c41;
+
+  /* =====================================================
+     GRIS
+     ===================================================== */
 
   --color-gray-25: #fcfcfd;
   --color-gray-50: #f9fafb;
@@ -82,18 +95,27 @@ layer(base);
   --color-gray-950: #0c111d;
   --color-gray-dark: #1a2231;
 
+  /* =====================================================
+     TES-ICG SANTÉ
+     COULEUR SECONDAIRE — ORANGE
+     ===================================================== */
+
   --color-orange-25: #fffaf5;
-  --color-orange-50: #fff6ed;
-  --color-orange-100: #ffead5;
-  --color-orange-200: #fddcab;
-  --color-orange-300: #feb273;
-  --color-orange-400: #fd853a;
-  --color-orange-500: #fb6514;
-  --color-orange-600: #ec4a0a;
-  --color-orange-700: #c4320a;
-  --color-orange-800: #9c2a10;
-  --color-orange-900: #7e2410;
-  --color-orange-950: #511c10;
+  --color-orange-50: #fff5eb;
+  --color-orange-100: #ffe8d1;
+  --color-orange-200: #ffd0a3;
+  --color-orange-300: #ffb66b;
+  --color-orange-400: #f99a3d;
+  --color-orange-500: #f28c28;
+  --color-orange-600: #df7617;
+  --color-orange-700: #c4610f;
+  --color-orange-800: #a14d0a;
+  --color-orange-900: #823e08;
+  --color-orange-950: #4f2505;
+
+  /* =====================================================
+     SUCCESS
+     ===================================================== */
 
   --color-success-25: #f6fef9;
   --color-success-50: #ecfdf3;
@@ -108,6 +130,10 @@ layer(base);
   --color-success-900: #054f31;
   --color-success-950: #053321;
 
+  /* =====================================================
+     ERROR
+     ===================================================== */
+
   --color-error-25: #fffbfa;
   --color-error-50: #fef3f2;
   --color-error-100: #fee4e2;
@@ -120,6 +146,10 @@ layer(base);
   --color-error-800: #912018;
   --color-error-900: #7a271a;
   --color-error-950: #55160c;
+
+  /* =====================================================
+     WARNING
+     ===================================================== */
 
   --color-warning-25: #fffcf5;
   --color-warning-50: #fffaeb;
@@ -135,27 +165,42 @@ layer(base);
   --color-warning-950: #4e1d09;
 
   --color-theme-pink-500: #ee46bc;
-
   --color-theme-purple-500: #7a5af8;
 
+  /* =====================================================
+     OMBRES
+     ===================================================== */
+
   --shadow-theme-md: 0px 4px 8px -2px rgba(16, 24, 40, 0.1),
-    0px 2px 4px -2px rgba(16, 24, 40, 0.06);
+  0px 2px 4px -2px rgba(16, 24, 40, 0.06);
+
   --shadow-theme-lg: 0px 12px 16px -4px rgba(16, 24, 40, 0.08),
-    0px 4px 6px -2px rgba(16, 24, 40, 0.03);
+  0px 4px 6px -2px rgba(16, 24, 40, 0.03);
+
   --shadow-theme-sm: 0px 1px 3px 0px rgba(16, 24, 40, 0.1),
-    0px 1px 2px 0px rgba(16, 24, 40, 0.06);
+  0px 1px 2px 0px rgba(16, 24, 40, 0.06);
+
   --shadow-theme-xs: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+
   --shadow-theme-xl: 0px 20px 24px -4px rgba(16, 24, 40, 0.08),
-    0px 8px 8px -4px rgba(16, 24, 40, 0.03);
+  0px 8px 8px -4px rgba(16, 24, 40, 0.03);
+
   --shadow-datepicker: -5px 0 0 #262d3c, 5px 0 0 #262d3c;
-  --shadow-focus-ring: 0px 0px 0px 4px rgba(70, 95, 255, 0.12);
+
+  --shadow-focus-ring: 0px 0px 0px 4px rgba(0, 132, 61, 0.12);
+
   --shadow-slider-navigation: 0px 1px 2px 0px rgba(16, 24, 40, 0.1),
-    0px 1px 3px 0px rgba(16, 24, 40, 0.1);
+  0px 1px 3px 0px rgba(16, 24, 40, 0.1);
+
   --shadow-tooltip: 0px 4px 6px -2px rgba(16, 24, 40, 0.05),
-    -8px 0px 20px 8px rgba(16, 24, 40, 0.05);
+  -8px 0px 20px 8px rgba(16, 24, 40, 0.05);
 
   --drop-shadow-4xl: 0 35px 35px rgba(0, 0, 0, 0.25),
-    0 45px 65px rgba(0, 0, 0, 0.15);
+  0 45px 65px rgba(0, 0, 0, 0.15);
+
+  /* =====================================================
+     Z-INDEX
+     ===================================================== */
 
   --z-index-1: 1;
   --z-index-9: 9;
@@ -166,14 +211,13 @@ layer(base);
   --z-index-999999: 999999;
 }
 
+
 /*
   The default border color has changed to `currentColor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
   looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
 */
+
 @layer base {
   *,
   ::after,
@@ -182,14 +226,21 @@ layer(base);
   ::file-selector-button {
     border-color: var(--color-gray-200, currentColor);
   }
+
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+
   body {
     @apply relative font-normal font-outfit z-1 bg-gray-50;
   }
 }
+
+
+/* =====================================================
+   MENU
+   ===================================================== */
 
 @utility menu-item {
   @apply relative flex items-center w-full gap-3 px-3 py-2 font-medium rounded-lg text-theme-sm;
@@ -230,12 +281,13 @@ layer(base);
 }
 
 @utility menu-item-arrow-inactive {
-  @apply text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300;
+  @apply text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300;
 }
 
 @utility menu-dropdown-item {
   @apply relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-theme-sm font-medium;
 }
+
 @utility menu-dropdown-item-active {
   @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400;
 }
@@ -268,14 +320,20 @@ layer(base);
   @apply bg-brand-50 group-hover:bg-brand-100 dark:bg-brand-500/15 dark:group-hover:bg-brand-500/20;
 }
 
+
+/* =====================================================
+   SCROLLBAR
+   ===================================================== */
+
 @utility no-scrollbar {
-  /* Chrome, Safari and Opera */
   &::-webkit-scrollbar {
     display: none;
   }
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+
 @utility custom-scrollbar {
   &::-webkit-scrollbar {
     @apply size-1.5;
@@ -294,8 +352,12 @@ layer(base);
   background-color: #344054;
 }
 
+
+/* =====================================================
+   INPUT DATE
+   ===================================================== */
+
 @layer utilities {
-  /* For Remove Date Icon */
   input[type="date"]::-webkit-inner-spin-button,
   input[type="time"]::-webkit-inner-spin-button,
   input[type="date"]::-webkit-calendar-picker-indicator,
@@ -305,14 +367,24 @@ layer(base);
   }
 }
 
+
+/* =====================================================
+   CHECKBOX
+   ===================================================== */
+
 .tableCheckbox:checked ~ span span {
   @apply opacity-100;
 }
+
 .tableCheckbox:checked ~ span {
   @apply border-brand-500 bg-brand-500;
 }
 
-/* third-party libraries CSS */
+
+/* =====================================================
+   APEXCHARTS
+   ===================================================== */
+
 .apexcharts-legend-text {
   @apply !text-gray-700 dark:!text-gray-400;
 }
@@ -330,21 +402,27 @@ layer(base);
   height: 6px;
   width: 6px;
 }
+
 .apexcharts-legend-text {
   @apply !pl-5 !text-gray-700 dark:!text-gray-400;
 }
+
 .apexcharts-tooltip-series-group {
   @apply !p-0;
 }
+
 .apexcharts-tooltip-y-group {
   @apply !p-0;
 }
+
 .apexcharts-tooltip-title {
   @apply !mb-0 !border-b-0 !bg-transparent !p-0 !text-[10px] !leading-4 !text-gray-800 dark:!text-white/90;
 }
+
 .apexcharts-tooltip-text {
   @apply !text-theme-xs !text-gray-700 dark:!text-white/90;
 }
+
 .apexcharts-tooltip-text-y-value {
   @apply !font-medium;
 }
@@ -352,9 +430,11 @@ layer(base);
 .apexcharts-gridline {
   @apply !stroke-gray-100 dark:!stroke-gray-800;
 }
+
 #chartTwo .apexcharts-datalabels-group {
   @apply !-translate-y-24;
 }
+
 #chartTwo .apexcharts-datalabels-group .apexcharts-text {
   @apply !fill-gray-800 !font-semibold dark:!fill-white/90;
 }
@@ -367,22 +447,36 @@ layer(base);
   @apply !p-0 !pl-6;
 }
 
+
+/* =====================================================
+   JVECTORMAP
+   ===================================================== */
+
 .jvectormap-container {
   @apply !bg-gray-50 dark:!bg-gray-900;
 }
+
 .jvectormap-region.jvectormap-element {
   @apply !fill-gray-300 hover:!fill-brand-500 dark:!fill-gray-700 dark:hover:!fill-brand-500;
 }
+
 .jvectormap-marker.jvectormap-element {
   @apply !stroke-gray-200 dark:!stroke-gray-800;
 }
+
 .jvectormap-tip {
   @apply !bg-brand-500 !border-none !px-2 !py-1;
 }
+
 .jvectormap-zoomin,
 .jvectormap-zoomout {
   @apply !hidden;
 }
+
+
+/* =====================================================
+   SWIPER
+   ===================================================== */
 
 .stocks-slider-outer .swiper-button-next:after,
 .stocks-slider-outer .swiper-button-prev:after {
@@ -391,7 +485,7 @@ layer(base);
 
 .stocks-slider-outer .swiper-button-next,
 .stocks-slider-outer .swiper-button-prev {
-  @apply !static mt-0 h-8 w-9 rounded-full border dark:hover:bg-white/[0.05] border-gray-200 !text-gray-700 transition hover:bg-gray-100 dark:border-white/[0.03] dark:bg-gray-800 dark:!text-gray-400  dark:hover:!text-white/90;
+  @apply !static mt-0 h-8 w-9 rounded-full border dark:hover:bg-white/[0.05] border-gray-200 !text-gray-700 transition hover:bg-gray-100 dark:border-white/[0.03] dark:bg-gray-800 dark:!text-gray-400 dark:hover:!text-white/90;
 }
 
 .stocks-slider-outer .swiper-button-next.swiper-button-disabled,
@@ -404,9 +498,15 @@ layer(base);
   @apply !h-auto !w-auto;
 }
 
+
+/* =====================================================
+   FLATPICKR
+   ===================================================== */
+
 .flatpickr-wrapper {
   @apply w-full;
 }
+
 .flatpickr-calendar {
   @apply mt-2 !bg-white !rounded-xl !p-5 !border !border-gray-200 dark:!border-white/5 !text-gray-500 dark:!bg-gray-dark dark:!text-gray-400 dark:!shadow-theme-xl 2xsm:!w-auto;
 }
@@ -415,6 +515,7 @@ layer(base);
 .flatpickr-months .flatpickr-next-month:hover svg {
   @apply stroke-brand-500;
 }
+
 .flatpickr-calendar.arrowTop:before,
 .flatpickr-calendar.arrowTop:after {
   @apply hidden;
@@ -423,6 +524,7 @@ layer(base);
 .flatpickr-current-month {
   @apply !p-0;
 }
+
 .flatpickr-current-month .cur-month,
 .flatpickr-current-month input.cur-year {
   @apply !h-auto !pt-0 !text-lg !font-medium !text-gray-800 dark:!text-white/90;
@@ -444,6 +546,7 @@ layer(base);
 .flatpickr-day {
   @apply !flex !items-center !text-theme-sm !font-medium !text-gray-800 dark:!text-white/90 dark:hover:!border-gray-300 dark:hover:!bg-gray-900;
 }
+
 .flatpickr-day.nextMonthDay,
 .flatpickr-day.prevMonthDay {
   @apply !text-gray-400;
@@ -452,6 +555,7 @@ layer(base);
 .flatpickr-months > .flatpickr-month {
   background: none !important;
 }
+
 .flatpickr-month .flatpickr-current-month .flatpickr-monthDropdown-months {
   background: none !important;
   appearance: none;
@@ -460,26 +564,31 @@ layer(base);
 }
 
 .flatpickr-month
-  .flatpickr-current-month
-  .flatpickr-monthDropdown-months:focus {
+.flatpickr-current-month
+.flatpickr-monthDropdown-months:focus {
   outline: none !important;
   border: 0 !important;
 }
+
 .flatpickr-months .flatpickr-prev-month,
 .flatpickr-months .flatpickr-next-month {
   @apply !top-7 dark:!fill-white dark:!text-white !bg-transparent;
 }
+
 .flatpickr-months .flatpickr-prev-month.flatpickr-prev-month,
 .flatpickr-months .flatpickr-next-month.flatpickr-prev-month {
   @apply !left-7;
 }
+
 .flatpickr-months .flatpickr-prev-month.flatpickr-next-month,
 .flatpickr-months .flatpickr-next-month.flatpickr-next-month {
   @apply !right-7;
 }
+
 .flatpickr-days {
   @apply !border-0;
 }
+
 span.flatpickr-weekday,
 .flatpickr-months .flatpickr-month {
   @apply dark:!fill-white dark:!text-white !bg-none;
@@ -492,13 +601,16 @@ span.flatpickr-weekday,
 .flatpickr-innerContainer {
   @apply !border-b-0;
 }
+
 .flatpickr-months .flatpickr-month {
   @apply !bg-none;
 }
+
 .flatpickr-day.inRange {
   box-shadow: -5px 0 0 #f9fafb, 5px 0 0 #f9fafb !important;
   @apply dark:!shadow-datepicker;
 }
+
 .flatpickr-day.inRange,
 .flatpickr-day.prevMonthDay.inRange,
 .flatpickr-day.nextMonthDay.inRange,
@@ -513,12 +625,14 @@ span.flatpickr-weekday,
 .flatpickr-day.nextMonthDay:focus {
   @apply !border-gray-50 !bg-gray-50 dark:!border-0 dark:!border-white/5 dark:!bg-white/5;
 }
+
 .flatpickr-day.selected,
 .flatpickr-day.startRange,
 .flatpickr-day.selected,
 .flatpickr-day.endRange {
   @apply !text-white dark:!text-white;
 }
+
 .flatpickr-day.selected,
 .flatpickr-day.startRange,
 .flatpickr-day.endRange,
@@ -537,13 +651,14 @@ span.flatpickr-weekday,
 .flatpickr-day.selected.nextMonthDay,
 .flatpickr-day.startRange.nextMonthDay,
 .flatpickr-day.endRange.nextMonthDay {
-  background: #465fff;
+  background: var(--color-brand-500);
   @apply !border-brand-500 !bg-brand-500 hover:!border-brand-500 hover:!bg-brand-500;
 }
+
 .flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n + 1)),
 .flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n + 1)),
 .flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n + 1)) {
-  box-shadow: -10px 0 0 #465fff;
+  box-shadow: -10px 0 0 var(--color-brand-500);
 }
 
 .flatpickr-months .flatpickr-prev-month svg,
@@ -552,6 +667,7 @@ span.flatpickr-weekday,
 .flatpickr-months .flatpickr-next-month {
   @apply hover:!fill-none;
 }
+
 .flatpickr-months .flatpickr-prev-month:hover svg,
 .flatpickr-months .flatpickr-next-month:hover svg {
   fill: none !important;
@@ -560,145 +676,200 @@ span.flatpickr-weekday,
 .flatpickr-calendar.static {
   @apply right-0;
 }
+
 .flatpickr-calendar.hasTime {
   width: 300px !important;
 }
+
 .flatpickr-calendar.hasTime .flatpickr-time {
   border: transparent !important;
 }
+
+
+/* =====================================================
+   FULLCALENDAR
+   ===================================================== */
+
 .fc .fc-view-harness {
   @apply max-w-full overflow-x-auto custom-scrollbar;
 }
+
 .fc-dayGridMonth-view.fc-view.fc-daygrid {
   @apply min-w-[718px];
 }
+
 .fc .fc-scrollgrid-section > * {
   border-right-width: 0;
   border-bottom-width: 0;
 }
+
 .fc .fc-scrollgrid {
   border-left-width: 0;
 }
+
 .fc .fc-toolbar.fc-header-toolbar {
   @apply flex-col gap-4 px-6 pt-6 sm:flex-row;
 }
+
 .fc-button-group {
   @apply gap-2;
 }
+
 .fc-button-group .fc-button {
   @apply flex h-10 w-10 items-center justify-center !rounded-lg border border-gray-200 bg-transparent hover:border-gray-200 hover:bg-gray-50 focus:shadow-none active:!border-gray-200 active:!bg-transparent active:!shadow-none dark:border-gray-800 dark:hover:border-gray-800 dark:hover:bg-gray-900 dark:active:!border-gray-800 capitalize;
 }
 
 .fc-button-group .fc-button.fc-prev-button:before {
   @apply inline-block mt-1;
+
   content: url("data:image/svg+xml,%3Csvg width='25' height='24' viewBox='0 0 25 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M16.0068 6L9.75684 12.25L16.0068 18.5' stroke='%23344054' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E%0A");
 }
+
 .fc-button-group .fc-button.fc-next-button:before {
   @apply inline-block mt-1;
-  content: url("data:image/svg+xml,%3Csvg width='25' height='24' viewBox='0 0 25 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9.50684 19L15.7568 12.75L9.50684 6.5' stroke='%23344054' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E%0A");
+
+  content: url("data:image/svg+xml,%3Csvg width='25' height='24' viewBox='0 0 25 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9.50684 19L15.75684 12.75L9.50684 6.5' stroke='%23344054' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E%0A");
 }
+
 .dark .fc-button-group .fc-button.fc-prev-button:before {
-  content: url("data:image/svg+xml,%3Csvg width='25' height='24' viewBox='0 0 25 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M16.0068 6L9.75684 12.25L16.0068 18.5' stroke='%2398A2B3' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E%0A");
+  content: url("data:image/svg+xml,%3Csvg width='25' height='24' viewBox='0 0 25 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M16.0068 6L9.75684 12.25L16.00684 18.5' stroke='%2398A2B3' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E%0A");
 }
+
 .dark .fc-button-group .fc-button.fc-next-button:before {
-  content: url("data:image/svg+xml,%3Csvg width='25' height='24' viewBox='0 0 25 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9.50684 19L15.7568 12.75L9.50684 6.5' stroke='%2398A2B3' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E%0A");
+  content: url("data:image/svg+xml,%3Csvg width='25' height='24' viewBox='0 0 25 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9.50684 19L15.75684 12.75L9.50684 6.5' stroke='%2398A2B3' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E%0A");
 }
+
 .fc-button-group .fc-button .fc-icon {
   @apply hidden;
 }
+
 .fc-addEventButton-button {
   @apply !rounded-lg !border-0 !bg-brand-500 !px-4 !py-2.5 !text-sm !font-medium hover:!bg-brand-600 focus:!shadow-none;
 }
+
 .fc-toolbar-title {
   @apply !text-lg !font-medium text-gray-800 dark:text-white/90;
 }
+
 .fc-header-toolbar.fc-toolbar .fc-toolbar-chunk:last-child {
   @apply rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900;
 }
+
 .fc-header-toolbar.fc-toolbar .fc-toolbar-chunk:last-child .fc-button {
   @apply !h-auto !w-auto rounded-md !border-0 bg-transparent !px-5 !py-2 text-sm font-medium text-gray-500 hover:text-gray-700 focus:!shadow-none dark:text-gray-400;
 }
+
 .fc-header-toolbar.fc-toolbar
-  .fc-toolbar-chunk:last-child
-  .fc-button.fc-button-active {
+.fc-toolbar-chunk:last-child
+.fc-button.fc-button-active {
   @apply text-gray-900 bg-white dark:bg-gray-800 dark:text-white;
 }
+
 .fc-theme-standard th {
   @apply !border-x-0 border-t !border-gray-200 bg-gray-50 !text-left dark:!border-gray-800 dark:bg-gray-900;
 }
+
 .fc-theme-standard td,
 .fc-theme-standard .fc-scrollgrid {
   @apply !border-gray-200 dark:!border-gray-800;
 }
+
 .fc .fc-col-header-cell-cushion {
   @apply !px-5 !py-4 text-sm font-medium uppercase text-gray-400;
 }
+
 .fc .fc-daygrid-day.fc-day-today {
   @apply bg-transparent;
 }
+
 .fc .fc-daygrid-day {
   @apply p-2;
 }
+
 .fc .fc-daygrid-day.fc-day-today .fc-scrollgrid-sync-inner {
   @apply rounded-sm bg-gray-100 dark:bg-white/[0.03];
 }
+
 .fc .fc-daygrid-day-number {
   @apply !p-3 text-sm font-medium text-gray-700 dark:text-gray-400;
 }
+
 .fc .fc-daygrid-day-top {
   @apply !flex-row;
 }
+
 .fc .fc-day-other .fc-daygrid-day-top {
   opacity: 1;
 }
+
 .fc .fc-day-other .fc-daygrid-day-top .fc-daygrid-day-number {
   @apply text-gray-400 dark:text-white/30;
 }
+
 .event-fc-color {
   @apply rounded-lg py-2.5 pl-4 pr-3;
 }
+
 .event-fc-color .fc-event-title {
   @apply p-0 text-sm font-normal text-gray-700;
 }
+
 .fc-daygrid-event-dot {
   @apply w-1 h-5 ml-0 mr-3 border-none rounded-sm;
 }
+
 .fc-event {
   @apply focus:shadow-none;
 }
+
 .fc-daygrid-event.fc-event-start {
   @apply !ml-3;
 }
+
 .event-fc-color.fc-bg-success {
   @apply border-success-50 bg-success-50;
 }
+
 .event-fc-color.fc-bg-danger {
   @apply border-error-50 bg-error-50;
 }
+
 .event-fc-color.fc-bg-primary {
   @apply border-brand-50 bg-brand-50;
 }
+
 .event-fc-color.fc-bg-warning {
   @apply border-orange-50 bg-orange-50;
 }
+
 .event-fc-color.fc-bg-success .fc-daygrid-event-dot {
   @apply bg-success-500;
 }
+
 .event-fc-color.fc-bg-danger .fc-daygrid-event-dot {
   @apply bg-error-500;
 }
+
 .event-fc-color.fc-bg-primary .fc-daygrid-event-dot {
   @apply bg-brand-500;
 }
+
 .event-fc-color.fc-bg-warning .fc-daygrid-event-dot {
   @apply bg-orange-500;
 }
+
 .fc-direction-ltr .fc-timegrid-slot-label-frame {
   @apply px-3 py-1.5 text-left text-sm font-medium text-gray-500 dark:text-gray-400;
 }
+
 .fc .fc-timegrid-axis-cushion {
   @apply text-sm font-medium text-gray-500 dark:text-gray-400;
 }
+
+
+/* =====================================================
+   AUTRES COMPOSANTS
+   ===================================================== */
 
 .input-date-icon::-webkit-inner-spin-button,
 .input-date-icon::-webkit-calendar-picker-indicator {
@@ -717,12 +888,14 @@ span.flatpickr-weekday,
 .carouselFour .swiper-button-prev:after {
   @apply hidden;
 }
+
 .carouselTwo .swiper-button-next.swiper-button-disabled,
 .carouselTwo .swiper-button-prev.swiper-button-disabled,
 .carouselFour .swiper-button-next.swiper-button-disabled,
 .carouselFour .swiper-button-prev.swiper-button-disabled {
   @apply bg-white/60 !opacity-100;
 }
+
 .carouselTwo .swiper-button-next,
 .carouselTwo .swiper-button-prev,
 .carouselFour .swiper-button-next,
@@ -755,6 +928,11 @@ span.flatpickr-weekday,
   @apply w-6.5 rounded-xl;
 }
 
+
+/* =====================================================
+   FORMULAIRES
+   ===================================================== */
+
 .form-check-input:checked ~ span {
   @apply border-[6px] border-brand-500 bg-brand-500 dark:border-brand-500;
 }
@@ -762,37 +940,57 @@ span.flatpickr-weekday,
 .taskCheckbox:checked ~ .box span {
   @apply opacity-100 bg-brand-500;
 }
+
 .taskCheckbox:checked ~ p {
   @apply text-gray-400 line-through;
 }
+
 .taskCheckbox:checked ~ .box {
   @apply border-brand-500 bg-brand-500 dark:border-brand-500;
 }
 
+
+/* =====================================================
+   TASK
+   ===================================================== */
+
 .task {
-  transition: all 0.2s ease; /* Smooth transition for visual effects */
+  transition: all 0.2s ease;
 }
 
 .task {
   border-radius: 0.75rem;
-  box-shadow: 0px 1px 3px 0px rgba(16, 24, 40, 0.1),
-    0px 1px 2px 0px rgba(16, 24, 40, 0.06);
+  box-shadow:
+          0px 1px 3px 0px rgba(16, 24, 40, 0.1),
+          0px 1px 2px 0px rgba(16, 24, 40, 0.06);
   opacity: 0.8;
-  cursor: grabbing; /* Changes the cursor to indicate dragging */
+  cursor: grabbing;
 }
+
+
+/* =====================================================
+   CALENDRIER
+   ===================================================== */
 
 .custom-calendar .fc-h-event {
   background-color: transparent;
   border: none;
   color: black;
 }
+
 .fc.fc-media-screen {
   @apply min-h-screen;
 }
 
+
+/* =====================================================
+   SIMPLEBAR
+   ===================================================== */
+
 .simplebar-scrollbar::before {
   @apply !bg-gray-200 !rounded-full dark:!bg-gray-700 !opacity-100;
 }
+
 .dark .simplebar-scrollbar::before {
   @apply !bg-gray-700;
 }
@@ -801,7 +999,11 @@ span.flatpickr-weekday,
   @apply opacity-100;
 }
 
-/* Code Editor */
+
+/* =====================================================
+   CODE EDITOR
+   ===================================================== */
+
 code[class*="language-"],
 pre[class*="language-"] {
   text-shadow: none;
@@ -820,41 +1022,53 @@ pre[class*="language-"] {
   text-shadow: none;
   color: #98a2b3;
 }
+
 [data-theme="light"] .language-html {
   background-color: #ffffff !important;
 }
+
 [data-theme="dark"] .language-html {
   background-color: #171f2e !important;
 }
+
 .token {
   text-shadow: none;
   font-size: 14px;
 }
+
 .token.doctype-tag,
 .token.name {
   color: #018001;
 }
+
 .token.tag {
   color: #267f99;
 }
+
 .token.selector {
   color: #267f99;
 }
+
 .token.property {
   color: #0070c1;
 }
+
 .token.language-css {
   color: #1b00ff;
 }
+
 .token.attr-name {
   color: #98a2b3;
 }
+
 .token.attr-value {
   color: #a31615;
 }
+
 .token.punctuation {
   color: #344054;
 }
+
 .dark .token.punctuation {
   color: #98a2b3;
 }
@@ -862,6 +1076,7 @@ pre[class*="language-"] {
 .line-numbers .line-numbers-rows {
   border-right: 0 !important;
 }
+
 pre[class*="language-"].line-numbers {
   padding-left: 2.8em !important;
 }

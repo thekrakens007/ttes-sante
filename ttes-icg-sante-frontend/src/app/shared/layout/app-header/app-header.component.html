@@ -27,8 +27,17 @@
       </button>
       <!-- Logo (placeholder) -->
       <a routerLink="/" class="xl:hidden">
-        <img class="dark:hidden" src="/images/logo/logo.svg" alt="Logo" />
-        <img class="hidden dark:block" src="/images/logo/logo-dark.svg" alt="Logo" />
+          <!-- Logo mode clair -->
+          <img
+                  src="/images/logo/logo.svg"
+                  alt="TES-ICG Santé"
+                  class="h-12 w-auto sm:h-14 dark:hidden">
+
+          <!-- Logo mode sombre -->
+          <img
+                  src="/images/logo/logo-dark.svg"
+                  alt="TES-ICG Santé"
+                  class="hidden h-12 w-auto sm:h-14 dark:block">
       </a>
       <button (click)="toggleApplicationMenu()"
         class="flex items-center justify-center w-10 h-10 text-gray-700 rounded-lg z-99999 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 xl:hidden">

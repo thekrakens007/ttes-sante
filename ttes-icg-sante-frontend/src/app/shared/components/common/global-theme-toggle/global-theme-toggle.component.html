@@ -1,0 +1,54 @@
+<button
+        type="button"
+        (click)="toggleTheme()"
+        [attr.aria-label]="isDark() ? 'Activer le mode clair' : 'Activer le mode sombre'"
+        [attr.title]="isDark() ? 'Mode clair' : 'Mode sombre'"
+        class="fixed bottom-6 right-6 z-[99999]
+         flex h-14 w-14 items-center justify-center
+         rounded-full
+         bg-green-600
+         text-white
+         shadow-lg
+         transition-all duration-300
+         hover:scale-105
+         hover:bg-green-700
+         focus:outline-none
+         focus:ring-4
+         focus:ring-green-500/30
+         dark:bg-green-500
+         dark:hover:bg-green-400">
+
+    <!-- MODE SOMBRE ACTIF → soleil -->
+    <svg
+            *ngIf="isDark()"
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2">
+
+        <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364-.707.707M6.343 17.657l-.707.707m12.728 0-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" />
+    </svg>
+
+    <!-- MODE CLAIR → lune -->
+    <svg
+            *ngIf="!isDark()"
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2">
+
+        <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 12.79A9 9 0 1 1 11.21 3
+         7 7 0 0 0 21 12.79Z" />
+    </svg>
+
+</button>

@@ -1,41 +1,56 @@
 <div
         class="overflow-hidden rounded-2xl border border-gray-200 bg-white
-         dark:border-gray-800 dark:bg-white/[0.03]"
+           shadow-sm
+           dark:border-gray-700 dark:bg-gray-900"
 >
 
-    <!-- Header -->
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
+
     <div
-            class="flex flex-col gap-3 border-b border-gray-100
-           px-5 py-4 sm:flex-row sm:items-center
-           sm:justify-between dark:border-gray-800"
+            class="flex flex-col gap-3 border-b border-gray-200
+               bg-white px-5 py-4
+               sm:flex-row sm:items-center sm:justify-between
+               dark:border-gray-700 dark:bg-gray-900"
     >
 
         <div>
 
             <h3
                     class="text-lg font-semibold text-gray-800
-               dark:text-white/90"
+                       dark:text-white"
             >
                 Produits
             </h3>
 
             <p
-                    class="text-sm text-gray-500
-               dark:text-gray-400"
+                    class="mt-1 text-sm text-gray-500
+                       dark:text-gray-400"
             >
                 Gestion des produits de la pharmacie
             </p>
 
         </div>
 
+
+        <!-- Actualiser -->
+
         <button
                 type="button"
                 (click)="loadProducts()"
-                class="rounded-lg border border-gray-300
-             bg-white px-4 py-2.5 text-sm font-medium
-             text-gray-700 hover:bg-gray-50
-             dark:border-gray-700 dark:bg-gray-800
-             dark:text-gray-400"
+                class="inline-flex items-center justify-center
+                   rounded-lg border border-gray-300
+                   bg-white px-4 py-2.5
+                   text-sm font-medium text-gray-700
+                   shadow-sm transition
+                   hover:bg-gray-50
+                   focus:outline-none focus:ring-2
+                   focus:ring-brand-500/20
+                   dark:border-gray-600
+                   dark:bg-gray-800
+                   dark:text-gray-200
+                   dark:hover:bg-gray-700"
         >
             Actualiser
         </button>
@@ -43,26 +58,59 @@
     </div>
 
 
-    <!-- Loading -->
+    <!-- ===================================================== -->
+    <!-- LOADING -->
+    <!-- ===================================================== -->
+
     @if (loading) {
 
-        <div class="p-8 text-center">
+        <div
+                class="flex items-center justify-center
+                   bg-white p-10
+                   dark:bg-gray-900"
+        >
 
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-                Chargement des produits...
-            </p>
+            <div class="flex items-center gap-3">
+
+                <div
+                        class="h-5 w-5 animate-spin rounded-full
+                           border-2 border-gray-200
+                           border-t-brand-500
+                           dark:border-gray-700
+                           dark:border-t-brand-400"
+                ></div>
+
+                <p
+                        class="text-sm text-gray-500
+                           dark:text-gray-400"
+                >
+                    Chargement des produits...
+                </p>
+
+            </div>
 
         </div>
 
     }
 
 
-    <!-- Error -->
+    <!-- ===================================================== -->
+    <!-- ERROR -->
+    <!-- ===================================================== -->
+
     @if (!loading && errorMessage) {
 
-        <div class="p-8 text-center">
+        <div
+                class="m-5 rounded-lg border border-red-200
+                   bg-red-50 p-4
+                   dark:border-red-900/50
+                   dark:bg-red-950/30"
+        >
 
-            <p class="text-sm text-red-500">
+            <p
+                    class="text-sm font-medium text-red-600
+                       dark:text-red-400"
+            >
                 {{ errorMessage }}
             </p>
 
@@ -71,86 +119,138 @@
     }
 
 
-    <!-- Table -->
+    <!-- ===================================================== -->
+    <!-- TABLE -->
+    <!-- ===================================================== -->
+
     @if (!loading && !errorMessage) {
 
         <div class="max-w-full overflow-x-auto">
 
-            <table class="w-full text-left">
+            <table class="w-full min-w-[1000px] text-left">
+
+                <!-- ================================================= -->
+                <!-- TABLE HEADER -->
+                <!-- ================================================= -->
 
                 <thead
-                        class="border-y border-gray-100
-                 dark:border-gray-800"
+                        class="border-y border-gray-200
+                           bg-gray-50
+                           dark:border-gray-700
+                           dark:bg-gray-800"
                 >
 
                 <tr>
 
                     <th
-                            class="px-5 py-3 text-xs font-medium
-                     text-gray-500 dark:text-gray-400"
+                            class="whitespace-nowrap px-5 py-3
+                               text-xs font-semibold uppercase
+                               tracking-wide text-gray-500
+                               dark:text-gray-300"
                     >
                         Produit
                     </th>
 
+
                     <th
-                            class="px-5 py-3 text-xs font-medium
-                     text-gray-500 dark:text-gray-400"
+                            class="whitespace-nowrap px-5 py-3
+                               text-xs font-semibold uppercase
+                               tracking-wide text-gray-500
+                               dark:text-gray-300"
                     >
                         SKU
                     </th>
 
+
                     <th
-                            class="px-5 py-3 text-xs font-medium
-                     text-gray-500 dark:text-gray-400"
+                            class="whitespace-nowrap px-5 py-3
+                               text-xs font-semibold uppercase
+                               tracking-wide text-gray-500
+                               dark:text-gray-300"
                     >
                         Prix
                     </th>
 
+
                     <th
-                            class="px-5 py-3 text-xs font-medium
-                     text-gray-500 dark:text-gray-400"
+                            class="whitespace-nowrap px-5 py-3
+                               text-xs font-semibold uppercase
+                               tracking-wide text-gray-500
+                               dark:text-gray-300"
                     >
                         Stock
                     </th>
 
+
                     <th
-                            class="px-5 py-3 text-xs font-medium
-                     text-gray-500 dark:text-gray-400"
+                            class="whitespace-nowrap px-5 py-3
+                               text-xs font-semibold uppercase
+                               tracking-wide text-gray-500
+                               dark:text-gray-300"
                     >
                         Catégories
                     </th>
 
+
                     <th
-                            class="px-5 py-3 text-xs font-medium
-                     text-gray-500 dark:text-gray-400"
+                            class="whitespace-nowrap px-5 py-3
+                               text-xs font-semibold uppercase
+                               tracking-wide text-gray-500
+                               dark:text-gray-300"
                     >
                         Prescription
                     </th>
-                    <th>Actions</th>
+
+
+                    <th
+                            class="whitespace-nowrap px-5 py-3
+                               text-xs font-semibold uppercase
+                               tracking-wide text-gray-500
+                               dark:text-gray-300"
+                    >
+                        Actions
+                    </th>
 
                 </tr>
 
                 </thead>
 
 
+                <!-- ================================================= -->
+                <!-- TABLE BODY -->
+                <!-- ================================================= -->
+
                 <tbody
                         class="divide-y divide-gray-100
-                 dark:divide-gray-800"
+                           dark:divide-gray-700"
                 >
 
                     @for (product of products; track product.id) {
 
-                        <tr>
+                        <tr
+                                class="transition
+                               hover:bg-gray-50
+                               dark:hover:bg-gray-800/70"
+                        >
 
-                            <!-- Produit -->
+                            <!-- ========================================= -->
+                            <!-- PRODUIT -->
+                            <!-- ========================================= -->
+
                             <td class="px-5 py-4">
 
                                 <div class="flex items-center gap-3">
 
+                                    <!-- Image -->
+
                                     <div
                                             class="h-[50px] w-[50px]
-                           overflow-hidden rounded-lg
-                           bg-gray-100 dark:bg-gray-800"
+                                           shrink-0 overflow-hidden
+                                           rounded-lg
+                                           border border-gray-200
+                                           bg-gray-100
+                                           dark:border-gray-700
+                                           dark:bg-gray-800"
                                     >
 
                                         <img
@@ -161,18 +261,24 @@
 
                                     </div>
 
-                                    <div>
+
+                                    <!-- Nom -->
+
+                                    <div class="min-w-0">
 
                                         <p
-                                                class="font-medium text-gray-800
-                             dark:text-white/90"
+                                                class="truncate font-medium
+                                               text-gray-800
+                                               dark:text-white"
                                         >
                                             {{ product.name }}
                                         </p>
 
+
                                         <p
-                                                class="text-xs text-gray-500
-                             dark:text-gray-400"
+                                                class="mt-1 text-xs
+                                               text-gray-500
+                                               dark:text-gray-400"
                                         >
                                             {{ product.brand || 'Sans marque' }}
                                         </p>
@@ -184,75 +290,112 @@
                             </td>
 
 
+                            <!-- ========================================= -->
                             <!-- SKU -->
+                            <!-- ========================================= -->
+
                             <td
-                                    class="px-5 py-4 text-sm
-                       text-gray-500 dark:text-gray-400"
+                                    class="whitespace-nowrap px-5 py-4
+                                   text-sm text-gray-600
+                                   dark:text-gray-300"
                             >
                                 {{ product.sku }}
                             </td>
 
 
-                            <!-- Prix -->
+                            <!-- ========================================= -->
+                            <!-- PRIX -->
+                            <!-- ========================================= -->
+
                             <td
-                                    class="px-5 py-4 text-sm font-medium
-                       text-gray-800 dark:text-white/90"
+                                    class="whitespace-nowrap px-5 py-4
+                                   text-sm font-semibold
+                                   text-gray-800
+                                   dark:text-white"
                             >
                                 {{ product.price | number:'1.0-2' }} FCFA
                             </td>
 
 
-                            <!-- Stock -->
+                            <!-- ========================================= -->
+                            <!-- STOCK -->
+                            <!-- ========================================= -->
+
                             <td class="px-5 py-4">
 
-                                <div class="flex flex-col gap-1">
+                                <div class="flex flex-col gap-1.5">
 
-                  <span
-                          class="text-sm font-medium
-                           text-gray-800 dark:text-white/90"
-                  >
-                    {{ product.stock }}
-                  </span>
+                                <span
+                                        class="text-sm font-semibold
+                                           text-gray-800
+                                           dark:text-white"
+                                >
+                                    {{ product.stock }}
+                                </span>
 
-                                    <app-badge
-                                            size="sm"
-                                            [color]="getStockColor(product.stock)"
-                                    >
-                                        {{ getStockLabel(product.stock) }}
-                                    </app-badge>
+
+                                    <div>
+
+                                        <app-badge
+                                                size="sm"
+                                                [color]="getStockColor(product.stock)"
+                                        >
+                                            {{ getStockLabel(product.stock) }}
+                                        </app-badge>
+
+                                    </div>
 
                                 </div>
 
                             </td>
 
 
-                            <!-- Catégories -->
+                            <!-- ========================================= -->
+                            <!-- CATEGORIES -->
+                            <!-- ========================================= -->
+
                             <td
-                                    class="px-5 py-4 text-sm
-                       text-gray-500 dark:text-gray-400"
+                                    class="max-w-[220px] px-5 py-4
+                                   text-sm text-gray-600
+                                   dark:text-gray-300"
                             >
 
-                                @if (product.categories.length > 0) {
+                                @if (
+                                    product.categories &&
+                                    product.categories.length > 0
+                                        ) {
 
+                                    <span>
                                     {{ product.categories.join(', ') }}
+                                </span>
 
                                 } @else {
 
+                                    <span
+                                            class="text-gray-400
+                                           dark:text-gray-500"
+                                    >
                                     -
+                                </span>
 
                                 }
 
                             </td>
 
 
-                            <!-- Prescription -->
+                            <!-- ========================================= -->
+                            <!-- PRESCRIPTION -->
+                            <!-- ========================================= -->
+
                             <td class="px-5 py-4">
 
                                 <app-badge
                                         size="sm"
-                                        [color]="product.requiresPrescription
-                    ? 'warning'
-                    : 'success'"
+                                        [color]="
+                                    product.requiresPrescription
+                                        ? 'warning'
+                                        : 'success'
+                                "
                                 >
                                     {{
                                         product.requiresPrescription
@@ -264,51 +407,72 @@
                             </td>
 
 
-                                <!-- ACTIONS -->
+                            <!-- ========================================= -->
+                            <!-- ACTIONS -->
+                            <!-- ========================================= -->
+
                             <td class="px-5 py-4">
 
                                 <div class="flex items-center gap-2">
 
                                     <!-- MODIFIER -->
+
                                     <button
                                             type="button"
                                             [routerLink]="[
-                    '/admin/products/edit',
-                    product.id
-                ]"
-                                            class="rounded-lg bg-blue-600 px-3 py-2
-                       text-sm font-medium text-white
-                       hover:bg-blue-700"
+                                        '/admin/products/edit',
+                                        product.id
+                                    ]"
+                                            class="inline-flex items-center
+                                           justify-center
+                                           rounded-lg
+                                           bg-blue-600
+                                           px-3 py-2
+                                           text-sm font-medium
+                                           text-white
+                                           transition
+                                           hover:bg-blue-700
+                                           focus:outline-none
+                                           focus:ring-2
+                                           focus:ring-blue-500/30"
                                     >
-
                                         Modifier
-
                                     </button>
 
 
                                     <!-- SUPPRIMER -->
+
                                     <button
                                             type="button"
                                             (click)="deleteProduct(product.id)"
-                                            class="rounded-lg bg-red-600 px-3 py-2
-                       text-sm font-medium text-white
-                       hover:bg-red-700"
+                                            class="inline-flex items-center
+                                           justify-center
+                                           rounded-lg
+                                           bg-red-600
+                                           px-3 py-2
+                                           text-sm font-medium
+                                           text-white
+                                           transition
+                                           hover:bg-red-700
+                                           focus:outline-none
+                                           focus:ring-2
+                                           focus:ring-red-500/30"
                                     >
-
                                         Supprimer
-
                                     </button>
 
                                 </div>
 
                             </td>
 
-
-
                         </tr>
 
                     }
 
+
+                <!-- ================================================= -->
+                <!-- EMPTY -->
+                <!-- ================================================= -->
 
                     @if (products.length === 0) {
 
@@ -316,11 +480,46 @@
 
                             <td
                                     colspan="7"
-                                    class="px-5 py-8 text-center
-                       text-sm text-gray-500
-                       dark:text-gray-400"
+                                    class="px-5 py-12 text-center
+                                   text-sm text-gray-500
+                                   dark:text-gray-400"
                             >
-                                Aucun produit trouvé.
+
+                                <div class="flex flex-col items-center">
+
+                                    <div
+                                            class="mb-3 flex h-12 w-12
+                                           items-center justify-center
+                                           rounded-full
+                                           bg-gray-100
+                                           dark:bg-gray-800"
+                                    >
+                                    <span
+                                            class="text-xl text-gray-400
+                                               dark:text-gray-500"
+                                    >
+                                        📦
+                                    </span>
+                                    </div>
+
+                                    <p
+                                            class="font-medium text-gray-700
+                                           dark:text-gray-300"
+                                    >
+                                        Aucun produit trouvé
+                                    </p>
+
+                                    <p
+                                            class="mt-1 text-xs
+                                           text-gray-400
+                                           dark:text-gray-500"
+                                    >
+                                        Aucun produit n'est disponible
+                                        dans le catalogue.
+                                    </p>
+
+                                </div>
+
                             </td>
 
                         </tr>

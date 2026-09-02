@@ -18,9 +18,13 @@ public class CorsConfig {
 
         configuration.setAllowedOrigins(
                 List.of(
+                        // Développement local
                         "http://localhost:4200",
                         "http://127.0.0.1:4200",
-                        "http://192.168.164.113:4200"
+                        "http://192.168.164.113:4200",
+
+                        // Production Render
+                        "https://ttes-icg-sante.onrender.com"
                 )
         );
 

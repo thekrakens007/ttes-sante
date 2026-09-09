@@ -217,5 +217,4 @@ export class ProductDetailComponent implements OnInit {
         ).format(price) + ' FCFA';
 
     }
-
 }

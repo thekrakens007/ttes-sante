@@ -12,6 +12,7 @@ import {TherapeuticAreaRequest} from "../interfaces/therapeutic-area-request.int
 import {InventoryResponse} from "../interfaces/inventory-response.interface";
 import {InventoryRequest} from "../interfaces/inventory-request.interface";
 import {ProductImageResponse} from "../interfaces/product-image-response.interface";
+import {ProductPage} from "../models/product.model";
 
 @Injectable({
     providedIn: 'root'
@@ -33,6 +34,24 @@ export class AdminService {
         );
 
     }
+
+    getProductsPaginated(
+        page: number = 0,
+        size: number = 8
+    ): Observable<ProductPage> {
+
+        return this.http.get<ProductPage>(
+            '/api/products/paginated',
+            {
+                params: {
+                    page: page.toString(),
+                    size: size.toString()
+                }
+            }
+        );
+
+    }
+
     getProductImages(productId: number) {
         return this.http.get<ProductImageResponse[]>(
             `${this.API_URL}/products/${productId}/images`

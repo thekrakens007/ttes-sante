@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -35,6 +36,8 @@ public class OrderResponse {
     private String customerNote;
 
     private String whatsappLink;
+
+    private LocalDateTime createdAt;
 
 
     private List<OrderItemResponse> items;

@@ -31,6 +31,8 @@ export interface OrderResponse {
 
     whatsappLink: string;
 
+    createdAt: string;
+
     items: OrderItemResponse[];
 
 }

@@ -199,6 +199,9 @@ public class OrderService {
                 .totalAmount(
                         order.getTotalAmount()
                 )
+                .createdAt(
+                        order.getCreatedAt()
+                )
                 .customerName(
                         order.getUser().getFirstName()
                                 +" "

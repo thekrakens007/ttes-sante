@@ -1,8 +1,9 @@
-
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { NgApexchartsModule, ApexAxisChartSeries, ApexChart, ApexXAxis, ApexPlotOptions, ApexDataLabels, ApexStroke, ApexLegend, ApexYAxis, ApexGrid, ApexFill, ApexTooltip } from 'ng-apexcharts';
 import { DropdownComponent } from '../../ui/dropdown/dropdown.component';
 import { DropdownItemComponent } from '../../ui/dropdown/dropdown-item/dropdown-item.component';
+import { AdminService } from '../../../../core/services/admin.service';
+import { OrderResponse } from '../../../../core/interfaces/order-response.interface';
 
 @Component({
   selector: 'app-monthly-sales-chart',
@@ -11,14 +12,17 @@ import { DropdownItemComponent } from '../../ui/dropdown/dropdown-item/dropdown-
     NgApexchartsModule,
     DropdownComponent,
     DropdownItemComponent
-],
+  ],
   templateUrl: './monthly-sales-chart.component.html'
 })
-export class MonthlySalesChartComponent {
+export class MonthlySalesChartComponent implements OnInit {
+
+  private adminService = inject(AdminService);
+
   public series: ApexAxisChartSeries = [
     {
-      name: 'Sales',
-      data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112],
+      name: 'Ventes',
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     },
   ];
   public chart: ApexChart = {
@@ -29,8 +33,8 @@ export class MonthlySalesChartComponent {
   };
   public xaxis: ApexXAxis = {
     categories: [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
+      'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'
     ],
     axisBorder: { show: false },
     axisTicks: { show: false },
@@ -60,11 +64,50 @@ export class MonthlySalesChartComponent {
   public fill: ApexFill = { opacity: 1 };
   public tooltip: ApexTooltip = {
     x: { show: false },
-    y: { formatter: (val: number) => `${val}` },
+    y: { formatter: (val: number) => `${val.toLocaleString('fr-FR')} FCFA` },
   };
   public colors: string[] = ['#465fff'];
 
   isOpen = false;
+
+  ngOnInit(): void {
+    this.loadMonthlySales();
+  }
+
+  loadMonthlySales(): void {
+
+    this.adminService.getOrders().subscribe({
+
+      next: (orders: OrderResponse[]) => {
+
+        const currentYear = new Date().getFullYear();
+        const monthlyTotals = new Array(12).fill(0);
+
+        orders.forEach((order) => {
+
+          if (!order.createdAt) {
+            return;
+          }
+
+          const date = new Date(order.createdAt);
+
+          if (date.getFullYear() === currentYear) {
+            monthlyTotals[date.getMonth()] += Number(order.totalAmount || 0);
+          }
+
+        });
+
+        this.series = [{ name: 'Ventes', data: monthlyTotals }];
+
+      },
+
+      error: (error) => {
+        console.error('Erreur lors du chargement des ventes mensuelles:', error);
+      }
+
+    });
+
+  }
 
   toggleDropdown() {
     this.isOpen = !this.isOpen;

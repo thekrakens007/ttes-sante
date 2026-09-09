@@ -3,6 +3,7 @@ layer(base);
 
 @import "tailwindcss";
 @import "swiper/css/bundle";
+@import "flatpickr/dist/flatpickr.min.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -675,6 +676,15 @@ span.flatpickr-weekday,
 
 .flatpickr-calendar.static {
   @apply right-0;
+  position: absolute !important;
+  top: calc(100% + 8px) !important;
+  z-index: 99999 !important;
+}
+
+.flatpickr-calendar {
+  box-sizing: border-box;
+  width: 307px;
+  max-width: 307px;
 }
 
 .flatpickr-calendar.hasTime {

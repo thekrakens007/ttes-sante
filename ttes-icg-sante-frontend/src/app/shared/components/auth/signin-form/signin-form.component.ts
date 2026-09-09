@@ -48,6 +48,10 @@ export class SigninFormComponent {
     // Réinitialiser le message d'erreur
     this.errorMessage = '';
 
+    if (this.loading) {
+      return;
+    }
+
     // Vérification des champs
     if (!this.email || !this.password) {
 

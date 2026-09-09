@@ -35,6 +35,20 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class ShopHomeComponent implements OnInit {
 
+    // =====================================================
+    // PAGINATION
+    // =====================================================
+
+    currentPage = 0;
+
+    pageSize = 8;
+
+    totalPages = 0;
+
+    totalElements = 0;
+
+    pages: number[] = [];
+
 
     // =====================================================
     // SERVICES
@@ -220,22 +234,75 @@ export class ShopHomeComponent implements OnInit {
 
         this.loading = true;
 
+        this.error = '';
+
         this.productService
-            .getProducts()
+            .getProductsPaginated(
+                this.currentPage,
+                this.pageSize
+            )
             .subscribe({
 
-                next: (products) => {
+                next: (response) => {
+
+                    // -------------------------------------
+                    // PRODUITS DE LA PAGE
+                    // -------------------------------------
 
                     this.products =
-                        products.filter(
+                        response.content.filter(
                             product =>
                                 product.stock > 0
                         );
 
+
+                    // -------------------------------------
+                    // INFORMATIONS PAGINATION
+                    // -------------------------------------
+
+                    this.totalPages =
+                        response.totalPages;
+
+                    this.totalElements =
+                        response.totalElements;
+
+
+                    // -------------------------------------
+                    // GENERATION DES NUMEROS DE PAGE
+                    // -------------------------------------
+
+                    this.pages =
+                        Array.from(
+                            {
+                                length:
+                                this.totalPages
+                            },
+                            (_, index) =>
+                                index
+                        );
+
+
+                    // -------------------------------------
+                    // FILTRES
+                    // -------------------------------------
+
+                    this.buildFilters();
+
+
+                    // -------------------------------------
+                    // PRODUITS AFFICHES
+                    // -------------------------------------
+
                     this.filteredProducts =
                         this.products;
 
-                    this.buildFilters();
+
+                    // -------------------------------------
+                    // RECHERCHE / FILTRES ACTUELS
+                    // -------------------------------------
+
+                    this.search();
+
 
                     this.loading = false;
 
@@ -261,6 +328,77 @@ export class ShopHomeComponent implements OnInit {
 
 
     // =====================================================
+    // PAGINATION
+    // =====================================================
+
+    goToPage(
+        page: number
+    ): void {
+
+        if (
+            page < 0 ||
+            page >= this.totalPages ||
+            page === this.currentPage
+        ) {
+
+            return;
+
+        }
+
+        this.currentPage = page;
+
+        this.loadProducts();
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+
+    }
+
+
+    nextPage(): void {
+
+        if (
+            this.currentPage <
+            this.totalPages - 1
+        ) {
+
+            this.currentPage++;
+
+            this.loadProducts();
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+
+        }
+
+    }
+
+
+    previousPage(): void {
+
+        if (
+            this.currentPage > 0
+        ) {
+
+            this.currentPage--;
+
+            this.loadProducts();
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+
+        }
+
+    }
+
+
+    // =====================================================
     // CONSTRUCTION DES FILTRES
     // =====================================================
 
@@ -272,16 +410,15 @@ export class ShopHomeComponent implements OnInit {
                     product.categories ?? []
             );
 
-        const companies =
+
+        const companies: string[] =
             this.products
-                .map(
-                    product =>
-                        product.companyName
-                )
+                .map(product => product.companyName)
                 .filter(
-                    value =>
+                    (value): value is string =>
                         !!value
                 );
+
 
         const therapeuticAreas =
             this.products.flatMap(
@@ -294,15 +431,21 @@ export class ShopHomeComponent implements OnInit {
             [...new Set(categories)]
                 .sort();
 
-        //this.companies =
-        //    [...new Set(companies)]
-        //        .sort();
 
-        console.log('compqnie:',companies);
+        this.companies =
+            [...new Set(companies)]
+                .sort();
+
 
         this.therapeuticAreas =
             [...new Set(therapeuticAreas)]
                 .sort();
+
+
+        console.log(
+            'Entreprises :',
+            this.companies
+        );
 
     }
 
@@ -320,100 +463,101 @@ export class ShopHomeComponent implements OnInit {
 
 
         this.filteredProducts =
-            this.products.filter(product => {
+            this.products.filter(
+                product => {
+
+                    // -------------------------------------
+                    // RECHERCHE TEXTUELLE
+                    // -------------------------------------
+
+                    const matchesSearch =
+                        !term ||
+
+                        product.name
+                            ?.toLowerCase()
+                            .includes(term)
+
+                        ||
+
+                        product.brand
+                            ?.toLowerCase()
+                            .includes(term)
+
+                        ||
+
+                        product.description
+                            ?.toLowerCase()
+                            .includes(term)
+
+                        ||
+
+                        product.categories?.some(
+                            category =>
+                                category
+                                    .toLowerCase()
+                                    .includes(term)
+                        )
+
+                        ||
+
+                        product.companyName
+                            ?.toLowerCase()
+                            .includes(term)
+
+                        ||
+
+                        product.therapeuticAreas?.some(
+                            area =>
+                                area
+                                    .toLowerCase()
+                                    .includes(term)
+                        );
 
 
-                // -----------------------------------------
-                // RECHERCHE TEXTUELLE
-                // -----------------------------------------
+                    // -------------------------------------
+                    // CATEGORIE
+                    // -------------------------------------
 
-                const matchesSearch =
-                    !term ||
+                    const matchesCategory =
+                        !this.selectedCategory ||
 
-                    product.name
-                        ?.toLowerCase()
-                        .includes(term)
+                        product.categories?.includes(
+                            this.selectedCategory
+                        );
 
-                    ||
 
-                    product.brand
-                        ?.toLowerCase()
-                        .includes(term)
+                    // -------------------------------------
+                    // ENTREPRISE
+                    // -------------------------------------
 
-                    ||
+                    const matchesCompany =
+                        !this.selectedCompany ||
 
-                    product.description
-                        ?.toLowerCase()
-                        .includes(term)
+                        product.companyName ===
+                        this.selectedCompany;
 
-                    ||
 
-                    product.categories?.some(
-                        category =>
-                            category
-                                .toLowerCase()
-                                .includes(term)
-                    )
+                    // -------------------------------------
+                    // DOMAINE THERAPEUTIQUE
+                    // -------------------------------------
 
-                    ||
+                    const matchesTherapeuticArea =
+                        !this.selectedTherapeuticArea ||
 
-                    product.companyName
-                        ?.toLowerCase()
-                        .includes(term)
+                        product.therapeuticAreas?.includes(
+                            this.selectedTherapeuticArea
+                        );
 
-                    ||
 
-                    product.therapeuticAreas?.some(
-                        area =>
-                            area
-                                .toLowerCase()
-                                .includes(term)
+                    return (
+                        matchesSearch &&
+                        matchesCategory &&
+                        matchesCompany &&
+                        matchesTherapeuticArea
                     );
 
-
-                // -----------------------------------------
-                // CATEGORIE
-                // -----------------------------------------
-
-                const matchesCategory =
-                    !this.selectedCategory ||
-
-                    product.categories?.includes(
-                        this.selectedCategory
-                    );
-
-
-                // -----------------------------------------
-                // ENTREPRISE
-                // -----------------------------------------
-
-                const matchesCompany =
-                    !this.selectedCompany ||
-
-                    product.companyName ===
-                    this.selectedCompany;
-
-
-                // -----------------------------------------
-                // DOMAINE THERAPEUTIQUE
-                // -----------------------------------------
-
-                const matchesTherapeuticArea =
-                    !this.selectedTherapeuticArea ||
-
-                    product.therapeuticAreas?.includes(
-                        this.selectedTherapeuticArea
-                    );
-
-
-                return (
-                    matchesSearch &&
-                    matchesCategory &&
-                    matchesCompany &&
-                    matchesTherapeuticArea
-                );
-
-            });
+                }
+            );
 
     }
 
@@ -476,6 +620,7 @@ export class ShopHomeComponent implements OnInit {
                     item.productId === productId
             );
 
+
         return item?.quantity ?? 0;
 
     }
@@ -497,6 +642,7 @@ export class ShopHomeComponent implements OnInit {
             return '/images/products/default-product.png';
 
         }
+
 
         const mainImage =
             product.images.find(

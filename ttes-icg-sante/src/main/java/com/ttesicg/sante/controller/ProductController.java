@@ -7,6 +7,9 @@ import com.ttesicg.sante.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -35,6 +38,17 @@ public class ProductController {
             @PathVariable Long id
     ){
         productService.delete(id);
+    }
+
+    @GetMapping("/paginated")
+    public Page<ProductResponse> getProductsPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return productService.getProductsPaginated(pageable);
     }
 
     @GetMapping("/{id}")

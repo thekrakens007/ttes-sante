@@ -64,3 +64,11 @@ export interface Product {
     images?: ProductImage[];
 
 }
+
+export interface ProductPage {
+    content: Product[];
+    totalElements: number;
+    totalPages: number;
+    size: number;
+    number: number;
+}

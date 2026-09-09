@@ -6,7 +6,6 @@
            dark:bg-gray-950
            dark:text-white">
 
-
     <!-- ================================================= -->
     <!-- HEADER TES-ICG SANTÉ -->
     <!-- ================================================= -->
@@ -20,7 +19,6 @@
                dark:border-gray-800
                dark:bg-gray-900">
 
-
         <!-- ================================================= -->
         <!-- HEADER PRINCIPAL -->
         <!-- ================================================= -->
@@ -32,22 +30,17 @@
                    sm:px-6 sm:py-4
                    lg:px-8">
 
-
-            <!-- ================= LOGO ================= -->
+            <!-- LOGO -->
 
             <a
                     routerLink="/"
                     (click)="closeMobileMenu()"
                     class="flex shrink-0 items-center">
 
-                <!-- LOGO MODE CLAIR -->
-
                 <img
                         src="/images/logo/logo.svg"
                         alt="TES-ICG Santé"
                         class="h-12 w-auto sm:h-14 dark:hidden">
-
-                <!-- LOGO MODE SOMBRE -->
 
                 <img
                         src="/images/logo/logo-dark.svg"
@@ -56,8 +49,7 @@
 
             </a>
 
-
-            <!-- ================= RECHERCHE DESKTOP ================= -->
+            <!-- RECHERCHE DESKTOP -->
 
             <div
                     class="hidden max-w-xl flex-1 md:block">
@@ -102,16 +94,10 @@
 
             </div>
 
-
-            <!-- ================================================= -->
             <!-- NAVIGATION DESKTOP -->
-            <!-- ================================================= -->
 
             <div
                     class="hidden items-center gap-2 md:flex">
-
-
-                <!-- ENTREPRISES -->
 
                 <a
                         routerLink="/companies"
@@ -129,14 +115,11 @@
 
                 </a>
 
-
-                <!-- NON CONNECTÉ -->
-
                 @if (!isLoggedIn()) {
 
-                    <a
-                            routerLink="/signin"
-                            class="rounded-lg px-3 py-2
+                <a
+                        routerLink="/signin"
+                        class="rounded-lg px-3 py-2
                                text-sm font-semibold
                                text-gray-700
                                transition
@@ -146,14 +129,13 @@
                                dark:hover:bg-green-900/30
                                dark:hover:text-green-400">
 
-                        Se connecter
+                    Se connecter
 
-                    </a>
+                </a>
 
-
-                    <a
-                            routerLink="/signup"
-                            class="rounded-lg
+                <a
+                        routerLink="/signup"
+                        class="rounded-lg
                                bg-green-600
                                px-4 py-2.5
                                text-sm font-semibold
@@ -164,24 +146,21 @@
                                dark:bg-green-500
                                dark:hover:bg-green-400">
 
-                        Créer un compte
+                    Créer un compte
 
-                    </a>
+                </a>
 
                 }
 
-
-                <!-- ADMIN -->
-
                 @if (
-                    isLoggedIn()
-                    &&
-                    isAdmin()
-                        ) {
+                isLoggedIn()
+                &&
+                isAdmin()
+                ) {
 
-                    <a
-                            routerLink="/admin"
-                            class="rounded-lg
+                <a
+                        routerLink="/admin"
+                        class="rounded-lg
                                bg-green-700
                                px-4 py-2.5
                                text-sm font-semibold
@@ -192,24 +171,21 @@
                                dark:bg-green-600
                                dark:hover:bg-green-500">
 
-                        ⚙️ Admin
+                    ⚙️ Admin
 
-                    </a>
+                </a>
 
                 }
 
-
-                <!-- CLIENT -->
-
                 @if (
-                    isLoggedIn()
-                    &&
-                    !isAdmin()
-                        ) {
+                isLoggedIn()
+                &&
+                !isAdmin()
+                ) {
 
-                    <a
-                            routerLink="/profile"
-                            class="rounded-lg
+                <a
+                        routerLink="/profile"
+                        class="rounded-lg
                                bg-green-600
                                px-4 py-2.5
                                text-sm font-semibold
@@ -220,20 +196,17 @@
                                dark:bg-green-500
                                dark:hover:bg-green-400">
 
-                        👤 Profil
+                    👤 Profil
 
-                    </a>
+                </a>
 
                 }
-
-
-                <!-- PANIER -->
 
                 @if (isLoggedIn()) {
 
-                    <a
-                            routerLink="/cart"
-                            class="rounded-lg
+                <a
+                        routerLink="/cart"
+                        class="rounded-lg
                                bg-green-600
                                px-4 py-2.5
                                text-sm font-semibold
@@ -244,16 +217,15 @@
                                dark:bg-green-500
                                dark:hover:bg-green-400">
 
-                        🛒 Panier
+                    🛒 Panier
 
-                    </a>
+                </a>
 
                 }
 
             </div>
 
-
-            <!-- MOBILE -->
+            <!-- MENU MOBILE -->
 
             <button
                     type="button"
@@ -280,19 +252,16 @@
                        md:hidden">
 
                 @if (mobileMenuOpen) {
-                    ✕
+                ✕
                 } @else {
-                    ☰
+                ☰
                 }
 
             </button>
 
         </div>
 
-
-        <!-- ================================================= -->
         <!-- RECHERCHE MOBILE -->
-        <!-- ================================================= -->
 
         <div
                 class="border-t border-gray-100
@@ -340,26 +309,22 @@
 
         </div>
 
-
-        <!-- ================================================= -->
         <!-- MENU MOBILE -->
-        <!-- ================================================= -->
 
         @if (mobileMenuOpen) {
 
-            <div
-                    class="border-t border-gray-200
+        <div
+                class="border-t border-gray-200
                        bg-white px-4 py-4
                        shadow-lg
                        dark:border-gray-800
                        dark:bg-gray-900
                        md:hidden">
 
-
-                <a
-                        routerLink="/companies"
-                        (click)="closeMobileMenu()"
-                        class="flex items-center
+            <a
+                    routerLink="/companies"
+                    (click)="closeMobileMenu()"
+                    class="flex items-center
                            rounded-lg px-4 py-3
                            text-sm font-semibold
                            text-gray-700
@@ -370,23 +335,22 @@
                            dark:hover:bg-green-900/30
                            dark:hover:text-green-400">
 
-                    🏢
+                🏢
 
-                    <span class="ml-3">
+                <span class="ml-3">
                         Entreprises
                     </span>
 
-                </a>
+            </a>
 
+            <div class="mt-2 flex flex-col gap-2">
 
-                <div class="mt-2 flex flex-col gap-2">
+                @if (!isLoggedIn()) {
 
-                    @if (!isLoggedIn()) {
-
-                        <a
-                                routerLink="/signin"
-                                (click)="closeMobileMenu()"
-                                class="flex items-center
+                <a
+                        routerLink="/signin"
+                        (click)="closeMobileMenu()"
+                        class="flex items-center
                                    rounded-lg px-4 py-3
                                    text-sm font-semibold
                                    text-gray-700
@@ -397,19 +361,18 @@
                                    dark:hover:bg-green-900/30
                                    dark:hover:text-green-400">
 
-                            🔐
+                    🔐
 
-                            <span class="ml-3">
+                    <span class="ml-3">
                                 Se connecter
                             </span>
 
-                        </a>
+                </a>
 
-
-                        <a
-                                routerLink="/signup"
-                                (click)="closeMobileMenu()"
-                                class="flex items-center
+                <a
+                        routerLink="/signup"
+                        (click)="closeMobileMenu()"
+                        class="flex items-center
                                    rounded-lg
                                    bg-green-600
                                    px-4 py-3
@@ -418,27 +381,26 @@
                                    transition
                                    hover:bg-green-700">
 
-                            📝
+                    📝
 
-                            <span class="ml-3">
+                    <span class="ml-3">
                                 Créer un compte
                             </span>
 
-                        </a>
+                </a>
 
-                    }
+                }
 
+                @if (
+                isLoggedIn()
+                &&
+                isAdmin()
+                ) {
 
-                    @if (
-                        isLoggedIn()
-                        &&
-                        isAdmin()
-                            ) {
-
-                        <a
-                                routerLink="/admin"
-                                (click)="closeMobileMenu()"
-                                class="flex items-center
+                <a
+                        routerLink="/admin"
+                        (click)="closeMobileMenu()"
+                        class="flex items-center
                                    rounded-lg
                                    bg-green-700
                                    px-4 py-3
@@ -447,27 +409,26 @@
                                    transition
                                    hover:bg-green-800">
 
-                            ⚙️
+                    ⚙️
 
-                            <span class="ml-3">
+                    <span class="ml-3">
                                 Dashboard Admin
                             </span>
 
-                        </a>
+                </a>
 
-                    }
+                }
 
+                @if (
+                isLoggedIn()
+                &&
+                !isAdmin()
+                ) {
 
-                    @if (
-                        isLoggedIn()
-                        &&
-                        !isAdmin()
-                            ) {
-
-                        <a
-                                routerLink="/profile"
-                                (click)="closeMobileMenu()"
-                                class="flex items-center
+                <a
+                        routerLink="/profile"
+                        (click)="closeMobileMenu()"
+                        class="flex items-center
                                    rounded-lg
                                    bg-green-600
                                    px-4 py-3
@@ -476,23 +437,22 @@
                                    transition
                                    hover:bg-green-700">
 
-                            👤
+                    👤
 
-                            <span class="ml-3">
+                    <span class="ml-3">
                                 Mon profil
                             </span>
 
-                        </a>
+                </a>
 
-                    }
+                }
 
+                @if (isLoggedIn()) {
 
-                    @if (isLoggedIn()) {
-
-                        <a
-                                routerLink="/cart"
-                                (click)="closeMobileMenu()"
-                                class="flex items-center
+                <a
+                        routerLink="/cart"
+                        (click)="closeMobileMenu()"
+                        class="flex items-center
                                    rounded-lg
                                    bg-green-600
                                    px-4 py-3
@@ -501,24 +461,23 @@
                                    transition
                                    hover:bg-green-700">
 
-                            🛒
+                    🛒
 
-                            <span class="ml-3">
+                    <span class="ml-3">
                                 Mon panier
                             </span>
 
-                        </a>
+                </a>
 
-                    }
-
-                </div>
+                }
 
             </div>
+
+        </div>
 
         }
 
     </header>
-
 
     <!-- ================================================= -->
     <!-- HERO -->
@@ -578,7 +537,6 @@
 
     </section>
 
-
     <!-- ================================================= -->
     <!-- CONTENT -->
     <!-- ================================================= -->
@@ -586,7 +544,6 @@
     <main
             class="mx-auto max-w-7xl px-4 py-10
                sm:px-6 lg:px-8">
-
 
         <!-- ================================================= -->
         <!-- FILTRES -->
@@ -624,13 +581,9 @@
 
             </div>
 
-
-            <!-- FILTRES -->
-
             <div
                     class="grid grid-cols-1 gap-4
                        md:grid-cols-3">
-
 
                 <!-- CATÉGORIE -->
 
@@ -667,20 +620,19 @@
                         </option>
 
                         @for (
-                            category of categories;
-                            track category
-                                ) {
+                        category of categories;
+                        track category
+                        ) {
 
-                            <option [value]="category">
-                                {{ category }}
-                            </option>
+                        <option [value]="category">
+                            {{ category }}
+                        </option>
 
                         }
 
                     </select>
 
                 </div>
-
 
                 <!-- ENTREPRISE -->
 
@@ -717,20 +669,19 @@
                         </option>
 
                         @for (
-                            company of companies;
-                            track company
-                                ) {
+                        company of companies;
+                        track company
+                        ) {
 
-                            <option [value]="company">
-                                {{ company }}
-                            </option>
+                        <option [value]="company">
+                            {{ company }}
+                        </option>
 
                         }
 
                     </select>
 
                 </div>
-
 
                 <!-- DOMAINE -->
 
@@ -767,13 +718,13 @@
                         </option>
 
                         @for (
-                            area of therapeuticAreas;
-                            track area
-                                ) {
+                        area of therapeuticAreas;
+                        track area
+                        ) {
 
-                            <option [value]="area">
-                                {{ area }}
-                            </option>
+                        <option [value]="area">
+                            {{ area }}
+                        </option>
 
                         }
 
@@ -782,7 +733,6 @@
                 </div>
 
             </div>
-
 
             <!-- RESET -->
 
@@ -810,7 +760,6 @@
 
         </div>
 
-
         <!-- ================================================= -->
         <!-- TITRE PRODUITS -->
         <!-- ================================================= -->
@@ -835,7 +784,7 @@
                            text-gray-500
                            dark:text-gray-400">
 
-                    {{ filteredProducts.length }}
+                    {{ totalElements }}
                     produit(s) disponible(s)
 
                 </p>
@@ -844,43 +793,41 @@
 
         </div>
 
-
         <!-- ================================================= -->
         <!-- LOADING -->
         <!-- ================================================= -->
 
         @if (loading) {
 
-            <div
-                    class="flex min-h-[300px]
+        <div
+                class="flex min-h-[300px]
                        items-center justify-center">
 
-                <div class="text-center">
+            <div class="text-center">
 
-                    <div
-                            class="mx-auto h-10 w-10
+                <div
+                        class="mx-auto h-10 w-10
                                animate-spin rounded-full
                                border-4 border-gray-200
                                border-t-green-600
                                dark:border-gray-700
                                dark:border-t-green-500">
-                    </div>
+                </div>
 
-                    <p
-                            class="mt-4 text-sm
+                <p
+                        class="mt-4 text-sm
                                text-gray-500
                                dark:text-gray-400">
 
-                        Chargement des produits...
+                    Chargement des produits...
 
-                    </p>
-
-                </div>
+                </p>
 
             </div>
 
-        }
+        </div>
 
+        }
 
         <!-- ================================================= -->
         <!-- ERROR -->
@@ -888,94 +835,90 @@
 
         @else if (error) {
 
-            <div
-                    class="rounded-lg border
+        <div
+                class="rounded-lg border
                        border-red-200
                        bg-red-50 p-6
                        text-center
                        dark:border-red-900
                        dark:bg-red-950/40">
 
-                <p class="text-red-600 dark:text-red-400">
-                    {{ error }}
-                </p>
+            <p class="text-red-600 dark:text-red-400">
+                {{ error }}
+            </p>
 
-                <button
-                        type="button"
-                        (click)="loadProducts()"
-                        class="mt-4 rounded-lg
+            <button
+                    type="button"
+                    (click)="loadProducts()"
+                    class="mt-4 rounded-lg
                            bg-red-600 px-5 py-2
                            text-sm font-medium
                            text-white
                            hover:bg-red-700">
 
-                    Réessayer
+                Réessayer
 
-                </button>
+            </button>
 
-            </div>
+        </div>
 
         }
-
 
         <!-- ================================================= -->
         <!-- AUCUN PRODUIT -->
         <!-- ================================================= -->
 
-        @else if (
-            filteredProducts.length === 0
-                ) {
+        @else if (filteredProducts.length === 0) {
 
-            <div
-                    class="rounded-xl border
+        <div
+                class="rounded-xl border
                        border-gray-200
                        bg-white py-16
                        text-center
                        dark:border-gray-800
                        dark:bg-gray-900">
 
-                <div class="text-5xl">
-                    🔍
-                </div>
+            <div class="text-5xl">
+                🔍
+            </div>
 
-                <h3
-                        class="mt-4 text-lg
+            <h3
+                    class="mt-4 text-lg
                            font-semibold
                            text-gray-900
                            dark:text-white">
 
-                    Aucun produit trouvé
+                Aucun produit trouvé
 
-                </h3>
+            </h3>
 
-                <p
-                        class="mt-2 text-sm
+            <p
+                    class="mt-2 text-sm
                            text-gray-500
                            dark:text-gray-400">
 
-                    Essayez avec un autre terme
-                    ou modifiez vos filtres.
+                Essayez avec un autre terme
+                ou modifiez vos filtres.
 
-                </p>
+            </p>
 
-                <button
-                        type="button"
-                        (click)="resetFilters()"
-                        class="mt-5 rounded-lg
+            <button
+                    type="button"
+                    (click)="resetFilters()"
+                    class="mt-5 rounded-lg
                            bg-green-600 px-5 py-2.5
                            text-sm font-semibold
                            text-white
                            transition
                            hover:bg-green-700">
 
-                    Réinitialiser les filtres
+                Réinitialiser les filtres
 
-                </button>
+            </button>
 
-            </div>
+        </div>
 
         }
-
 
         <!-- ================================================= -->
         <!-- PRODUITS -->
@@ -983,31 +926,33 @@
 
         @else {
 
-            <div
-                    class="grid grid-cols-1 gap-6
+        <div
+                class="grid grid-cols-1 gap-6
                        sm:grid-cols-2
                        lg:grid-cols-3
                        xl:grid-cols-4">
 
-                @for (
-                    product of filteredProducts;
-                    track product.id
-                        ) {
+            @for (
+            product of filteredProducts;
+            track product.id
+            ) {
 
-                    <div class="group">
+            <div class="group">
 
-                        <app-product-card
-                                [product]="product">
-                        </app-product-card>
+                <app-product-card
+                        [product]="product">
+                </app-product-card>
 
-
-                        <div
-                                class="mt-3 grid grid-cols-2
+                <div
+                        class="mt-3 grid grid-cols-2
                                    gap-2">
 
-                            <a
-                                    [routerLink]="['/products', product.id]"
-                                    class="flex items-center
+                    <a
+                            [routerLink]="[
+                                    '/products',
+                                    product.id
+                                ]"
+                            class="flex items-center
                                        justify-center gap-2
                                        rounded-lg
                                        border border-green-600
@@ -1022,18 +967,17 @@
                                        dark:text-green-400
                                        dark:hover:bg-green-900/30">
 
-                                👁️
+                        👁️
 
-                                <span>
+                        <span>
                                     Détails
                                 </span>
 
-                            </a>
+                    </a>
 
-
-                            <a
-                                    routerLink="/cart"
-                                    class="flex items-center
+                    <a
+                            routerLink="/cart"
+                            class="flex items-center
                                        justify-center gap-2
                                        rounded-lg
                                        bg-green-600
@@ -1045,21 +989,169 @@
                                        dark:bg-green-500
                                        dark:hover:bg-green-400">
 
-                                🛒
+                        🛒
 
-                                <span>
+                        <span>
                                     Panier
                                 </span>
 
-                            </a>
+                    </a>
 
-                        </div>
-
-                    </div>
-
-                }
+                </div>
 
             </div>
+
+            }
+
+        </div>
+
+        <!-- ================================================= -->
+        <!-- PAGINATION -->
+        <!-- ================================================= -->
+
+        @if (totalPages > 1) {
+
+        <div
+                class="mt-10 flex flex-wrap
+                           items-center justify-center
+                           gap-2">
+
+            <!-- PRÉCÉDENT -->
+
+            <button
+                    type="button"
+                    (click)="previousPage()"
+                    [disabled]="currentPage === 0"
+                    class="rounded-lg
+                               border border-gray-300
+                               bg-white
+                               px-4 py-2.5
+                               text-sm font-semibold
+                               text-gray-700
+                               transition
+                               hover:border-green-500
+                               hover:bg-green-50
+                               hover:text-green-700
+                               disabled:cursor-not-allowed
+                               disabled:opacity-40
+                               dark:border-gray-700
+                               dark:bg-gray-900
+                               dark:text-gray-200
+                               dark:hover:border-green-500
+                               dark:hover:bg-green-900/30">
+
+                ← Précédent
+
+            </button>
+
+            <!-- NUMÉROS -->
+
+            @for (
+            page of pages;
+            track page
+            ) {
+
+            <button
+                    type="button"
+                    (click)="goToPage(page)"
+                    class="flex h-10 min-w-10
+                                   items-center
+                                   justify-center
+                                   rounded-lg
+                                   border
+                                   px-3 text-sm
+                                   font-semibold
+                                   transition"
+                    [class.border-green-600]="
+                                currentPage === page
+                            "
+                    [class.bg-green-600]="
+                                currentPage === page
+                            "
+                    [class.text-white]="
+                                currentPage === page
+                            "
+                    [class.border-gray-300]="
+                                currentPage !== page
+                            "
+                    [class.bg-white]="
+                                currentPage !== page
+                            "
+                    [class.text-gray-700]="
+                                currentPage !== page
+                            "
+                    [class.hover:border-green-500]="
+                                currentPage !== page
+                            "
+                    [class.hover:bg-green-50]="
+                                currentPage !== page
+                            "
+                    [class.dark:border-gray-700]="
+                                currentPage !== page
+                            "
+                    [class.dark:bg-gray-900]="
+                                currentPage !== page
+                            "
+                    [class.dark:text-gray-200]="
+                                currentPage !== page
+                            ">
+
+                {{ page + 1 }}
+
+            </button>
+
+            }
+
+            <!-- SUIVANT -->
+
+            <button
+                    type="button"
+                    (click)="nextPage()"
+                    [disabled]="
+                            currentPage === totalPages - 1
+                        "
+                    class="rounded-lg
+                               border border-gray-300
+                               bg-white
+                               px-4 py-2.5
+                               text-sm font-semibold
+                               text-gray-700
+                               transition
+                               hover:border-green-500
+                               hover:bg-green-50
+                               hover:text-green-700
+                               disabled:cursor-not-allowed
+                               disabled:opacity-40
+                               dark:border-gray-700
+                               dark:bg-gray-900
+                               dark:text-gray-200
+                               dark:hover:border-green-500
+                               dark:hover:bg-green-900/30">
+
+                Suivant →
+
+            </button>
+
+        </div>
+
+        <!-- INFORMATIONS -->
+
+        <p
+                class="mt-4 text-center text-sm
+                           text-gray-500
+                           dark:text-gray-400">
+
+            Page {{ currentPage + 1 }}
+            sur {{ totalPages }}
+
+            ·
+
+            {{ totalElements }}
+            produit(s) disponible(s)
+
+        </p>
+
+        }
 
         }
 

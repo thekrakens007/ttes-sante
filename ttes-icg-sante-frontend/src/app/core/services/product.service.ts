@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Product } from '../models/product.model';
+import {Product, ProductPage} from '../models/product.model';
 
 @Injectable({
     providedIn: 'root'
@@ -15,6 +15,20 @@ export class ProductService {
 
     getProducts(): Observable<Product[]> {
         return this.http.get<Product[]>(this.API_URL);
+    }
+    getProductsPaginated(
+        page: number = 0,
+        size: number = 12
+    ): Observable<ProductPage> {
+
+        const params = new HttpParams()
+            .set('page', page)
+            .set('size', size);
+
+        return this.http.get<ProductPage>(
+            `${this.API_URL}/paginated`,
+            { params }
+        );
     }
 
     getProduct(productId: number): Observable<Product> {

@@ -11,4 +11,7 @@ public interface UserRepository
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
 
+    Optional<User> findByVerificationToken(String token);
+    Optional<User> findByResetPasswordToken(String token);
+
 }

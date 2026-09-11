@@ -12,6 +12,10 @@ interface LoginResponse {
   token: string;
 }
 
+interface MessageResponse {
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -61,27 +65,41 @@ export class AuthService {
     );
     this.router.navigate(['/']);
   }
+
   register(request: {
     firstName: string;
     lastName: string;
     email: string;
     phone:string;
     password: string;
-  }) {
-    return this.http.post<LoginResponse>(
+  }): Observable<MessageResponse> {
+
+    // L'inscription ne renvoie plus de JWT : le compte doit d'abord être
+    // activé via le lien de vérification envoyé par email.
+    return this.http.post<MessageResponse>(
         `${this.API_URL}/register`,
         request
-    ).pipe(
-        tap(response => {
+    );
+  }
 
-          if (response.token) {
-            localStorage.setItem(
-                this.TOKEN_KEY,
-                response.token
-            );
-          }
+  verifyEmail(token: string): Observable<MessageResponse> {
+    return this.http.get<MessageResponse>(
+        `${this.API_URL}/verify-email`,
+        { params: { token } }
+    );
+  }
 
-        })
+  forgotPassword(email: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(
+        `${this.API_URL}/forgot-password`,
+        { email }
+    );
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(
+        `${this.API_URL}/reset-password`,
+        { token, newPassword }
     );
   }
 

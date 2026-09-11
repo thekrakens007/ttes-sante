@@ -2,39 +2,33 @@ package com.ttesicg.sante.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import io.jsonwebtoken.Claims;
-
 import java.io.IOException;
-import java.util.List;
-
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
-
 
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain
-    )
-            throws ServletException, IOException {
+    ) throws ServletException, IOException {
+
         System.out.println("===== JWT FILTER EXECUTE =====");
         System.out.println("METHOD : " + request.getMethod());
         System.out.println("URI : " + request.getRequestURI());
@@ -43,23 +37,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         System.out.println("Authorization : " + authHeader);
 
+        // Aucun token JWT
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 
+            System.out.println("===== NO JWT -> REQUEST CONTINUES =====");
 
-        if(authHeader == null || !authHeader.startsWith("Bearer ")){
-
-            filterChain.doFilter(request,response);
+            filterChain.doFilter(request, response);
             return;
         }
 
-
+        // Récupération du token
         String token = authHeader.substring(7);
 
-
-        if(jwtService.isValid(token)) {
-
+        // Vérification du token
+        if (jwtService.isValid(token)) {
 
             String email = jwtService.extractUsername(token);
-
 
             var userDetails =
                     userDetailsService.loadUserByUsername(email);
@@ -69,8 +62,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             System.out.println("Enabled : " + userDetails.isEnabled());
             System.out.println("Authorities : " + userDetails.getAuthorities());
 
-
-
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
                             userDetails,
@@ -78,14 +69,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             userDetails.getAuthorities()
                     );
 
-
             SecurityContextHolder
                     .getContext()
                     .setAuthentication(authentication);
 
+        } else {
+
+            System.out.println("===== INVALID JWT =====");
         }
 
-
-        filterChain.doFilter(request,response);
+        // Continuer vers Spring Security / Controller
+        filterChain.doFilter(request, response);
     }
 }

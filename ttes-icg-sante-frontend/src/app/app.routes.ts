@@ -43,6 +43,9 @@ import {adminGuard} from "./core/guards/admin.guard";
 import {ProductDetailComponent} from "./pages/shop/product-detail/product-detail.component";
 import {CompanyListComponent} from "./pages/shop/company-list/company-list.component";
 import {CompanyDetailComponent} from "./pages/shop/company-detail/company-detail.component";
+import {ForgotPasswordComponent} from "./pages/auth-pages/forgot-password/forgot-password.component";
+import {ResetPasswordComponent} from "./pages/auth-pages/reset-password/reset-password.component";
+import {VerifyEmailComponent} from "./pages/auth-pages/verify-email/verify-email.component";
 
 export const routes: Routes = [
   // =====================================================
@@ -287,6 +290,21 @@ export const routes: Routes = [
     path: 'signup',
     component: SignUpComponent,
     title: 'Créer un compte'
+  },
+  {
+    path: 'forgot-password',
+    component: ForgotPasswordComponent,
+    title: 'Mot de passe oublié'
+  },
+  {
+    path: 'reset-password',
+    component: ResetPasswordComponent,
+    title: 'Réinitialiser le mot de passe'
+  },
+  {
+    path: 'verify-email',
+    component: VerifyEmailComponent,
+    title: 'Vérification email'
   },
   // error pages
   {

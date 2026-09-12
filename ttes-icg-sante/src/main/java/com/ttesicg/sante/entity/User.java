@@ -31,8 +31,15 @@ public class User {
     private String email;
 
     @JsonIgnore
-    @Column(nullable = false)
+    @Column
     private String password;
+
+    @Column(name = "auth_provider", nullable = false, length = 20)
+    @Builder.Default
+    private String authProvider = "LOCAL";
+
+    @Column(name = "google_id", unique = true, length = 255)
+    private String googleId;
 
     @Column(length = 30)
     private String phone;

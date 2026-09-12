@@ -46,6 +46,7 @@ import {CompanyDetailComponent} from "./pages/shop/company-detail/company-detail
 import {ForgotPasswordComponent} from "./pages/auth-pages/forgot-password/forgot-password.component";
 import {ResetPasswordComponent} from "./pages/auth-pages/reset-password/reset-password.component";
 import {VerifyEmailComponent} from "./pages/auth-pages/verify-email/verify-email.component";
+import {SignupSuccessComponent} from "./shared/components/auth/signup-success/signup-success.component";
 
 export const routes: Routes = [
   // =====================================================
@@ -290,6 +291,10 @@ export const routes: Routes = [
     path: 'signup',
     component: SignUpComponent,
     title: 'Créer un compte'
+  },
+  {
+    path: 'signup-success',
+    component: SignupSuccessComponent
   },
   {
     path: 'forgot-password',

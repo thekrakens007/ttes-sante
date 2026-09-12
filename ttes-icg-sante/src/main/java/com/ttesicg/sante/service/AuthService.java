@@ -10,6 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.ttesicg.sante.security.GoogleTokenVerifier;
+import com.ttesicg.sante.dto.GoogleAuthRequest;
+
+
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -25,32 +29,115 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final GoogleTokenVerifier googleTokenVerifier;
 
     private static final long VERIFICATION_VALIDITY_HOURS = 24;
     private static final long RESET_VALIDITY_MINUTES = 60;
 
-    public AuthResponse login(LoginRequest request) {
+        public AuthResponse login(LoginRequest request) {
 
-        // Si le compte est désactivé (email non vérifié), Spring Security lève
-        // une DisabledException ici, avant même d'atteindre la ligne suivante.
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+            // Si le compte est désactivé (email non vérifié), Spring Security
+            // lève une DisabledException ici, avant même d'atteindre la ligne suivante.
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
 
-        var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+            var user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
-        String token = jwtService.generateToken(
-                user.getId(),
-                user.getEmail(),
-                user.getRoles().stream().map(r -> "ROLE_" + r.getName()).toList()
-        );
+            String token = jwtService.generateToken(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getRoles()
+                            .stream()
+                            .map(r -> "ROLE_" + r.getName())
+                            .toList()
+            );
 
-        return new AuthResponse(token);
-    }
+            return new AuthResponse(token);
+        }
+
+        public AuthResponse loginWithGoogle(GoogleAuthRequest request) {
+
+            var payload = googleTokenVerifier.verify(
+                    request.getIdToken()
+            );
+
+            String email = payload.getEmail();
+            String googleId = payload.getSubject();
+
+            String firstName = (String) payload.get("given_name");
+            String lastName = (String) payload.get("family_name");
+
+            if (email == null || email.isBlank()) {
+                throw new RuntimeException(
+                        "Google n'a pas fourni d'adresse email"
+                );
+            }
+
+            User user = userRepository
+                    .findByEmail(email)
+                    .orElseGet(() -> {
+
+                        Role clientRole = roleRepository.findByName("CLIENT")
+                                .orElseThrow(() ->
+                                        new RuntimeException(
+                                                "Le rôle CLIENT n'existe pas"
+                                        )
+                                );
+
+                        User newUser = User.builder()
+                                .firstName(
+                                        firstName != null
+                                                ? firstName
+                                                : "Utilisateur"
+                                )
+                                .lastName(
+                                        lastName != null
+                                                ? lastName
+                                                : "Google"
+                                )
+                                .email(email)
+                                .password(null)
+                                .phone(null)
+                                .enabled(true)
+                                .emailVerified(true)
+                                .authProvider("GOOGLE")
+                                .googleId(googleId)
+                                .roles(Set.of(clientRole))
+                                .build();
+
+                        return userRepository.save(newUser);
+                    });
+
+            // Si un compte existe déjà avec cet email,
+            // on associe son compte Google s'il n'en possède pas encore.
+            if (user.getGoogleId() == null) {
+
+                user.setGoogleId(googleId);
+                userRepository.save(user);
+
+            } else if (!user.getGoogleId().equals(googleId)) {
+
+                throw new RuntimeException(
+                        "Ce compte est déjà associé à un autre compte Google"
+                );
+            }
+
+            String token = jwtService.generateToken(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getRoles()
+                            .stream()
+                            .map(r -> "ROLE_" + r.getName())
+                            .toList()
+            );
+
+            return new AuthResponse(token);
+        }
 
     public MessageResponse register(RegisterRequest request) {
 

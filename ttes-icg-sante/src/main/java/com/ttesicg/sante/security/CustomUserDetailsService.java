@@ -11,7 +11,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-
     @Override
     public UserDetails loadUserByUsername(String email)
             throws UsernameNotFoundException {
@@ -23,11 +22,18 @@ public class CustomUserDetailsService implements UserDetailsService {
                         )
                 );
 
+        // Les comptes Google n'ont pas de mot de passe local.
+        // Spring Security exige néanmoins une valeur non nulle.
+        String password = user.getPassword();
+
+        if (password == null) {
+            password = "{noop}GOOGLE_AUTH_ONLY";
+        }
 
         return org.springframework.security.core.userdetails.User
                 .builder()
                 .username(user.getEmail())
-                .password(user.getPassword())
+                .password(password)
                 .authorities(
                         user.getRoles()
                                 .stream()

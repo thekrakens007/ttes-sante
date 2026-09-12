@@ -32,6 +32,25 @@ export class AuthService {
       private router: Router
   ) {}
 
+loginWithGoogle(idToken: string): Observable<any> {
+  return this.http.post<any>(
+    `${this.API_URL}/google`,
+{
+  idToken: idToken
+}
+).pipe(
+    tap((response) => {
+      if (response && response.token) {
+        localStorage.setItem(
+            this.TOKEN_KEY,
+            response.token
+        );
+      }
+    })
+);
+}
+
+
   login(email: string, password: string): Observable<LoginResponse> {
 
     const request: LoginRequest = {

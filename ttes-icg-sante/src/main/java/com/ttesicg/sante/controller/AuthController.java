@@ -5,6 +5,7 @@ import com.ttesicg.sante.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import com.ttesicg.sante.dto.GoogleAuthRequest;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -36,5 +37,12 @@ public class AuthController {
     @PostMapping("/reset-password")
     public MessageResponse resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         return authService.resetPassword(request);
+    }
+
+    @PostMapping("/google")
+    public AuthResponse loginWithGoogle(
+            @RequestBody GoogleAuthRequest request
+    ) {
+        return authService.loginWithGoogle(request);
     }
 }

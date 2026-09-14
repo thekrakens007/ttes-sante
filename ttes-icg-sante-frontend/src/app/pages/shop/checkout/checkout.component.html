@@ -281,35 +281,139 @@
 
                         <!-- TELEPHONE -->
 
+                        <!-- TELEPHONE -->
+
                         <div class="mb-5">
 
                             <label
                                     class="mb-2 block text-sm
-                                           font-medium
-                                           text-gray-700
-                                           dark:text-gray-300"
+               font-medium
+               text-gray-700
+               dark:text-gray-300"
                             >
 
                                 Téléphone
 
+                                <span class="text-red-500">
+            *
+        </span>
+
                             </label>
 
-                            <input
-                                    type="tel"
-                                    [value]="phone"
-                                    class="w-full rounded-lg
-                                           border border-gray-300
-                                           bg-gray-100 px-4 py-3
-                                           text-gray-700
-                                           dark:border-gray-700
-                                           dark:bg-gray-800
-                                           dark:text-gray-300"
+
+                            <!-- ============================= -->
+                            <!-- PAYS + NUMERO -->
+                            <!-- ============================= -->
+
+                            <div class="flex gap-2">
+
+
+                                <!-- PAYS -->
+
+                                <div class="w-36 sm:w-40">
+
+                                    <select
+                                            name="phoneCountry"
+                                            [value]="selectedCountry.code"
+                                            (change)="onCountryChange($event)"
+                                            class="h-11 w-full rounded-lg
+                       border border-gray-300
+                       bg-white px-2
+                       text-sm text-gray-700
+                       outline-none transition
+                       focus:border-brand-500
+                       focus:ring-2
+                       focus:ring-brand-500/20
+                       dark:border-gray-700
+                       dark:bg-gray-800
+                       dark:text-gray-300"
+                                    >
+
+                                        @for (
+                                        country of countries;
+                                        track country.code
+                                        ) {
+
+                                        <option
+                                                [value]="country.code"
+                                        >
+
+                                            {{ country.flag }}
+                                            {{ country.dialCode }}
+
+                                        </option>
+
+                                        }
+
+                                    </select>
+
+                                </div>
+
+
+                                <!-- NUMERO -->
+
+                                <div class="flex-1">
+
+                                    <input
+                                            type="tel"
+                                            name="phone"
+                                            [(ngModel)]="phone"
+                                            (input)="phoneError = ''"
+                                            autocomplete="tel"
+                                            placeholder="699 123 456"
+                                            class="h-11 w-full rounded-lg
+                       border border-gray-300
+                       bg-white px-3
+                       text-sm text-gray-700
+                       outline-none transition
+                       focus:border-brand-500
+                       focus:ring-2
+                       focus:ring-brand-500/20
+                       dark:border-gray-700
+                       dark:bg-gray-800
+                       dark:text-white"
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- PAYS -->
+
+                            <p
+                                    class="mt-1.5 text-xs
+               text-gray-400
+               dark:text-gray-500"
                             >
+
+                                {{ selectedCountry.name }}
+                                {{ selectedCountry.dialCode }}
+
+                            </p>
+
+
+                            <!-- ERREUR -->
+
+                            @if (phoneError) {
+
+                            <p
+                                    class="mt-1 text-sm text-red-500"
+                            >
+
+                                {{ phoneError }}
+
+                            </p>
+
+                            }
+
+
+                            <!-- INFORMATION -->
 
                             <p
                                     class="mt-1 text-xs
-                                           text-gray-500
-                                           dark:text-gray-400"
+               text-gray-500
+               dark:text-gray-400"
                             >
 
                                 Le numéro associé à votre compte

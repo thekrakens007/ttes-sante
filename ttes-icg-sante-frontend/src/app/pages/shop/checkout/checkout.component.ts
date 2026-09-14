@@ -20,6 +20,16 @@ import { Cart } from '../../../core/interfaces/cart.interface';
 
 import { UserService } from '../../../core/services/user.service';
 
+import {
+    parsePhoneNumberFromString,
+    PhoneNumber
+} from 'libphonenumber-js';
+
+import {
+    PHONE_COUNTRIES,
+    PhoneCountry
+} from '../../../shared/utils/phone-countries';
+
 
 @Component({
     selector: 'app-checkout',
@@ -78,7 +88,28 @@ export class CheckoutComponent implements OnInit {
 
     customerNote = '';
 
+    /**
+     * Numéro affiché dans le formulaire.
+     *
+     * Exemple :
+     * 699123456
+     */
     phone = '';
+
+    /**
+     * Liste des pays.
+     */
+    countries = PHONE_COUNTRIES;
+
+    /**
+     * Cameroun par défaut.
+     */
+    selectedCountry: PhoneCountry = PHONE_COUNTRIES[0];
+
+    /**
+     * Erreur spécifique au téléphone.
+     */
+    phoneError = '';
 
 
     // ==========================================
@@ -114,6 +145,16 @@ export class CheckoutComponent implements OnInit {
                     this.phone =
                         profile.phone ?? '';
 
+                    /*
+                     * Si le backend retourne par exemple :
+                     *
+                     * +237699123456
+                     *
+                     * on essaie de détecter
+                     * automatiquement le pays.
+                     */
+                    this.detectPhoneCountry();
+
                 },
 
                 error: (error) => {
@@ -125,9 +166,194 @@ export class CheckoutComponent implements OnInit {
 
                     this.phone = '';
 
+                    this.phoneError =
+                        'Impossible de récupérer votre numéro de téléphone.';
+
                 }
 
             });
+
+    }
+
+
+    // ==========================================
+    // DETECTION DU PAYS
+    // ==========================================
+
+    detectPhoneCountry(): void {
+
+        if (!this.phone.trim()) {
+
+            return;
+
+        }
+
+        try {
+
+            /*
+             * On essaie de lire le numéro
+             * directement depuis son format international.
+             *
+             * Exemple :
+             *
+             * +237699123456
+             *
+             * => pays CM
+             */
+            const phoneNumber =
+                parsePhoneNumberFromString(
+                    this.phone.trim()
+                );
+
+            if (!phoneNumber) {
+
+                return;
+
+            }
+
+            const countryCode =
+                phoneNumber.country;
+
+            if (!countryCode) {
+
+                return;
+
+            }
+
+            const country =
+                this.countries.find(
+                    c => c.code === countryCode
+                );
+
+            if (country) {
+
+                this.selectedCountry =
+                    country;
+
+                /*
+                 * On affiche uniquement la partie
+                 * nationale dans le champ.
+                 *
+                 * +237699123456
+                 *
+                 * devient :
+                 *
+                 * 699123456
+                 */
+                this.phone =
+                    phoneNumber.nationalNumber;
+
+            }
+
+        } catch (error) {
+
+            console.warn(
+                'Impossible de détecter le pays du numéro :',
+                error
+            );
+
+        }
+
+    }
+
+
+    // ==========================================
+    // CHANGEMENT DE PAYS
+    // ==========================================
+
+    onCountryChange(event: Event): void {
+
+        const select =
+            event.target as HTMLSelectElement;
+
+        const country =
+            this.countries.find(
+                c => c.code === select.value
+            );
+
+        if (!country) {
+
+            return;
+
+        }
+
+        this.selectedCountry =
+            country;
+
+        this.phoneError = '';
+
+        /*
+         * Si un numéro existe déjà,
+         * on le revalide avec le nouveau pays.
+         */
+        if (this.phone.trim()) {
+
+            this.validatePhone();
+
+        }
+
+    }
+
+
+    // ==========================================
+    // VALIDATION TELEPHONE
+    // ==========================================
+
+    validatePhone(): PhoneNumber | null {
+
+        this.phoneError = '';
+
+        const value =
+            this.phone.trim();
+
+        if (!value) {
+
+            this.phoneError =
+                'Le numéro de téléphone est obligatoire.';
+
+            return null;
+
+        }
+
+        /*
+         * Analyse du numéro avec le pays sélectionné.
+         *
+         * Exemple :
+         *
+         * pays = CM
+         * téléphone = 699123456
+         *
+         * => +237699123456
+         */
+        const phoneNumber =
+            parsePhoneNumberFromString(
+                value,
+                this.selectedCountry.code as any
+            );
+
+        if (!phoneNumber) {
+
+            this.phoneError =
+                `Le numéro saisi n'est pas reconnu pour ${this.selectedCountry.name}.`;
+
+            return null;
+
+        }
+
+        /*
+         * Vérification des règles
+         * téléphoniques du pays.
+         */
+        if (!phoneNumber.isValid()) {
+
+            this.phoneError =
+                `Le numéro de téléphone n'est pas valide pour ${this.selectedCountry.name}.`;
+
+            return null;
+
+        }
+
+        return phoneNumber;
 
     }
 
@@ -216,7 +442,24 @@ export class CheckoutComponent implements OnInit {
         }
 
 
-        // Vérification adresse
+        // ==========================================
+        // VERIFICATION TELEPHONE
+        // ==========================================
+
+        const phoneNumber =
+            this.validatePhone();
+
+        if (!phoneNumber) {
+
+            return;
+
+        }
+
+
+        // ==========================================
+        // VERIFICATION ADRESSE
+        // ==========================================
+
         if (
             !this.deliveryAddress.trim()
         ) {
@@ -244,9 +487,28 @@ export class CheckoutComponent implements OnInit {
 
 
         // ==========================================
-        // REQUEST
+        // NUMERO INTERNATIONAL
         // ==========================================
 
+        const internationalPhone =
+            phoneNumber.number;
+
+        console.log(
+            'Téléphone checkout :',
+            internationalPhone
+        );
+
+
+        /*
+         * IMPORTANT :
+         *
+         * Pour l'instant, on ne met pas le téléphone
+         * dans CreateOrderRequest parce que ton modèle
+         * actuel ne semble pas le prévoir.
+         *
+         * Le backend peut continuer à récupérer
+         * le téléphone depuis l'utilisateur connecté.
+         */
         const request: CreateOrderRequest = {
 
             deliveryAddress:

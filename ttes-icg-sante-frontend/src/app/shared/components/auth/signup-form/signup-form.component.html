@@ -100,11 +100,11 @@
 
         <div class="relative flex justify-center">
 
-      <span
-              class="bg-white px-3 text-sm text-gray-400 dark:bg-gray-900"
-      >
-        Ou
-      </span>
+            <span
+                    class="bg-white px-3 text-sm text-gray-400 dark:bg-gray-900"
+            >
+                Ou
+            </span>
 
         </div>
 
@@ -165,7 +165,9 @@
         </div>
 
 
-        <!-- Téléphone -->
+        <!-- ========================= -->
+        <!-- TÉLÉPHONE -->
+        <!-- ========================= -->
 
         <div>
 
@@ -174,17 +176,87 @@
                 <span class="text-error-500">*</span>
             </app-label>
 
-            <app-input-field
-                    type="tel"
-                    name="phone"
-                    placeholder="+237 6XX XXX XXX"
-                    [(ngModel)]="phone"
-            />
+
+            <div class="flex gap-2">
+
+                <!-- Pays -->
+
+                <div class="w-36 sm:w-40">
+
+                    <select
+                            name="phoneCountry"
+                            [value]="selectedCountry.code"
+                            (change)="onCountryChange($event)"
+                            class="h-11 w-full rounded-lg border border-gray-300 bg-white px-2 text-sm text-gray-700 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                    >
+
+                        @for (
+                        country of countries;
+                        track country.code
+                        ) {
+
+                        <option
+                                [value]="country.code"
+                        >
+                            {{ country.flag }}
+                            {{ country.dialCode }}
+                        </option>
+
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <!-- Numéro -->
+
+                <div class="flex-1">
+
+                    <input
+                            id="phone"
+                            name="phone"
+                            type="tel"
+                            [(ngModel)]="phone"
+                            (input)="phoneError = ''"
+                            placeholder="699 123 456"
+                            autocomplete="tel"
+                            class="h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-700 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                    />
+
+                </div>
+
+            </div>
+
+
+            <!-- Pays sélectionné -->
+
+            <p
+                    class="mt-1.5 text-xs text-gray-400 dark:text-gray-500"
+            >
+                {{ selectedCountry.name }}
+                {{ selectedCountry.dialCode }}
+            </p>
+
+
+            <!-- Erreur téléphone -->
+
+            @if (phoneError) {
+
+            <p
+                    class="mt-1 text-sm text-red-500"
+            >
+                {{ phoneError }}
+            </p>
+
+            }
 
         </div>
 
 
-        <!-- Email -->
+        <!-- ========================= -->
+        <!-- EMAIL -->
+        <!-- ========================= -->
 
         <div>
 
@@ -203,7 +275,9 @@
         </div>
 
 
-        <!-- Mot de passe -->
+        <!-- ========================= -->
+        <!-- MOT DE PASSE -->
+        <!-- ========================= -->
 
         <div>
 
@@ -246,12 +320,15 @@
                         <path
                                 d="M9.88 9.88a3 3 0 1 0 4.24 4.24"
                         />
+
                         <path
                                 d="M10.73 5.08A10.43 10.43 0 0 1 12 5c5 0 8.27 4.11 9 7-.28 1.12-1.05 2.55-2.22 3.8"
                         />
+
                         <path
                                 d="M6.61 6.61C4.62 7.92 3.25 10.14 3 12c.73 2.89 4 7 9 7 1.61 0 3.06-.43 4.31-1.14"
                         />
+
                         <line
                                 x1="3"
                                 y1="3"
@@ -278,11 +355,13 @@
                         <path
                                 d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"
                         />
+
                         <circle
                                 cx="12"
                                 cy="12"
                                 r="3"
                         />
+
                     </svg>
 
                     }
@@ -294,7 +373,9 @@
         </div>
 
 
-        <!-- Conditions -->
+        <!-- ========================= -->
+        <!-- CONDITIONS -->
+        <!-- ========================= -->
 
         <div class="flex items-start gap-3">
 
@@ -306,7 +387,9 @@
             <p
                     class="text-sm text-gray-500 dark:text-gray-400"
             >
+
                 J'accepte les
+
                 <a
                         routerLink="/terms"
                         class="text-brand-500 hover:text-brand-600 dark:text-brand-400"
@@ -324,12 +407,15 @@
                 </a>.
 
                 <span class="text-error-500">*</span>
+
             </p>
 
         </div>
 
 
-        <!-- Bouton inscription -->
+        <!-- ========================= -->
+        <!-- BOUTON -->
+        <!-- ========================= -->
 
         <button
                 type="submit"
@@ -359,6 +445,7 @@
                         fill="currentColor"
                         d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                 ></path>
+
             </svg>
 
             Création du compte...
@@ -374,11 +461,14 @@
     </form>
 
 
-    <!-- Connexion -->
+    <!-- ========================= -->
+    <!-- CONNEXION -->
+    <!-- ========================= -->
 
     <p
             class="mt-5 text-center text-sm text-gray-500 dark:text-gray-400"
     >
+
         Vous avez déjà un compte ?
 
         <a

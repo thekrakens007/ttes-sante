@@ -19,61 +19,40 @@ import java.util.Set;
 public class AdminUserService {
 
     private final UserRepository userRepository;
-
     private final RoleRepository roleRepository;
 
-
-    /**
-     * Voir tous les utilisateurs
-     */
     @Transactional(readOnly = true)
     public List<UserAdminResponse> findAll() {
-
         return userRepository.findAll()
                 .stream()
                 .map(this::map)
                 .toList();
     }
 
-
-    /**
-     * Voir un utilisateur
-     */
     @Transactional(readOnly = true)
     public UserAdminResponse findById(Long id) {
-
         User user = userRepository.findById(id)
-                .orElseThrow(
-                        () -> new RuntimeException(
-                                "Utilisateur introuvable"
-                        )
-                );
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
 
         return map(user);
     }
 
-
     /**
-     * Modifier un utilisateur
+     * Récupérer tous les rôles
      */
+    @Transactional(readOnly = true)
+    public List<Role> findAllRoles() {
+        return roleRepository.findAll();
+    }
+
     @Transactional
     public UserAdminResponse update(
             Long id,
             UpdateUserRequest request
     ) {
-
         User user = userRepository.findById(id)
-                .orElseThrow(
-                        () -> new RuntimeException(
-                                "Utilisateur introuvable"
-                        )
-                );
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
 
-
-        /*
-         * Vérifier que l'email n'est pas déjà utilisé
-         * par un autre utilisateur.
-         */
         if (!user.getEmail().equalsIgnoreCase(request.getEmail())
                 && userRepository.existsByEmail(request.getEmail())) {
 
@@ -82,38 +61,25 @@ public class AdminUserService {
             );
         }
 
-
         user.setFirstName(request.getFirstName());
-
         user.setLastName(request.getLastName());
-
         user.setEmail(request.getEmail());
-
         user.setPhone(request.getPhone());
 
-
         if (request.getEnabled() != null) {
-
-            user.setEnabled(
-                    request.getEnabled()
-            );
+            user.setEnabled(request.getEnabled());
         }
 
-
-        /*
+        /**
          * Modification des rôles
          */
         if (request.getRoleIds() != null) {
 
-            Set<Role> roles =
-                    new HashSet<>(
-                            roleRepository.findAllById(
-                                    request.getRoleIds()
-                            )
-                    );
+            Set<Role> roles = new HashSet<>(
+                    roleRepository.findAllById(request.getRoleIds())
+            );
 
             if (roles.size() != request.getRoleIds().size()) {
-
                 throw new RuntimeException(
                         "Un ou plusieurs rôles sont introuvables"
                 );
@@ -122,89 +88,57 @@ public class AdminUserService {
             user.setRoles(roles);
         }
 
-
-        User saved =
-                userRepository.save(user);
-
+        User saved = userRepository.save(user);
 
         return map(saved);
     }
 
-
-    /**
-     * Activer / désactiver un utilisateur
-     */
     @Transactional
     public UserAdminResponse updateStatus(
             Long id,
             Boolean enabled
     ) {
-
         User user = userRepository.findById(id)
-                .orElseThrow(
-                        () -> new RuntimeException(
-                                "Utilisateur introuvable"
-                        )
-                );
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
 
         user.setEnabled(enabled);
 
-        User saved =
-                userRepository.save(user);
+        User saved = userRepository.save(user);
 
         return map(saved);
     }
 
-
-    /**
-     * Supprimer un utilisateur
-     */
     @Transactional
     public void delete(Long id) {
-
         User user = userRepository.findById(id)
-                .orElseThrow(
-                        () -> new RuntimeException(
-                                "Utilisateur introuvable"
-                        )
-                );
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
 
         userRepository.delete(user);
     }
 
-
-    /**
-     * Conversion Entity -> DTO
-     */
     private UserAdminResponse map(User user) {
 
-        Set<String> roles =
-                user.getRoles()
-                        .stream()
-                        .map(Role::getName)
-                        .collect(java.util.stream.Collectors.toSet());
+        Set<String> roles = user.getRoles()
+                .stream()
+                .map(Role::getName)
+                .collect(java.util.stream.Collectors.toSet());
 
+        Set<Long> roleIds = user.getRoles()
+                .stream()
+                .map(Role::getId)
+                .collect(java.util.stream.Collectors.toSet());
 
         return UserAdminResponse.builder()
-
                 .id(user.getId())
-
                 .firstName(user.getFirstName())
-
                 .lastName(user.getLastName())
-
                 .email(user.getEmail())
-
                 .phone(user.getPhone())
-
                 .enabled(user.getEnabled())
-
                 .roles(roles)
-
+                .roleIds(roleIds)
                 .createdAt(user.getCreatedAt())
-
                 .updatedAt(user.getUpdatedAt())
-
                 .build();
     }
 }

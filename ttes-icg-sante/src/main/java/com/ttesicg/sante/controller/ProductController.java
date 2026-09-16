@@ -25,20 +25,6 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
-    @PutMapping("/{id}")
-    public ProductResponse updateProduct(
-            @PathVariable Long id,
-            @Valid @RequestBody ProductRequest request
-    ) {
-        return productService.update(id, request);
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(
-            @PathVariable Long id
-    ){
-        productService.delete(id);
-    }
 
     @GetMapping("/paginated")
     public Page<ProductResponse> getProductsPaginated(

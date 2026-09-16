@@ -29,6 +29,10 @@ public class ProductResponse {
 
     private BigDecimal price;
 
+    private BigDecimal purchasePrice;
+
+    private String ingredients;
+
     private Boolean requiresPrescription;
 
     private Integer stock;

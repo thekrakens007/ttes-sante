@@ -2,6 +2,7 @@ package com.ttesicg.sante.controller;
 
 import com.ttesicg.sante.dto.UpdateUserRequest;
 import com.ttesicg.sante.dto.UserAdminResponse;
+import com.ttesicg.sante.entity.Role;
 import com.ttesicg.sante.service.AdminUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,16 +17,21 @@ public class AdminUserController {
 
     private final AdminUserService adminUserService;
 
-
     /**
      * Voir tous les utilisateurs
      */
     @GetMapping
     public List<UserAdminResponse> findAll() {
-
         return adminUserService.findAll();
     }
 
+    /**
+     * Voir tous les rôles
+     */
+    @GetMapping("/roles")
+    public List<Role> findRoles() {
+        return adminUserService.findAllRoles();
+    }
 
     /**
      * Voir un utilisateur
@@ -34,10 +40,8 @@ public class AdminUserController {
     public UserAdminResponse findById(
             @PathVariable Long id
     ) {
-
         return adminUserService.findById(id);
     }
-
 
     /**
      * Modifier un utilisateur
@@ -47,13 +51,11 @@ public class AdminUserController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateUserRequest request
     ) {
-
         return adminUserService.update(
                 id,
                 request
         );
     }
-
 
     /**
      * Activer / désactiver
@@ -63,13 +65,11 @@ public class AdminUserController {
             @PathVariable Long id,
             @RequestParam Boolean enabled
     ) {
-
         return adminUserService.updateStatus(
                 id,
                 enabled
         );
     }
-
 
     /**
      * Supprimer
@@ -78,7 +78,6 @@ public class AdminUserController {
     public void delete(
             @PathVariable Long id
     ) {
-
         adminUserService.delete(id);
     }
 }

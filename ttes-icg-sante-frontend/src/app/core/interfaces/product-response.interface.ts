@@ -20,6 +20,10 @@ export interface ProductResponse {
 
     price: number;
 
+    purchasePrice: number | null;
+
+    ingredients: string;
+
     requiresPrescription: boolean;
 
     stock: number;

@@ -77,7 +77,19 @@ public class Product {
     @Column(length = 100)
     private String dosage;
 
+    @Column(
+            name = "purchase_price",
+            precision = 12,
+            scale = 2
+    )
+    private BigDecimal purchasePrice;
 
+
+    @Column(
+            name = "ingredients",
+            columnDefinition = "TEXT"
+    )
+    private String ingredients;
 
     /**
      * Exemple:

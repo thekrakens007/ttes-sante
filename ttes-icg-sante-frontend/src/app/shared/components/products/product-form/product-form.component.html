@@ -225,6 +225,57 @@
 
         </div>
 
+        <!-- Prix d'achat - ADMIN UNIQUEMENT -->
+
+        <div>
+            <label
+                    class="mb-2 block text-sm font-medium
+               text-gray-700 dark:text-gray-400">
+
+                Prix d'achat (FCFA)
+
+            </label>
+
+            <input
+                    id="purchasePrice"
+                    type="number"
+                    formControlName="purchasePrice"
+                    min="0"
+                    placeholder="Ex: 3000"
+                    class="h-11 w-full rounded-lg border
+           border-gray-300 bg-transparent px-4
+           text-sm text-gray-800 outline-none
+           dark:border-gray-700 dark:bg-gray-900
+           dark:text-white/90"
+            />
+
+            <p class="mt-1 text-xs text-gray-500">
+                Visible uniquement dans l'administration.
+            </p>
+        </div>
+
+        <!-- Ingrédients -->
+
+        <div>
+            <label
+                    class="mb-2 block text-sm font-medium
+               text-gray-700 dark:text-gray-400">
+
+                Ingrédients
+
+            </label>
+
+            <textarea
+                    formControlName="ingredients"
+                    rows="4"
+                    placeholder="Ex: Paracétamol, amidon, povidone..."
+                    class="w-full rounded-lg border
+               border-gray-300 bg-transparent px-4
+               py-3 text-sm text-gray-800 outline-none
+               dark:border-gray-700 dark:bg-gray-900
+               dark:text-white/90">
+    </textarea>
+        </div>
 
         <!-- Description -->
 

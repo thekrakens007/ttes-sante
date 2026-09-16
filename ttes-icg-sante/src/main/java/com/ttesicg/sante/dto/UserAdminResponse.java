@@ -24,6 +24,8 @@ public class UserAdminResponse {
 
     private Set<String> roles;
 
+    private Set<Long> roleIds;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

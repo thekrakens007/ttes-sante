@@ -29,6 +29,8 @@ export interface Product {
 
     stock: number;
 
+    purchasePrice?: number | null;
+    ingredients?: string | null;
 
     // ==========================================
     // ENTREPRISE

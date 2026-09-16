@@ -144,7 +144,16 @@ export class ProductFormComponent implements OnInit {
                 Validators.min(0)
             ]
         ],
+        purchasePrice: [
+            null as number | null,
+            [
+                Validators.min(0)
+            ]
+        ],
 
+        ingredients: [
+            ''
+        ],
         requiresPrescription: [
             false
         ],
@@ -326,6 +335,11 @@ export class ProductFormComponent implements OnInit {
 
                         price:
                             product.price ?? 0,
+                        purchasePrice:
+                            product.purchasePrice ?? null,
+
+                        ingredients:
+                            product.ingredients ?? '',
 
                         requiresPrescription:
                             product.requiresPrescription ?? false,
@@ -1017,6 +1031,15 @@ export class ProductFormComponent implements OnInit {
 
         this.loading = true;
 
+        console.log(
+            'purchasePrice CONTROL :',
+            this.productForm.get('purchasePrice')?.value
+        );
+
+        console.log(
+            'purchasePrice ELEMENT :',
+            (document.getElementById('purchasePrice') as HTMLInputElement)?.value
+        );
 
         const formValue =
             this.productForm.getRawValue();
@@ -1057,6 +1080,15 @@ export class ProductFormComponent implements OnInit {
 
                 price:
                     Number(formValue.price ?? 0),
+
+                purchasePrice:
+                    formValue.purchasePrice !== null &&
+                    formValue.purchasePrice !== undefined
+                        ? Number(formValue.purchasePrice)
+                        : null,
+
+                ingredients:
+                    formValue.ingredients ?? '',
 
                 requiresPrescription:
                     formValue.requiresPrescription ?? false,

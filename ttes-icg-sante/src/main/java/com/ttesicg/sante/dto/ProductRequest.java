@@ -30,6 +30,9 @@ public class ProductRequest {
 
     private String brand;
 
+    private BigDecimal purchasePrice;
+
+    private String ingredients;
 
     private String activeIngredient;
 

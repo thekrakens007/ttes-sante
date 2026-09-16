@@ -13,6 +13,7 @@ import {InventoryResponse} from "../interfaces/inventory-response.interface";
 import {InventoryRequest} from "../interfaces/inventory-request.interface";
 import {ProductImageResponse} from "../interfaces/product-image-response.interface";
 import {ProductPage} from "../models/product.model";
+import {RoleResponse} from "../interfaces/role-response.interface";
 
 @Injectable({
     providedIn: 'root'
@@ -383,6 +384,13 @@ export class AdminService {
 
         return this.http.delete<void>(
             `${this.API_URL}/categories/${id}`
+        );
+
+    }
+    getRoles(): Observable<RoleResponse[]> {
+
+        return this.http.get<RoleResponse[]>(
+            `${this.API_URL}/users/roles`
         );
 
     }

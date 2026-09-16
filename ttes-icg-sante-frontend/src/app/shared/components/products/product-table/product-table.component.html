@@ -349,13 +349,41 @@
                 }
 
 
-                <!-- Price -->
-                <div class="mt-4">
-                            <span
-                                    class="text-xl font-bold text-brand-500"
-                            >
-                                {{ product.price | number:'1.0-0' }} F
-                            </span>
+                <!-- ================= -->
+                <!-- PRICES -->
+                <!-- ================= -->
+                <div class="mt-4 space-y-1">
+
+                    <!-- Prix de vente -->
+                    <div>
+        <span class="text-xl font-bold text-brand-500">
+            {{ product.price | number:'1.0-0' }} F
+        </span>
+                        <span class="ml-1 text-xs text-gray-500 dark:text-gray-400">
+            Prix de vente
+        </span>
+                    </div>
+
+                    <!-- Prix d'achat - administration uniquement -->
+                    <div class="flex items-center gap-2">
+        <span class="text-sm font-medium text-gray-600 dark:text-gray-300">
+            Prix d'achat :
+        </span>
+
+                        @if (
+                        product.purchasePrice !== null &&
+                        product.purchasePrice !== undefined
+                        ) {
+                        <span class="text-sm font-semibold text-orange-600 dark:text-orange-400">
+                {{ product.purchasePrice | number:'1.0-0' }} F
+            </span>
+                        } @else {
+                        <span class="text-sm italic text-gray-400">
+                Non renseigné
+            </span>
+                        }
+                    </div>
+
                 </div>
 
 

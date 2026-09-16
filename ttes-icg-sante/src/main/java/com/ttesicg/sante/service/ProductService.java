@@ -109,6 +109,9 @@ public class ProductService {
 
                         .price(request.getPrice())
 
+                        .purchasePrice(request.getPurchasePrice())
+                        .ingredients(request.getIngredients())
+
                         .requiresPrescription(
                                 request.getRequiresPrescription()
                         )
@@ -274,6 +277,14 @@ public class ProductService {
 
         product.setPrice(
                 request.getPrice()
+        );
+
+        product.setPurchasePrice(
+                request.getPurchasePrice()
+        );
+
+        product.setIngredients(
+                request.getIngredients()
         );
 
         product.setRequiresPrescription(
@@ -498,6 +509,10 @@ public class ProductService {
                 .price(
                         product.getPrice()
                 )
+
+                .purchasePrice(product.getPurchasePrice())
+
+                .ingredients(product.getIngredients())
 
                 .requiresPrescription(
                         product.getRequiresPrescription()

@@ -8,6 +8,9 @@ export interface ProductRequest {
     dosage?: string;
     form?: string;
     price: number;
+    purchasePrice: number | null;
+
+    ingredients: string;
     requiresPrescription: boolean;
     stock?: number;
     categoryIds: number[];

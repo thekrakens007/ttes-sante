@@ -1,5 +1,3 @@
-
-
 export interface Cart {
     id: number;
     total: number;
@@ -7,18 +5,26 @@ export interface Cart {
 }
 
 export interface CartItemRequest {
-    productId: number;
+    productId?: number;
+    bundleId?: number;
     quantity: number;
 }
 
-
 export interface CartItem {
     id: number;
-    productId: number;
-    productName: string;
+
+    productId?: number;
+    productName?: string;
+
+    bundleId?: number;
+    bundleName?: string;
+
     quantity: number;
+
     price: number;
+
     imageUrl?: string;
+
     subtotal: number;
 }
 
@@ -29,6 +35,7 @@ export interface CartResponse {
 }
 
 export interface AddCartItemRequest {
-    productId: number;
+    productId?: number;
+    bundleId?: number;
     quantity: number;
 }

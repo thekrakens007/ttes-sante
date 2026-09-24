@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import {Router} from "@angular/router";
+import { Router } from '@angular/router';
 
 interface LoginRequest {
   email: string;
@@ -25,33 +25,49 @@ export class AuthService {
 
   private readonly API_URL = '/api/auth';
 
-
   private readonly TOKEN_KEY = 'ttes_icg_sante_token';
 
   constructor(
       private router: Router
   ) {}
 
-loginWithGoogle(idToken: string): Observable<any> {
-  return this.http.post<any>(
-    `${this.API_URL}/google`,
-{
-  idToken: idToken
-}
-).pipe(
-    tap((response) => {
-      if (response && response.token) {
-        localStorage.setItem(
-            this.TOKEN_KEY,
-            response.token
+  // =========================================================
+  // GOOGLE LOGIN
+  // =========================================================
+
+  loginWithGoogle(idToken: string): Observable<any> {
+
+    return this.http
+        .post<any>(
+            `${this.API_URL}/google`,
+            {
+              idToken: idToken
+            }
+        )
+        .pipe(
+            tap((response) => {
+
+              if (response && response.token) {
+
+                localStorage.setItem(
+                    this.TOKEN_KEY,
+                    response.token
+                );
+
+              }
+
+            })
         );
-      }
-    })
-);
-}
+  }
 
+  // =========================================================
+  // LOGIN
+  // =========================================================
 
-  login(email: string, password: string): Observable<LoginResponse> {
+  login(
+      email: string,
+      password: string
+  ): Observable<LoginResponse> {
 
     const request: LoginRequest = {
       email,
@@ -66,70 +82,118 @@ loginWithGoogle(idToken: string): Observable<any> {
         .pipe(
             tap(response => {
 
-              if (response.token) {
+              if (response?.token) {
+
                 localStorage.setItem(
                     this.TOKEN_KEY,
                     response.token
                 );
+
               }
 
             })
         );
   }
 
+  // =========================================================
+  // LOGOUT
+  // =========================================================
+
   logout(): void {
 
     localStorage.removeItem(
         this.TOKEN_KEY
     );
+
     this.router.navigate(['/']);
   }
+
+  // =========================================================
+  // REGISTER
+  // =========================================================
 
   register(request: {
     firstName: string;
     lastName: string;
     email: string;
-    phone:string;
+    phone: string;
     password: string;
   }): Observable<MessageResponse> {
 
-    // L'inscription ne renvoie plus de JWT : le compte doit d'abord être
-    // activé via le lien de vérification envoyé par email.
     return this.http.post<MessageResponse>(
         `${this.API_URL}/register`,
         request
     );
   }
 
-  verifyEmail(token: string): Observable<MessageResponse> {
+  // =========================================================
+  // VERIFY EMAIL
+  // =========================================================
+
+  verifyEmail(
+      token: string
+  ): Observable<MessageResponse> {
+
     return this.http.get<MessageResponse>(
         `${this.API_URL}/verify-email`,
-        { params: { token } }
+        {
+          params: {
+            token
+          }
+        }
     );
   }
 
-  forgotPassword(email: string): Observable<MessageResponse> {
+  // =========================================================
+  // FORGOT PASSWORD
+  // =========================================================
+
+  forgotPassword(
+      email: string
+  ): Observable<MessageResponse> {
+
     return this.http.post<MessageResponse>(
         `${this.API_URL}/forgot-password`,
-        { email }
+        {
+          email
+        }
     );
   }
 
-  resetPassword(token: string, newPassword: string): Observable<MessageResponse> {
+  // =========================================================
+  // RESET PASSWORD
+  // =========================================================
+
+  resetPassword(
+      token: string,
+      newPassword: string
+  ): Observable<MessageResponse> {
+
     return this.http.post<MessageResponse>(
         `${this.API_URL}/reset-password`,
-        { token, newPassword }
+        {
+          token,
+          newPassword
+        }
     );
   }
+
+  // =========================================================
+  // GET TOKEN
+  // =========================================================
 
   getToken(): string | null {
 
     return localStorage.getItem(
         this.TOKEN_KEY
     );
-
   }
-  getUserId(): number | null {
+
+  // =========================================================
+  // DECODER JWT
+  // =========================================================
+
+  private decodeToken(): any | null {
 
     const token = this.getToken();
 
@@ -139,94 +203,192 @@ loginWithGoogle(idToken: string): Observable<any> {
 
     try {
 
+      const parts = token.split('.');
+
+      if (parts.length !== 3) {
+        return null;
+      }
+
+      /*
+       * Le payload JWT utilise du Base64URL.
+       * On convertit donc - et _ avant le décodage.
+       */
+      const base64Payload = parts[1]
+          .replace(/-/g, '+')
+          .replace(/_/g, '/');
+
       const payload = JSON.parse(
-          atob(token.split('.')[1])
+          atob(base64Payload)
       );
 
-      return payload.userId ?? null;
+      return payload;
 
     } catch (error) {
 
       console.error(
-          'Impossible de lire le userId du JWT',
+          'Impossible de décoder le JWT',
           error
       );
 
       return null;
     }
   }
-  isLoggedIn(): boolean {
-    return !!this.getToken();
 
+  // =========================================================
+  // CHECK TOKEN EXPIRATION
+  // =========================================================
+
+  private isTokenExpired(): boolean {
+
+    const payload = this.decodeToken();
+
+    if (!payload) {
+      return true;
+    }
+
+    /*
+     * exp est exprimé en secondes Unix.
+     * Date.now() est exprimé en millisecondes.
+     */
+    if (!payload.exp) {
+      return true;
+    }
+
+    return (
+        payload.exp * 1000 <= Date.now()
+    );
   }
+
+  // =========================================================
+  // CHECK LOGIN
+  // =========================================================
+
+  isLoggedIn(): boolean {
+
+    const token = this.getToken();
+
+    if (!token) {
+      return false;
+    }
+
+    /*
+     * Token invalide ou expiré.
+     */
+    if (this.isTokenExpired()) {
+
+      localStorage.removeItem(
+          this.TOKEN_KEY
+      );
+
+      return false;
+    }
+
+    return true;
+  }
+
+  // =========================================================
+  // GET USER ID
+  // =========================================================
+
+  getUserId(): number | null {
+
+    if (!this.isLoggedIn()) {
+      return null;
+    }
+
+    const payload = this.decodeToken();
+
+    if (!payload) {
+      return null;
+    }
+
+    return payload.userId ?? null;
+  }
+
+  // =========================================================
+  // GET USER EMAIL
+  // =========================================================
 
   getUserEmail(): string | null {
 
-    const token = this.getToken();
-
-    if (!token) {
+    if (!this.isLoggedIn()) {
       return null;
     }
 
-    try {
+    const payload = this.decodeToken();
 
-      const payload = JSON.parse(
-          atob(token.split('.')[1])
-      );
-
-      return payload.sub ?? null;
-
-    } catch (error) {
-
-      console.error(
-          'Impossible de lire le JWT',
-          error
-      );
-
+    if (!payload) {
       return null;
     }
+
+    return payload.sub ?? null;
   }
 
+  // =========================================================
+  // GET ROLES
+  // =========================================================
 
   getRoles(): string[] {
 
-    const token = this.getToken();
-
-    if (!token) {
+    if (!this.isLoggedIn()) {
       return [];
     }
 
-    try {
+    const payload = this.decodeToken();
 
-      const payload = JSON.parse(
-          atob(token.split('.')[1])
-      );
-
-      return payload.roles ?? [];
-
-    } catch (error) {
-
-      console.error(
-          'Impossible de lire les rôles du JWT',
-          error
-      );
-
+    if (!payload) {
       return [];
     }
+
+    return payload.roles ?? [];
   }
 
+  // =========================================================
+  // CHECK ROLE
+  // =========================================================
 
   hasRole(role: string): boolean {
 
-    return this.getRoles().includes(role);
+    if (!this.isLoggedIn()) {
+      return false;
+    }
 
+    return this.getRoles().includes(role);
   }
 
+  // =========================================================
+  // CHECK ADMIN
+  // =========================================================
 
   isAdmin(): boolean {
 
-    return this.hasRole('ROLE_ADMIN');
+    const token = this.getToken();
 
+    if (!token) {
+      return false;
+    }
+
+    const payload = this.decodeToken();
+
+    if (!payload) {
+      return false;
+    }
+
+    if (!payload.exp) {
+      return false;
+    }
+
+    if (payload.exp * 1000 <= Date.now()) {
+
+      localStorage.removeItem(
+          this.TOKEN_KEY
+      );
+
+      return false;
+    }
+
+    const roles = payload.roles ?? [];
+
+    return roles.includes('ROLE_ADMIN');
   }
-
 }

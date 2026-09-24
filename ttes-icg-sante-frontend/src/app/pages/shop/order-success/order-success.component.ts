@@ -13,7 +13,8 @@ import {
 } from '@angular/router';
 
 import {
-    OrderResponse
+    OrderResponse,
+    OrderItemResponse
 } from '../../../core/interfaces/order-response.interface';
 
 
@@ -58,6 +59,42 @@ export class OrderSuccessComponent implements OnInit {
     }
 
 
+    // ==========================================
+    // PACK ?
+    // ==========================================
+
+    isBundle(item: OrderItemResponse): boolean {
+
+        return item.bundleId != null;
+
+    }
+
+
+    // ==========================================
+    // NOM ARTICLE
+    // ==========================================
+
+    getItemName(
+        item: OrderItemResponse
+    ): string {
+
+        if (this.isBundle(item)) {
+
+            return item.bundleName
+                ?? 'Pack';
+
+        }
+
+        return item.productName
+            ?? 'Produit';
+
+    }
+
+
+    // ==========================================
+    // FORMAT PRIX
+    // ==========================================
+
     formatPrice(price: number): string {
 
         return new Intl.NumberFormat(
@@ -67,30 +104,42 @@ export class OrderSuccessComponent implements OnInit {
     }
 
 
+    // ==========================================
+    // NAVIGATION
+    // ==========================================
+
     goToShop(): void {
 
-        this.router.navigate(['/']);
+        this.router.navigate([
+            '/'
+        ]);
 
     }
 
 
     goToCart(): void {
 
-        this.router.navigate(['/cart']);
+        this.router.navigate([
+            '/cart'
+        ]);
 
     }
 
 
     goToProfile(): void {
 
-        this.router.navigate(['/profile']);
+        this.router.navigate([
+            '/profile'
+        ]);
 
     }
 
 
     goToOrders(): void {
 
-        this.router.navigate(['/my-orders']);
+        this.router.navigate([
+            '/my-orders'
+        ]);
 
     }
 

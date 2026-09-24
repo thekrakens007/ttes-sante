@@ -668,5 +668,34 @@ export class CheckoutComponent implements OnInit {
         ]);
 
     }
+    isBundle(item: any): boolean {
+
+        return item.bundleId != null;
+
+    }
+
+
+    getItemName(item: any): string {
+
+        if (this.isBundle(item)) {
+
+            return item.bundleName
+                ?? 'Pack';
+
+        }
+
+        return item.productName
+            ?? 'Produit';
+
+    }
+
+
+    getItemType(item: any): string {
+
+        return this.isBundle(item)
+            ? 'Pack'
+            : 'Produit';
+
+    }
 
 }

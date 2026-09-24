@@ -190,7 +190,9 @@ export class RecentOrdersComponent implements OnInit {
 
     if (order.items.length === 1) {
 
-      return order.items[0].productName;
+      return order.items[0].bundleName
+          ?? order.items[0].productName
+          ?? 'Article';
 
     }
 

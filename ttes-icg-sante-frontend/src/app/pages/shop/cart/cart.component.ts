@@ -5,20 +5,31 @@ import {
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-import {Router, RouterModule} from '@angular/router';
+
+import {
+    Router,
+    RouterModule
+} from '@angular/router';
 
 import {
     CartService
 } from '../../../core/services/cart.service';
-import {Cart, CartItem} from "../../../core/interfaces/cart.interface";
+
+import {
+    Cart,
+    CartItem
+} from '../../../core/interfaces/cart.interface';
+
 
 @Component({
     selector: 'app-cart',
     standalone: true,
+
     imports: [
         CommonModule,
         RouterModule
     ],
+
     templateUrl: './cart.component.html'
 })
 export class CartComponent implements OnInit {
@@ -27,22 +38,32 @@ export class CartComponent implements OnInit {
 
     private router = inject(Router);
 
+
+    // ==========================================
+    // ÉTAT
+    // ==========================================
+
     cart: Cart | null = null;
 
     loading = true;
 
     error = '';
 
-    updatingItemId: number | null = null;
-    trackByItemId(
-        index: number,
-        item: CartItem
-    ): number {
-        console.log(index);
-        console.log(item.id);
-        return item.id;
-    }
+    /**
+     * Message d'erreur lié à une action
+     * effectuée sur le panier.
+     *
+     * Exemple :
+     * "Stock insuffisant pour le pack pack1"
+     */
+    actionError = '';
 
+    updatingItemId: number | null = null;
+
+
+    // ==========================================
+    // INITIALISATION
+    // ==========================================
 
     ngOnInit(): void {
 
@@ -51,14 +72,29 @@ export class CartComponent implements OnInit {
     }
 
 
-    /**
-     * Charger le panier
-     */
+    // ==========================================
+    // CHARGER LE PANIER
+    // ==========================================
+
     loadCart(): void {
 
         this.loading = true;
 
         this.error = '';
+
+        /*
+         * IMPORTANT :
+         *
+         * On ne fait PAS :
+         *
+         * this.actionError = '';
+         *
+         * ici.
+         *
+         * Sinon, lorsqu'une modification de quantité
+         * échoue, le message "Stock insuffisant..."
+         * serait immédiatement supprimé.
+         */
 
         this.cartService
             .getCart()
@@ -66,7 +102,9 @@ export class CartComponent implements OnInit {
 
                 next: (cart) => {
 
-                    cart.items.sort((a, b) => a.id - b.id);
+                    cart.items.sort(
+                        (a, b) => a.id - b.id
+                    );
 
                     this.cart = cart;
 
@@ -83,6 +121,7 @@ export class CartComponent implements OnInit {
 
                     this.error =
                         error?.error?.message
+                        ?? error?.error?.error
                         ?? 'Impossible de charger le panier.';
 
                     this.loading = false;
@@ -92,6 +131,68 @@ export class CartComponent implements OnInit {
             });
 
     }
+
+
+    // ==========================================
+    // TRACK BY
+    // ==========================================
+
+    trackByItemId(
+        index: number,
+        item: CartItem
+    ): number {
+
+        return item.id;
+
+    }
+
+
+    // ==========================================
+    // DÉTECTER PACK
+    // ==========================================
+
+    isBundle(item: CartItem): boolean {
+
+        return item.bundleId != null;
+
+    }
+
+
+    // ==========================================
+    // NOM ARTICLE
+    // ==========================================
+
+    getItemName(item: CartItem): string {
+
+        if (this.isBundle(item)) {
+
+            return item.bundleName
+                ?? 'Pack';
+
+        }
+
+        return item.productName
+            ?? 'Produit';
+
+    }
+
+
+    // ==========================================
+    // TYPE ARTICLE
+    // ==========================================
+
+    getItemType(item: CartItem): string {
+
+        return this.isBundle(item)
+            ? 'Pack'
+            : 'Produit';
+
+    }
+
+
+    // ==========================================
+    // QUANTITÉ
+    // ==========================================
 
     onQuantityInput(
         itemId: number,
@@ -114,9 +215,12 @@ export class CartComponent implements OnInit {
         );
 
     }
-    /**
-     * Augmenter la quantité
-     */
+
+
+    // ==========================================
+    // AUGMENTER
+    // ==========================================
+
     increase(
         itemId: number,
         quantity: number
@@ -130,9 +234,10 @@ export class CartComponent implements OnInit {
     }
 
 
-    /**
-     * Diminuer la quantité
-     */
+    // ==========================================
+    // DIMINUER
+    // ==========================================
+
     decrease(
         itemId: number,
         quantity: number
@@ -150,17 +255,27 @@ export class CartComponent implements OnInit {
     }
 
 
-    /**
-     * Modifier quantité
-     */
+    // ==========================================
+    // MODIFIER QUANTITÉ
+    // ==========================================
+
     updateQuantity(
         itemId: number,
         quantity: number
     ): void {
 
-        if (!Number.isInteger(quantity) || quantity < 1) {
+        if (
+            !Number.isInteger(quantity)
+            || quantity < 1
+        ) {
             return;
         }
+
+        /*
+         * On supprime uniquement l'ancien message
+         * au début d'une nouvelle tentative.
+         */
+        this.actionError = '';
 
         this.updatingItemId = itemId;
 
@@ -171,15 +286,25 @@ export class CartComponent implements OnInit {
             )
             .subscribe({
 
+                // ==================================
+                // SUCCÈS
+                // ==================================
+
                 next: (cart) => {
 
-                    cart.items.sort((a, b) => a.id - b.id);
+                    cart.items.sort(
+                        (a, b) => a.id - b.id
+                    );
 
                     this.cart = cart;
 
                     this.updatingItemId = null;
 
                 },
+
+                // ==================================
+                // ERREUR
+                // ==================================
 
                 error: (error) => {
 
@@ -190,31 +315,61 @@ export class CartComponent implements OnInit {
 
                     this.updatingItemId = null;
 
-                    alert(
-                        error?.error?.message
-                        ?? 'Impossible de modifier la quantité.'
-                    );
+                    /*
+                     * Le backend peut renvoyer :
+                     *
+                     * {
+                     *     "message":
+                     *     "Stock insuffisant pour le pack pack1"
+                     * }
+                     *
+                     * ou :
+                     *
+                     * {
+                     *     "error":
+                     *     "Stock insuffisant pour le pack pack1"
+                     * }
+                     */
 
-                    // Recharger pour récupérer la vraie valeur
+                    this.actionError =
+                        error?.error?.message
+                        ?? error?.error?.error
+                        ?? 'Stock insuffisant pour cet article.';
+
+
+                    /*
+                     * On recharge le panier pour conserver
+                     * la quantité réellement enregistrée.
+                     *
+                     * IMPORTANT :
+                     * loadCart() ne supprime plus actionError.
+                     */
                     this.loadCart();
 
                 }
 
             });
+
     }
 
 
+    // ==========================================
+    // SUPPRIMER
+    // ==========================================
 
-    /**
-     * Supprimer un article
-     */
     removeItem(itemId: number): void {
+
+        this.actionError = '';
 
         this.cartService
             .removeItem(itemId)
             .subscribe({
 
                 next: (cart) => {
+
+                    cart.items.sort(
+                        (a, b) => a.id - b.id
+                    );
 
                     this.cart = cart;
 
@@ -227,10 +382,10 @@ export class CartComponent implements OnInit {
                         error
                     );
 
-                    alert(
+                    this.actionError =
                         error?.error?.message
-                        ?? 'Impossible de supprimer cet article.'
-                    );
+                        ?? error?.error?.error
+                        ?? 'Impossible de supprimer cet article.';
 
                 }
 
@@ -239,20 +394,33 @@ export class CartComponent implements OnInit {
     }
 
 
-    /**
-     * Vérifier panier vide
-     */
-    get isEmpty(): boolean {
+    // ==========================================
+    // FERMER MESSAGE
+    // ==========================================
 
-        return !this.cart ||
-            this.cart.items.length === 0;
+    closeActionError(): void {
+
+        this.actionError = '';
 
     }
 
 
-    /**
-     * Format prix
-     */
+    // ==========================================
+    // PANIER VIDE
+    // ==========================================
+
+    get isEmpty(): boolean {
+
+        return !this.cart
+            || this.cart.items.length === 0;
+
+    }
+
+
+    // ==========================================
+    // FORMAT PRIX
+    // ==========================================
+
     formatPrice(price: number): string {
 
         return new Intl.NumberFormat(
@@ -261,15 +429,23 @@ export class CartComponent implements OnInit {
 
     }
 
+
+    // ==========================================
+    // CHECKOUT
+    // ==========================================
+
     checkout(): void {
 
-        if (!this.cart || this.cart.items.length === 0) {
-
+        if (
+            !this.cart
+            || this.cart.items.length === 0
+        ) {
             return;
-
         }
 
-        this.router.navigate(['/checkout']);
+        this.router.navigate([
+            '/checkout'
+        ]);
 
     }
 

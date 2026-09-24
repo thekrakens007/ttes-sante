@@ -1,0 +1,1251 @@
+<div
+        class="min-h-screen bg-gray-50 text-gray-900 transition-colors duration-300
+           dark:bg-gray-950 dark:text-white">
+
+    <!-- ========================================================= -->
+    <!-- TOP BAR -->
+    <!-- ========================================================= -->
+
+    <div class="hidden bg-green-950 text-xs text-green-50 md:block">
+
+        <div
+                class="mx-auto flex max-w-7xl items-center
+                   justify-between gap-4 px-4 py-2.5
+                   sm:px-6 lg:px-8">
+
+            <div class="flex items-center gap-5">
+
+                <span class="flex items-center gap-1.5">
+                    📍 Douala, Cameroun
+                </span>
+
+                <span class="flex items-center gap-1.5">
+                    🕒 Lun - Sam : 8h - 18h
+                </span>
+
+                <span class="flex items-center gap-1.5">
+                    ✉️ contact&#64;tes-icg.com
+                </span>
+
+            </div>
+
+            <div class="flex items-center gap-5">
+
+                <a
+                        href="tel:+237000000000"
+                        class="flex items-center gap-1.5
+                           font-semibold text-white
+                           transition hover:text-orange-300">
+
+
+
+                </a>
+
+                <a
+                        routerLink="/companies"
+                        class="rounded-lg bg-orange-400
+                           px-3 py-1.5 font-bold
+                           text-green-950 transition
+                           hover:bg-orange-300">
+
+                    Prendre rendez-vous
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- HEADER -->
+    <!-- ========================================================= -->
+
+    <header
+            class="sticky top-0 z-50 border-b border-gray-200/80
+               bg-white/95 shadow-sm backdrop-blur-md
+               transition-colors duration-300
+               dark:border-gray-800 dark:bg-gray-900/95">
+
+        <div
+                class="mx-auto flex max-w-7xl items-center
+                   justify-between gap-4 px-4 py-3
+                   sm:px-6 lg:px-8">
+
+            <!-- LOGO -->
+
+            <a
+                    routerLink="/"
+                    (click)="closeMobileMenu()"
+                    class="flex shrink-0 items-center">
+
+                <img
+                        src="/images/logo/logo.svg"
+                        alt="TES-ICG Santé"
+                        class="h-11 w-auto sm:h-12 dark:hidden">
+
+                <img
+                        src="/images/logo/logo-dark.svg"
+                        alt="TES-ICG Santé"
+                        class="hidden h-11 w-auto sm:h-12 dark:block">
+
+            </a>
+
+
+            <!-- NAVIGATION -->
+
+            <nav
+                    class="hidden items-center gap-1 md:flex">
+
+                <a
+                        routerLink="/"
+                        class="rounded-lg px-3 py-2 text-sm font-bold
+                           uppercase tracking-wide text-gray-700
+                           transition hover:bg-green-50
+                           hover:text-green-700
+                           dark:text-gray-200
+                           dark:hover:bg-green-900/30
+                           dark:hover:text-green-400">
+
+                    Accueil
+
+                </a>
+
+                <a
+                        routerLink="/products"
+                        routerLinkActive="bg-green-50 text-green-700
+                                     dark:bg-green-900/30
+                                     dark:text-green-400"
+                        class="rounded-lg px-3 py-2 text-sm font-bold
+                           uppercase tracking-wide text-gray-700
+                           transition hover:bg-green-50
+                           hover:text-green-700
+                           dark:text-gray-200
+                           dark:hover:bg-green-900/30
+                           dark:hover:text-green-400">
+
+                    Produits
+
+                </a>
+
+                <a
+                        routerLink="/bundles"
+                        class="rounded-lg px-3 py-2 text-sm font-bold
+                           uppercase tracking-wide text-gray-700
+                           transition hover:bg-green-50
+                           hover:text-green-700
+                           dark:text-gray-200
+                           dark:hover:bg-green-900/30
+                           dark:hover:text-green-400">
+
+                    Packs
+
+                </a>
+
+                <a
+                        routerLink="/companies"
+                        class="rounded-lg px-3 py-2 text-sm font-bold
+                           uppercase tracking-wide text-gray-700
+                           transition hover:bg-green-50
+                           hover:text-green-700
+                           dark:text-gray-200
+                           dark:hover:bg-green-900/30
+                           dark:hover:text-green-400">
+
+                    Entreprises
+
+                </a>
+
+            </nav>
+
+
+            <!-- ACTIONS DROITE -->
+
+            <div
+                    class="hidden items-center gap-2 md:flex">
+
+                <button
+                        type="button"
+                        aria-label="Rechercher"
+                        class="flex h-10 w-10 items-center
+                           justify-center rounded-xl
+                           text-lg text-gray-600 transition
+                           hover:bg-green-50
+                           hover:text-green-700
+                           dark:text-gray-300
+                           dark:hover:bg-green-900/30">
+
+
+
+                </button>
+
+
+                @if (!isLoggedIn()) {
+
+                <a
+                        routerLink="/signin"
+                        class="rounded-lg px-3 py-2 text-sm font-semibold
+                               text-gray-700 transition
+                               hover:bg-green-50 hover:text-green-700
+                               dark:text-gray-200
+                               dark:hover:bg-green-900/30
+                               dark:hover:text-green-400">
+
+                    Se connecter
+
+                </a>
+
+                <a
+                        routerLink="/signup"
+                        class="rounded-xl bg-green-600 px-4 py-2.5
+                               text-sm font-semibold text-white
+                               shadow-sm transition hover:bg-green-700
+                               dark:bg-green-500
+                               dark:hover:bg-green-400">
+
+                    Créer un compte
+
+                </a>
+
+                }
+
+
+                @if (isLoggedIn() && isAdmin()) {
+
+                <a
+                        routerLink="/admin"
+                        class="rounded-xl bg-green-700 px-4 py-2.5
+                               text-sm font-semibold text-white
+                               shadow-sm transition hover:bg-green-800">
+
+                    ⚙️ Admin
+
+                </a>
+
+                }
+
+
+                @if (isLoggedIn() && !isAdmin()) {
+
+                <a
+                        routerLink="/profile"
+                        class="rounded-xl bg-green-600 px-4 py-2.5
+                               text-sm font-semibold text-white
+                               shadow-sm transition hover:bg-green-700">
+
+                    👤 Profil
+
+                </a>
+
+                }
+
+
+                @if (isLoggedIn()) {
+
+                <a
+                        routerLink="/cart"
+                        class="rounded-xl bg-green-600 px-4 py-2.5
+                               text-sm font-semibold text-white
+                               shadow-sm transition hover:bg-green-700">
+
+                    🛒 Panier
+
+                </a>
+
+                }
+
+            </div>
+
+
+            <!-- MOBILE BUTTON -->
+
+            <button
+                    type="button"
+                    (click)="toggleMobileMenu()"
+                    [attr.aria-expanded]="mobileMenuOpen"
+                    aria-label="Ouvrir le menu"
+                    class="flex h-10 w-10 shrink-0 items-center
+                       justify-center rounded-xl border
+                       border-gray-300 bg-white text-xl
+                       text-gray-700 transition
+                       hover:border-green-500
+                       hover:bg-green-50
+                       hover:text-green-700
+                       dark:border-gray-700
+                       dark:bg-gray-800
+                       dark:text-gray-200 md:hidden">
+
+                @if (mobileMenuOpen) {
+                ✕
+                } @else {
+                ☰
+                }
+
+            </button>
+
+        </div>
+
+
+        <!-- BARRE DE RECHERCHE -->
+
+        <div
+                class="border-t border-gray-100 bg-white px-4 py-3
+                   dark:border-gray-800 dark:bg-gray-900">
+
+            <div
+                    class="mx-auto max-w-lg md:max-w-2xl">
+
+                <div class="relative">
+
+                    <input
+                            type="text"
+                            [(ngModel)]="searchTerm"
+                            [ngModelOptions]="{standalone: true}"
+                            (ngModelChange)="search()"
+                            placeholder="Rechercher un produit..."
+                            class="h-11 w-full rounded-xl
+                               border border-gray-200
+                               bg-gray-50 px-4 pr-12
+                               text-sm text-gray-800
+                               outline-none transition
+                               placeholder:text-gray-400
+                               focus:border-green-600
+                               focus:bg-white
+                               focus:ring-4
+                               focus:ring-green-600/10
+                               dark:border-gray-700
+                               dark:bg-gray-800
+                               dark:text-white
+                               dark:placeholder:text-gray-500
+                               dark:focus:border-green-500">
+
+                    <span
+                            class="pointer-events-none absolute right-4
+                               top-1/2 -translate-y-1/2 text-lg">
+
+                        🔍
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- MOBILE MENU -->
+
+        @if (mobileMenuOpen) {
+
+        <div
+                class="border-t border-gray-200 bg-white px-4 py-4
+                       shadow-lg dark:border-gray-800
+                       dark:bg-gray-900 md:hidden">
+
+            <div class="flex flex-col gap-2">
+
+                <a
+                        routerLink="/"
+                        (click)="closeMobileMenu()"
+                        class="rounded-xl px-4 py-3 text-sm font-semibold
+                               text-gray-700 hover:bg-green-50
+                               dark:text-gray-200
+                               dark:hover:bg-green-900/30">
+
+                    🏠 Accueil
+
+                </a>
+
+                <a
+                        routerLink="/products"
+                        (click)="closeMobileMenu()"
+                        class="rounded-xl px-4 py-3 text-sm font-semibold
+                               text-gray-700 hover:bg-green-50
+                               dark:text-gray-200
+                               dark:hover:bg-green-900/30">
+
+                    🛍️ Produits
+
+                </a>
+
+                <a
+                        routerLink="/bundles"
+                        (click)="closeMobileMenu()"
+                        class="rounded-xl px-4 py-3 text-sm font-semibold
+                               text-gray-700 hover:bg-green-50
+                               dark:text-gray-200
+                               dark:hover:bg-green-900/30">
+
+                    📦 Packs
+
+                </a>
+
+                <a
+                        routerLink="/companies"
+                        (click)="closeMobileMenu()"
+                        class="rounded-xl px-4 py-3 text-sm font-semibold
+                               text-gray-700 hover:bg-green-50
+                               dark:text-gray-200
+                               dark:hover:bg-green-900/30">
+
+                    🏢 Entreprises
+
+                </a>
+
+
+                @if (!isLoggedIn()) {
+
+                <a
+                        routerLink="/signin"
+                        (click)="closeMobileMenu()"
+                        class="rounded-xl px-4 py-3 text-sm font-semibold
+                                   text-gray-700 hover:bg-green-50
+                                   dark:text-gray-200">
+
+                    🔐 Se connecter
+
+                </a>
+
+                <a
+                        routerLink="/signup"
+                        (click)="closeMobileMenu()"
+                        class="rounded-xl bg-green-600 px-4 py-3
+                                   text-sm font-semibold text-white
+                                   hover:bg-green-700">
+
+                    📝 Créer un compte
+
+                </a>
+
+                }
+
+
+                @if (isLoggedIn() && isAdmin()) {
+
+                <a
+                        routerLink="/admin"
+                        (click)="closeMobileMenu()"
+                        class="rounded-xl bg-green-700 px-4 py-3
+                                   text-sm font-semibold text-white">
+
+                    ⚙️ Dashboard Admin
+
+                </a>
+
+                }
+
+
+                @if (isLoggedIn() && !isAdmin()) {
+
+                <a
+                        routerLink="/profile"
+                        (click)="closeMobileMenu()"
+                        class="rounded-xl bg-green-600 px-4 py-3
+                                   text-sm font-semibold text-white">
+
+                    👤 Mon profil
+
+                </a>
+
+                }
+
+
+                @if (isLoggedIn()) {
+
+                <a
+                        routerLink="/cart"
+                        (click)="closeMobileMenu()"
+                        class="rounded-xl bg-green-600 px-4 py-3
+                                   text-sm font-semibold text-white">
+
+                    🛒 Mon panier
+
+                </a>
+
+                }
+
+            </div>
+
+        </div>
+
+        }
+
+    </header>
+
+
+    <!-- ========================================================= -->
+    <!-- CONTENU -->
+    <!-- ========================================================= -->
+
+    <main
+            class="mx-auto max-w-7xl px-4 py-16
+               sm:px-6 lg:px-8">
+
+        <section id="produits">
+
+            <!-- ================================================= -->
+            <!-- TITRE -->
+            <!-- ================================================= -->
+
+            <div
+                    class="mb-8 flex flex-col gap-4
+                       sm:flex-row sm:items-end
+                       sm:justify-between">
+
+                <div>
+
+                    <div
+                            class="mb-2 text-sm font-bold
+                               uppercase tracking-wider
+                               text-green-600
+                               dark:text-green-400">
+
+                        Catalogue
+
+                    </div>
+
+                    <h2
+                            class="text-3xl font-extrabold
+                               tracking-tight
+                               text-gray-900
+                               dark:text-white">
+
+                        Nos produits
+
+                    </h2>
+
+                    <p
+                            class="mt-2 text-sm text-gray-500
+                               dark:text-gray-400">
+
+                        {{ totalElements }}
+                        produit(s) disponible(s)
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- FILTRES -->
+            <!-- ================================================= -->
+
+            <div
+                    class="mb-10 rounded-2xl border
+                       border-gray-200 bg-white p-5
+                       shadow-sm dark:border-gray-800
+                       dark:bg-gray-900">
+
+                <div
+                        class="mb-5 flex items-center gap-3">
+
+                    <div
+                            class="flex h-10 w-10 items-center
+                               justify-center rounded-xl
+                               bg-green-100 text-lg
+                               dark:bg-green-900/30">
+
+                        🔎
+
+                    </div>
+
+                    <div>
+
+                        <h3
+                                class="font-bold text-gray-900
+                                   dark:text-white">
+
+                            Rechercher et filtrer
+
+                        </h3>
+
+                        <p
+                                class="text-xs text-gray-500
+                                   dark:text-gray-400">
+
+                            Trouvez rapidement le produit
+                            qui vous convient.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                        class="grid grid-cols-1 gap-4
+                           md:grid-cols-3">
+
+                    <!-- CATÉGORIE -->
+
+                    <div>
+
+                        <label
+                                class="mb-2 block text-sm
+                                   font-medium
+                                   text-gray-700
+                                   dark:text-gray-300">
+
+                            Catégorie
+
+                        </label>
+
+                        <select
+                                [(ngModel)]="selectedCategory"
+                                [ngModelOptions]="{standalone: true}"
+                                (ngModelChange)="search()"
+                                class="h-11 w-full rounded-xl
+                                   border border-gray-200
+                                   bg-gray-50 px-4
+                                   text-sm outline-none
+                                   transition
+                                   focus:border-green-600
+                                   focus:ring-4
+                                   focus:ring-green-600/10
+                                   dark:border-gray-700
+                                   dark:bg-gray-800
+                                   dark:text-white">
+
+                            <option value="">
+                                Toutes les catégories
+                            </option>
+
+                            @for (
+                            category of categories;
+                            track category
+                            ) {
+
+                            <option [value]="category">
+                                {{ category }}
+                            </option>
+
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- ENTREPRISE -->
+
+                    <div>
+
+                        <label
+                                class="mb-2 block text-sm
+                                   font-medium
+                                   text-gray-700
+                                   dark:text-gray-300">
+
+                            Entreprise
+
+                        </label>
+
+                        <select
+                                [(ngModel)]="selectedCompany"
+                                [ngModelOptions]="{standalone: true}"
+                                (ngModelChange)="search()"
+                                class="h-11 w-full rounded-xl
+                                   border border-gray-200
+                                   bg-gray-50 px-4
+                                   text-sm outline-none
+                                   transition
+                                   focus:border-green-600
+                                   focus:ring-4
+                                   focus:ring-green-600/10
+                                   dark:border-gray-700
+                                   dark:bg-gray-800
+                                   dark:text-white">
+
+                            <option value="">
+                                Toutes les entreprises
+                            </option>
+
+                            @for (
+                            company of companies;
+                            track company
+                            ) {
+
+                            <option [value]="company">
+                                {{ company }}
+                            </option>
+
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- DOMAINE -->
+
+                    <div>
+
+                        <label
+                                class="mb-2 block text-sm
+                                   font-medium
+                                   text-gray-700
+                                   dark:text-gray-300">
+
+                            Domaine thérapeutique
+
+                        </label>
+
+                        <select
+                                [(ngModel)]="selectedTherapeuticArea"
+                                [ngModelOptions]="{standalone: true}"
+                                (ngModelChange)="search()"
+                                class="h-11 w-full rounded-xl
+                                   border border-gray-200
+                                   bg-gray-50 px-4
+                                   text-sm outline-none
+                                   transition
+                                   focus:border-green-600
+                                   focus:ring-4
+                                   focus:ring-green-600/10
+                                   dark:border-gray-700
+                                   dark:bg-gray-800
+                                   dark:text-white">
+
+                            <option value="">
+                                Tous les domaines
+                            </option>
+
+                            @for (
+                            area of therapeuticAreas;
+                            track area
+                            ) {
+
+                            <option [value]="area">
+                                {{ area }}
+                            </option>
+
+                            }
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="mt-4 flex justify-end">
+
+                    <button
+                            type="button"
+                            (click)="resetFilters()"
+                            class="rounded-xl border
+                               border-green-600 px-4 py-2.5
+                               text-sm font-semibold
+                               text-green-700 transition
+                               hover:bg-green-50
+                               dark:border-green-500
+                               dark:text-green-400
+                               dark:hover:bg-green-900/30">
+
+                        Réinitialiser
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- LOADING -->
+            <!-- ================================================= -->
+
+            @if (loading) {
+
+            <div
+                    class="grid grid-cols-1 gap-6
+                           sm:grid-cols-2 lg:grid-cols-3
+                           xl:grid-cols-4">
+
+                @for (
+                item of [1,2,3,4];
+                track item
+                ) {
+
+                <div
+                        class="h-96 animate-pulse
+                                   rounded-2xl bg-gray-200
+                                   dark:bg-gray-800">
+
+                </div>
+
+                }
+
+            </div>
+
+            }
+
+
+            <!-- ================================================= -->
+            <!-- ERROR -->
+            <!-- ================================================= -->
+
+            @else if (error) {
+
+            <div
+                    class="rounded-2xl border
+                           border-red-200 bg-red-50 p-8
+                           text-center
+                           dark:border-red-900
+                           dark:bg-red-950/40">
+
+                <div class="text-4xl">
+                    ⚠️
+                </div>
+
+                <p
+                        class="mt-3 text-red-600
+                               dark:text-red-400">
+
+                    {{ error }}
+
+                </p>
+
+                <button
+                        type="button"
+                        (click)="loadProducts()"
+                        class="mt-5 rounded-xl
+                               bg-red-600 px-5 py-2.5
+                               text-sm font-semibold
+                               text-white hover:bg-red-700">
+
+                    Réessayer
+
+                </button>
+
+            </div>
+
+            }
+
+
+            <!-- ================================================= -->
+            <!-- AUCUN PRODUIT -->
+            <!-- ================================================= -->
+
+            @else if (
+            filteredProducts.length === 0
+            ) {
+
+            <div
+                    class="rounded-2xl border
+                           border-gray-200 bg-white
+                           px-6 py-16 text-center
+                           dark:border-gray-800
+                           dark:bg-gray-900">
+
+                <div class="text-5xl">
+                    🔍
+                </div>
+
+                <h3
+                        class="mt-4 text-lg font-bold
+                               text-gray-900
+                               dark:text-white">
+
+                    Aucun produit trouvé
+
+                </h3>
+
+                <p
+                        class="mt-2 text-sm text-gray-500
+                               dark:text-gray-400">
+
+                    Essayez avec un autre terme
+                    ou modifiez vos filtres.
+
+                </p>
+
+                <button
+                        type="button"
+                        (click)="resetFilters()"
+                        class="mt-5 rounded-xl
+                               bg-green-600 px-5 py-2.5
+                               text-sm font-semibold
+                               text-white hover:bg-green-700">
+
+                    Réinitialiser les filtres
+
+                </button>
+
+            </div>
+
+            }
+
+
+            <!-- ================================================= -->
+            <!-- GRILLE PRODUITS -->
+            <!-- ================================================= -->
+
+            @else {
+
+            <div
+                    class="grid grid-cols-1 gap-6
+                           sm:grid-cols-2 lg:grid-cols-3
+                           xl:grid-cols-4">
+
+                @for (
+                product of filteredProducts;
+                track product.id
+                ) {
+
+                <div class="group">
+
+                    <!-- CARTE PRODUIT -->
+
+                    <article
+                            class="overflow-hidden rounded-2xl
+                                       border border-gray-200
+                                       bg-white shadow-sm
+                                       transition duration-300
+                                       hover:-translate-y-1
+                                       hover:shadow-xl
+                                       dark:border-gray-800
+                                       dark:bg-gray-900">
+
+                        <!-- IMAGE -->
+
+                        <a
+                                [routerLink]="[
+                                        '/products',
+                                        product.id
+                                    ]"
+                                class="relative block
+                                           aspect-square
+                                           overflow-hidden
+                                           bg-gray-100
+                                           dark:bg-gray-800">
+
+                            <!-- CORRIGÉ -->
+                            <img
+                                    [src]="getMainImage(product)"
+                                    [alt]="product.name"
+                                    class="h-full w-full
+                                               object-cover
+                                               transition duration-500
+                                               group-hover:scale-105">
+
+
+                            @if (product.stock > 0) {
+
+                            <div
+                                    class="absolute left-3 top-3
+                                                   flex items-center gap-1
+                                                   rounded-full bg-green-600
+                                                   px-3 py-1 text-xs
+                                                   font-bold text-white">
+
+                                ✅ Disponible
+
+                            </div>
+
+                            } @else {
+
+                            <div
+                                    class="absolute left-3 top-3
+                                                   flex items-center gap-1
+                                                   rounded-full bg-gray-500
+                                                   px-3 py-1 text-xs
+                                                   font-bold text-white">
+
+                                ⛔ Rupture
+
+                            </div>
+
+                            }
+
+                        </a>
+
+
+                        <!-- CONTENU -->
+
+                        <div class="p-4">
+
+                            <a
+                                    [routerLink]="[
+                                            '/products',
+                                            product.id
+                                        ]">
+
+                                <h3
+                                        class="text-base font-bold
+                                                   text-gray-900
+                                                   transition
+                                                   hover:text-green-700
+                                                   dark:text-white
+                                                   dark:hover:text-green-400">
+
+                                    {{ product.name }}
+
+                                </h3>
+
+                            </a>
+
+
+                            <!-- CORRIGÉ -->
+                            <p
+                                    class="mt-1 text-sm
+                                               text-gray-500
+                                               dark:text-gray-400">
+
+                                {{
+                                product.categories?.join(', ')
+                                || 'Sans catégorie'
+                                }}
+
+                                •
+
+                                {{ product.stock }}
+
+                                en stock
+
+                            </p>
+
+
+                            <p
+                                    class="mt-0.5 text-xs
+                                               font-semibold
+                                               uppercase tracking-wide
+                                               text-green-700
+                                               dark:text-green-400">
+
+                                {{ product.companyName }}
+
+                            </p>
+
+
+                            <div
+                                    class="mt-3 flex items-center
+                                               justify-between">
+
+                                <p
+                                        class="text-lg font-extrabold
+                                                   text-green-700
+                                                   dark:text-green-400">
+
+                                    {{
+                                    formatPrice(
+                                    product.price
+                                    )
+                                    }}
+
+                                </p>
+
+                            </div>
+
+
+                            <!-- AJOUT PANIER -->
+
+                            <button
+                                    type="button"
+                                    (click)="addToCart(product)"
+                                    [disabled]="
+                                            product.stock === 0
+                                        "
+                                    class="mt-3 w-full rounded-xl
+                                               bg-green-600 px-3 py-2.5
+                                               text-sm font-bold
+                                               text-white transition
+                                               hover:bg-green-700
+                                               disabled:cursor-not-allowed
+                                               disabled:bg-gray-300
+                                               dark:bg-green-500
+                                               dark:hover:bg-green-400">
+
+                                🛒 Ajouter au panier
+
+                            </button>
+
+                        </div>
+
+                    </article>
+
+
+                    <!-- ACTIONS SECONDAIRES -->
+
+                    <div
+                            class="mt-3 grid grid-cols-2
+                                       gap-2">
+
+                        <a
+                                [routerLink]="[
+                                        '/products',
+                                        product.id
+                                    ]"
+                                class="flex items-center
+                                           justify-center gap-2
+                                           rounded-xl border
+                                           border-green-600
+                                           bg-white px-3 py-2.5
+                                           text-sm font-semibold
+                                           text-green-700
+                                           transition
+                                           hover:bg-green-50
+                                           dark:border-green-500
+                                           dark:bg-gray-900
+                                           dark:text-green-400
+                                           dark:hover:bg-green-900/30">
+
+                            👁️ Détails
+
+                        </a>
+
+
+                        <a
+                                routerLink="/cart"
+                                class="flex items-center
+                                           justify-center gap-2
+                                           rounded-xl bg-green-600
+                                           px-3 py-2.5
+                                           text-sm font-semibold
+                                           text-white transition
+                                           hover:bg-green-700
+                                           dark:bg-green-500">
+
+                            🛒 Panier
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+                }
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- PAGINATION -->
+            <!-- ================================================= -->
+
+            @if (totalPages > 1) {
+
+            <div
+                    class="mt-12 flex flex-wrap
+                               items-center justify-center gap-2">
+
+                <button
+                        type="button"
+                        (click)="previousPage()"
+                        [disabled]="currentPage === 0"
+                        class="rounded-xl border
+                                   border-gray-300 bg-white
+                                   px-4 py-2.5 text-sm
+                                   font-semibold text-gray-700
+                                   transition
+                                   hover:border-green-500
+                                   hover:bg-green-50
+                                   disabled:cursor-not-allowed
+                                   disabled:opacity-40
+                                   dark:border-gray-700
+                                   dark:bg-gray-900
+                                   dark:text-gray-200">
+
+                    ← Précédent
+
+                </button>
+
+
+                @for (
+                page of pages;
+                track page
+                ) {
+
+                <button
+                        type="button"
+                        (click)="goToPage(page)"
+                        class="flex h-10 min-w-10
+                                       items-center justify-center
+                                       rounded-xl border px-3
+                                       text-sm font-semibold
+                                       transition"
+                        [class.border-green-600]="
+                                    currentPage === page
+                                "
+                        [class.bg-green-600]="
+                                    currentPage === page
+                                "
+                        [class.text-white]="
+                                    currentPage === page
+                                "
+                        [class.border-gray-300]="
+                                    currentPage !== page
+                                "
+                        [class.bg-white]="
+                                    currentPage !== page
+                                "
+                        [class.text-gray-700]="
+                                    currentPage !== page
+                                ">
+
+                    {{ page + 1 }}
+
+                </button>
+
+                }
+
+
+                <button
+                        type="button"
+                        (click)="nextPage()"
+                        [disabled]="
+                                currentPage === totalPages - 1
+                            "
+                        class="rounded-xl border
+                                   border-gray-300 bg-white
+                                   px-4 py-2.5 text-sm
+                                   font-semibold text-gray-700
+                                   transition
+                                   hover:border-green-500
+                                   hover:bg-green-50
+                                   disabled:cursor-not-allowed
+                                   disabled:opacity-40
+                                   dark:border-gray-700
+                                   dark:bg-gray-900
+                                   dark:text-gray-200">
+
+                    Suivant →
+
+                </button>
+
+            </div>
+
+
+            <p
+                    class="mt-4 text-center text-sm
+                               text-gray-500
+                               dark:text-gray-400">
+
+                Page {{ currentPage + 1 }}
+
+                sur
+
+                {{ totalPages }}
+
+                ·
+
+                {{ totalElements }}
+                produit(s)
+
+            </p>
+
+            }
+
+            }
+
+        </section>
+
+    </main>
+
+</div>

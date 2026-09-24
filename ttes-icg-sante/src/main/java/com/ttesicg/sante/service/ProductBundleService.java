@@ -31,9 +31,13 @@ import java.util.List;
 public class ProductBundleService {
 
     private final ProductBundleRepository bundleRepository;
+
     private final BundleItemRepository bundleItemRepository;
+
     private final BundleImageRepository bundleImageRepository;
+
     private final ProductRepository productRepository;
+
     private final InventoryRepository inventoryRepository;
 
 
@@ -74,14 +78,48 @@ public class ProductBundleService {
     @Transactional
     public BundleResponse findById(Long id) {
 
-        ProductBundle bundle = bundleRepository
-                .findById(id)
-                .orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Pack introuvable"
-                        )
-                );
+        ProductBundle bundle =
+                bundleRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Pack introuvable"
+                                )
+                        );
+
+        return map(bundle);
+    }
+
+
+    // =========================================================
+    // GET UN PACK ACTIF
+    // =========================================================
+
+    @Transactional
+    public BundleResponse findActiveById(Long id) {
+
+        ProductBundle bundle =
+                bundleRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Pack introuvable"
+                                )
+                        );
+
+        /*
+         * Un client ne doit pas pouvoir consulter
+         * un pack désactivé.
+         */
+        if (!Boolean.TRUE.equals(bundle.getActive())) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Pack introuvable"
+            );
+        }
 
         return map(bundle);
     }
@@ -96,29 +134,43 @@ public class ProductBundleService {
 
         validateItems(request);
 
-        ProductBundle bundle = ProductBundle.builder()
-                .name(request.name())
-                .description(request.description())
-                .price(request.price())
-                .active(
-                        request.active() == null
-                                || request.active()
-                )
-                .build();
+        ProductBundle bundle =
+                ProductBundle.builder()
+                        .name(request.name())
+                        .description(request.description())
+                        .price(request.price())
+                        .active(
+                                request.active() == null
+                                        || request.active()
+                        )
+                        .build();
 
         ProductBundle savedBundle =
                 bundleRepository.save(bundle);
 
+
+        /*
+         * Enregistrer les produits du pack.
+         */
         saveItems(
                 savedBundle,
                 request.items()
         );
 
+
+        /*
+         * Enregistrer les images du pack.
+         */
         saveImages(
                 savedBundle,
                 request.images()
         );
 
+
+        /*
+         * Retourner le pack complet avec
+         * son stock calculé.
+         */
         return map(savedBundle);
     }
 
@@ -128,15 +180,13 @@ public class ProductBundleService {
     // =========================================================
 
     @Transactional
-    public BundleResponse update(
-            Long id,
-            BundleRequest request
-    ) {
+    public BundleResponse update(Long id, BundleRequest request) {
 
         validateItems(request);
 
         ProductBundle bundle =
-                bundleRepository.findById(id)
+                bundleRepository
+                        .findById(id)
                         .orElseThrow(() ->
                                 new ResponseStatusException(
                                         HttpStatus.NOT_FOUND,
@@ -153,30 +203,27 @@ public class ProductBundleService {
         }
 
         /*
-         * On remplace complètement les produits
-         * du pack.
+         * Supprimer les anciens éléments du pack.
          */
-        bundleItemRepository.deleteByBundleId(
-                bundle.getId()
-        );
+        bundleItemRepository.deleteByBundleId(bundle.getId());
+        bundleImageRepository.deleteByBundleId(bundle.getId());
 
         /*
-         * On remplace également les images.
+         * Forcer Hibernate à exécuter immédiatement les DELETE
+         * avant de recréer les éléments.
          */
-        bundleImageRepository.deleteByBundleId(
-                bundle.getId()
-        );
+        bundleItemRepository.flush();
+        bundleImageRepository.flush();
 
-        saveItems(
-                bundle,
-                request.items()
-        );
+        /*
+         * Recréer les éléments avec les nouvelles données.
+         */
+        saveItems(bundle, request.items());
+        saveImages(bundle, request.images());
 
-        saveImages(
-                bundle,
-                request.images()
-        );
-
+        /*
+         * Sauvegarder le pack.
+         */
         ProductBundle savedBundle =
                 bundleRepository.save(bundle);
 
@@ -192,7 +239,8 @@ public class ProductBundleService {
     public void delete(Long id) {
 
         ProductBundle bundle =
-                bundleRepository.findById(id)
+                bundleRepository
+                        .findById(id)
                         .orElseThrow(() ->
                                 new ResponseStatusException(
                                         HttpStatus.NOT_FOUND,
@@ -217,18 +265,22 @@ public class ProductBundleService {
             return;
         }
 
+
         for (BundleItemRequest request : requests) {
 
             Product product =
-                    productRepository.findById(
-                            request.productId()
-                    ).orElseThrow(() ->
-                            new ResponseStatusException(
-                                    HttpStatus.NOT_FOUND,
-                                    "Produit introuvable : "
-                                            + request.productId()
+                    productRepository
+                            .findById(
+                                    request.productId()
                             )
-                    );
+                            .orElseThrow(() ->
+                                    new ResponseStatusException(
+                                            HttpStatus.NOT_FOUND,
+                                            "Produit introuvable : "
+                                                    + request.productId()
+                                    )
+                            );
+
 
             BundleItem item =
                     BundleItem.builder()
@@ -236,6 +288,7 @@ public class ProductBundleService {
                             .product(product)
                             .quantity(request.quantity())
                             .build();
+
 
             bundleItemRepository.save(item);
         }
@@ -255,38 +308,57 @@ public class ProductBundleService {
             return;
         }
 
+
         boolean mainAlreadyDefined = false;
+
 
         for (int i = 0; i < requests.size(); i++) {
 
             BundleImageRequest request =
                     requests.get(i);
 
-            boolean main = request.main();
+
+            boolean main =
+                    request.main();
+
 
             /*
-             * Une seule image principale.
+             * Une seule image peut être principale.
+             *
+             * Si plusieurs images sont envoyées
+             * avec main=true, seule la première
+             * sera conservée comme principale.
              */
             if (main && mainAlreadyDefined) {
+
                 main = false;
             }
 
+
             if (main) {
+
                 mainAlreadyDefined = true;
             }
+
 
             int displayOrder =
                     request.displayOrder() != null
                             ? request.displayOrder()
                             : i;
 
+
             BundleImage image =
                     BundleImage.builder()
                             .bundle(bundle)
-                            .imageUrl(request.imageUrl())
+                            .imageUrl(
+                                    request.imageUrl()
+                            )
                             .main(main)
-                            .displayOrder(displayOrder)
+                            .displayOrder(
+                                    displayOrder
+                            )
                             .build();
+
 
             bundleImageRepository.save(image);
         }
@@ -310,12 +382,18 @@ public class ProductBundleService {
             );
         }
 
+
+        /*
+         * Vérifier qu'un même produit
+         * n'apparaît pas plusieurs fois.
+         */
         long distinctProducts =
                 request.items()
                         .stream()
                         .map(BundleItemRequest::productId)
                         .distinct()
                         .count();
+
 
         if (distinctProducts
                 != request.items().size()) {
@@ -339,18 +417,38 @@ public class ProductBundleService {
 
         List<BundleItem> items =
                 bundleItemRepository
-                        .findByBundleId(bundle.getId());
+                        .findByBundleId(
+                                bundle.getId()
+                        );
+
 
         if (items == null || items.isEmpty()) {
+
             return 0;
         }
 
-        int stockPack = Integer.MAX_VALUE;
+
+        /*
+         * On commence avec la valeur maximale.
+         *
+         * Ensuite :
+         *
+         * stockPack =
+         * min(
+         *      stockProduit1 / quantité1,
+         *      stockProduit2 / quantité2,
+         *      ...
+         * )
+         */
+        int stockPack =
+                Integer.MAX_VALUE;
+
 
         for (BundleItem item : items) {
 
             Product product =
                     item.getProduct();
+
 
             Inventory inventory =
                     inventoryRepository
@@ -359,16 +457,20 @@ public class ProductBundleService {
                             )
                             .orElse(null);
 
+
             int productStock =
                     inventory != null
                             ? inventory.getQuantity()
                             : 0;
 
+
             int quantityRequired =
                     item.getQuantity();
 
+
             int possiblePacks =
                     productStock / quantityRequired;
+
 
             stockPack =
                     Math.min(
@@ -377,6 +479,7 @@ public class ProductBundleService {
                     );
         }
 
+
         return stockPack == Integer.MAX_VALUE
                 ? 0
                 : stockPack;
@@ -384,7 +487,7 @@ public class ProductBundleService {
 
 
     // =========================================================
-    // TRANSFORMATION ENTITY -> RESPONSE
+    // ENTITY -> RESPONSE
     // =========================================================
 
     private BundleResponse map(
@@ -406,6 +509,7 @@ public class ProductBundleService {
                             Product product =
                                     item.getProduct();
 
+
                             Inventory inventory =
                                     inventoryRepository
                                             .findByProductId(
@@ -413,10 +517,12 @@ public class ProductBundleService {
                                             )
                                             .orElse(null);
 
+
                             Integer availableStock =
                                     inventory != null
                                             ? inventory.getQuantity()
                                             : 0;
+
 
                             return new BundleItemResponse(
                                     item.getId(),
@@ -427,6 +533,7 @@ public class ProductBundleService {
                                     product.getPrice(),
                                     availableStock
                             );
+
                         })
                         .toList();
 
@@ -455,7 +562,7 @@ public class ProductBundleService {
 
 
         // -----------------------------------------------------
-        // STOCK TOTAL DU PACK
+        // STOCK DU PACK
         // -----------------------------------------------------
 
         int stock =

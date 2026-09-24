@@ -85,15 +85,19 @@ public class WhatsAppService {
 
 
         // ======================================================
-        // PRODUITS
+        // PRODUITS / PACKS
         // ======================================================
 
         message.append("\n")
-                .append("🛍️ *PRODUITS*")
+                .append("🛍️ *ARTICLES*")
                 .append("\n\n");
 
 
         order.getItems().forEach(item -> {
+
+            // ==================================================
+            // SOUS-TOTAL
+            // ==================================================
 
             BigDecimal subtotal =
                     item.getPrice()
@@ -103,23 +107,85 @@ public class WhatsAppService {
                                     )
                             );
 
-            message.append("• ")
-                    .append(item.getProduct().getName())
+
+            // ==================================================
+            // NOM + TYPE DE L'ARTICLE
+            // ==================================================
+
+            String itemName;
+            String itemType;
+
+            /*
+             * ARTICLE = PRODUIT
+             */
+            if (item.getProduct() != null) {
+
+                itemName =
+                        item.getProduct().getName();
+
+                itemType = "Produit";
+
+            }
+
+            /*
+             * ARTICLE = PACK
+             */
+            else if (item.getBundle() != null) {
+
+                itemName =
+                        item.getBundle().getName();
+
+                itemType = "Pack";
+
+            }
+
+            /*
+             * CAS ANORMAL
+             */
+            else {
+
+                itemName = "Article";
+                itemType = "Article";
+
+            }
+
+
+            // ==================================================
+            // AFFICHAGE
+            // ==================================================
+
+            message.append("• ");
+
+            if ("Pack".equals(itemType)) {
+
+                message.append("📦 *Pack* : ");
+
+            } else {
+
+                message.append("🛍️ *Produit* : ");
+
+            }
+
+            message.append(itemName)
                     .append("\n");
+
 
             message.append("  Quantité : ")
                     .append(item.getQuantity())
                     .append("\n");
+
 
             message.append("  Prix unitaire : ")
                     .append(item.getPrice())
                     .append(" FCFA")
                     .append("\n");
 
+
             message.append("  Sous-total : ")
                     .append(subtotal)
                     .append(" FCFA")
                     .append("\n\n");
+
         });
 
 
@@ -132,6 +198,10 @@ public class WhatsAppService {
                 .append(" FCFA")
                 .append("\n\n");
 
+
+        // ======================================================
+        // STATUT FINAL
+        // ======================================================
 
         message.append("📦 *Statut :* ")
                 .append(order.getStatus());

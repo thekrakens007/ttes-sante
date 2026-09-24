@@ -1,7 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {AddCartItemRequest, Cart, CartItemRequest, CartResponse} from "../interfaces/cart.interface";
+
+import {
+    Cart,
+    CartItemRequest
+} from '../interfaces/cart.interface';
 
 @Injectable({
     providedIn: 'root'
@@ -12,22 +16,14 @@ export class CartService {
 
     private readonly API_URL = '/api/cart';
 
-
-
-    /**
-     * Récupérer le panier du client connecté
-     */
     getCart(): Observable<Cart> {
-
         return this.http.get<Cart>(
             `${this.API_URL}/me`
         );
-
     }
 
-
     /**
-     * Ajouter un produit
+     * Ajouter un produit au panier.
      */
     addItem(
         productId: number,
@@ -43,13 +39,27 @@ export class CartService {
             `${this.API_URL}/me/items`,
             request
         );
-
     }
 
-
     /**
-     * Modifier la quantité
+     * Ajouter un pack au panier.
      */
+    addBundle(
+        bundleId: number,
+        quantity: number = 1
+    ): Observable<Cart> {
+
+        const request: CartItemRequest = {
+            bundleId,
+            quantity
+        };
+
+        return this.http.post<Cart>(
+            `${this.API_URL}/me/items`,
+            request
+        );
+    }
+
     updateQuantity(
         itemId: number,
         quantity: number
@@ -64,13 +74,8 @@ export class CartService {
                 }
             }
         );
-
     }
 
-
-    /**
-     * Supprimer un article
-     */
     removeItem(
         itemId: number
     ): Observable<Cart> {
@@ -78,7 +83,5 @@ export class CartService {
         return this.http.delete<Cart>(
             `${this.API_URL}/me/items/${itemId}`
         );
-
     }
-
 }

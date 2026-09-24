@@ -23,29 +23,30 @@ import { BundleResponse } from '../../../core/interfaces/bundle-response.interfa
 
 
 @Component({
-    selector: 'app-shop-home',
-
+    selector: 'app-products-page',
     standalone: true,
-
     imports: [
         CommonModule,
         RouterModule,
         FormsModule,
         ProductCardComponent
     ],
-
-    templateUrl: './shop-home.component.html'
+    templateUrl: './products-list.component.html'
 })
-export class ShopHomeComponent implements OnInit {
+export class ProductsListComponent implements OnInit {
 
     // ============================================================
     // PAGINATION
     // ============================================================
 
     currentPage = 0;
+
     pageSize = 8;
+
     totalPages = 0;
+
     totalElements = 0;
+
     pages: number[] = [];
 
 
@@ -63,8 +64,11 @@ export class ShopHomeComponent implements OnInit {
     // ============================================================
 
     private productService = inject(ProductService);
+
     private cartService = inject(CartService);
+
     private authService = inject(AuthService);
+
     private bundleService = inject(BundleService);
 
 
@@ -80,6 +84,7 @@ export class ShopHomeComponent implements OnInit {
     // ============================================================
 
     products: Product[] = [];
+
     filteredProducts: Product[] = [];
 
 
@@ -90,6 +95,7 @@ export class ShopHomeComponent implements OnInit {
     bundles: BundleResponse[] = [];
 
     bundlesLoading = true;
+
     bundlesError = '';
 
 
@@ -102,16 +108,18 @@ export class ShopHomeComponent implements OnInit {
 
     // ============================================================
     // FILTERS
-    // IMPORTANT :
-    // categories, companies et therapeuticAreas sont des string[]
     // ============================================================
 
     selectedCategory = '';
+
     selectedCompany = '';
+
     selectedTherapeuticArea = '';
 
     categories: string[] = [];
+
     companies: string[] = [];
+
     therapeuticAreas: string[] = [];
 
 
@@ -120,6 +128,7 @@ export class ShopHomeComponent implements OnInit {
     // ============================================================
 
     loading = true;
+
     error = '';
 
 
@@ -128,7 +137,9 @@ export class ShopHomeComponent implements OnInit {
     // ============================================================
 
     ngOnInit(): void {
+
         this.loadProducts();
+
         this.loadBundles();
 
         if (this.isLoggedIn()) {
@@ -142,10 +153,14 @@ export class ShopHomeComponent implements OnInit {
     // ============================================================
 
     toggleMobileMenu(): void {
-        this.mobileMenuOpen = !this.mobileMenuOpen;
+
+        this.mobileMenuOpen =
+            !this.mobileMenuOpen;
     }
 
+
     closeMobileMenu(): void {
+
         this.mobileMenuOpen = false;
     }
 
@@ -154,6 +169,22 @@ export class ShopHomeComponent implements OnInit {
     // AUTHENTICATION
     // ============================================================
 
+    isLoggedIn(): boolean {
+
+        return this.authService.isLoggedIn();
+    }
+
+
+    isAdmin(): boolean {
+
+        if (!this.isLoggedIn()) {
+            return false;
+        }
+
+        return this.authService.hasRole(
+            'ROLE_ADMIN'
+        );
+    }
 
 
     // ============================================================
@@ -161,28 +192,38 @@ export class ShopHomeComponent implements OnInit {
     // ============================================================
 
     loadBundles(): void {
+
         this.bundlesLoading = true;
+
         this.bundlesError = '';
 
-        this.bundleService.getBundles().subscribe({
-            next: (bundles) => {
-                this.bundles = (bundles ?? []).slice(0, 4);
-                this.bundlesLoading = false;
-            },
+        this.bundleService
+            .getBundles()
+            .subscribe({
 
-            error: (error) => {
-                console.error(
-                    'Erreur lors du chargement des packs',
-                    error
-                );
+                next: (bundles) => {
 
-                this.bundles = [];
-                this.bundlesError =
-                    'Impossible de charger les packs.';
+                    this.bundles =
+                        (bundles ?? []).slice(0, 4);
 
-                this.bundlesLoading = false;
-            }
-        });
+                    this.bundlesLoading = false;
+                },
+
+                error: (error) => {
+
+                    console.error(
+                        'Erreur lors du chargement des packs',
+                        error
+                    );
+
+                    this.bundles = [];
+
+                    this.bundlesError =
+                        'Impossible de charger les packs.';
+
+                    this.bundlesLoading = false;
+                }
+            });
     }
 
 
@@ -190,7 +231,9 @@ export class ShopHomeComponent implements OnInit {
     // IMAGE PRINCIPALE D'UN BUNDLE
     // ============================================================
 
-    getBundleImage(bundle: BundleResponse): string {
+    getBundleImage(
+        bundle: BundleResponse
+    ): string {
 
         if (
             !bundle.images ||
@@ -199,9 +242,10 @@ export class ShopHomeComponent implements OnInit {
             return '/images/products/default-product.png';
         }
 
-        const mainImage = bundle.images.find(
-            image => image.main
-        );
+        const mainImage =
+            bundle.images.find(
+                image => image.main
+            );
 
         return (
             mainImage?.imageUrl ||
@@ -218,6 +262,7 @@ export class ShopHomeComponent implements OnInit {
     getBundleItemCount(
         bundle: BundleResponse
     ): number {
+
         return bundle.items?.length ?? 0;
     }
 
@@ -229,6 +274,7 @@ export class ShopHomeComponent implements OnInit {
     isBundleAvailable(
         bundle: BundleResponse
     ): boolean {
+
         return (
             bundle.stock !== undefined &&
             bundle.stock > 0
@@ -243,25 +289,31 @@ export class ShopHomeComponent implements OnInit {
     loadCart(): void {
 
         if (!this.isLoggedIn()) {
+
             this.cart = null;
+
             return;
         }
 
-        this.cartService.getCart().subscribe({
+        this.cartService
+            .getCart()
+            .subscribe({
 
-            next: (cart) => {
-                this.cart = cart;
-            },
+                next: (cart) => {
 
-            error: (error) => {
-                console.error(
-                    'Erreur chargement panier',
-                    error
-                );
+                    this.cart = cart;
+                },
 
-                this.cart = null;
-            }
-        });
+                error: (error) => {
+
+                    console.error(
+                        'Erreur chargement panier',
+                        error
+                    );
+
+                    this.cart = null;
+                }
+            });
     }
 
 
@@ -272,6 +324,7 @@ export class ShopHomeComponent implements OnInit {
     loadProducts(): void {
 
         this.loading = true;
+
         this.error = '';
 
         this.productService
@@ -287,7 +340,8 @@ export class ShopHomeComponent implements OnInit {
                     this.products = (
                         response.content ?? []
                     ).filter(
-                        product => product.stock > 0
+                        product =>
+                            product.stock > 0
                     );
 
 
@@ -316,6 +370,7 @@ export class ShopHomeComponent implements OnInit {
                         ...this.products
                     ];
 
+
                     this.search();
 
 
@@ -330,10 +385,13 @@ export class ShopHomeComponent implements OnInit {
                     );
 
                     this.products = [];
+
                     this.filteredProducts = [];
 
                     this.totalPages = 0;
+
                     this.totalElements = 0;
+
                     this.pages = [];
 
                     this.error =
@@ -349,7 +407,9 @@ export class ShopHomeComponent implements OnInit {
     // PAGINATION
     // ============================================================
 
-    goToPage(page: number): void {
+    goToPage(
+        page: number
+    ): void {
 
         if (
             page < 0 ||
@@ -376,6 +436,7 @@ export class ShopHomeComponent implements OnInit {
             this.currentPage <
             this.totalPages - 1
         ) {
+
             this.currentPage++;
 
             this.loadProducts();
@@ -432,7 +493,9 @@ export class ShopHomeComponent implements OnInit {
                         product.companyName
                 )
                 .filter(
-                    (value): value is string =>
+                    (
+                        value
+                    ): value is string =>
                         !!value
                 );
 
@@ -479,85 +542,87 @@ export class ShopHomeComponent implements OnInit {
 
 
         this.filteredProducts =
-            this.products.filter(product => {
+            this.products.filter(
+                product => {
 
-                // ----------------------------
-                // Recherche
-                // ----------------------------
+                    // ----------------------------
+                    // Recherche
+                    // ----------------------------
 
-                const matchesSearch =
-                    !term ||
+                    const matchesSearch =
+                        !term ||
 
-                    product.name
-                        ?.toLowerCase()
-                        .includes(term) ||
+                        product.name
+                            ?.toLowerCase()
+                            .includes(term) ||
 
-                    product.brand
-                        ?.toLowerCase()
-                        .includes(term) ||
+                        product.brand
+                            ?.toLowerCase()
+                            .includes(term) ||
 
-                    product.description
-                        ?.toLowerCase()
-                        .includes(term) ||
+                        product.description
+                            ?.toLowerCase()
+                            .includes(term) ||
 
-                    product.categories?.some(
-                        category =>
-                            category
-                                .toLowerCase()
-                                .includes(term)
-                    ) ||
+                        product.categories?.some(
+                            category =>
+                                category
+                                    .toLowerCase()
+                                    .includes(term)
+                        ) ||
 
-                    product.companyName
-                        ?.toLowerCase()
-                        .includes(term) ||
+                        product.companyName
+                            ?.toLowerCase()
+                            .includes(term) ||
 
-                    product.therapeuticAreas?.some(
-                        area =>
-                            area
-                                .toLowerCase()
-                                .includes(term)
+                        product.therapeuticAreas?.some(
+                            area =>
+                                area
+                                    .toLowerCase()
+                                    .includes(term)
+                        );
+
+
+                    // ----------------------------
+                    // Catégorie
+                    // ----------------------------
+
+                    const matchesCategory =
+                        !this.selectedCategory ||
+                        product.categories?.includes(
+                            this.selectedCategory
+                        );
+
+
+                    // ----------------------------
+                    // Entreprise
+                    // ----------------------------
+
+                    const matchesCompany =
+                        !this.selectedCompany ||
+                        product.companyName ===
+                        this.selectedCompany;
+
+
+                    // ----------------------------
+                    // Domaine thérapeutique
+                    // ----------------------------
+
+                    const matchesTherapeuticArea =
+                        !this.selectedTherapeuticArea ||
+                        product.therapeuticAreas?.includes(
+                            this.selectedTherapeuticArea
+                        );
+
+
+                    return (
+                        matchesSearch &&
+                        matchesCategory &&
+                        matchesCompany &&
+                        matchesTherapeuticArea
                     );
-
-
-                // ----------------------------
-                // Catégorie
-                // ----------------------------
-
-                const matchesCategory =
-                    !this.selectedCategory ||
-                    product.categories?.includes(
-                        this.selectedCategory
-                    );
-
-
-                // ----------------------------
-                // Entreprise
-                // ----------------------------
-
-                const matchesCompany =
-                    !this.selectedCompany ||
-                    product.companyName ===
-                    this.selectedCompany;
-
-
-                // ----------------------------
-                // Domaine thérapeutique
-                // ----------------------------
-
-                const matchesTherapeuticArea =
-                    !this.selectedTherapeuticArea ||
-                    product.therapeuticAreas?.includes(
-                        this.selectedTherapeuticArea
-                    );
-
-
-                return (
-                    matchesSearch &&
-                    matchesCategory &&
-                    matchesCompany &&
-                    matchesTherapeuticArea
-                );
-            });
+                }
+            );
     }
 
 
@@ -619,6 +684,37 @@ export class ShopHomeComponent implements OnInit {
 
 
     // ============================================================
+    // ADD PRODUCT TO CART
+    // ============================================================
+
+    addToCart(product: Product): void {
+        if (!product?.id) {
+            console.error('Produit invalide');
+            return;
+        }
+
+        this.cartService
+            .addItem(product.id, 1)
+            .subscribe({
+                next: (cart) => {
+                    this.cart = cart;
+
+                    console.log(
+                        'Produit ajouté au panier :',
+                        product.name
+                    );
+                },
+                error: (error) => {
+                    console.error(
+                        'Erreur lors de l’ajout au panier :',
+                        error
+                    );
+                }
+            });
+    }
+
+
+    // ============================================================
     // PRODUCT IMAGE
     // ============================================================
 
@@ -630,6 +726,7 @@ export class ShopHomeComponent implements OnInit {
             !product.images ||
             product.images.length === 0
         ) {
+
             return '/images/products/default-product.png';
         }
 
@@ -660,24 +757,5 @@ export class ShopHomeComponent implements OnInit {
             ).format(price ?? 0) +
             ' FCFA'
         );
-    }
-
-    isLoggedIn(): boolean {
-        const result = this.authService.isLoggedIn();
-
-        console.log('AUTH isLoggedIn =', result);
-        console.log('AUTH token =', this.authService.getToken());
-        console.log('AUTH roles =', this.authService.getRoles());
-        console.log('AUTH admin =', this.authService.isAdmin());
-
-        return result;
-    }
-
-    isAdmin(): boolean {
-        const result = this.authService.isAdmin();
-
-        console.log('AUTH isAdmin =', result);
-
-        return result;
     }
 }

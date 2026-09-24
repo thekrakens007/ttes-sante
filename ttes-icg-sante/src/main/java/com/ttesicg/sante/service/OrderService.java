@@ -1,6 +1,5 @@
 package com.ttesicg.sante.service;
 
-
 import com.ttesicg.sante.dto.CreateOrderRequest;
 import com.ttesicg.sante.dto.OrderItemResponse;
 import com.ttesicg.sante.dto.OrderResponse;
@@ -13,14 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
 import java.util.List;
-
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
-
 
     private final OrderRepository orderRepository;
 
@@ -33,6 +29,8 @@ public class OrderService {
     private final WhatsAppService whatsappService;
 
     private final InventoryRepository inventoryRepository;
+
+    private final BundleItemRepository bundleItemRepository;
 
     @Transactional
     public OrderResponse createOrder(
@@ -48,7 +46,6 @@ public class OrderService {
                                 )
                         );
 
-
         Cart cart =
                 cartRepository.findByUser(user)
                         .orElseThrow(
@@ -57,7 +54,6 @@ public class OrderService {
                                 )
                         );
 
-
         if (cart.getItems().isEmpty()) {
 
             throw new RuntimeException(
@@ -65,64 +61,59 @@ public class OrderService {
             );
         }
 
-
         Order order =
                 Order.builder()
-
                         .user(user)
-
                         .status(OrderStatus.PENDING)
-
                         .totalAmount(BigDecimal.ZERO)
-
                         .deliveryAddress(
                                 request.getDeliveryAddress()
                         )
-
                         .customerNote(
                                 request.getCustomerNote()
                         )
-
                         .items(
                                 new java.util.ArrayList<>()
                         )
-
                         .build();
 
+        BigDecimal total = BigDecimal.ZERO;
 
-        BigDecimal total =
-                BigDecimal.ZERO;
-
-
+        /*
+         * IMPORTANT :
+         *
+         * On parcourt les articles du panier.
+         *
+         * Chaque article peut être :
+         *
+         * - un produit
+         * - un pack
+         */
         for (CartItem cartItem : cart.getItems()) {
 
+            /*
+             * Vérifier et décrémenter le stock.
+             */
             checkAndUpdateStock(cartItem);
 
-
+            /*
+             * Créer la ligne de commande.
+             */
             OrderItem item =
                     OrderItem.builder()
-
                             .order(order)
-
-                            .product(
-                                    cartItem.getProduct()
-                            )
-
-                            .quantity(
-                                    cartItem.getQuantity()
-                            )
-
-                            .price(
-                                    cartItem.getPrice()
-                            )
-
+                            .product(cartItem.getProduct())
+                            .bundle(cartItem.getBundle())
+                            .quantity(cartItem.getQuantity())
+                            .price(cartItem.getPrice())
                             .build();
-
 
             order.getItems()
                     .add(item);
 
-
+            /*
+             * Calcul du sous-total.
+             */
             BigDecimal subtotal =
                     cartItem.getPrice()
                             .multiply(
@@ -131,35 +122,27 @@ public class OrderService {
                                     )
                             );
 
-
             total =
                     total.add(subtotal);
         }
 
-
         order.setTotalAmount(total);
 
-
-        // ==========================================================
-        // ENREGISTRER LA COMMANDE
-        // ==========================================================
-
+        /*
+         * ENREGISTRER LA COMMANDE
+         */
         Order saved =
                 orderRepository.save(order);
 
-
-        // ==========================================================
-        // GENERER LE LIEN WHATSAPP
-        // ==========================================================
-
+        /*
+         * GENERER LE LIEN WHATSAPP
+         */
         String whatsappLink =
                 whatsappService.generateWhatsAppLink(saved);
 
-
-        // ==========================================================
-        // VIDER LE PANIER
-        // ==========================================================
-
+        /*
+         * VIDER LE PANIER
+         */
         cartItemRepository.deleteAll(
                 cart.getItems()
         );
@@ -168,101 +151,323 @@ public class OrderService {
 
         cartRepository.save(cart);
 
-
-        // ==========================================================
-        // REPONSE
-        // ==========================================================
-
+        /*
+         * REPONSE
+         */
         OrderResponse response =
                 map(saved);
-
 
         response.setWhatsappLink(
                 whatsappLink
         );
 
-
         return response;
     }
 
-    private OrderResponse map(Order order){
+    /**
+     * Vérifie le stock et le décrémente.
+     *
+     * Produit :
+     *
+     *   stock produit -= quantité commandée
+     *
+     * Pack :
+     *
+     *   pour chaque produit du pack :
+     *   stock produit -=
+     *       quantité du pack × quantité commandée
+     */
+    private void checkAndUpdateStock(
+            CartItem cartItem
+    ) {
 
+        /*
+         * ==========================
+         * PRODUIT
+         * ==========================
+         */
+        if (cartItem.getProduct() != null) {
 
-        OrderResponse response = OrderResponse.builder()
+            Product product =
+                    cartItem.getProduct();
 
-                .id(order.getId())
+            Inventory inventory =
+                    inventoryRepository
+                            .findByProductId(
+                                    product.getId()
+                            )
+                            .orElseThrow(
+                                    () -> new RuntimeException(
+                                            "Stock introuvable pour "
+                                                    + product.getName()
+                                    )
+                            );
 
-                .status(
-                        order.getStatus().name()
-                )
+            if (inventory.getQuantity()
+                    < cartItem.getQuantity()) {
 
-                .totalAmount(
-                        order.getTotalAmount()
-                )
-                .createdAt(
-                        order.getCreatedAt()
-                )
-                .customerName(
-                        order.getUser().getFirstName()
-                                +" "
-                                +order.getUser().getLastName()
-                )
+                throw new RuntimeException(
+                        "Stock insuffisant pour "
+                                + product.getName()
+                );
+            }
 
-                .customerPhone(
-                        order.getUser().getPhone()
-                )
+            inventory.setQuantity(
+                    inventory.getQuantity()
+                            - cartItem.getQuantity()
+            );
 
-                .customerEmail(
-                        order.getUser().getEmail()
-                )
-                .deliveryAddress(
-                        order.getDeliveryAddress()
-                )
+            inventoryRepository.save(inventory);
 
-                .customerNote(
-                        order.getCustomerNote()
-                )
-                .items(
-                        order.getItems()
-                                .stream()
-                                .map(item ->
+            return;
+        }
 
-                                        OrderItemResponse.builder()
+        /*
+         * ==========================
+         * PACK
+         * ==========================
+         */
+        if (cartItem.getBundle() != null) {
 
-                                                .id(item.getId())
+            ProductBundle bundle =
+                    cartItem.getBundle();
 
-                                                .productName(
-                                                        item.getProduct()
-                                                                .getName()
-                                                )
+            List<BundleItem> bundleItems =
+                    bundleItemRepository
+                            .findByBundleId(
+                                    bundle.getId()
+                            );
 
-                                                .quantity(
-                                                        item.getQuantity()
-                                                )
+            if (bundleItems.isEmpty()) {
 
-                                                .price(
-                                                        item.getPrice()
-                                                )
+                throw new RuntimeException(
+                        "Le pack "
+                                + bundle.getName()
+                                + " ne contient aucun produit"
+                );
+            }
 
+            /*
+             * Première étape :
+             * vérifier TOUT le stock avant
+             * de modifier quoi que ce soit.
+             */
+            for (BundleItem bundleItem : bundleItems) {
 
-                                                .build()
+                Product product =
+                        bundleItem.getProduct();
 
-
+                Inventory inventory =
+                        inventoryRepository
+                                .findByProductId(
+                                        product.getId()
                                 )
+                                .orElseThrow(
+                                        () -> new RuntimeException(
+                                                "Stock introuvable pour "
+                                                        + product.getName()
+                                        )
+                                );
 
-                                .toList()
-                )
+                int requiredQuantity =
+                        bundleItem.getQuantity()
+                                * cartItem.getQuantity();
 
-                .build();
+                if (inventory.getQuantity()
+                        < requiredQuantity) {
 
+                    throw new RuntimeException(
+                            "Stock insuffisant pour "
+                                    + product.getName()
+                                    + " dans le pack "
+                                    + bundle.getName()
+                    );
+                }
+            }
 
+            /*
+             * Deuxième étape :
+             * décrémenter les stocks.
+             */
+            for (BundleItem bundleItem : bundleItems) {
 
-        return response;
+                Product product =
+                        bundleItem.getProduct();
 
+                Inventory inventory =
+                        inventoryRepository
+                                .findByProductId(
+                                        product.getId()
+                                )
+                                .orElseThrow(
+                                        () -> new RuntimeException(
+                                                "Stock introuvable pour "
+                                                        + product.getName()
+                                        )
+                                );
+
+                int requiredQuantity =
+                        bundleItem.getQuantity()
+                                * cartItem.getQuantity();
+
+                inventory.setQuantity(
+                        inventory.getQuantity()
+                                - requiredQuantity
+                );
+
+                inventoryRepository.save(inventory);
+            }
+
+            return;
+        }
+
+        /*
+         * ==========================
+         * ARTICLE INVALIDE
+         * ==========================
+         */
+        throw new RuntimeException(
+                "Article du panier invalide"
+        );
     }
 
+    private OrderResponse map(
+            Order order
+    ) {
 
-    private User getUserByEmail(String email) {
+        OrderResponse response =
+                OrderResponse.builder()
+
+                        .id(order.getId())
+
+                        .status(
+                                order.getStatus().name()
+                        )
+
+                        .totalAmount(
+                                order.getTotalAmount()
+                        )
+
+                        .createdAt(
+                                order.getCreatedAt()
+                        )
+
+                        .customerName(
+                                order.getUser().getFirstName()
+                                        + " "
+                                        + order.getUser().getLastName()
+                        )
+
+                        .customerPhone(
+                                order.getUser().getPhone()
+                        )
+
+                        .customerEmail(
+                                order.getUser().getEmail()
+                        )
+
+                        .deliveryAddress(
+                                order.getDeliveryAddress()
+                        )
+
+                        .customerNote(
+                                order.getCustomerNote()
+                        )
+
+                        .items(
+                                order.getItems()
+                                        .stream()
+                                        .map(this::mapOrderItem)
+                                        .toList()
+                        )
+
+                        .build();
+
+        return response;
+    }
+
+    private OrderItemResponse mapOrderItem(
+            OrderItem item
+    ) {
+
+        /*
+         * Ligne = PRODUIT
+         */
+        if (item.getProduct() != null) {
+
+            Product product =
+                    item.getProduct();
+
+            return OrderItemResponse.builder()
+
+                    .id(item.getId())
+
+                    .productId(
+                            product.getId()
+                    )
+
+                    .productName(
+                            product.getName()
+                    )
+
+                    .bundleId(null)
+
+                    .bundleName(null)
+
+                    .quantity(
+                            item.getQuantity()
+                    )
+
+                    .price(
+                            item.getPrice()
+                    )
+
+                    .build();
+        }
+
+        /*
+         * Ligne = PACK
+         */
+        if (item.getBundle() != null) {
+
+            ProductBundle bundle =
+                    item.getBundle();
+
+            return OrderItemResponse.builder()
+
+                    .id(item.getId())
+
+                    .productId(null)
+
+                    .productName(null)
+
+                    .bundleId(
+                            bundle.getId()
+                    )
+
+                    .bundleName(
+                            bundle.getName()
+                    )
+
+                    .quantity(
+                            item.getQuantity()
+                    )
+
+                    .price(
+                            item.getPrice()
+                    )
+
+                    .build();
+        }
+
+        throw new RuntimeException(
+                "Ligne de commande invalide"
+        );
+    }
+
+    private User getUserByEmail(
+            String email
+    ) {
 
         return userRepository.findByEmail(email)
                 .orElseThrow(
@@ -278,7 +483,8 @@ public class OrderService {
             CreateOrderRequest request
     ) {
 
-        User user = getUserByEmail(email);
+        User user =
+                getUserByEmail(email);
 
         return createOrder(
                 user.getId(),
@@ -290,39 +496,38 @@ public class OrderService {
             String email
     ) {
 
-        User user = getUserByEmail(email);
+        User user =
+                getUserByEmail(email);
 
         return findMyOrders(
                 user.getId()
         );
     }
 
-    public List<OrderResponse> findMyOrders(Long userId){
-
+    public List<OrderResponse> findMyOrders(
+            Long userId
+    ) {
 
         return orderRepository
                 .findByUserId(userId)
                 .stream()
                 .map(this::map)
                 .toList();
-
     }
 
-    public List<OrderResponse> findAllOrders(){
-
+    public List<OrderResponse> findAllOrders() {
 
         return orderRepository
                 .findAllByOrderByCreatedAtDesc()
                 .stream()
                 .map(this::map)
                 .toList();
-
     }
 
     public OrderResponse updateStatus(
             Long orderId,
             String status
-    ){
+    ) {
 
         Order order =
                 orderRepository.findById(orderId)
@@ -332,54 +537,12 @@ public class OrderService {
                                 )
                         );
 
-
         order.setStatus(
                 OrderStatus.valueOf(status)
         );
 
-
         orderRepository.save(order);
 
-
         return map(order);
-
     }
-
-    private void checkAndUpdateStock(CartItem cartItem){
-
-
-        Inventory inventory =
-                inventoryRepository
-                        .findByProductId(
-                                cartItem.getProduct().getId()
-                        )
-                        .orElseThrow(
-                                () -> new RuntimeException(
-                                        "Stock introuvable pour "
-                                                + cartItem.getProduct().getName()
-                                )
-                        );
-
-
-        if(inventory.getQuantity() < cartItem.getQuantity()){
-
-            throw new RuntimeException(
-                    "Stock insuffisant pour "
-                            + cartItem.getProduct().getName()
-            );
-
-        }
-
-
-        inventory.setQuantity(
-                inventory.getQuantity()
-                        -
-                        cartItem.getQuantity()
-        );
-
-
-        inventoryRepository.save(inventory);
-
-    }
-
 }

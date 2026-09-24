@@ -44,6 +44,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/companies/**")
                 .permitAll()
 
+                 .requestMatchers("/api/bundles/**")
+                 .permitAll()
+
                 .requestMatchers("/api/inventory/**")
                 .hasRole("ADMIN")
 

@@ -537,19 +537,45 @@
 
                                 <div>
 
+                                    <!-- TYPE -->
+
+                                    <span
+                                            *ngIf="isBundle(item)"
+                                            class="mb-1 inline-flex rounded-full
+                       bg-blue-100 px-2 py-1
+                       text-xs font-semibold
+                       text-blue-700"
+                                    >
+                📦 Pack
+            </span>
+
+                                    <span
+                                            *ngIf="!isBundle(item)"
+                                            class="mb-1 inline-flex rounded-full
+                       bg-gray-100 px-2 py-1
+                       text-xs font-semibold
+                       text-gray-700"
+                                    >
+                Produit
+            </span>
+
+                                    <!-- NOM -->
+
                                     <p
                                             class="font-medium
-                                                   text-gray-900
-                                                   dark:text-white"
+                       text-gray-900
+                       dark:text-white"
                                     >
 
-                                        {{ item.productName }}
+                                        {{ getItemName(item) }}
 
                                     </p>
 
+                                    <!-- QUANTITÉ -->
+
                                     <p
                                             class="text-sm
-                                                   text-gray-500"
+                       text-gray-500"
                                     >
 
                                         {{ item.quantity }}
@@ -561,15 +587,17 @@
                                 </div>
 
 
+                                <!-- SOUS-TOTAL -->
+
                                 <span
                                         class="font-semibold
-                                               text-gray-900
-                                               dark:text-white"
+                   text-gray-900
+                   dark:text-white"
                                 >
 
-                                    {{ formatPrice(item.subtotal) }}
+            {{ formatPrice(item.subtotal) }}
 
-                                </span>
+        </span>
 
                             </div>
 

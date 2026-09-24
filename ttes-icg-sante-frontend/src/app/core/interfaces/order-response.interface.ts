@@ -2,7 +2,13 @@ export interface OrderItemResponse {
 
     id: number;
 
-    productName: string;
+    productId?: number;
+
+    productName?: string;
+
+    bundleId?: number;
+
+    bundleName?: string;
 
     quantity: number;
 
@@ -27,11 +33,11 @@ export interface OrderResponse {
 
     deliveryAddress: string;
 
-    customerNote: string;
+    customerNote?: string;
 
-    whatsappLink: string;
+    whatsappLink?: string;
 
-    createdAt: string;
+    createdAt?: string;
 
     items: OrderItemResponse[];
 

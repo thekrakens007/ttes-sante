@@ -1,0 +1,231 @@
+<div class="p-6">
+
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+
+        <div>
+            <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
+                Gestion des packs
+            </h1>
+
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Gérez les packs disponibles dans la boutique.
+            </p>
+        </div>
+
+        <a
+                routerLink="/admin/bundles/new"
+                class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+        >
+            + Nouveau pack
+        </a>
+
+    </div>
+
+    <!-- Chargement -->
+    <div
+            *ngIf="loading"
+            class="flex justify-center py-12"
+    >
+        <p class="text-gray-500 dark:text-gray-400">
+            Chargement des packs...
+        </p>
+    </div>
+
+    <!-- Erreur -->
+    <div
+            *ngIf="!loading && error"
+            class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400"
+    >
+        {{ error }}
+
+        <button
+                type="button"
+                (click)="loadBundles()"
+                class="ml-3 font-medium underline"
+        >
+            Réessayer
+        </button>
+    </div>
+
+    <!-- Tableau -->
+    <div
+            *ngIf="!loading && !error"
+            class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
+    >
+
+        <div class="overflow-x-auto">
+
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+
+                <thead class="bg-gray-50 dark:bg-gray-800/50">
+
+                <tr>
+
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Pack
+                    </th>
+
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Prix
+                    </th>
+
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Produits
+                    </th>
+
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Stock
+                    </th>
+
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Statut
+                    </th>
+
+                    <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Actions
+                    </th>
+
+                </tr>
+
+                </thead>
+
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+
+                <tr
+                        *ngFor="let bundle of bundles"
+                        class="hover:bg-gray-50 dark:hover:bg-white/[0.02]"
+                >
+
+                    <!-- Pack -->
+                    <td class="px-6 py-4">
+
+                        <div class="flex items-center gap-3">
+
+                            <div
+                                    class="h-12 w-12 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800"
+                            >
+
+                                <img
+                                        *ngIf="getMainImage(bundle)"
+                                        [src]="getMainImage(bundle)"
+                                        [alt]="bundle.name"
+                                        class="h-full w-full object-cover"
+                                />
+
+                                <div
+                                        *ngIf="!getMainImage(bundle)"
+                                        class="flex h-full w-full items-center justify-center text-xs text-gray-400"
+                                >
+                                    Aucune
+                                </div>
+
+                            </div>
+
+                            <div>
+
+                                <div class="font-medium text-gray-900 dark:text-white">
+                                    {{ bundle.name }}
+                                </div>
+
+                                <div class="text-xs text-gray-500">
+                                    ID : {{ bundle.id }}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </td>
+
+                    <!-- Prix -->
+                    <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                        {{ formatPrice(bundle.price) }}
+                    </td>
+
+                    <!-- Produits -->
+                    <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                        {{ bundle.items?.length || 0 }}
+                    </td>
+
+                    <!-- Stock -->
+                    <td class="px-6 py-4">
+
+                            <span
+                                    [ngClass]="{
+                                    'text-red-600': bundle.stock <= 0,
+                                    'text-orange-600': bundle.stock > 0 && bundle.stock <= 5,
+                                    'text-green-600': bundle.stock > 5
+                                }"
+                                    class="font-medium"
+                            >
+                                {{ bundle.stock }}
+                            </span>
+
+                    </td>
+
+                    <!-- Statut -->
+                    <td class="px-6 py-4">
+
+                            <span
+                                    *ngIf="bundle.active"
+                                    class="inline-flex rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700"
+                            >
+                                Actif
+                            </span>
+
+                        <span
+                                *ngIf="!bundle.active"
+                                class="inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600"
+                        >
+                                Inactif
+                            </span>
+
+                    </td>
+
+                    <!-- Actions -->
+                    <td class="px-6 py-4 text-right">
+
+                        <div class="flex justify-end gap-2">
+
+                            <a
+                                    [routerLink]="['/admin/bundles/edit', bundle.id]"
+                                    class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300"
+                            >
+                                Modifier
+                            </a>
+
+                            <button
+                                    type="button"
+                                    (click)="deleteBundle(bundle)"
+                                    class="rounded-lg border border-red-300 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
+                            >
+                                Supprimer
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                <!-- Aucun pack -->
+                <tr *ngIf="bundles.length === 0">
+
+                    <td
+                            colspan="6"
+                            class="px-6 py-12 text-center text-gray-500"
+                    >
+                        Aucun pack enregistré.
+                    </td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>

@@ -283,7 +283,9 @@ export class OrdersComponent implements OnInit {
 
         if (order.items.length === 1) {
 
-            return order.items[0].productName;
+            return order.items[0].bundleName
+                ?? order.items[0].productName
+                ?? 'Article';
 
         }
 
@@ -314,7 +316,9 @@ export class OrdersComponent implements OnInit {
         }
 
         if (order.items.length === 1) {
-            return order.items[0].productName;
+            return order.items[0].bundleName
+                ?? order.items[0].productName
+                ?? 'Article';
         }
 
         return `${order.items[0].productName} + ${

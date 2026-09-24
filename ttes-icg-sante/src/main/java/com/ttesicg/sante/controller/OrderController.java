@@ -20,7 +20,6 @@ public class OrderController {
 
     private final OrderService orderService;
 
-
     /**
      * Passer ma commande
      */
@@ -35,7 +34,6 @@ public class OrderController {
                 request
         );
     }
-
 
     /**
      * Voir mes commandes

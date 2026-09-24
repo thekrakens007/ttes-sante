@@ -21,6 +21,7 @@ import { CalenderComponent } from './pages/calender/calender.component';
 import {authGuard} from "./core/guards/auth.guard";
 import {UsersComponent} from "./pages/users/users.component";
 import {ProductsComponent} from "./pages/products/products.component";
+import {ProductsListComponent} from "./pages/shop/products/products-list.component";
 import {CreateProductComponent} from "./pages/admin/products/product-form/create-product.component";
 import {CategoryFormPageComponent} from "./pages/categories/category-form-page.component";
 import {CategoriesComponent} from "./pages/categories/categories.component";
@@ -47,6 +48,10 @@ import {ForgotPasswordComponent} from "./pages/auth-pages/forgot-password/forgot
 import {ResetPasswordComponent} from "./pages/auth-pages/reset-password/reset-password.component";
 import {VerifyEmailComponent} from "./pages/auth-pages/verify-email/verify-email.component";
 import {SignupSuccessComponent} from "./shared/components/auth/signup-success/signup-success.component";
+import {BundleListComponent} from "./pages/shop/bundles/bundle-list/bundle-list.component";
+import {BundleDetailComponent} from "./pages/shop/bundles/bundle-detail/bundle-detail.component";
+import {BundleFormComponent} from "./pages/admin/ bundles/bundle-form/bundle-form.component";
+import {BundlesComponent} from "./pages/admin/ bundles/bundles.component";
 
 export const routes: Routes = [
   // =====================================================
@@ -75,6 +80,11 @@ export const routes: Routes = [
   {
     path: 'products/:id',
     component: ProductDetailComponent
+  },
+  {
+    path: 'products',
+    component: ProductsListComponent,
+    title: 'Liste des produits'
   },
   {
     path: 'checkout',
@@ -115,6 +125,17 @@ export const routes: Routes = [
     canActivate: [authGuard],
     title: 'Mes commandes'
   },
+  {
+    path: 'bundles',
+    component: BundleListComponent,
+    title: 'Nos packs'
+  },
+
+  {
+    path: 'bundles/:id',
+    component: BundleDetailComponent,
+    title: 'Détail du pack'
+  },
 
   {
     path: 'admin',
@@ -144,6 +165,11 @@ export const routes: Routes = [
         component: InventoryEditComponent,
         title: 'Modifier le stock'
       },
+        {
+            path: 'products',
+            component: ProductsComponent,
+            title: 'Gestion des produits'
+        },
       {
         path: 'categories',
         component: CategoriesComponent,
@@ -197,13 +223,30 @@ export const routes: Routes = [
       },
       {
         path: 'products',
-        component: ProductsComponent,
+        component: ProductsListComponent,
         title: 'Gestion des produits'
       },
       {
         path: 'users',
         component: UsersComponent,
         title: 'Gestion des utilisateurs'
+      },
+      {
+        path: 'bundles',
+        component: BundlesComponent,
+        title: 'Gestion des packs'
+      },
+
+      {
+        path: 'bundles/new',
+        component: BundleFormComponent,
+        title: 'Nouveau pack'
+      },
+
+      {
+        path: 'bundles/edit/:id',
+        component: BundleFormComponent,
+        title: 'Modifier le pack'
       },
       {
         path:'calendar',

@@ -46,6 +46,7 @@ export class AppSidebarComponent {
   </svg>`,
       subItems: [
         { name: "Produits", path: "/admin/products" },
+        { name: "Packs", path: "/admin/bundles" },
         { name: "Catégories", path: "/admin/categories" },
         { name: "Entreprises", path: "/admin/companies" },
         { name: "Domaines thérapeutiques", path: "/admin/therapeutic-areas" }

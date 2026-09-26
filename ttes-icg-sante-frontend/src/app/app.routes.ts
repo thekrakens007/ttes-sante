@@ -148,7 +148,7 @@ export const routes: Routes = [
         component: EcommerceComponent,
         pathMatch: 'full',
         title:
-          'Angular Ecommerce Dashboard | TailAdmin - Angular Admin Dashboard Template',
+          'TTES-ICG-SANTE Ecommerce | Dashboard',
       },
       {
         path: 'orders',

@@ -24,7 +24,10 @@ public class CorsConfig {
                         "http://192.168.164.113:4200",
 
                         // Production Render
-                        "https://ttes-icg-sante.onrender.com"
+                        "https://ttes-icg-sante.onrender.com",
+
+                        // Production lws
+                        "https://ttes-icg-sante.com"
                 )
         );
 

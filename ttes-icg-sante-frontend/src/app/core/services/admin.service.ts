@@ -37,22 +37,21 @@ export class AdminService {
     }
 
     getProductsPaginated(
-        page: number = 0,
-        size: number = 8
-    ): Observable<ProductPage> {
+    page: number = 0,
+    size: number = 8
+): Observable<ProductPage> {
 
-        return this.http.get<ProductPage>(
-            '/api/products/paginated',
-            {
-                params: {
-                    page: page.toString(),
-                    size: size.toString()
-                }
+    return this.http.get<ProductPage>(
+        `${this.API_URL}/products/paginated`,
+        {
+            params: {
+                page: page.toString(),
+                size: size.toString()
             }
-        );
+        }
+    );
 
-    }
-
+}
     getProductImages(productId: number) {
         return this.http.get<ProductImageResponse[]>(
             `${this.API_URL}/products/${productId}/images`

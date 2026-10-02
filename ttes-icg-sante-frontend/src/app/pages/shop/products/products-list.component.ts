@@ -572,18 +572,28 @@ applyLocalFilters(): void {
 
     resetFilters(): void {
 
-        this.searchTerm = '';
+    const hadSearch =
+        this.searchTerm.trim().length > 0;
 
-        this.selectedCategory = '';
+    this.searchTerm = '';
 
-        this.selectedCompany = '';
+    this.selectedCategory = '';
+    this.selectedCompany = '';
+    this.selectedTherapeuticArea = '';
 
-        this.selectedTherapeuticArea = '';
+    this.currentPage = 0;
+
+    if (hadSearch) {
+
+        this.loadProducts();
+
+    } else {
 
         this.filteredProducts = [
             ...this.products
         ];
     }
+}
 
 
     // ============================================================

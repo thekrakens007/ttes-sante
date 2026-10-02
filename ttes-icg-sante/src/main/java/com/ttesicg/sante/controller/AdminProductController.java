@@ -98,4 +98,29 @@ public class AdminProductController {
 
         return ResponseEntity.noContent().build();
     }
+
+    /**
+ * Recherche paginée des produits pour l'administration
+ */
+@GetMapping("/search")
+public Page<ProductResponse> searchProducts(
+        @RequestParam String keyword,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "8") int size
+) {
+
+    Pageable pageable = PageRequest.of(
+            page,
+            size,
+            Sort.by(
+                    Sort.Direction.DESC,
+                    "createdAt"
+            )
+    );
+
+    return productService.searchProductsPaginated(
+            keyword,
+            pageable
+    );
+}
 }

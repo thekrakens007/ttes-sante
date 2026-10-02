@@ -6,6 +6,7 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 import { BadgeComponent } from '../../ui/badge/badge.component';
 import { AdminService } from '../../../../core/services/admin.service';
@@ -15,6 +16,7 @@ import { Product } from '../../../../core/models/product.model';
     selector: 'app-product-table',
     imports: [
         CommonModule,
+        FormsModule,
         BadgeComponent,
         RouterModule
     ],

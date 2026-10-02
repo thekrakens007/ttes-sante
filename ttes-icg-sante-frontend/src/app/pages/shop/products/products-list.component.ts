@@ -321,87 +321,79 @@ export class ProductsListComponent implements OnInit {
     // PRODUCTS
     // ============================================================
 
-    loadProducts(): void {
+loadProducts(): void {
 
-        this.loading = true;
+    this.loading = true;
+    this.error = '';
 
-        this.error = '';
+    const keyword = this.searchTerm.trim();
 
-        this.productService
-            .getProductsPaginated(
-                this.currentPage,
-                this.pageSize
-            )
-            .subscribe({
+    const request$ = keyword
+        ? this.productService.searchProductsPaginated(
+            keyword,
+            this.currentPage,
+            this.pageSize
+        )
+        : this.productService.getProductsPaginated(
+            this.currentPage,
+            this.pageSize
+        );
 
-                next: (response) => {
+    request$.subscribe({
 
-                    // Produits disponibles uniquement
-                    this.products = (
-                        response.content ?? []
-                    ).filter(
-                        product =>
-                            product.stock > 0
-                    );
+        next: (response) => {
 
+            /*
+             * Le backend client retourne déjà uniquement
+             * les produits actifs et disponibles.
+             */
+            this.products = response.content ?? [];
 
-                    // Pagination
-                    this.totalPages =
-                        response.totalPages ?? 0;
+            this.totalPages =
+                response.totalPages ?? 0;
 
-                    this.totalElements =
-                        response.totalElements ?? 0;
+            this.totalElements =
+                response.totalElements ?? 0;
 
-
-                    this.pages = Array.from(
-                        {
-                            length: this.totalPages
-                        },
-                        (_, index) => index
-                    );
-
-
-                    // Filtres
-                    this.buildFilters();
-
-
-                    // Produits filtrés
-                    this.filteredProducts = [
-                        ...this.products
-                    ];
-
-
-                    this.search();
-
-
-                    this.loading = false;
+            this.pages = Array.from(
+                {
+                    length: this.totalPages
                 },
+                (_, index) => index
+            );
 
-                error: (error) => {
+            /*
+             * Les filtres catégorie / entreprise /
+             * domaine restent des filtres locaux.
+             */
+            this.buildFilters();
 
-                    console.error(
-                        'Erreur lors du chargement des produits',
-                        error
-                    );
+            this.applyLocalFilters();
 
-                    this.products = [];
+            this.loading = false;
+        },
 
-                    this.filteredProducts = [];
+        error: (error) => {
 
-                    this.totalPages = 0;
+            console.error(
+                'Erreur lors du chargement des produits',
+                error
+            );
 
-                    this.totalElements = 0;
+            this.products = [];
+            this.filteredProducts = [];
 
-                    this.pages = [];
+            this.totalPages = 0;
+            this.totalElements = 0;
+            this.pages = [];
 
-                    this.error =
-                        'Impossible de charger les produits.';
+            this.error =
+                'Impossible de charger les produits.';
 
-                    this.loading = false;
-                }
-            });
-    }
-
+            this.loading = false;
+        }
+    });
+}
 
     // ============================================================
     // PAGINATION
@@ -533,99 +525,47 @@ export class ProductsListComponent implements OnInit {
     // SEARCH + FILTERS
     // ============================================================
 
-    search(): void {
+    submitSearch(): void {
 
-        const term =
-            this.searchTerm
-                .trim()
-                .toLowerCase();
+    this.currentPage = 0;
 
+    this.loadProducts();
 
-        this.filteredProducts =
-            this.products.filter(
-                product => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
 
-                    // ----------------------------
-                    // Recherche
-                    // ----------------------------
+applyLocalFilters(): void {
 
-                    const matchesSearch =
-                        !term ||
+    this.filteredProducts =
+        this.products.filter(product => {
 
-                        product.name
-                            ?.toLowerCase()
-                            .includes(term) ||
+            const matchesCategory =
+                !this.selectedCategory ||
+                product.categories?.includes(
+                    this.selectedCategory
+                );
 
-                        product.brand
-                            ?.toLowerCase()
-                            .includes(term) ||
+            const matchesCompany =
+                !this.selectedCompany ||
+                product.companyName ===
+                this.selectedCompany;
 
-                        product.description
-                            ?.toLowerCase()
-                            .includes(term) ||
+            const matchesTherapeuticArea =
+                !this.selectedTherapeuticArea ||
+                product.therapeuticAreas?.includes(
+                    this.selectedTherapeuticArea
+                );
 
-                        product.categories?.some(
-                            category =>
-                                category
-                                    .toLowerCase()
-                                    .includes(term)
-                        ) ||
-
-                        product.companyName
-                            ?.toLowerCase()
-                            .includes(term) ||
-
-                        product.therapeuticAreas?.some(
-                            area =>
-                                area
-                                    .toLowerCase()
-                                    .includes(term)
-                        );
-
-
-                    // ----------------------------
-                    // Catégorie
-                    // ----------------------------
-
-                    const matchesCategory =
-                        !this.selectedCategory ||
-                        product.categories?.includes(
-                            this.selectedCategory
-                        );
-
-
-                    // ----------------------------
-                    // Entreprise
-                    // ----------------------------
-
-                    const matchesCompany =
-                        !this.selectedCompany ||
-                        product.companyName ===
-                        this.selectedCompany;
-
-
-                    // ----------------------------
-                    // Domaine thérapeutique
-                    // ----------------------------
-
-                    const matchesTherapeuticArea =
-                        !this.selectedTherapeuticArea ||
-                        product.therapeuticAreas?.includes(
-                            this.selectedTherapeuticArea
-                        );
-
-
-                    return (
-                        matchesSearch &&
-                        matchesCategory &&
-                        matchesCompany &&
-                        matchesTherapeuticArea
-                    );
-                }
+            return (
+                matchesCategory &&
+                matchesCompany &&
+                matchesTherapeuticArea
             );
-    }
-
-
+        });
+}
     // ============================================================
     // RESET FILTERS
     // ============================================================

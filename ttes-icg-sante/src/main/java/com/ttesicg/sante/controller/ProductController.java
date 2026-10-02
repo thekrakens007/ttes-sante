@@ -27,17 +27,26 @@ public class ProductController {
     }
 
 
-    @GetMapping("/paginated")
-    public Page<ProductResponse> getProductsPaginated(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size
-    ) {
+    
+@GetMapping("/paginated")
+public Page<ProductResponse> getProductsPaginated(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "8") int size
+) {
 
-        Pageable pageable = PageRequest.of(page, size);
+    Pageable pageable = PageRequest.of(
+            page,
+            size,
+            Sort.by(
+                    Sort.Direction.DESC,
+                    "createdAt"
+            )
+    );
 
-        return productService.getProductsPaginated(pageable);
-    }
-
+    return productService.getAvailableProductsPaginated(
+            pageable
+    );
+}
     @GetMapping("/{id}")
     public ProductResponse getProductById(@PathVariable Long id) {
         return productService.getProductById(id);

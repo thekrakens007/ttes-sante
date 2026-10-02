@@ -66,6 +66,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                 OR LOWER(COALESCE(p.company.name, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
             )
         """)
+    @Query("""
+    SELECT p
+    FROM Product p
+    WHERE p.active = true
+      AND p.inventory.quantity > 0
+    """)
+Page<Product> findAvailableProducts(Pageable pageable);
+    
     Page<Product> searchAvailableProducts(
             @Param("keyword") String keyword,
             Pageable pageable

@@ -54,6 +54,15 @@ public class ProductService {
         return map(product);
     }
 
+    public Page<ProductResponse> getAvailableProductsPaginated(
+        Pageable pageable
+) {
+
+    return productRepository
+            .findAvailableProducts(pageable)
+            .map(this::map);
+}
+
     public Page<ProductResponse> getProductsPaginated(Pageable pageable) {
         return productRepository
                 .findAll(pageable)

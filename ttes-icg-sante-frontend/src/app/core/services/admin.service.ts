@@ -121,7 +121,23 @@ export class AdminService {
         );
 
     }
+searchProductsPaginated(
+    keyword: string,
+    page: number = 0,
+    size: number = 8
+): Observable<ProductPage> {
 
+    return this.http.get<ProductPage>(
+        `${this.API_URL}/products/search`,
+        {
+            params: {
+                keyword: keyword.trim(),
+                page: page.toString(),
+                size: size.toString()
+            }
+        }
+    );
+}
 
     deleteUser(id: number): Observable<void> {
 

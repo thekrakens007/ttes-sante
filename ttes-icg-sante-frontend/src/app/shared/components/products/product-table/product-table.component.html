@@ -22,7 +22,52 @@
         </div>
 
         <div class="flex items-center gap-3">
+<!-- RECHERCHE -->
 
+            <form
+                (ngSubmit)="submitSearch()"
+                class="relative w-full sm:w-80"
+            >
+
+                <input
+                    type="search"
+                    name="productSearch"
+                    [(ngModel)]="searchTerm"
+                    placeholder="Rechercher un produit..."
+                    autocomplete="off"
+                    class="h-11 w-full rounded-xl
+                           border border-gray-300
+                           bg-white px-4 pr-12
+                           text-sm text-gray-800
+                           outline-none transition
+                           placeholder:text-gray-400
+                           focus:border-brand-500
+                           focus:ring-4
+                           focus:ring-brand-500/10
+                           dark:border-gray-700
+                           dark:bg-gray-800
+                           dark:text-white"
+                />
+
+                <button
+                    type="submit"
+                    [disabled]="loading"
+                    aria-label="Rechercher"
+                    class="absolute right-1.5 top-1/2
+                           flex h-8 w-8
+                           -translate-y-1/2
+                           items-center
+                           justify-center
+                           rounded-lg
+                           text-lg
+                           hover:bg-gray-100
+                           disabled:opacity-50
+                           dark:hover:bg-gray-700"
+                >
+                    🔍
+                </button>
+
+            </form>
             <!-- Nombre de produits -->
             @if (!loading && !errorMessage) {
             <span

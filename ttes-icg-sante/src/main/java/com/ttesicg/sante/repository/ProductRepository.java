@@ -76,4 +76,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCompanyId(Long companyId);
 
     List<Product> findByActiveTrue();
+
+    List<Product> findByNameContainingIgnoreCase(String name);
 }

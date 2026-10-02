@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -43,12 +44,26 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public List<ProductResponse> searchProducts(
-            @RequestParam String name
-    ) {
-        return productService.searchProducts(name);
-    }
+public Page<ProductResponse> searchProducts(
+        @RequestParam String keyword,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "8") int size
+) {
 
+    Pageable pageable = PageRequest.of(
+            page,
+            size,
+            Sort.by(
+                    Sort.Direction.DESC,
+                    "createdAt"
+            )
+    );
+
+    return productService.searchAvailableProductsPaginated(
+            keyword,
+            pageable
+    );
+}
     @GetMapping("/company/{companyId}")
     public List<ProductResponse> getProductsByCompany(
             @PathVariable Long companyId

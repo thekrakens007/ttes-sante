@@ -664,7 +664,40 @@ public class ProductService {
 
         productRepository.delete(product);
     }
+// =====================================================
+// SEARCH CLIENT - PAGINATED
+// =====================================================
 
+public Page<ProductResponse> searchAvailableProductsPaginated(
+        String keyword,
+        Pageable pageable
+) {
+
+    return productRepository
+            .searchAvailableProducts(
+                    keyword.trim(),
+                    pageable
+            )
+            .map(this::map);
+}
+
+
+// =====================================================
+// SEARCH ADMIN - PAGINATED
+// =====================================================
+
+public Page<ProductResponse> searchProductsPaginated(
+        String keyword,
+        Pageable pageable
+) {
+
+    return productRepository
+            .searchProducts(
+                    keyword.trim(),
+                    pageable
+            )
+            .map(this::map);
+}
 
     // =====================================================
     // DELETE PRODUCT

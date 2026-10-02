@@ -20,13 +20,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
      * =========================================================
      * RECHERCHE ADMIN
      * =========================================================
-     *
-     * Recherche dans :
-     * - nom
-     * - SKU
-     * - marque
-     * - principe actif
-     * - entreprise
      */
     @Query("""
         SELECT p
@@ -45,12 +38,21 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     /*
      * =========================================================
+     * PRODUITS DISPONIBLES
+     * =========================================================
+     */
+    @Query("""
+        SELECT p
+        FROM Product p
+        WHERE p.active = true
+          AND p.inventory.quantity > 0
+        """)
+    Page<Product> findAvailableProducts(Pageable pageable);
+
+    /*
+     * =========================================================
      * RECHERCHE CLIENT
      * =========================================================
-     *
-     * On ne retourne que :
-     * - les produits actifs
-     * - avec un stock > 0
      */
     @Query("""
         SELECT p
@@ -66,14 +68,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                 OR LOWER(COALESCE(p.company.name, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
             )
         """)
-    @Query("""
-    SELECT p
-    FROM Product p
-    WHERE p.active = true
-      AND p.inventory.quantity > 0
-    """)
-Page<Product> findAvailableProducts(Pageable pageable);
-    
     Page<Product> searchAvailableProducts(
             @Param("keyword") String keyword,
             Pageable pageable

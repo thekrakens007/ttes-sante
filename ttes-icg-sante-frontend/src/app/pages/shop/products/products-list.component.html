@@ -299,36 +299,52 @@
 
                 <div class="relative">
 
-                    <input
-                            type="text"
-                            [(ngModel)]="searchTerm"
-                            [ngModelOptions]="{standalone: true}"
-                            (ngModelChange)="search()"
-                            placeholder="Rechercher un produit..."
-                            class="h-11 w-full rounded-xl
-                               border border-gray-200
-                               bg-gray-50 px-4 pr-12
-                               text-sm text-gray-800
-                               outline-none transition
-                               placeholder:text-gray-400
-                               focus:border-green-600
-                               focus:bg-white
-                               focus:ring-4
-                               focus:ring-green-600/10
-                               dark:border-gray-700
-                               dark:bg-gray-800
-                               dark:text-white
-                               dark:placeholder:text-gray-500
-                               dark:focus:border-green-500">
+                   <form
+    (ngSubmit)="submitSearch()"
+    class="relative"
+>
+    <input
+        type="search"
+        name="search"
+        [(ngModel)]="searchTerm"
+        placeholder="Rechercher un produit..."
+        autocomplete="off"
+        class="h-11 w-full rounded-xl
+               border border-gray-200
+               bg-gray-50 px-4 pr-14
+               text-sm text-gray-800
+               outline-none transition
+               placeholder:text-gray-400
+               focus:border-green-600
+               focus:bg-white
+               focus:ring-4
+               focus:ring-green-600/10
+               dark:border-gray-700
+               dark:bg-gray-800
+               dark:text-white
+               dark:placeholder:text-gray-500
+               dark:focus:border-green-500"
+    />
 
-                    <span
-                            class="pointer-events-none absolute right-4
-                               top-1/2 -translate-y-1/2 text-lg">
-
-                        🔍
-
-                    </span>
-
+    <button
+        type="submit"
+        aria-label="Rechercher"
+        [disabled]="loading"
+        class="absolute right-1.5 top-1/2
+               flex h-8 w-8
+               -translate-y-1/2
+               items-center justify-center
+               rounded-lg
+               text-lg
+               transition
+               hover:bg-green-100
+               disabled:cursor-not-allowed
+               disabled:opacity-50
+               dark:hover:bg-green-900/30"
+    >
+        🔍
+    </button>
+</form>
                 </div>
 
             </div>
@@ -599,7 +615,7 @@
                         <select
                                 [(ngModel)]="selectedCategory"
                                 [ngModelOptions]="{standalone: true}"
-                                (ngModelChange)="search()"
+                                (ngModelChange)="applyLocalFilters()"
                                 class="h-11 w-full rounded-xl
                                    border border-gray-200
                                    bg-gray-50 px-4
@@ -649,7 +665,7 @@
                         <select
                                 [(ngModel)]="selectedCompany"
                                 [ngModelOptions]="{standalone: true}"
-                                (ngModelChange)="search()"
+                                (ngModelChange)="applyLocalFilters()"
                                 class="h-11 w-full rounded-xl
                                    border border-gray-200
                                    bg-gray-50 px-4
@@ -699,7 +715,7 @@
                         <select
                                 [(ngModel)]="selectedTherapeuticArea"
                                 [ngModelOptions]="{standalone: true}"
-                                (ngModelChange)="search()"
+                                (ngModelChange)="applyLocalFilters()"
                                 class="h-11 w-full rounded-xl
                                    border border-gray-200
                                    bg-gray-50 px-4

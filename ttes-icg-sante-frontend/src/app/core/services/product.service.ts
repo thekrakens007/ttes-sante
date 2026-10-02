@@ -31,6 +31,39 @@ export class ProductService {
         );
     }
 
+    getProductsPaginated(
+    page: number = 0,
+    size: number = 8
+): Observable<ProductPage> {
+
+    const params = new HttpParams()
+        .set('page', page)
+        .set('size', size);
+
+    return this.http.get<ProductPage>(
+        `${this.API_URL}/paginated`,
+        { params }
+    );
+}
+
+
+searchProductsPaginated(
+    keyword: string,
+    page: number = 0,
+    size: number = 8
+): Observable<ProductPage> {
+
+    const params = new HttpParams()
+        .set('keyword', keyword.trim())
+        .set('page', page)
+        .set('size', size);
+
+    return this.http.get<ProductPage>(
+        `${this.API_URL}/search`,
+        { params }
+    );
+}
+
     getProduct(productId: number): Observable<Product> {
         return this.http.get<Product>(
             `${this.API_URL}/${productId}`

@@ -38,6 +38,8 @@ export class ProductTableComponent implements OnInit {
 
     errorMessage = '';
 
+    searchTerm = '';
+
     // =========================
     // PAGINATION
     // =========================
@@ -66,54 +68,72 @@ export class ProductTableComponent implements OnInit {
 
     loadProducts(): void {
 
-        this.loading = true;
+    this.loading = true;
+    this.errorMessage = '';
 
-        this.errorMessage = '';
+    const keyword =
+        this.searchTerm.trim();
 
-        this.adminService
-            .getProductsPaginated(
-                this.currentPage,
-                this.pageSize
-            )
-            .subscribe({
+    const request$ = keyword
+        ? this.adminService.searchProductsPaginated(
+            keyword,
+            this.currentPage,
+            this.pageSize
+        )
+        : this.adminService.getProductsPaginated(
+            this.currentPage,
+            this.pageSize
+        );
 
-                next: (response) => {
+    request$.subscribe({
 
-                    this.products = response.content;
+        next: (response) => {
 
-                    this.totalPages = response.totalPages;
+            this.products =
+                response.content ?? [];
 
-                    this.totalElements = response.totalElements;
+            this.totalPages =
+                response.totalPages ?? 0;
 
-                    this.pages = Array.from(
-                        {
-                            length: this.totalPages
-                        },
-                        (_, index) => index
-                    );
+            this.totalElements =
+                response.totalElements ?? 0;
 
-                    this.loading = false;
-
+            this.pages = Array.from(
+                {
+                    length: this.totalPages
                 },
+                (_, index) => index
+            );
 
-                error: (error) => {
+            this.loading = false;
+        },
 
-                    console.error(
-                        'Erreur lors du chargement des produits:',
-                        error
-                    );
+        error: (error) => {
 
-                    this.errorMessage =
-                        'Impossible de charger les produits.';
+            console.error(
+                'Erreur lors du chargement des produits',
+                error
+            );
 
-                    this.loading = false;
+            this.products = [];
+            this.totalPages = 0;
+            this.totalElements = 0;
+            this.pages = [];
 
-                }
+            this.errorMessage =
+                'Impossible de charger les produits.';
 
-            });
+            this.loading = false;
+        }
+    });
+}
 
-    }
+    submitSearch(): void {
 
+    this.currentPage = 0;
+
+    this.loadProducts();
+}
     // =========================
     // REFRESH
     // =========================

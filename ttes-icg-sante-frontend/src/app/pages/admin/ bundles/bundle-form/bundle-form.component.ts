@@ -23,7 +23,6 @@ import {
 
 import { BundleService } from '../../../../core/services/bundle.service';
 import { ProductService } from '../../../../core/services/product.service';
-
 import { Product } from '../../../../core/models/product.model';
 
 
@@ -34,8 +33,9 @@ interface BundleFormItem {
 
 
 interface BundleFormImage {
-    url: string;
-    altText?: string;
+    imageUrl: string;
+    main: boolean;
+    displayOrder: number;
 }
 
 
@@ -134,14 +134,13 @@ export class BundleFormComponent implements OnInit {
 
     ngOnInit(): void {
 
-        const id = this.route.snapshot.paramMap.get('id');
+        const id =
+            this.route.snapshot.paramMap.get('id');
 
 
-        /*
-         * ========================================================
-         * MODE MODIFICATION
-         * ========================================================
-         */
+        // --------------------------------------------------------
+        // MODE MODIFICATION
+        // --------------------------------------------------------
 
         if (id) {
 
@@ -152,51 +151,45 @@ export class BundleFormComponent implements OnInit {
         }
 
 
-        /*
-         * ========================================================
-         * MODE CREATION
-         * ========================================================
-         *
-         * Si on arrive depuis la liste des produits :
-         *
-         * /admin/bundles/new?productIds=1&productIds=5&productIds=8
-         *
-         * alors les produits sont automatiquement ajoutés.
-         */
+        // --------------------------------------------------------
+        // MODE CREATION
+        // --------------------------------------------------------
 
         else {
 
-            const productIds = this.route
-                .snapshot
-                .queryParamMap
-                .getAll('productIds')
-                .map(value => Number(value))
-                .filter(
-                    productId =>
-                        Number.isInteger(productId) &&
-                        productId > 0
-                );
+            const productIds =
+                this.route
+                    .snapshot
+                    .queryParamMap
+                    .getAll('productIds')
+                    .map(value => Number(value))
+                    .filter(
+                        productId =>
+                            Number.isInteger(productId) &&
+                            productId > 0
+                    );
 
 
-            this.initializeSelectedProducts(productIds);
+            this.initializeSelectedProducts(
+                productIds
+            );
 
         }
 
 
-        // Charger la liste des produits
+        // Charger les produits
         this.loadProducts();
 
 
-        /*
-         * En mode modification, charger le pack existant.
-         */
-
+        // Charger le pack en modification
         if (
             this.isEditMode &&
             this.bundleId
         ) {
 
-            this.loadBundle(this.bundleId);
+            this.loadBundle(
+                this.bundleId
+            );
 
         }
 
@@ -204,33 +197,23 @@ export class BundleFormComponent implements OnInit {
 
 
     // ============================================================
-    // INITIALISATION DES PRODUITS SELECTIONNES
+    // INITIALISATION PRODUITS SELECTIONNES
     // ============================================================
 
     private initializeSelectedProducts(
         productIds: number[]
     ): void {
 
-        /*
-         * Set pour éviter les doublons.
-         */
-
         const uniqueIds = [
             ...new Set(productIds)
         ];
 
 
-        /*
-         * Chaque produit sélectionné depuis la liste
-         * arrive avec une quantité de 1.
-         */
-
-        this.selectedItems = uniqueIds.map(
-            productId => ({
+        this.selectedItems =
+            uniqueIds.map(productId => ({
                 productId,
                 quantity: 1
-            })
-        );
+            }));
 
     }
 
@@ -243,31 +226,34 @@ export class BundleFormComponent implements OnInit {
 
         this.loading = true;
 
-        this.productService.getProducts().subscribe({
+        this.productService
+            .getProducts()
+            .subscribe({
 
-            next: (products: Product[]) => {
+                next: (products: Product[]) => {
 
-                this.products = products ?? [];
+                    this.products =
+                        products ?? [];
 
-                this.loading = false;
+                    this.loading = false;
 
-            },
+                },
 
-            error: (error) => {
+                error: (error) => {
 
-                console.error(
-                    'Erreur chargement produits :',
-                    error
-                );
+                    console.error(
+                        'Erreur chargement produits :',
+                        error
+                    );
 
-                this.error =
-                    'Impossible de charger les produits.';
+                    this.error =
+                        'Impossible de charger les produits.';
 
-                this.loading = false;
+                    this.loading = false;
 
-            }
+                }
 
-        });
+            });
 
     }
 
@@ -280,31 +266,33 @@ export class BundleFormComponent implements OnInit {
 
         this.loading = true;
 
-        this.bundleService.getAdminBundle(id).subscribe({
+        this.bundleService
+            .getAdminBundle(id)
+            .subscribe({
 
-            next: (bundle: any) => {
+                next: (bundle: any) => {
 
-                this.fillForm(bundle);
+                    this.fillForm(bundle);
 
-                this.loading = false;
+                    this.loading = false;
 
-            },
+                },
 
-            error: (error) => {
+                error: (error) => {
 
-                console.error(
-                    'Erreur chargement pack :',
-                    error
-                );
+                    console.error(
+                        'Erreur chargement pack :',
+                        error
+                    );
 
-                this.error =
-                    'Impossible de charger le pack.';
+                    this.error =
+                        'Impossible de charger le pack.';
 
-                this.loading = false;
+                    this.loading = false;
 
-            }
+                }
 
-        });
+            });
 
     }
 
@@ -317,7 +305,8 @@ export class BundleFormComponent implements OnInit {
 
         this.form.patchValue({
 
-            name: bundle.name ?? '',
+            name:
+                bundle.name ?? '',
 
             description:
                 bundle.description ?? '',
@@ -331,13 +320,13 @@ export class BundleFormComponent implements OnInit {
         });
 
 
-        /*
-         * Produits du pack
-         */
+        // --------------------------------------------------------
+        // PRODUITS
+        // --------------------------------------------------------
 
         this.selectedItems =
-            (bundle.items ?? []).map(
-                (item: any) => ({
+            (bundle.items ?? [])
+                .map((item: any) => ({
 
                     productId:
                         item.productId ??
@@ -346,26 +335,40 @@ export class BundleFormComponent implements OnInit {
                     quantity:
                         item.quantity ?? 1
 
-                })
-            );
+                }))
+                .filter(
+                    (item: BundleFormItem) =>
+                        Number.isInteger(
+                            item.productId
+                        ) &&
+                        item.productId > 0
+                );
 
 
-        /*
-         * Images du pack
-         */
+        // --------------------------------------------------------
+        // IMAGES
+        // --------------------------------------------------------
 
         this.images =
-            (bundle.images ?? []).map(
-                (image: any) => ({
+            (bundle.images ?? [])
+                .map(
+                    (image: any, index: number) => ({
 
-                    url:
-                        image.url ?? '',
+                        imageUrl:
+                            image.imageUrl ??
+                            image.url ??
+                            '',
 
-                    altText:
-                        image.altText ?? ''
+                        main:
+                            image.main ??
+                            index === 0,
 
-                })
-            );
+                        displayOrder:
+                            image.displayOrder ??
+                            index
+
+                    })
+                );
 
     }
 
@@ -384,14 +387,11 @@ export class BundleFormComponent implements OnInit {
         }
 
 
-        /*
-         * Vérifier si le produit existe déjà.
-         */
-
         const alreadyExists =
             this.selectedItems.some(
                 item =>
-                    item.productId === this.productToAdd
+                    item.productId ===
+                    this.productToAdd
             );
 
 
@@ -404,10 +404,6 @@ export class BundleFormComponent implements OnInit {
 
         }
 
-
-        /*
-         * Vérifier quantité.
-         */
 
         if (
             !this.quantityToAdd ||
@@ -422,22 +418,18 @@ export class BundleFormComponent implements OnInit {
         }
 
 
-        /*
-         * Ajouter le produit.
-         */
-
         this.selectedItems.push({
 
-            productId: this.productToAdd,
+            productId:
+                this.productToAdd,
 
-            quantity: this.quantityToAdd
+            quantity:
+                Math.floor(
+                    this.quantityToAdd
+                )
 
         });
 
-
-        /*
-         * Reset.
-         */
 
         this.productToAdd = null;
 
@@ -452,9 +444,14 @@ export class BundleFormComponent implements OnInit {
     // SUPPRIMER PRODUIT
     // ============================================================
 
-    removeProduct(index: number): void {
+    removeProduct(
+        index: number
+    ): void {
 
-        this.selectedItems.splice(index, 1);
+        this.selectedItems.splice(
+            index,
+            1
+        );
 
     }
 
@@ -468,16 +465,26 @@ export class BundleFormComponent implements OnInit {
         quantity: number
     ): void {
 
-        if (!Number.isFinite(quantity)) {
+        if (
+            !Number.isFinite(quantity)
+        ) {
             quantity = 1;
         }
 
 
-        quantity = Math.floor(quantity);
+        quantity =
+            Math.floor(quantity);
 
 
         if (quantity < 1) {
             quantity = 1;
+        }
+
+
+        if (
+            !this.selectedItems[index]
+        ) {
+            return;
         }
 
 
@@ -498,6 +505,41 @@ export class BundleFormComponent implements OnInit {
         return this.products.find(
             product =>
                 product.id === productId
+        );
+
+    }
+
+
+    // ============================================================
+    // IMAGE PRINCIPALE DU PRODUIT
+    // ============================================================
+
+    getMainImage(
+        productId: number
+    ): string {
+
+        const product =
+            this.getProduct(productId);
+
+
+        if (
+            !product?.images ||
+            product.images.length === 0
+        ) {
+            return '';
+        }
+
+
+        const mainImage =
+            product.images.find(
+                image => image.main
+            );
+
+
+        return (
+            mainImage?.imageUrl ??
+            product.images[0]?.imageUrl ??
+            ''
         );
 
     }
@@ -544,18 +586,7 @@ export class BundleFormComponent implements OnInit {
         }
 
 
-        /*
-         * Selon ton modèle Product,
-         * le stock peut être directement disponible.
-         */
-
-        const productWithStock =
-            product as Product & {
-                stock?: number;
-            };
-
-
-        return productWithStock.stock ?? null;
+        return product.stock ?? null;
 
     }
 
@@ -568,9 +599,13 @@ export class BundleFormComponent implements OnInit {
 
         this.images.push({
 
-            url: '',
+            imageUrl: '',
 
-            altText: ''
+            main:
+                this.images.length === 0,
+
+            displayOrder:
+                this.images.length
 
         });
 
@@ -581,9 +616,35 @@ export class BundleFormComponent implements OnInit {
     // SUPPRESSION IMAGE
     // ============================================================
 
-    removeImage(index: number): void {
+    removeImage(
+        index: number
+    ): void {
 
-        this.images.splice(index, 1);
+        this.images.splice(
+            index,
+            1
+        );
+
+
+        this.images.forEach(
+            (image, i) => {
+
+                image.displayOrder = i;
+
+            }
+        );
+
+
+        if (
+            this.images.length > 0 &&
+            !this.images.some(
+                image => image.main
+            )
+        ) {
+
+            this.images[0].main = true;
+
+        }
 
     }
 
@@ -597,29 +658,35 @@ export class BundleFormComponent implements OnInit {
         value: string
     ): void {
 
-        if (!this.images[index]) {
+        if (
+            !this.images[index]
+        ) {
             return;
         }
 
-        this.images[index].url = value;
+
+        this.images[index].imageUrl =
+            value;
 
     }
 
 
     // ============================================================
-    // IMAGE ALT
+    // IMAGE PRINCIPALE
     // ============================================================
 
-    updateImageAlt(
-        index: number,
-        value: string
+    setMainImage(
+        index: number
     ): void {
 
-        if (!this.images[index]) {
-            return;
-        }
+        this.images.forEach(
+            (image, i) => {
 
-        this.images[index].altText = value;
+                image.main =
+                    i === index;
+
+            }
+        );
 
     }
 
@@ -631,11 +698,12 @@ export class BundleFormComponent implements OnInit {
     save(): void {
 
         this.error = '';
+
         this.success = '';
 
 
         // --------------------------------------------------------
-        // Validation formulaire
+        // VALIDATION FORMULAIRE
         // --------------------------------------------------------
 
         if (this.form.invalid) {
@@ -651,7 +719,7 @@ export class BundleFormComponent implements OnInit {
 
 
         // --------------------------------------------------------
-        // Vérifier produits
+        // VERIFIER PRODUITS
         // --------------------------------------------------------
 
         if (
@@ -668,13 +736,15 @@ export class BundleFormComponent implements OnInit {
 
 
         // --------------------------------------------------------
-        // Vérifier quantités
+        // VERIFIER QUANTITES
         // --------------------------------------------------------
 
         const invalidQuantity =
             this.selectedItems.some(
                 item =>
-                    !Number.isInteger(item.quantity) ||
+                    !Number.isInteger(
+                        item.quantity
+                    ) ||
                     item.quantity < 1
             );
 
@@ -690,14 +760,14 @@ export class BundleFormComponent implements OnInit {
 
 
         // --------------------------------------------------------
-        // Vérifier images
+        // VERIFIER IMAGES
         // --------------------------------------------------------
 
         const invalidImage =
             this.images.some(
                 image =>
-                    !image.url ||
-                    !image.url.trim()
+                    !image.imageUrl ||
+                    !image.imageUrl.trim()
             );
 
 
@@ -712,7 +782,7 @@ export class BundleFormComponent implements OnInit {
 
 
         // --------------------------------------------------------
-        // Récupérer valeurs
+        // VALEURS FORMULAIRE
         // --------------------------------------------------------
 
         const formValue =
@@ -720,7 +790,7 @@ export class BundleFormComponent implements OnInit {
 
 
         // --------------------------------------------------------
-        // Construire requête
+        // CONSTRUIRE REQUETE
         // --------------------------------------------------------
 
         const request = {
@@ -732,7 +802,9 @@ export class BundleFormComponent implements OnInit {
                 formValue.description?.trim() ?? '',
 
             price:
-                Number(formValue.price ?? 0),
+                Number(
+                    formValue.price ?? 0
+                ),
 
             active:
                 formValue.active ?? true,
@@ -752,13 +824,17 @@ export class BundleFormComponent implements OnInit {
 
             images:
                 this.images.map(
-                    image => ({
+                    (image, index) => ({
 
-                        url:
-                            image.url.trim(),
+                        imageUrl:
+                            image.imageUrl.trim(),
 
-                        altText:
-                            image.altText?.trim() ?? ''
+                        main:
+                            image.main,
+
+                        displayOrder:
+                            image.displayOrder ??
+                            index
 
                     })
                 )
@@ -767,11 +843,15 @@ export class BundleFormComponent implements OnInit {
 
 
         // --------------------------------------------------------
-        // Sauvegarde
+        // SAUVEGARDE
         // --------------------------------------------------------
 
         this.saving = true;
 
+
+        // --------------------------------------------------------
+        // MODIFICATION
+        // --------------------------------------------------------
 
         if (
             this.isEditMode &&
@@ -791,6 +871,7 @@ export class BundleFormComponent implements OnInit {
 
                         this.success =
                             'Pack modifié avec succès.';
+
 
                         setTimeout(() => {
 
@@ -821,6 +902,11 @@ export class BundleFormComponent implements OnInit {
 
         }
 
+
+        // --------------------------------------------------------
+        // CREATION
+        // --------------------------------------------------------
+
         else {
 
             this.bundleService
@@ -833,6 +919,7 @@ export class BundleFormComponent implements OnInit {
 
                         this.success =
                             'Pack créé avec succès.';
+
 
                         setTimeout(() => {
 

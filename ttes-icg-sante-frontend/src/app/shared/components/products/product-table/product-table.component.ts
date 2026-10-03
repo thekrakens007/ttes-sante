@@ -6,11 +6,15 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import {
+    Router,
+    RouterModule
+} from '@angular/router';
 
 import { BadgeComponent } from '../../ui/badge/badge.component';
 import { AdminService } from '../../../../core/services/admin.service';
 import { Product } from '../../../../core/models/product.model';
+
 
 @Component({
     selector: 'app-product-table',
@@ -23,119 +27,189 @@ import { Product } from '../../../../core/models/product.model';
     ],
     templateUrl: './product-table.component.html'
 })
-export class ProductTableComponent implements OnInit {
+export class ProductTableComponent
+    implements OnInit {
 
-    private adminService = inject(AdminService);
-    private router = inject(Router);
+    private adminService =
+        inject(AdminService);
+
+    private router =
+        inject(Router);
+
+
+    // ============================================================
+    // PRODUITS
+    // ============================================================
 
     products: Product[] = [];
 
+
+    // ============================================================
+    // ETAT
+    // ============================================================
+
     loading = true;
+
     errorMessage = '';
+
+
+    // ============================================================
+    // RECHERCHE
+    // ============================================================
 
     searchTerm = '';
 
+
+    // ============================================================
+    // PAGINATION
+    // ============================================================
+
     currentPage = 0;
+
     pageSize = 8;
 
     totalPages = 0;
+
     totalElements = 0;
 
     pages: number[] = [];
 
-    /**
-     * Produits sélectionnés pour créer un pack.
-     *
-     * IMPORTANT :
-     * Cette sélection est indépendante de la page courante.
-     * Donc elle reste conservée lors :
-     * - de la pagination
-     * - d'une recherche
-     * - du changement de page
-     */
-    selectedProductIds = new Set<number>();
+
+    // ============================================================
+    // SELECTION POUR PACK
+    // ============================================================
+
+    selectedProductIds =
+        new Set<number>();
+
+
+    // ============================================================
+    // INIT
+    // ============================================================
 
     ngOnInit(): void {
+
         this.loadProducts();
+
     }
 
-    /**
-     * Nombre de produits actuellement sélectionnés.
-     */
+
+    // ============================================================
+    // NOMBRE PRODUITS SELECTIONNES
+    // ============================================================
+
     get selectedProductCount(): number {
+
         return this.selectedProductIds.size;
+
     }
 
-    /**
-     * Charge les produits.
-     */
+
+    // ============================================================
+    // CHARGEMENT PRODUITS
+    // ============================================================
+
     loadProducts(): void {
+
         this.loading = true;
+
         this.errorMessage = '';
 
-        const keyword = this.searchTerm.trim();
+
+        const keyword =
+            this.searchTerm.trim();
+
 
         const request = keyword
-            ? this.adminService.searchProductsPaginated(
-                keyword,
-                this.currentPage,
-                this.pageSize
-            )
-            : this.adminService.getProductsPaginated(
-                this.currentPage,
-                this.pageSize
-            );
+
+            ? this.adminService
+                .searchProductsPaginated(
+                    keyword,
+                    this.currentPage,
+                    this.pageSize
+                )
+
+            : this.adminService
+                .getProductsPaginated(
+                    this.currentPage,
+                    this.pageSize
+                );
+
 
         request.subscribe({
+
             next: (response: any) => {
 
-                this.products = response.content ?? [];
+                this.products =
+                    response.content ?? [];
 
-                this.totalPages = response.totalPages ?? 0;
-                this.totalElements = response.totalElements ?? 0;
+                this.totalPages =
+                    response.totalPages ?? 0;
+
+                this.totalElements =
+                    response.totalElements ?? 0;
 
                 this.generatePages();
 
                 this.loading = false;
+
             },
 
             error: (error) => {
-                console.error('Erreur chargement produits :', error);
+
+                console.error(
+                    'Erreur chargement produits :',
+                    error
+                );
 
                 this.errorMessage =
                     'Impossible de charger les produits.';
 
                 this.products = [];
+
                 this.loading = false;
+
             }
+
         });
+
     }
 
-    /**
-     * Génère les numéros de pages.
-     */
+
+    // ============================================================
+    // PAGINATION
+    // ============================================================
+
     generatePages(): void {
+
         this.pages = [];
 
-        for (let i = 0; i < this.totalPages; i++) {
+        for (
+            let i = 0;
+            i < this.totalPages;
+            i++
+        ) {
+
             this.pages.push(i);
+
         }
+
     }
 
-    /**
-     * Recherche.
-     *
-     * La sélection des produits n'est volontairement PAS vidée ici.
-     */
+
     submitSearch(): void {
+
         this.currentPage = 0;
+
         this.loadProducts();
+
     }
 
-    /**
-     * Aller directement à une page.
-     */
-    goToPage(page: number): void {
+
+    goToPage(
+        page: number
+    ): void {
+
         if (
             page < 0 ||
             page >= this.totalPages ||
@@ -144,69 +218,107 @@ export class ProductTableComponent implements OnInit {
             return;
         }
 
+
         this.currentPage = page;
+
         this.loadProducts();
+
     }
 
-    /**
-     * Page précédente.
-     */
+
     previousPage(): void {
-        if (this.currentPage > 0) {
+
+        if (
+            this.currentPage > 0
+        ) {
+
             this.currentPage--;
+
             this.loadProducts();
+
         }
+
     }
 
-    /**
-     * Page suivante.
-     */
+
     nextPage(): void {
-        if (this.currentPage < this.totalPages - 1) {
+
+        if (
+            this.currentPage <
+            this.totalPages - 1
+        ) {
+
             this.currentPage++;
+
             this.loadProducts();
+
         }
+
     }
 
-    /**
-     * Sélectionner / désélectionner un produit.
-     */
-    toggleProductSelection(productId: number): void {
 
-        if (this.selectedProductIds.has(productId)) {
-            this.selectedProductIds.delete(productId);
-        } else {
-            this.selectedProductIds.add(productId);
+    // ============================================================
+    // SELECTION
+    // ============================================================
+
+    toggleProductSelection(
+        productId: number
+    ): void {
+
+        if (
+            this.selectedProductIds
+                .has(productId)
+        ) {
+
+            this.selectedProductIds
+                .delete(productId);
+
         }
+        else {
+
+            this.selectedProductIds
+                .add(productId);
+
+        }
+
     }
 
-    /**
-     * Vérifie si un produit est sélectionné.
-     */
-    isProductSelected(productId: number): boolean {
-        return this.selectedProductIds.has(productId);
+
+    isProductSelected(
+        productId: number
+    ): boolean {
+
+        return this.selectedProductIds
+            .has(productId);
+
     }
 
-    /**
-     * Vide complètement la sélection.
-     */
+
     clearProductSelection(): void {
+
         this.selectedProductIds.clear();
+
     }
 
-    /**
-     * Envoie les produits sélectionnés vers le formulaire
-     * de création du pack.
-     */
+
+    // ============================================================
+    // CREATION PACK
+    // ============================================================
+
     continueToBundleCreation(): void {
 
-        const productIds = Array.from(
-            this.selectedProductIds
-        );
+        const productIds =
+            Array.from(
+                this.selectedProductIds
+            );
 
-        if (productIds.length === 0) {
+
+        if (
+            productIds.length === 0
+        ) {
             return;
         }
+
 
         this.router.navigate(
             ['/admin/bundles/new'],
@@ -216,38 +328,139 @@ export class ProductTableComponent implements OnInit {
                 }
             }
         );
+
     }
 
-    /**
-     * Supprimer un produit.
-     */
-    deleteProduct(productId: number): void {
 
-        if (!confirm(
-            'Êtes-vous sûr de vouloir supprimer ce produit ?'
-        )) {
-            return;
+    // ============================================================
+    // IMAGE PRINCIPALE
+    // ============================================================
+
+    getMainImage(
+        product: Product
+    ): string {
+
+        if (
+            !product.images ||
+            product.images.length === 0
+        ) {
+
+            return '';
+
         }
 
-        this.adminService.deleteProduct(productId).subscribe({
-            next: () => {
 
-                // Si le produit était sélectionné,
-                // on le retire également de la sélection.
-                this.selectedProductIds.delete(productId);
+        const mainImage =
+            product.images.find(
+                image => image.main
+            );
 
-                this.loadProducts();
-            },
 
-            error: (error) => {
-                console.error(
-                    'Erreur suppression produit :',
-                    error
-                );
+        return (
+            mainImage?.imageUrl ??
+            product.images[0]?.imageUrl ??
+            ''
+        );
 
-                this.errorMessage =
-                    'Impossible de supprimer le produit.';
-            }
-        });
     }
+
+
+    // ============================================================
+    // STOCK
+    // ============================================================
+
+    getStockColor(
+        stock: number
+    ): 'success' | 'warning' | 'error' {
+
+        if (stock <= 0) {
+
+            return 'error';
+
+        }
+
+
+        if (stock < 10) {
+
+            return 'warning';
+
+        }
+
+
+        return 'success';
+
+    }
+
+
+    getStockLabel(
+        stock: number
+    ): string {
+
+        if (stock <= 0) {
+
+            return 'Rupture';
+
+        }
+
+
+        if (stock < 10) {
+
+            return 'Stock faible';
+
+        }
+
+
+        return 'En stock';
+
+    }
+
+
+    // ============================================================
+    // SUPPRESSION PRODUIT
+    // ============================================================
+
+    deleteProduct(
+        productId: number
+    ): void {
+
+        if (
+            !confirm(
+                'Êtes-vous sûr de vouloir supprimer ce produit ?'
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        this.adminService
+            .deleteProduct(productId)
+            .subscribe({
+
+                next: () => {
+
+                    this.selectedProductIds
+                        .delete(productId);
+
+                    this.loadProducts();
+
+                },
+
+                error: (error) => {
+
+                    console.error(
+                        'Erreur suppression produit :',
+                        error
+                    );
+
+                    this.errorMessage =
+                        'Impossible de supprimer le produit.';
+
+                }
+
+            });
+
+    }
+
 }

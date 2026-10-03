@@ -11,9 +11,7 @@
         <div>
 
             <h1 class="text-2xl font-bold text-gray-900">
-
                 {{ isEditMode ? 'Modifier le pack' : 'Créer un pack' }}
-
             </h1>
 
             <p class="mt-1 text-sm text-gray-500">
@@ -75,6 +73,33 @@
 
 
     <!-- ========================================================= -->
+    <!-- LOADING -->
+    <!-- ========================================================= -->
+
+    @if (loading) {
+
+        <div
+            class="flex min-h-[200px] items-center justify-center rounded-xl border border-gray-200 bg-white"
+        >
+
+            <div class="text-center">
+
+                <div
+                    class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-brand-600"
+                ></div>
+
+                <p class="mt-3 text-sm text-gray-500">
+                    Chargement...
+                </p>
+
+            </div>
+
+        </div>
+
+    }
+
+
+    <!-- ========================================================= -->
     <!-- FORMULAIRE -->
     <!-- ========================================================= -->
 
@@ -101,7 +126,9 @@
             </p>
 
 
-            <div class="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div
+                class="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2"
+            >
 
                 <!-- NOM -->
 
@@ -230,7 +257,7 @@
 
 
         <!-- ===================================================== -->
-        <!-- PRODUITS SELECTIONNES -->
+        <!-- PRODUITS -->
         <!-- ===================================================== -->
 
         <div
@@ -268,11 +295,12 @@
             </div>
 
 
-            <!-- ================================================= -->
-            <!-- MESSAGE SELECTION DEPUIS PRODUITS -->
-            <!-- ================================================= -->
+            <!-- MESSAGE SELECTION -->
 
-            @if (!isEditMode && selectedItems.length > 0) {
+            @if (
+                !isEditMode &&
+                selectedItems.length > 0
+            ) {
 
                 <div
                     class="mt-5 rounded-lg border border-blue-100 bg-blue-50 p-4"
@@ -287,19 +315,23 @@
                             viewBox="0 0 24 24"
                             stroke="currentColor"
                         >
+
                             <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                                 stroke-width="2"
                                 d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"
                             />
+
                         </svg>
 
                         <p class="text-sm text-blue-800">
+
                             Les produits affichés ci-dessous ont été
                             sélectionnés depuis la liste des produits.
                             Vous pouvez maintenant définir les quantités
                             nécessaires pour le pack.
+
                         </p>
 
                     </div>
@@ -310,7 +342,7 @@
 
 
             <!-- ================================================= -->
-            <!-- AJOUT MANUEL D'UN PRODUIT -->
+            <!-- AJOUT MANUEL -->
             <!-- ================================================= -->
 
             <div
@@ -323,11 +355,10 @@
                     Ajouter un autre produit
                 </h3>
 
+
                 <div
                     class="mt-3 grid grid-cols-1 gap-3 md:grid-cols-[1fr_150px_auto]"
                 >
-
-                    <!-- PRODUIT -->
 
                     <select
                         [(ngModel)]="productToAdd"
@@ -355,8 +386,6 @@
                     </select>
 
 
-                    <!-- QUANTITE -->
-
                     <input
                         type="number"
                         min="1"
@@ -366,8 +395,6 @@
                         class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
                     />
 
-
-                    <!-- BOUTON -->
 
                     <button
                         type="button"
@@ -383,7 +410,7 @@
 
 
             <!-- ================================================= -->
-            <!-- LISTE DES PRODUITS SELECTIONNES -->
+            <!-- LISTE PRODUITS -->
             <!-- ================================================= -->
 
             @if (selectedItems.length > 0) {
@@ -402,14 +429,18 @@
 
                             <!-- INFO PRODUIT -->
 
-                            <div class="flex min-w-0 flex-1 items-center gap-4">
+                            <div
+                                class="flex min-w-0 flex-1 items-center gap-4"
+                            >
 
-                                @if (getProduct(item.productId)?.imageUrl) {
+                                @if (
+                                    getMainImage(item.productId)
+                                ) {
 
                                     <img
-                                        [src]="getProduct(item.productId)?.imageUrl"
+                                        [src]="getMainImage(item.productId)"
                                         [alt]="getProductName(item.productId)"
-                                        class="h-14 w-14 rounded-lg object-cover"
+                                        class="h-14 w-14 flex-shrink-0 rounded-lg object-cover"
                                     />
 
                                 }
@@ -426,12 +457,14 @@
                                             viewBox="0 0 24 24"
                                             stroke="currentColor"
                                         >
+
                                             <path
                                                 stroke-linecap="round"
                                                 stroke-linejoin="round"
                                                 stroke-width="1.5"
                                                 d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4m4-9h8"
                                             />
+
                                         </svg>
 
                                     </div>
@@ -452,6 +485,7 @@
                                     >
                                         Produit #{{ item.productId }}
                                     </p>
+
 
                                     @if (
                                         getProductStock(item.productId) !== null
@@ -591,7 +625,7 @@
                         >
 
                             <div
-                                class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_1fr_auto]"
+                                class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto_auto]"
                             >
 
                                 <!-- URL -->
@@ -606,7 +640,7 @@
 
                                     <input
                                         type="url"
-                                        [value]="image.url"
+                                        [value]="image.imageUrl"
                                         (input)="
                                             updateImageUrl(
                                                 i,
@@ -620,37 +654,34 @@
                                 </div>
 
 
-                                <!-- ALT -->
+                                <!-- IMAGE PRINCIPALE -->
 
-                                <div>
+                                <div class="flex items-end">
 
                                     <label
-                                        class="mb-2 block text-xs font-medium text-gray-600"
+                                        class="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-300 px-4 py-3 text-sm"
                                     >
-                                        Texte alternatif
-                                    </label>
 
-                                    <input
-                                        type="text"
-                                        [value]="image.altText ?? ''"
-                                        (input)="
-                                            updateImageAlt(
-                                                i,
-                                                $any($event.target).value
-                                            )
-                                        "
-                                        placeholder="Image du pack"
-                                        class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
-                                    />
+                                        <input
+                                            type="radio"
+                                            name="mainBundleImage"
+                                            [checked]="image.main"
+                                            (change)="setMainImage(i)"
+                                            class="h-4 w-4"
+                                        />
+
+                                        <span>
+                                            Image principale
+                                        </span>
+
+                                    </label>
 
                                 </div>
 
 
                                 <!-- DELETE -->
 
-                                <div
-                                    class="flex items-end"
-                                >
+                                <div class="flex items-end">
 
                                     <button
                                         type="button"
@@ -665,13 +696,15 @@
                             </div>
 
 
-                            @if (image.url) {
+                            <!-- PREVIEW -->
+
+                            @if (image.imageUrl) {
 
                                 <div class="mt-4">
 
                                     <img
-                                        [src]="image.url"
-                                        [alt]="image.altText || 'Aperçu'"
+                                        [src]="image.imageUrl"
+                                        alt="Aperçu du pack"
                                         class="h-32 w-full rounded-lg object-cover"
                                     />
 

@@ -1,793 +1,487 @@
+<div class="space-y-6">
 
-<div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-
-    <!-- ========================= -->
+    <!-- ========================================================= -->
     <!-- HEADER -->
-    <!-- ========================= -->
+    <!-- ========================================================= -->
+
     <div
-            class="flex flex-col gap-4 border-b border-gray-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800"
+        class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
     >
+
         <div>
-            <h2
-                    class="text-xl font-semibold text-gray-800 dark:text-white/90"
-            >
+            <h2 class="text-xl font-semibold text-gray-900">
                 Produits
             </h2>
 
-            <p
-                    class="mt-1 text-sm text-gray-500 dark:text-gray-400"
-            >
-                Gestion des produits de la pharmacie
-            </p>
-        </div>
+            <div class="mt-1 flex flex-wrap items-center gap-2">
 
-        <div class="flex items-center gap-3">
-<!-- RECHERCHE -->
-
-            <form
-                (ngSubmit)="submitSearch()"
-                class="relative w-full sm:w-80"
-            >
-
-                <input
-                    type="search"
-                    name="productSearch"
-                    [(ngModel)]="searchTerm"
-                    placeholder="Rechercher un produit..."
-                    autocomplete="off"
-                    class="h-11 w-full rounded-xl
-                           border border-gray-300
-                           bg-white px-4 pr-12
-                           text-sm text-gray-800
-                           outline-none transition
-                           placeholder:text-gray-400
-                           focus:border-brand-500
-                           focus:ring-4
-                           focus:ring-brand-500/10
-                           dark:border-gray-700
-                           dark:bg-gray-800
-                           dark:text-white"
-                />
-
-                <button
-                    type="submit"
-                    [disabled]="loading"
-                    aria-label="Rechercher"
-                    class="absolute right-1.5 top-1/2
-                           flex h-8 w-8
-                           -translate-y-1/2
-                           items-center
-                           justify-center
-                           rounded-lg
-                           text-lg
-                           hover:bg-gray-100
-                           disabled:opacity-50
-                           dark:hover:bg-gray-700"
-                >
-                    🔍
-                </button>
-
-            </form>
-            <!-- Nombre de produits -->
-            @if (!loading && !errorMessage) {
-            <span
-                    class="text-sm text-gray-500 dark:text-gray-400"
-            >
+                <p class="text-sm text-gray-500">
                     {{ totalElements }} produit(s)
-                </span>
-            }
-
-            <!-- Bouton actualiser -->
-            <button
-                    type="button"
-                    (click)="refreshProducts()"
-                    [disabled]="loading"
-                    class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-            >
-                <svg
-                        class="h-4 w-4"
-                        [class.animate-spin]="loading"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                            d="M4 4V9H9"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                    />
-
-                    <path
-                            d="M20 20V15H15"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                    />
-
-                    <path
-                            d="M20.49 9C19.5 5.53 16.26 3 12.43 3C8.58 3 5.31 5.55 4.34 9"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                    />
-
-                    <path
-                            d="M3.51 15C4.5 18.47 7.74 21 11.57 21C15.42 21 18.69 18.45 19.66 15"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                    />
-                </svg>
-
-                Actualiser
-            </button>
-        </div>
-    </div>
-
-
-    <!-- ========================= -->
-    <!-- LOADING -->
-    <!-- ========================= -->
-    @if (loading) {
-
-    <div
-            class="grid grid-cols-1 gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-    >
-
-        @for (item of [1,2,3,4,5,6,7,8]; track item) {
-
-        <div
-                class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
-        >
-
-            <!-- Image skeleton -->
-            <div
-                    class="h-52 animate-pulse bg-gray-200 dark:bg-gray-800"
-            ></div>
-
-            <div class="space-y-4 p-5">
-
-                <!-- Name -->
-                <div
-                        class="h-5 w-3/4 animate-pulse rounded bg-gray-200 dark:bg-gray-800"
-                ></div>
-
-                <!-- Brand -->
-                <div
-                        class="h-4 w-1/2 animate-pulse rounded bg-gray-200 dark:bg-gray-800"
-                ></div>
-
-                <!-- Price -->
-                <div
-                        class="h-6 w-1/3 animate-pulse rounded bg-gray-200 dark:bg-gray-800"
-                ></div>
-
-                <!-- Infos -->
-                <div class="space-y-2">
-                    <div
-                            class="h-4 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-800"
-                    ></div>
-
-                    <div
-                            class="h-4 w-2/3 animate-pulse rounded bg-gray-200 dark:bg-gray-800"
-                    ></div>
-                </div>
-
-                <!-- Buttons -->
-                <div class="flex gap-2 pt-2">
-                    <div
-                            class="h-10 flex-1 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-800"
-                    ></div>
-
-                    <div
-                            class="h-10 w-10 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-800"
-                    ></div>
-                </div>
-
-            </div>
-        </div>
-        }
-
-    </div>
-    }
-
-
-    <!-- ========================= -->
-    <!-- ERROR -->
-    <!-- ========================= -->
-    @if (!loading && errorMessage) {
-
-    <div class="px-6 py-16 text-center">
-
-        <div
-                class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400"
-        >
-            <svg
-                    class="h-8 w-8"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-            >
-                <path
-                        d="M12 9V13"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                />
-
-                <path
-                        d="M12 17H12.01"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                />
-
-                <path
-                        d="M10.29 3.86L1.82 18C1.64 18.31 1.55 18.67 1.55 19.04C1.55 20.13 2.43 21 3.52 21H20.48C21.57 21 22.45 20.13 22.45 19.04C22.45 18.67 22.36 18.31 22.18 18L13.71 3.86C13.54 3.57 13.28 3.33 12.97 3.17C12.66 3.01 12.32 2.93 12 2.93C11.68 2.93 11.34 3.01 11.03 3.17C10.72 3.33 10.46 3.57 10.29 3.86Z"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linejoin="round"
-                />
-            </svg>
-        </div>
-
-        <h3
-                class="mt-4 text-lg font-semibold text-gray-800 dark:text-white"
-        >
-            Une erreur est survenue
-        </h3>
-
-        <p
-                class="mt-2 text-sm text-gray-500 dark:text-gray-400"
-        >
-            {{ errorMessage }}
-        </p>
-
-        <button
-                type="button"
-                (click)="refreshProducts()"
-                class="mt-6 inline-flex items-center justify-center rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600"
-        >
-            Réessayer
-        </button>
-
-    </div>
-    }
-
-
-    <!-- ========================= -->
-    <!-- EMPTY -->
-    <!-- ========================= -->
-    @if (
-    !loading &&
-    !errorMessage &&
-    products.length === 0
-    ) {
-
-    <div class="px-6 py-16 text-center">
-
-        <div
-                class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
-        >
-            <svg
-                    class="h-8 w-8"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-            >
-                <path
-                        d="M3 7L5 3H19L21 7"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                />
-
-                <path
-                        d="M3 7V20C3 20.55 3.45 21 4 21H20C20.55 21 21 20.55 21 20V7"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linejoin="round"
-                />
-
-                <path
-                        d="M3 7H21"
-                        stroke="currentColor"
-                        stroke-width="2"
-                />
-
-                <path
-                        d="M9 11H15"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                />
-            </svg>
-        </div>
-
-        <h3
-                class="mt-4 text-lg font-semibold text-gray-800 dark:text-white"
-        >
-            Aucun produit
-        </h3>
-
-        <p
-                class="mt-2 text-sm text-gray-500 dark:text-gray-400"
-        >
-            Aucun produit n'est disponible pour le moment.
-        </p>
-
-    </div>
-    }
-
-
-    <!-- ========================= -->
-    <!-- PRODUCTS GRID -->
-    <!-- ========================= -->
-    @if (
-    !loading &&
-    !errorMessage &&
-    products.length > 0
-    ) {
-
-    <div
-            class="grid grid-cols-1 gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-    >
-
-        @for (
-        product of products;
-        track product.id
-        ) {
-
-        <div
-                class="group flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900"
-        >
-
-            <!-- ================= -->
-            <!-- PRODUCT IMAGE -->
-            <!-- ================= -->
-            <div
-                    class="relative h-52 overflow-hidden bg-gray-100 dark:bg-gray-800"
-            >
-
-                <img
-                        [src]="getMainImage(product)"
-                        [alt]="product.name"
-                        class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                />
-
-                <!-- Stock badge -->
-                <div class="absolute right-3 top-3">
-                    <app-badge
-                            [color]="getStockColor(product.stock)"
-                    >
-                        {{ getStockLabel(product.stock) }}
-                    </app-badge>
-                </div>
-
-            </div>
-
-
-            <!-- ================= -->
-            <!-- PRODUCT CONTENT -->
-            <!-- ================= -->
-            <div class="flex flex-1 flex-col p-5">
-
-                <!-- Name -->
-                <h3
-                        class="line-clamp-2 text-base font-semibold text-gray-800 dark:text-white"
-                        [title]="product.name"
-                >
-                    {{ product.name }}
-                </h3>
-
-                <!-- Brand -->
-                @if (product.brand) {
-                <p
-                        class="mt-1 text-sm text-gray-500 dark:text-gray-400"
-                >
-                    {{ product.brand }}
                 </p>
-                }
 
-
-                <!-- ================= -->
-                <!-- PRICES -->
-                <!-- ================= -->
-                <div class="mt-4 space-y-1">
-
-                    <!-- Prix de vente -->
-                    <div>
-        <span class="text-xl font-bold text-brand-500">
-            {{ product.price | number:'1.0-0' }} F
-        </span>
-                        <span class="ml-1 text-xs text-gray-500 dark:text-gray-400">
-            Prix de vente
-        </span>
-                    </div>
-
-                    <!-- Prix d'achat - administration uniquement -->
-                    <div class="flex items-center gap-2">
-        <span class="text-sm font-medium text-gray-600 dark:text-gray-300">
-            Prix d'achat :
-        </span>
-
-                        @if (
-                        product.purchasePrice !== null &&
-                        product.purchasePrice !== undefined
-                        ) {
-                        <span class="text-sm font-semibold text-orange-600 dark:text-orange-400">
-                {{ product.purchasePrice | number:'1.0-0' }} F
-            </span>
-                        } @else {
-                        <span class="text-sm italic text-gray-400">
-                Non renseigné
-            </span>
-                        }
-                    </div>
-
-                </div>
-
-
-                <!-- ================= -->
-                <!-- INFORMATIONS -->
-                <!-- ================= -->
-                <div
-                        class="mt-4 space-y-3 border-t border-gray-100 pt-4 dark:border-gray-800"
-                >
-
-                    <!-- SKU -->
-                    @if (product.sku) {
-                    <div
-                            class="flex items-center justify-between gap-3"
-                    >
-                                    <span
-                                            class="text-xs font-medium uppercase tracking-wide text-gray-400"
-                                    >
-                                        SKU
-                                    </span>
-
-                        <span
-                                class="truncate text-sm font-medium text-gray-700 dark:text-gray-300"
-                                [title]="product.sku"
-                        >
-                                        {{ product.sku }}
-                                    </span>
-                    </div>
-                    }
-
-
-                    <!-- Stock -->
-                    <div
-                            class="flex items-center justify-between gap-3"
-                    >
-                                <span
-                                        class="text-xs font-medium uppercase tracking-wide text-gray-400"
-                                >
-                                    Stock
-                                </span>
-
-                        <span
-                                class="text-sm font-semibold"
-                                [class.text-red-600]="product.stock <= 0"
-                                [class.text-orange-500]="product.stock > 0 && product.stock <= 10"
-                                [class.text-green-600]="product.stock > 10"
-                        >
-                                    {{ product.stock }}
-                                </span>
-                    </div>
-
-                </div>
-
-
-                <!-- ================= -->
-                <!-- CATEGORIES -->
-                <!-- ================= -->
-                <div class="mt-4">
-
-                    <p
-                            class="mb-2 text-xs font-medium uppercase tracking-wide text-gray-400"
-                    >
-                        Catégories
-                    </p>
-
-                    @if (
-                    product.categories &&
-                    product.categories.length > 0
-                    ) {
-
-                    <div class="flex flex-wrap gap-2">
-
-                        @for (
-                        category of product.categories;
-                        track category
-                        ) {
-
-                        <span
-                                class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300"
-                        >
-                                            {{ category }}
-                                        </span>
-
-                        }
-
-                    </div>
-
-                    } @else {
+                @if (selectedProductCount > 0) {
 
                     <span
-                            class="text-sm text-gray-400"
+                        class="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700"
                     >
-                                    Aucune
-                                </span>
-
-                    }
-
-                </div>
-
-
-                <!-- Prescription -->
-                @if (product.requiresPrescription) {
-
-                <div class="mt-4">
-
-                                <span
-                                        class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 dark:bg-red-900/20 dark:text-red-400"
-                                >
-                                    <svg
-                                            class="h-3.5 w-3.5"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                                d="M12 3L21 7V12C21 17.5 17.5 20.5 12 22C6.5 20.5 3 17.5 3 12V7L12 3Z"
-                                                stroke="currentColor"
-                                                stroke-width="2"
-                                                stroke-linejoin="round"
-                                        />
-
-                                        <path
-                                                d="M12 8V12"
-                                                stroke="currentColor"
-                                                stroke-width="2"
-                                                stroke-linecap="round"
-                                        />
-
-                                        <path
-                                                d="M12 16H12.01"
-                                                stroke="currentColor"
-                                                stroke-width="2"
-                                                stroke-linecap="round"
-                                        />
-                                    </svg>
-
-                                    Ordonnance requise
-                                </span>
-
-                </div>
-
+                        {{ selectedProductCount }}
+                        produit(s) sélectionné(s)
+                    </span>
                 }
 
+            </div>
+        </div>
 
-                <!-- ================= -->
-                <!-- ACTIONS -->
-                <!-- ================= -->
-                <div
-                        class="mt-auto flex gap-2 pt-5"
+
+        <!-- ACTIONS -->
+
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+
+            @if (selectedProductCount > 0) {
+
+                <button
+                    type="button"
+                    (click)="continueToBundleCreation()"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
                 >
-
-                    <!-- Modifier -->
-                    <a
-                            [routerLink]="[
-                                    '/admin/products/edit',
-                                    product.id
-                                ]"
-                            class="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600"
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
                     >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 4v16m8-8H4"
+                        />
+                    </svg>
 
-                        <svg
-                                class="h-4 w-4"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                    d="M12 20H21"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                            />
-
-                            <path
-                                    d="M16.5 3.5C17.3284 2.67157 18.6716 2.67157 19.5 3.5C20.3284 4.32843 20.3284 5.67157 19.5 6.5L7 19L3 20L4 16L16.5 3.5Z"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                            />
-                        </svg>
-
-                        Modifier
-
-                    </a>
+                    Créer un pack
+                    ({{ selectedProductCount }})
+                </button>
 
 
-                    <!-- Supprimer -->
-                    <button
-                            type="button"
-                            (click)="deleteProduct(product.id)"
-                            class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-red-200 text-red-600 transition hover:bg-red-50 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-900/20"
-                            title="Supprimer le produit"
-                    >
+                <button
+                    type="button"
+                    (click)="clearProductSelection()"
+                    class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                >
+                    Vider la sélection
+                </button>
 
-                        <svg
-                                class="h-5 w-5"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                    d="M3 6H21"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                            />
+            }
 
-                            <path
-                                    d="M8 6V4C8 3.45 8.45 3 9 3H15C15.55 3 16 3.45 16 4V6"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                            />
+        </div>
 
-                            <path
-                                    d="M19 6L18 21H6L5 6"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linejoin="round"
-                            />
+    </div>
 
-                            <path
-                                    d="M10 11V17"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                            />
 
-                            <path
-                                    d="M14 11V17"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                            />
-                        </svg>
+    <!-- ========================================================= -->
+    <!-- RECHERCHE -->
+    <!-- ========================================================= -->
 
-                    </button>
+    <form
+        (ngSubmit)="submitSearch()"
+        class="flex flex-col gap-3 sm:flex-row"
+    >
 
-                </div>
+        <div class="relative flex-1">
+
+            <input
+                type="text"
+                name="search"
+                [(ngModel)]="searchTerm"
+                placeholder="Rechercher un produit..."
+                class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 pr-12 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+            />
+
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+            </svg>
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="rounded-lg bg-gray-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-gray-800"
+        >
+            Rechercher
+        </button>
+
+    </form>
+
+
+    <!-- ========================================================= -->
+    <!-- ERREUR -->
+    <!-- ========================================================= -->
+
+    @if (errorMessage) {
+
+        <div
+            class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+        >
+            {{ errorMessage }}
+        </div>
+
+    }
+
+
+    <!-- ========================================================= -->
+    <!-- LOADING -->
+    <!-- ========================================================= -->
+
+    @if (loading) {
+
+        <div
+            class="flex min-h-[250px] items-center justify-center rounded-xl border border-gray-200 bg-white"
+        >
+
+            <div class="text-center">
+
+                <div
+                    class="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-brand-500"
+                ></div>
+
+                <p class="mt-3 text-sm text-gray-500">
+                    Chargement des produits...
+                </p>
 
             </div>
 
         </div>
 
-        }
+    }
 
-    </div>
+    @else {
 
+        <!-- ===================================================== -->
+        <!-- EMPTY -->
+        <!-- ===================================================== -->
 
-    <!-- ========================= -->
-    <!-- PAGINATION -->
-    <!-- ========================= -->
-    @if (totalPages > 1) {
+        @if (products.length === 0) {
 
-    <div
-            class="flex flex-col items-center justify-between gap-4 border-t border-gray-200 px-6 py-5 sm:flex-row dark:border-gray-800"
-    >
-
-        <!-- Informations -->
-        <p
-                class="text-sm text-gray-500 dark:text-gray-400"
-        >
-            Page
-            <span
-                    class="font-semibold text-gray-700 dark:text-gray-200"
+            <div
+                class="rounded-xl border border-gray-200 bg-white p-10 text-center"
             >
-                        {{ currentPage + 1 }}
-                    </span>
-            sur
-            <span
-                    class="font-semibold text-gray-700 dark:text-gray-200"
-            >
-                        {{ totalPages }}
-                    </span>
-        </p>
 
-
-        <!-- Pagination buttons -->
-        <div class="flex items-center gap-1">
-
-            <!-- Previous -->
-            <button
-                    type="button"
-                    (click)="previousPage()"
-                    [disabled]="currentPage === 0"
-                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                    title="Page précédente"
-            >
                 <svg
-                        class="h-4 w-4"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="mx-auto h-12 w-12 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                 >
                     <path
-                            d="M15 18L9 12L15 6"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4m4-9h8"
                     />
                 </svg>
-            </button>
 
+                <h3 class="mt-4 text-lg font-semibold text-gray-900">
+                    Aucun produit trouvé
+                </h3>
 
-            <!-- Pages -->
-            @for (
-            page of pages;
-            track page
-            ) {
+                <p class="mt-1 text-sm text-gray-500">
+                    Essayez une autre recherche.
+                </p>
 
-            <button
-                    type="button"
-                    (click)="goToPage(page)"
-                    class="inline-flex h-10 min-w-10 items-center justify-center rounded-lg px-3 text-sm font-medium transition"
-                    [class.bg-brand-500]="currentPage === page"
-                    [class.text-white]="currentPage === page"
-                    [class.text-gray-600]="currentPage !== page"
-                    [class.hover:bg-gray-100]="currentPage !== page"
-                    [class.dark:text-gray-300]="currentPage !== page"
-                    [class.dark:hover:bg-gray-800]="currentPage !== page"
+            </div>
+
+        }
+
+        @else {
+
+            <!-- ================================================= -->
+            <!-- PRODUCT GRID -->
+            <!-- ================================================= -->
+
+            <div
+                class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
             >
-                {{ page + 1 }}
-            </button>
+
+                @for (product of products; track product.id) {
+
+                    <div
+                        class="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                        [class.ring-2]="isProductSelected(product.id)"
+                        [class.ring-blue-500]="isProductSelected(product.id)"
+                    >
+
+                        <!-- ===================================== -->
+                        <!-- IMAGE -->
+                        <!-- ===================================== -->
+
+                        <div
+                            class="relative h-52 overflow-hidden bg-gray-100"
+                        >
+
+                            @if (product.imageUrl) {
+
+                                <img
+                                    [src]="product.imageUrl"
+                                    [alt]="product.name"
+                                    class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                                />
+
+                            }
+
+                            @else {
+
+                                <div
+                                    class="flex h-full items-center justify-center"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-14 w-14 text-gray-300"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="1.5"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-9h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                        />
+                                    </svg>
+                                </div>
+
+                            }
+
+
+                            <!-- ================================= -->
+                            <!-- CHECKBOX SELECTION -->
+                            <!-- ================================= -->
+
+                            <label
+                                class="absolute left-3 top-3 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg bg-white/95 shadow-md backdrop-blur"
+                                [title]="
+                                    isProductSelected(product.id)
+                                        ? 'Retirer du pack'
+                                        : 'Ajouter au pack'
+                                "
+                            >
+
+                                <input
+                                    type="checkbox"
+                                    class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    [checked]="isProductSelected(product.id)"
+                                    (change)="toggleProductSelection(product.id)"
+                                    (click)="$event.stopPropagation()"
+                                />
+
+                            </label>
+
+
+                            <!-- ================================= -->
+                            <!-- BADGE SELECTION -->
+                            <!-- ================================= -->
+
+                            @if (isProductSelected(product.id)) {
+
+                                <div
+                                    class="absolute right-3 top-3 rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white shadow"
+                                >
+                                    Sélectionné
+                                </div>
+
+                            }
+
+                        </div>
+
+
+                        <!-- ===================================== -->
+                        <!-- CONTENT -->
+                        <!-- ===================================== -->
+
+                        <div class="p-4">
+
+                            <div class="mb-2 flex items-start justify-between gap-3">
+
+                                <h3
+                                    class="line-clamp-2 text-sm font-semibold text-gray-900"
+                                >
+                                    {{ product.name }}
+                                </h3>
+
+                                @if (product.active !== undefined) {
+
+                                    <app-badge
+                                        [variant]="
+                                            product.active
+                                                ? 'success'
+                                                : 'danger'
+                                        "
+                                    >
+                                        {{
+                                            product.active
+                                                ? 'Actif'
+                                                : 'Inactif'
+                                        }}
+                                    </app-badge>
+
+                                }
+
+                            </div>
+
+
+                            @if (product.companyName) {
+
+                                <p
+                                    class="mb-2 text-xs font-medium text-gray-500"
+                                >
+                                    {{ product.companyName }}
+                                </p>
+
+                            }
+
+
+                            @if (product.description) {
+
+                                <p
+                                    class="mb-4 line-clamp-2 text-xs text-gray-500"
+                                >
+                                    {{ product.description }}
+                                </p>
+
+                            }
+
+
+                            <div
+                                class="mb-4 flex items-center justify-between"
+                            >
+
+                                <span
+                                    class="text-lg font-bold text-brand-600"
+                                >
+                                    {{ product.price | number }} FCFA
+                                </span>
+
+                            </div>
+
+
+                            <!-- ================================= -->
+                            <!-- ACTIONS -->
+                            <!-- ================================= -->
+
+                            <div class="flex gap-2">
+
+                                <a
+                                    [routerLink]="[
+                                        '/admin/products',
+                                        product.id,
+                                        'edit'
+                                    ]"
+                                    class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700 transition hover:bg-gray-50"
+                                >
+                                    Modifier
+                                </a>
+
+
+                                <button
+                                    type="button"
+                                    (click)="deleteProduct(product.id)"
+                                    class="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 transition hover:bg-red-50"
+                                >
+                                    Supprimer
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                }
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- PAGINATION -->
+            <!-- ================================================= -->
+
+            @if (totalPages > 1) {
+
+                <div
+                    class="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+
+                    <p class="text-sm text-gray-500">
+                        Page
+                        <span class="font-medium text-gray-900">
+                            {{ currentPage + 1 }}
+                        </span>
+                        sur
+                        <span class="font-medium text-gray-900">
+                            {{ totalPages }}
+                        </span>
+                    </p>
+
+
+                    <div class="flex items-center gap-1">
+
+                        <button
+                            type="button"
+                            (click)="previousPage()"
+                            [disabled]="currentPage === 0"
+                            class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                            Précédent
+                        </button>
+
+
+                        @for (page of pages; track page) {
+
+                            <button
+                                type="button"
+                                (click)="goToPage(page)"
+                                class="hidden min-w-10 rounded-lg px-3 py-2 text-sm font-medium transition sm:block"
+                                [class.bg-brand-600]="currentPage === page"
+                                [class.text-white]="currentPage === page"
+                                [class.text-gray-700]="currentPage !== page"
+                                [class.hover:bg-gray-100]="currentPage !== page"
+                            >
+                                {{ page + 1 }}
+                            </button>
+
+                        }
+
+
+                        <button
+                            type="button"
+                            (click)="nextPage()"
+                            [disabled]="currentPage === totalPages - 1"
+                            class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                            Suivant
+                        </button>
+
+                    </div>
+
+                </div>
 
             }
 
-
-            <!-- Next -->
-            <button
-                    type="button"
-                    (click)="nextPage()"
-                    [disabled]="currentPage >= totalPages - 1"
-                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                    title="Page suivante"
-            >
-                <svg
-                        class="h-4 w-4"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                            d="M9 18L15 12L9 6"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                    />
-                </svg>
-            </button>
-
-        </div>
-
-    </div>
-
-    }
+        }
 
     }
 
 </div>
-

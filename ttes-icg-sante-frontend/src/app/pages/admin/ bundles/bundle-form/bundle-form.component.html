@@ -1,147 +1,186 @@
-<div class="p-6">
+<div class="mx-auto max-w-5xl space-y-6">
 
+    <!-- ========================================================= -->
     <!-- HEADER -->
-    <div class="mb-6">
+    <!-- ========================================================= -->
 
-        <a
-                routerLink="/admin/bundles"
-                class="text-sm text-blue-600 hover:underline"
-        >
-            ← Retour aux packs
-        </a>
-
-
-        <h1 class="mt-3 text-2xl font-bold text-gray-900">
-
-            {{
-            isEditMode
-            ? 'Modifier le pack'
-            : 'Nouveau pack'
-            }}
-
-        </h1>
-
-    </div>
-
-
-    <!-- LOADING -->
     <div
-            *ngIf="loading"
-            class="rounded-xl border bg-white p-12 text-center"
-    >
-        Chargement du pack...
-    </div>
-
-
-    <form
-            *ngIf="!loading"
-            [formGroup]="form"
-            (ngSubmit)="save()"
-            class="space-y-6"
+        class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
     >
 
-        <!-- ERROR -->
-        <div
-                *ngIf="error"
-                class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700"
-        >
-            {{ error }}
+        <div>
+
+            <h1 class="text-2xl font-bold text-gray-900">
+
+                {{ isEditMode ? 'Modifier le pack' : 'Créer un pack' }}
+
+            </h1>
+
+            <p class="mt-1 text-sm text-gray-500">
+
+                @if (isEditMode) {
+
+                    Modifiez les informations et les produits du pack.
+
+                }
+                @else {
+
+                    Complétez les informations du pack avec les produits sélectionnés.
+
+                }
+
+            </p>
+
         </div>
 
 
-        <!-- SUCCESS -->
+        <a
+            routerLink="/admin/bundles"
+            class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+        >
+            Retour aux packs
+        </a>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- SUCCESS -->
+    <!-- ========================================================= -->
+
+    @if (success) {
+
         <div
-                *ngIf="success"
-                class="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-700"
+            class="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-700"
         >
             {{ success }}
         </div>
 
+    }
 
-        <!-- INFORMATIONS -->
-        <div class="rounded-xl border bg-white p-6">
 
-            <h2 class="mb-6 text-lg font-semibold text-gray-900">
+    <!-- ========================================================= -->
+    <!-- ERROR -->
+    <!-- ========================================================= -->
+
+    @if (error) {
+
+        <div
+            class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+        >
+            {{ error }}
+        </div>
+
+    }
+
+
+    <!-- ========================================================= -->
+    <!-- FORMULAIRE -->
+    <!-- ========================================================= -->
+
+    <form
+        [formGroup]="form"
+        (ngSubmit)="save()"
+        class="space-y-6"
+    >
+
+        <!-- ===================================================== -->
+        <!-- INFORMATIONS GENERALES -->
+        <!-- ===================================================== -->
+
+        <div
+            class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+        >
+
+            <h2 class="text-lg font-semibold text-gray-900">
                 Informations du pack
             </h2>
 
+            <p class="mt-1 text-sm text-gray-500">
+                Définissez les informations principales du pack.
+            </p>
 
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 
-                <!-- NAME -->
+            <div class="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
+
+                <!-- NOM -->
+
                 <div class="md:col-span-2">
 
                     <label
-                            for="name"
-                            class="mb-2 block text-sm font-medium text-gray-700"
+                        for="name"
+                        class="mb-2 block text-sm font-medium text-gray-700"
                     >
-                        Nom du pack *
+                        Nom du pack
                     </label>
 
                     <input
-                            id="name"
-                            type="text"
-                            formControlName="name"
-                            placeholder="Ex : Pack Santé Essentiel"
-                            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    >
+                        id="name"
+                        type="text"
+                        formControlName="name"
+                        placeholder="Ex : Pack Bien-être"
+                        class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                    />
 
-                    <p
-                            *ngIf="
-                            form.controls.name.touched &&
-                            form.controls.name.invalid
-                        "
-                            class="mt-1 text-sm text-red-600"
-                    >
-                        Le nom du pack est obligatoire.
-                    </p>
+                    @if (
+                        form.get('name')?.invalid &&
+                        form.get('name')?.touched
+                    ) {
+
+                        <p class="mt-1 text-xs text-red-600">
+                            Le nom du pack est obligatoire.
+                        </p>
+
+                    }
 
                 </div>
 
 
                 <!-- DESCRIPTION -->
+
                 <div class="md:col-span-2">
 
                     <label
-                            for="description"
-                            class="mb-2 block text-sm font-medium text-gray-700"
+                        for="description"
+                        class="mb-2 block text-sm font-medium text-gray-700"
                     >
                         Description
                     </label>
 
                     <textarea
-                            id="description"
-                            formControlName="description"
-                            rows="4"
-                            placeholder="Description du pack..."
-                            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        id="description"
+                        rows="4"
+                        formControlName="description"
+                        placeholder="Description du pack..."
+                        class="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
                     ></textarea>
 
                 </div>
 
 
-                <!-- PRICE -->
+                <!-- PRIX -->
+
                 <div>
 
                     <label
-                            for="price"
-                            class="mb-2 block text-sm font-medium text-gray-700"
+                        for="price"
+                        class="mb-2 block text-sm font-medium text-gray-700"
                     >
-                        Prix de vente du pack *
+                        Prix du pack
                     </label>
 
                     <div class="relative">
 
                         <input
-                                id="price"
-                                type="number"
-                                min="0"
-                                formControlName="price"
-                                class="w-full rounded-lg border border-gray-300 px-4 py-2.5 pr-20 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                        >
+                            id="price"
+                            type="number"
+                            min="0"
+                            formControlName="price"
+                            class="w-full rounded-lg border border-gray-300 px-4 py-3 pr-20 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                        />
 
                         <span
-                                class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500"
                         >
                             FCFA
                         </span>
@@ -151,19 +190,34 @@
                 </div>
 
 
-                <!-- ACTIVE -->
+                <!-- ACTIF -->
+
                 <div class="flex items-center">
 
-                    <label class="flex cursor-pointer items-center gap-3">
+                    <label
+                        class="flex cursor-pointer items-center gap-3"
+                    >
 
                         <input
-                                type="checkbox"
-                                formControlName="active"
-                                class="h-4 w-4 rounded"
-                        >
+                            type="checkbox"
+                            formControlName="active"
+                            class="h-5 w-5 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+                        />
 
-                        <span class="text-sm font-medium text-gray-700">
-                            Pack actif
+                        <span>
+
+                            <span
+                                class="block text-sm font-medium text-gray-700"
+                            >
+                                Pack actif
+                            </span>
+
+                            <span
+                                class="block text-xs text-gray-500"
+                            >
+                                Le pack sera visible sur la boutique.
+                            </span>
+
                         </span>
 
                     </label>
@@ -175,177 +229,328 @@
         </div>
 
 
-        <!-- PRODUCTS -->
-        <div class="rounded-xl border bg-white p-6">
+        <!-- ===================================================== -->
+        <!-- PRODUITS SELECTIONNES -->
+        <!-- ===================================================== -->
 
-            <div class="mb-6">
+        <div
+            class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+        >
 
-                <h2 class="text-lg font-semibold text-gray-900">
-                    Produits du pack
-                </h2>
+            <div
+                class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+            >
 
-                <p class="mt-1 text-sm text-gray-500">
-                    Sélectionnez les produits et indiquez la quantité nécessaire pour une unité du pack.
-                </p>
+                <div>
+
+                    <h2 class="text-lg font-semibold text-gray-900">
+                        Produits du pack
+                    </h2>
+
+                    <p class="mt-1 text-sm text-gray-500">
+
+                        @if (selectedItems.length > 0) {
+
+                            {{ selectedItems.length }}
+                            produit(s) dans ce pack.
+
+                        }
+                        @else {
+
+                            Aucun produit sélectionné.
+
+                        }
+
+                    </p>
+
+                </div>
 
             </div>
 
 
-            <!-- ADD PRODUCT -->
-            <div
-                    class="grid grid-cols-1 gap-3 rounded-lg bg-gray-50 p-4 md:grid-cols-[1fr_150px_auto]"
-            >
+            <!-- ================================================= -->
+            <!-- MESSAGE SELECTION DEPUIS PRODUITS -->
+            <!-- ================================================= -->
 
-                <select
-                        [(ngModel)]="productToAdd"
-                        [ngModelOptions]="{standalone: true}"
-                        class="rounded-lg border border-gray-300 bg-white px-4 py-2.5"
+            @if (!isEditMode && selectedItems.length > 0) {
+
+                <div
+                    class="mt-5 rounded-lg border border-blue-100 bg-blue-50 p-4"
                 >
 
-                    <option [ngValue]="null">
-                        Sélectionner un produit
-                    </option>
+                    <div class="flex gap-3">
 
-                    <option
-                            *ngFor="let product of products"
-                            [ngValue]="product.id"
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"
+                            />
+                        </svg>
+
+                        <p class="text-sm text-blue-800">
+                            Les produits affichés ci-dessous ont été
+                            sélectionnés depuis la liste des produits.
+                            Vous pouvez maintenant définir les quantités
+                            nécessaires pour le pack.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            }
+
+
+            <!-- ================================================= -->
+            <!-- AJOUT MANUEL D'UN PRODUIT -->
+            <!-- ================================================= -->
+
+            <div
+                class="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4"
+            >
+
+                <h3
+                    class="text-sm font-semibold text-gray-800"
+                >
+                    Ajouter un autre produit
+                </h3>
+
+                <div
+                    class="mt-3 grid grid-cols-1 gap-3 md:grid-cols-[1fr_150px_auto]"
+                >
+
+                    <!-- PRODUIT -->
+
+                    <select
+                        [(ngModel)]="productToAdd"
+                        [ngModelOptions]="{ standalone: true }"
+                        class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
                     >
-                        {{ product.name }}
-                        — stock {{ product.stock }}
-                    </option>
 
-                </select>
+                        <option [ngValue]="null">
+                            Sélectionner un produit
+                        </option>
+
+                        @for (
+                            product of products;
+                            track product.id
+                        ) {
+
+                            <option
+                                [ngValue]="product.id"
+                            >
+                                {{ product.name }}
+                            </option>
+
+                        }
+
+                    </select>
 
 
-                <input
+                    <!-- QUANTITE -->
+
+                    <input
                         type="number"
                         min="1"
                         [(ngModel)]="quantityToAdd"
-                        [ngModelOptions]="{standalone: true}"
-                        class="rounded-lg border border-gray-300 px-4 py-2.5"
+                        [ngModelOptions]="{ standalone: true }"
                         placeholder="Quantité"
-                >
+                        class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                    />
 
 
-                <button
+                    <!-- BOUTON -->
+
+                    <button
                         type="button"
                         (click)="addProduct()"
-                        class="rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white hover:bg-blue-700"
-                >
-                    Ajouter
-                </button>
+                        class="rounded-lg bg-gray-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-gray-800"
+                    >
+                        Ajouter
+                    </button>
+
+                </div>
 
             </div>
 
 
-            <!-- SELECTED PRODUCTS -->
-            <div
-                    *ngIf="selectedItems.length > 0"
-                    class="mt-6 overflow-x-auto"
-            >
+            <!-- ================================================= -->
+            <!-- LISTE DES PRODUITS SELECTIONNES -->
+            <!-- ================================================= -->
 
-                <table class="w-full min-w-[700px]">
+            @if (selectedItems.length > 0) {
 
-                    <thead class="border-b">
+                <div class="mt-6 space-y-3">
 
-                    <tr>
+                    @for (
+                        item of selectedItems;
+                        track item.productId;
+                        let i = $index
+                    ) {
 
-                        <th class="px-4 py-3 text-left text-sm font-semibold">
-                            Produit
-                        </th>
+                        <div
+                            class="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-4 sm:flex-row sm:items-center"
+                        >
 
-                        <th class="px-4 py-3 text-left text-sm font-semibold">
-                            Stock actuel
-                        </th>
+                            <!-- INFO PRODUIT -->
 
-                        <th class="px-4 py-3 text-left text-sm font-semibold">
-                            Quantité dans le pack
-                        </th>
+                            <div class="flex min-w-0 flex-1 items-center gap-4">
 
-                        <th class="px-4 py-3 text-right text-sm font-semibold">
-                            Action
-                        </th>
+                                @if (getProduct(item.productId)?.imageUrl) {
 
-                    </tr>
+                                    <img
+                                        [src]="getProduct(item.productId)?.imageUrl"
+                                        [alt]="getProductName(item.productId)"
+                                        class="h-14 w-14 rounded-lg object-cover"
+                                    />
 
-                    </thead>
+                                }
+                                @else {
 
+                                    <div
+                                        class="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100"
+                                    >
 
-                    <tbody class="divide-y">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            class="h-7 w-7 text-gray-400"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="1.5"
+                                                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4m4-9h8"
+                                            />
+                                        </svg>
 
-                    <tr
-                            *ngFor="let item of selectedItems"
-                    >
+                                    </div>
 
-                        <td class="px-4 py-4">
-
-                            <p class="font-medium text-gray-900">
-                                {{ getProductName(item.productId) }}
-                            </p>
-
-                            <p class="text-xs text-gray-500">
-                                ID : {{ item.productId }}
-                            </p>
-
-                        </td>
-
-
-                        <td class="px-4 py-4 text-gray-600">
-
-                            {{ getProductStock(item.productId) }}
-
-                        </td>
+                                }
 
 
-                        <td class="px-4 py-4">
+                                <div class="min-w-0">
 
-                            <input
-                                    type="number"
-                                    min="1"
-                                    [value]="item.quantity"
-                                    (change)="updateProductQuantity(item.productId, $event)"
-                                    class="w-28 rounded-lg border border-gray-300 px-3 py-2"
+                                    <p
+                                        class="truncate text-sm font-semibold text-gray-900"
+                                    >
+                                        {{ getProductName(item.productId) }}
+                                    </p>
+
+                                    <p
+                                        class="mt-1 text-xs text-gray-500"
+                                    >
+                                        Produit #{{ item.productId }}
+                                    </p>
+
+                                    @if (
+                                        getProductStock(item.productId) !== null
+                                    ) {
+
+                                        <p
+                                            class="mt-1 text-xs text-gray-500"
+                                        >
+                                            Stock :
+                                            {{ getProductStock(item.productId) }}
+                                        </p>
+
+                                    }
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- QUANTITE -->
+
+                            <div
+                                class="flex items-center gap-2"
                             >
 
-                        </td>
+                                <label
+                                    class="text-xs font-medium text-gray-500"
+                                >
+                                    Quantité
+                                </label>
+
+                                <input
+                                    type="number"
+                                    min="1"
+                                    [ngModel]="item.quantity"
+                                    (ngModelChange)="
+                                        updateProductQuantity(
+                                            i,
+                                            $event
+                                        )
+                                    "
+                                    [ngModelOptions]="{
+                                        standalone: true
+                                    }"
+                                    class="w-24 rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                                />
+
+                            </div>
 
 
-                        <td class="px-4 py-4 text-right">
+                            <!-- SUPPRIMER -->
 
                             <button
-                                    type="button"
-                                    (click)="removeProduct(item.productId)"
-                                    class="text-sm font-medium text-red-600 hover:underline"
+                                type="button"
+                                (click)="removeProduct(i)"
+                                class="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
                             >
                                 Retirer
                             </button>
 
-                        </td>
+                        </div>
 
-                    </tr>
+                    }
 
-                    </tbody>
+                </div>
 
-                </table>
+            }
+            @else {
 
-            </div>
+                <div
+                    class="mt-6 rounded-lg border border-dashed border-gray-300 p-8 text-center"
+                >
 
+                    <p class="text-sm text-gray-500">
+                        Aucun produit dans ce pack.
+                    </p>
 
-            <!-- EMPTY -->
-            <div
-                    *ngIf="selectedItems.length === 0"
-                    class="mt-6 rounded-lg border border-dashed p-8 text-center text-gray-500"
-            >
-                Aucun produit ajouté au pack.
-            </div>
+                    <p class="mt-1 text-xs text-gray-400">
+                        Sélectionnez des produits ou ajoutez-en un ci-dessus.
+                    </p>
+
+                </div>
+
+            }
 
         </div>
 
 
+        <!-- ===================================================== -->
         <!-- IMAGES -->
-        <div class="rounded-xl border bg-white p-6">
+        <!-- ===================================================== -->
 
-            <div class="mb-6 flex items-center justify-between">
+        <div
+            class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+        >
+
+            <div
+                class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+            >
 
                 <div>
 
@@ -354,16 +559,16 @@
                     </h2>
 
                     <p class="mt-1 text-sm text-gray-500">
-                        Ajoutez les images du pack par URL.
+                        Ajoutez les images utilisées pour présenter le pack.
                     </p>
 
                 </div>
 
 
                 <button
-                        type="button"
-                        (click)="addImage()"
-                        class="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+                    type="button"
+                    (click)="addImage()"
+                    class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
                 >
                     + Ajouter une image
                 </button>
@@ -371,116 +576,181 @@
             </div>
 
 
-            <!-- IMAGES -->
-            <div
-                    *ngIf="images.length > 0"
-                    class="space-y-4"
-            >
+            @if (images.length > 0) {
 
-                <div
-                        *ngFor="let image of images; let i = index"
-                        class="rounded-lg border p-4"
-                >
+                <div class="mt-6 space-y-4">
 
-                    <div class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto_auto]">
+                    @for (
+                        image of images;
+                        track $index;
+                        let i = $index
+                    ) {
 
-                        <!-- URL -->
-                        <input
-                                type="url"
-                                [value]="image.imageUrl"
-                                (input)="updateImageUrl(i, $event)"
-                                placeholder="https://..."
-                                class="rounded-lg border border-gray-300 px-4 py-2.5"
+                        <div
+                            class="rounded-lg border border-gray-200 p-4"
                         >
 
-
-                        <!-- MAIN -->
-                        <label
-                                class="flex items-center gap-2"
-                        >
-
-                            <input
-                                    type="radio"
-                                    name="mainImage"
-                                    [checked]="image.main"
-                                    (change)="setMainImage(i)"
+                            <div
+                                class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_1fr_auto]"
                             >
 
-                            <span class="text-sm">
-                                Principale
-                            </span>
+                                <!-- URL -->
 
-                        </label>
+                                <div>
+
+                                    <label
+                                        class="mb-2 block text-xs font-medium text-gray-600"
+                                    >
+                                        URL de l'image
+                                    </label>
+
+                                    <input
+                                        type="url"
+                                        [value]="image.url"
+                                        (input)="
+                                            updateImageUrl(
+                                                i,
+                                                $any($event.target).value
+                                            )
+                                        "
+                                        placeholder="https://..."
+                                        class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                                    />
+
+                                </div>
 
 
-                        <!-- REMOVE -->
-                        <button
-                                type="button"
-                                (click)="removeImage(i)"
-                                class="text-sm font-medium text-red-600 hover:underline"
-                        >
-                            Supprimer
-                        </button>
+                                <!-- ALT -->
 
-                    </div>
+                                <div>
+
+                                    <label
+                                        class="mb-2 block text-xs font-medium text-gray-600"
+                                    >
+                                        Texte alternatif
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        [value]="image.altText ?? ''"
+                                        (input)="
+                                            updateImageAlt(
+                                                i,
+                                                $any($event.target).value
+                                            )
+                                        "
+                                        placeholder="Image du pack"
+                                        class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                                    />
+
+                                </div>
 
 
-                    <!-- PREVIEW -->
-                    <div
-                            *ngIf="image.imageUrl"
-                            class="mt-4"
-                    >
+                                <!-- DELETE -->
 
-                        <img
-                                [src]="image.imageUrl"
-                                alt="Aperçu"
-                                class="h-32 w-32 rounded-lg object-cover"
-                        >
+                                <div
+                                    class="flex items-end"
+                                >
 
-                    </div>
+                                    <button
+                                        type="button"
+                                        (click)="removeImage(i)"
+                                        class="w-full rounded-lg border border-red-200 px-4 py-3 text-sm font-medium text-red-600 transition hover:bg-red-50 md:w-auto"
+                                    >
+                                        Supprimer
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            @if (image.url) {
+
+                                <div class="mt-4">
+
+                                    <img
+                                        [src]="image.url"
+                                        [alt]="image.altText || 'Aperçu'"
+                                        class="h-32 w-full rounded-lg object-cover"
+                                    />
+
+                                </div>
+
+                            }
+
+                        </div>
+
+                    }
 
                 </div>
 
-            </div>
+            }
+            @else {
 
+                <div
+                    class="mt-6 rounded-lg border border-dashed border-gray-300 p-8 text-center"
+                >
 
-            <!-- EMPTY -->
-            <div
-                    *ngIf="images.length === 0"
-                    class="rounded-lg border border-dashed p-8 text-center text-gray-500"
-            >
-                Aucune image ajoutée.
-            </div>
+                    <p class="text-sm text-gray-500">
+                        Aucune image ajoutée.
+                    </p>
+
+                    <button
+                        type="button"
+                        (click)="addImage()"
+                        class="mt-3 text-sm font-medium text-brand-600 hover:text-brand-700"
+                    >
+                        Ajouter une image
+                    </button>
+
+                </div>
+
+            }
 
         </div>
 
 
+        <!-- ===================================================== -->
         <!-- ACTIONS -->
-        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <!-- ===================================================== -->
+
+        <div
+            class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"
+        >
 
             <a
-                    routerLink="/admin/bundles"
-                    class="rounded-lg border border-gray-300 px-6 py-2.5 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+                routerLink="/admin/bundles"
+                class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
             >
                 Annuler
             </a>
 
 
             <button
-                    type="submit"
-                    [disabled]="saving"
-                    class="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400"
+                type="submit"
+                [disabled]="saving"
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-6 py-3 text-sm font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
 
-                {{
-                saving
-                ? 'Enregistrement...'
-                : (
-                isEditMode
-                ? 'Modifier le pack'
-                : 'Créer le pack'
-                )
-                }}
+                @if (saving) {
+
+                    <span
+                        class="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"
+                    ></span>
+
+                    Enregistrement...
+
+                }
+                @else {
+
+                    {{
+                        isEditMode
+                            ? 'Enregistrer les modifications'
+                            : 'Créer le pack'
+                    }}
+
+                }
 
             </button>
 

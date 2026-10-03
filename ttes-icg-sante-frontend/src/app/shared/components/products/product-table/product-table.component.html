@@ -9,15 +9,19 @@
     >
 
         <div>
+
             <h2 class="text-xl font-semibold text-gray-900">
                 Produits
             </h2>
 
-            <div class="mt-1 flex flex-wrap items-center gap-2">
+            <div
+                class="mt-1 flex flex-wrap items-center gap-2"
+            >
 
                 <p class="text-sm text-gray-500">
                     {{ totalElements }} produit(s)
                 </p>
+
 
                 @if (selectedProductCount > 0) {
 
@@ -27,15 +31,19 @@
                         {{ selectedProductCount }}
                         produit(s) sélectionné(s)
                     </span>
+
                 }
 
             </div>
+
         </div>
 
 
         <!-- ACTIONS -->
 
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div
+            class="flex flex-col gap-3 sm:flex-row sm:items-center"
+        >
 
             @if (selectedProductCount > 0) {
 
@@ -44,6 +52,7 @@
                     (click)="continueToBundleCreation()"
                     class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
                 >
+
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         class="h-5 w-5"
@@ -51,16 +60,19 @@
                         viewBox="0 0 24 24"
                         stroke="currentColor"
                     >
+
                         <path
                             stroke-linecap="round"
                             stroke-linejoin="round"
                             stroke-width="2"
                             d="M12 4v16m8-8H4"
                         />
+
                     </svg>
 
                     Créer un pack
                     ({{ selectedProductCount }})
+
                 </button>
 
 
@@ -105,12 +117,14 @@
                 viewBox="0 0 24 24"
                 stroke="currentColor"
             >
+
                 <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
                     d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
+
             </svg>
 
         </div>
@@ -154,7 +168,7 @@
             <div class="text-center">
 
                 <div
-                    class="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-brand-500"
+                    class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-brand-600"
                 ></div>
 
                 <p class="mt-3 text-sm text-gray-500">
@@ -166,7 +180,6 @@
         </div>
 
     }
-
     @else {
 
         <!-- ===================================================== -->
@@ -186,15 +199,19 @@
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                 >
+
                     <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
                         stroke-width="1.5"
                         d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4m4-9h8"
                     />
+
                 </svg>
 
-                <h3 class="mt-4 text-lg font-semibold text-gray-900">
+                <h3
+                    class="mt-4 text-lg font-semibold text-gray-900"
+                >
                     Aucun produit trouvé
                 </h3>
 
@@ -205,7 +222,6 @@
             </div>
 
         }
-
         @else {
 
             <!-- ================================================= -->
@@ -216,12 +232,19 @@
                 class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
             >
 
-                @for (product of products; track product.id) {
+                @for (
+                    product of products;
+                    track product.id
+                ) {
 
                     <div
                         class="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-                        [class.ring-2]="isProductSelected(product.id)"
-                        [class.ring-blue-500]="isProductSelected(product.id)"
+                        [class.ring-2]="
+                            isProductSelected(product.id)
+                        "
+                        [class.ring-blue-500]="
+                            isProductSelected(product.id)
+                        "
                     >
 
                         <!-- ===================================== -->
@@ -232,21 +255,23 @@
                             class="relative h-52 overflow-hidden bg-gray-100"
                         >
 
-                            @if (product.imageUrl) {
+                            @if (
+                                getMainImage(product)
+                            ) {
 
                                 <img
-                                    [src]="product.imageUrl"
+                                    [src]="getMainImage(product)"
                                     [alt]="product.name"
                                     class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                                 />
 
                             }
-
                             @else {
 
                                 <div
                                     class="flex h-full items-center justify-center"
                                 >
+
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         class="h-14 w-14 text-gray-300"
@@ -254,20 +279,23 @@
                                         viewBox="0 0 24 24"
                                         stroke="currentColor"
                                     >
+
                                         <path
                                             stroke-linecap="round"
                                             stroke-linejoin="round"
                                             stroke-width="1.5"
                                             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-9h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                                         />
+
                                     </svg>
+
                                 </div>
 
                             }
 
 
                             <!-- ================================= -->
-                            <!-- CHECKBOX SELECTION -->
+                            <!-- CHECKBOX -->
                             <!-- ================================= -->
 
                             <label
@@ -282,8 +310,14 @@
                                 <input
                                     type="checkbox"
                                     class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                    [checked]="isProductSelected(product.id)"
-                                    (change)="toggleProductSelection(product.id)"
+                                    [checked]="
+                                        isProductSelected(product.id)
+                                    "
+                                    (change)="
+                                        toggleProductSelection(
+                                            product.id
+                                        )
+                                    "
                                     (click)="$event.stopPropagation()"
                                 />
 
@@ -294,7 +328,9 @@
                             <!-- BADGE SELECTION -->
                             <!-- ================================= -->
 
-                            @if (isProductSelected(product.id)) {
+                            @if (
+                                isProductSelected(product.id)
+                            ) {
 
                                 <div
                                     class="absolute right-3 top-3 rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white shadow"
@@ -313,7 +349,9 @@
 
                         <div class="p-4">
 
-                            <div class="mb-2 flex items-start justify-between gap-3">
+                            <div
+                                class="mb-2 flex items-start justify-between gap-3"
+                            >
 
                                 <h3
                                     class="line-clamp-2 text-sm font-semibold text-gray-900"
@@ -321,28 +359,31 @@
                                     {{ product.name }}
                                 </h3>
 
-                                @if (product.active !== undefined) {
 
-                                    <app-badge
-                                        [variant]="
-                                            product.active
-                                                ? 'success'
-                                                : 'danger'
-                                        "
-                                    >
-                                        {{
-                                            product.active
-                                                ? 'Actif'
-                                                : 'Inactif'
-                                        }}
-                                    </app-badge>
+                                <!-- STOCK -->
 
-                                }
+                                <app-badge
+                                    [color]="
+                                        getStockColor(
+                                            product.stock
+                                        )
+                                    "
+                                >
+                                    {{
+                                        getStockLabel(
+                                            product.stock
+                                        )
+                                    }}
+                                </app-badge>
 
                             </div>
 
 
-                            @if (product.companyName) {
+                            <!-- ENTREPRISE -->
+
+                            @if (
+                                product.companyName
+                            ) {
 
                                 <p
                                     class="mb-2 text-xs font-medium text-gray-500"
@@ -353,7 +394,11 @@
                             }
 
 
-                            @if (product.description) {
+                            <!-- DESCRIPTION -->
+
+                            @if (
+                                product.description
+                            ) {
 
                                 <p
                                     class="mb-4 line-clamp-2 text-xs text-gray-500"
@@ -364,6 +409,8 @@
                             }
 
 
+                            <!-- PRIX -->
+
                             <div
                                 class="mb-4 flex items-center justify-between"
                             >
@@ -371,15 +418,17 @@
                                 <span
                                     class="text-lg font-bold text-brand-600"
                                 >
-                                    {{ product.price | number }} FCFA
+                                    {{
+                                        product.price
+                                            | number
+                                    }}
+                                    FCFA
                                 </span>
 
                             </div>
 
 
-                            <!-- ================================= -->
                             <!-- ACTIONS -->
-                            <!-- ================================= -->
 
                             <div class="flex gap-2">
 
@@ -397,7 +446,11 @@
 
                                 <button
                                     type="button"
-                                    (click)="deleteProduct(product.id)"
+                                    (click)="
+                                        deleteProduct(
+                                            product.id
+                                        )
+                                    "
                                     class="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 transition hover:bg-red-50"
                                 >
                                     Supprimer
@@ -421,43 +474,67 @@
             @if (totalPages > 1) {
 
                 <div
-                    class="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
+                    class="mt-5 flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
 
                     <p class="text-sm text-gray-500">
+
                         Page
-                        <span class="font-medium text-gray-900">
+
+                        <span
+                            class="font-medium text-gray-900"
+                        >
                             {{ currentPage + 1 }}
                         </span>
+
                         sur
-                        <span class="font-medium text-gray-900">
+
+                        <span
+                            class="font-medium text-gray-900"
+                        >
                             {{ totalPages }}
                         </span>
+
                     </p>
 
 
-                    <div class="flex items-center gap-1">
+                    <div
+                        class="flex items-center gap-1"
+                    >
 
                         <button
                             type="button"
                             (click)="previousPage()"
-                            [disabled]="currentPage === 0"
+                            [disabled]="
+                                currentPage === 0
+                            "
                             class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
                         >
                             Précédent
                         </button>
 
 
-                        @for (page of pages; track page) {
+                        @for (
+                            page of pages;
+                            track page
+                        ) {
 
                             <button
                                 type="button"
                                 (click)="goToPage(page)"
                                 class="hidden min-w-10 rounded-lg px-3 py-2 text-sm font-medium transition sm:block"
-                                [class.bg-brand-600]="currentPage === page"
-                                [class.text-white]="currentPage === page"
-                                [class.text-gray-700]="currentPage !== page"
-                                [class.hover:bg-gray-100]="currentPage !== page"
+                                [class.bg-brand-600]="
+                                    currentPage === page
+                                "
+                                [class.text-white]="
+                                    currentPage === page
+                                "
+                                [class.text-gray-700]="
+                                    currentPage !== page
+                                "
+                                [class.hover:bg-gray-100]="
+                                    currentPage !== page
+                                "
                             >
                                 {{ page + 1 }}
                             </button>
@@ -468,7 +545,10 @@
                         <button
                             type="button"
                             (click)="nextPage()"
-                            [disabled]="currentPage === totalPages - 1"
+                            [disabled]="
+                                currentPage ===
+                                totalPages - 1
+                            "
                             class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
                         >
                             Suivant

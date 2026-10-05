@@ -23,6 +23,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
     selector: 'app-bundle-list',
+
     standalone: true,
 
     imports: [
@@ -97,9 +98,9 @@ export class BundleListComponent implements OnInit {
     /**
      * Valeurs possibles :
      *
-     * ''       = tous
-     * 'stock'  = disponibles
-     * 'out'    = rupture
+     * ''            = tous
+     * 'available'   = disponibles
+     * 'unavailable' = rupture
      */
     stockFilter = '';
 
@@ -110,7 +111,10 @@ export class BundleListComponent implements OnInit {
 
     currentPage = 0;
 
-    pageSize = 8;
+    /**
+     * Nombre de packs affichés par page.
+     */
+    pageSize = 12;
 
     totalPages = 0;
 
@@ -124,6 +128,7 @@ export class BundleListComponent implements OnInit {
     ngOnInit(): void {
 
         this.loadBundles();
+
     }
 
 
@@ -135,12 +140,14 @@ export class BundleListComponent implements OnInit {
 
         this.mobileMenuOpen =
             !this.mobileMenuOpen;
+
     }
 
 
     closeMobileMenu(): void {
 
         this.mobileMenuOpen = false;
+
     }
 
 
@@ -151,6 +158,7 @@ export class BundleListComponent implements OnInit {
     isLoggedIn(): boolean {
 
         return this.authService.isLoggedIn();
+
     }
 
 
@@ -159,11 +167,13 @@ export class BundleListComponent implements OnInit {
         if (!this.isLoggedIn()) {
 
             return false;
+
         }
 
         return this.authService.hasRole(
             'ROLE_ADMIN'
         );
+
     }
 
 
@@ -192,6 +202,7 @@ export class BundleListComponent implements OnInit {
                     this.search();
 
                     this.loading = false;
+
                 },
 
 
@@ -218,9 +229,11 @@ export class BundleListComponent implements OnInit {
 
 
                     this.loading = false;
+
                 }
 
             });
+
     }
 
 
@@ -247,6 +260,7 @@ export class BundleListComponent implements OnInit {
         ) {
 
             return '';
+
         }
 
 
@@ -258,6 +272,7 @@ export class BundleListComponent implements OnInit {
             )
             .toLowerCase()
             .trim();
+
     }
 
 
@@ -297,14 +312,14 @@ export class BundleListComponent implements OnInit {
                         !this.stockFilter ||
 
                         (
-                            this.stockFilter === 'stock' &&
+                            this.stockFilter === 'available' &&
                             this.isBundleAvailable(
                                 bundle
                             )
                         ) ||
 
                         (
-                            this.stockFilter === 'out' &&
+                            this.stockFilter === 'unavailable' &&
                             !this.isBundleAvailable(
                                 bundle
                             )
@@ -315,6 +330,7 @@ export class BundleListComponent implements OnInit {
                         matchesSearch &&
                         matchesStock
                     );
+
                 }
             );
 
@@ -326,6 +342,7 @@ export class BundleListComponent implements OnInit {
         this.currentPage = 0;
 
         this.updatePagination();
+
     }
 
 
@@ -374,6 +391,7 @@ export class BundleListComponent implements OnInit {
         ) {
 
             return true;
+
         }
 
 
@@ -387,6 +405,7 @@ export class BundleListComponent implements OnInit {
         ) {
 
             return false;
+
         }
 
 
@@ -478,8 +497,10 @@ export class BundleListComponent implements OnInit {
                 return productText.includes(
                     term
                 );
+
             }
         );
+
     }
 
 
@@ -500,6 +521,7 @@ export class BundleListComponent implements OnInit {
         this.currentPage = 0;
 
         this.updatePagination();
+
     }
 
 
@@ -512,6 +534,7 @@ export class BundleListComponent implements OnInit {
         this.searchTerm = '';
 
         this.search();
+
     }
 
 
@@ -535,6 +558,7 @@ export class BundleListComponent implements OnInit {
             this.pages = [];
 
             return;
+
         }
 
 
@@ -553,9 +577,15 @@ export class BundleListComponent implements OnInit {
 
             this.currentPage =
                 this.totalPages - 1;
+
         }
+
     }
 
+
+    // ============================================================
+    // PACKS DE LA PAGE COURANTE
+    // ============================================================
 
     get paginatedBundles(): BundleResponse[] {
 
@@ -573,8 +603,13 @@ export class BundleListComponent implements OnInit {
             start,
             end
         );
+
     }
 
+
+    // ============================================================
+    // ALLER À UNE PAGE
+    // ============================================================
 
     goToPage(
         page: number
@@ -587,6 +622,7 @@ export class BundleListComponent implements OnInit {
         ) {
 
             return;
+
         }
 
 
@@ -600,8 +636,13 @@ export class BundleListComponent implements OnInit {
             behavior: 'smooth'
 
         });
+
     }
 
+
+    // ============================================================
+    // PAGE SUIVANTE
+    // ============================================================
 
     nextPage(): void {
 
@@ -620,9 +661,15 @@ export class BundleListComponent implements OnInit {
                 behavior: 'smooth'
 
             });
+
         }
+
     }
 
+
+    // ============================================================
+    // PAGE PRECEDENTE
+    // ============================================================
 
     previousPage(): void {
 
@@ -640,7 +687,9 @@ export class BundleListComponent implements OnInit {
                 behavior: 'smooth'
 
             });
+
         }
+
     }
 
 
@@ -658,6 +707,7 @@ export class BundleListComponent implements OnInit {
         ) {
 
             return '/images/products/default-product.png';
+
         }
 
 
@@ -672,6 +722,7 @@ export class BundleListComponent implements OnInit {
             bundle.images[0]?.imageUrl ??
             '/images/products/default-product.png'
         );
+
     }
 
 
@@ -687,6 +738,7 @@ export class BundleListComponent implements OnInit {
             bundle.stock !== undefined &&
             bundle.stock > 0
         );
+
     }
 
 
@@ -697,6 +749,7 @@ export class BundleListComponent implements OnInit {
         return !this.isBundleAvailable(
             bundle
         );
+
     }
 
 
@@ -709,6 +762,7 @@ export class BundleListComponent implements OnInit {
     ): number {
 
         return bundle.items?.length ?? 0;
+
     }
 
 
@@ -733,6 +787,7 @@ export class BundleListComponent implements OnInit {
             );
 
             return;
+
         }
 
 
@@ -755,6 +810,7 @@ export class BundleListComponent implements OnInit {
             );
 
             return;
+
         }
 
 
@@ -768,6 +824,7 @@ export class BundleListComponent implements OnInit {
         ) {
 
             return;
+
         }
 
 
@@ -795,6 +852,7 @@ export class BundleListComponent implements OnInit {
                     alert(
                         'Pack ajouté au panier.'
                     );
+
                 },
 
 
@@ -833,6 +891,7 @@ export class BundleListComponent implements OnInit {
 
 
                         return;
+
                     }
 
 
@@ -840,9 +899,11 @@ export class BundleListComponent implements OnInit {
                         error?.error?.message ??
                         'Impossible d’ajouter le pack au panier.'
                     );
+
                 }
 
             });
+
     }
 
 
@@ -862,6 +923,7 @@ export class BundleListComponent implements OnInit {
             ) +
             ' FCFA'
         );
+
     }
 
 
@@ -875,15 +937,18 @@ export class BundleListComponent implements OnInit {
 
             const input =
                 document.querySelector(
-                    'input[type="search"]'
+                    'input[type="text"]'
                 ) as HTMLInputElement | null;
 
 
             if (input) {
 
                 input.focus();
+
             }
 
         });
+
     }
+
 }

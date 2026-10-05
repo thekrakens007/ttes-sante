@@ -1,889 +1,259 @@
-<div
-    class="min-h-screen bg-gray-50
-           dark:bg-gray-950">
+import {
+    Component,
+    OnInit,
+    inject
+} from '@angular/core';
+
+import { CommonModule } from '@angular/common';
+
+import {
+    ActivatedRoute,
+    Router,
+    RouterLink
+} from '@angular/router';
+
+import { ProductService } from '../../../core/services/product.service';
+
+import { Product } from '../../../core/models/product.model';
+
+import { CartService } from '../../../core/services/cart.service';
+
+import { AuthService } from '../../../core/services/auth.service';
 
 
-    <!-- HEADER -->
+@Component({
+    selector: 'app-product-detail',
 
-    <header
-        class="border-b border-gray-200
-               bg-white
-               dark:border-gray-800
-               dark:bg-gray-900">
+    standalone: true,
 
-        <div
-            class="mx-auto flex max-w-7xl
-                   items-center justify-between
-                   px-4 py-4
-                   sm:px-6 lg:px-8">
+    imports: [
+        CommonModule,
+        RouterLink
+    ],
 
-            <a
-                routerLink="/"
-                class="flex items-center gap-3">
+    templateUrl: './product-detail.component.html'
+})
+export class ProductDetailComponent implements OnInit {
 
-                <img
-                    src="/images/logo/logo.svg"
-                    alt="TTES-ICG Santé"
-                    class="h-10 w-auto">
+    private route = inject(ActivatedRoute);
 
-            </a>
+    private productService = inject(ProductService);
 
+    private cartService = inject(CartService);
 
-            <a
-                routerLink="/"
-                class="rounded-lg
-                       border border-gray-300
-                       px-4 py-2
-                       text-sm font-medium
-                       text-gray-700
-                       hover:bg-gray-50
-                       dark:border-gray-700
-                       dark:text-gray-300">
+    private authService = inject(AuthService);
 
-                ← Retour à la boutique
-
-            </a>
-
-        </div>
-
-    </header>
+    private router = inject(Router);
 
 
-    <!-- LOADING -->
+    addingToCart = false;
 
-    @if (loading) {
+    product: Product | null = null;
 
-        <main
-            class="mx-auto max-w-7xl
-                   px-4 py-16
-                   sm:px-6 lg:px-8">
+    loading = true;
 
-            <div class="flex justify-center">
+    error = '';
 
-                <div
-                    class="h-12 w-12
-                           animate-spin
-                           rounded-full
-                           border-4 border-gray-200
-                           border-t-brand-500">
-                </div>
+    /**
+     * URL de l'image actuellement affichée
+     */
+    selectedImage = '';
 
-            </div>
 
-            <p
-                class="mt-4 text-center
-                       text-gray-500">
+    ngOnInit(): void {
 
-                Chargement du produit...
+        const id =
+            this.route.snapshot.paramMap.get('id');
 
-            </p>
+        if (!id) {
 
-        </main>
+            this.error =
+                'Produit introuvable.';
+
+            this.loading = false;
+
+            return;
+        }
+
+        this.loadProduct(Number(id));
 
     }
 
 
-    <!-- ERROR -->
+    loadProduct(id: number): void {
 
-    @else if (error) {
+        this.loading = true;
 
-        <main
-            class="mx-auto max-w-3xl
-                   px-4 py-16
-                   sm:px-6 lg:px-8">
+        this.error = '';
 
-            <div
-                class="rounded-2xl
-                       border border-red-200
-                       bg-red-50 p-8
-                       text-center">
+        this.productService
+            .getProduct(id)
+            .subscribe({
 
-                <div class="text-5xl">
-                    ⚠️
-                </div>
+                next: (product) => {
 
-                <h1
-                    class="mt-4 text-xl
-                           font-bold text-red-700">
+                    console.log(
+                        'Produit détail :',
+                        product
+                    );
 
-                    Produit introuvable
-
-                </h1>
-
-                <p
-                    class="mt-2 text-red-600">
-
-                    {{ error }}
-
-                </p>
-
-                <a
-                    routerLink="/"
-                    class="mt-6 inline-flex
-                           rounded-lg
-                           bg-brand-500
-                           px-6 py-3
-                           font-semibold
-                           text-white
-                           hover:bg-brand-600">
-
-                    Retour à la boutique
-
-                </a>
-
-            </div>
-
-        </main>
-
-    }
+                    this.product = product;
 
 
-    <!-- PRODUIT -->
-
-    @else if (product) {
-
-        <main
-            class="mx-auto max-w-7xl
-                   px-4 py-10
-                   sm:px-6 lg:px-8">
-
-
-            <!-- BREADCRUMB -->
-
-            <div class="mb-8">
-
-                <a
-                    routerLink="/"
-                    class="text-sm
-                           text-brand-600
-                           hover:underline">
-
-                    ← Boutique
-
-                </a>
-
-            </div>
-
-
-            <!-- DETAILS -->
-
-            <div
-                class="grid grid-cols-1
-                       gap-10
-                       lg:grid-cols-2">
-
-
-                <!-- ================================================= -->
-                <!-- GALERIE IMAGES -->
-                <!-- ================================================= -->
-
-                <div>
-
-                    <!-- IMAGE PRINCIPALE -->
-
-                    <div
-                        class="overflow-hidden
-                               rounded-2xl
-                               border border-gray-200
-                               bg-white
-                               dark:border-gray-800
-                               dark:bg-gray-900">
-
-                        @if (
-                            product.images &&
-                            product.images.length > 0
-                        ) {
-
-                            <img
-                                [src]="selectedImage"
-                                [alt]="product.name"
-                                class="h-[450px]
-                                       w-full
-                                       object-contain
-                                       transition
-                                       duration-300">
-
-                        } @else {
-
-                            <div
-                                class="flex h-[450px]
-                                       items-center
-                                       justify-center
-                                       text-8xl">
-
-                                💊
-
-                            </div>
-
-                        }
-
-                    </div>
-
-
-                    <!-- MINIATURES -->
-
-                    @if (
+                    /*
+                     * On affiche automatiquement
+                     * la première image du produit.
+                     */
+                    if (
                         product.images &&
-                        product.images.length > 1
+                        product.images.length > 0
                     ) {
 
-                        <div
-                            class="mt-4
-                                   flex gap-3
-                                   overflow-x-auto
-                                   pb-2">
+                        this.selectedImage =
+                            product.images[0].imageUrl;
 
-                            @for (
-                                image of product.images;
-                                track image.id
-                            ) {
+                    } else {
 
-                                <button
-                                    type="button"
-                                    (click)="selectImage(image.imageUrl)"
-                                    [class]="
-                                        selectedImage === image.imageUrl
-                                            ? 'h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border-2 border-brand-500 bg-white shadow-sm dark:bg-gray-900'
-                                            : 'h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border-2 border-transparent bg-white hover:border-gray-300 dark:bg-gray-900 dark:hover:border-gray-700'
-                                    ">
-
-                                    <img
-                                        [src]="image.imageUrl"
-                                        [alt]="product.name"
-                                        class="h-full w-full object-cover">
-
-                                </button>
-
-                            }
-
-                        </div>
+                        this.selectedImage = '';
 
                     }
 
 
-                    <!-- NOMBRE D'IMAGES -->
+                    this.loading = false;
 
-                    @if (
-                        product.images &&
-                        product.images.length > 1
-                    ) {
+                },
 
-                        <p
-                            class="mt-2 text-center
-                                   text-xs
-                                   text-gray-500
-                                   dark:text-gray-400">
+                error: (error) => {
 
-                            {{ product.images.length }} images disponibles
+                    console.error(
+                        'Erreur chargement produit :',
+                        error
+                    );
 
-                        </p>
+                    this.error =
+                        error?.error?.message ??
+                        'Impossible de charger le produit.';
 
-                    }
+                    this.loading = false;
 
-                </div>
+                }
 
-
-                <!-- ================================================= -->
-                <!-- INFORMATIONS PRODUIT -->
-                <!-- ================================================= -->
-
-                <div>
-
-                    <!-- ENTREPRISE -->
-
-                    @if (
-                        product.companyName &&
-                        product.companyId
-                    ) {
-
-                        <a
-                            [routerLink]="[
-                                '/companies',
-                                product.companyId
-                            ]"
-                            class="inline-flex items-center gap-2
-                                   text-sm
-                                   font-semibold
-                                   uppercase
-                                   tracking-wide
-                                   text-brand-600
-                                   transition
-                                   hover:text-brand-700
-                                   hover:underline
-                                   dark:text-brand-400
-                                   dark:hover:text-brand-300">
-
-                            <span>
-                                🏢
-                            </span>
-
-                            <span>
-                                {{ product.companyName }}
-                            </span>
-
-                            <span class="text-xs">
-                                →
-                            </span>
-
-                        </a>
-
-                    }
-
-
-                    <!-- NOM -->
-
-                    <h1
-                        class="mt-2 text-3xl
-                               font-bold
-                               text-gray-900
-                               dark:text-white">
-
-                        {{ product.name }}
-
-                    </h1>
-
-
-                    <!-- SKU -->
-
-                    <p
-                        class="mt-2 text-sm
-                               text-gray-500
-                               dark:text-gray-400">
-
-                        SKU : {{ product.sku }}
-
-                    </p>
-
-
-                    <!-- PRIX -->
-
-                    <div
-                        class="mt-6">
-
-                        <span
-                            class="text-3xl
-                                   font-bold
-                                   text-brand-600">
-
-                            {{ formatPrice(product.price) }}
-
-                        </span>
-
-                    </div>
-
-
-                    <!-- ================================================= -->
-                    <!-- DESCRIPTION -->
-                    <!-- ================================================= -->
-
-                    @if (product.description) {
-
-                        <div
-                            class="mt-8">
-
-                            <h2
-                                class="text-lg
-                                       font-semibold
-                                       text-gray-900
-                                       dark:text-white">
-
-                                Description
-
-                            </h2>
-
-                            <div
-                                class="mt-3
-                                       whitespace-pre-line
-                                       leading-7
-                                       text-gray-600
-                                       dark:text-gray-400">
-
-                                {{ product.description }}
-
-                            </div>
-
-                        </div>
-
-                    }
-
-
-                    <!-- ================================================= -->
-                    <!-- INGREDIENTS -->
-                    <!-- ================================================= -->
-
-                    @if (product.ingredients) {
-
-                        <div
-                            class="mt-8">
-
-                            <h2
-                                class="text-lg
-                                       font-semibold
-                                       text-gray-900
-                                       dark:text-white">
-
-                                Ingrédients
-
-                            </h2>
-
-                            <div
-                                class="mt-3
-                                       rounded-xl
-                                       border border-gray-200
-                                       bg-gray-50
-                                       p-5
-                                       dark:border-gray-800
-                                       dark:bg-gray-900">
-
-                                <div
-                                    class="whitespace-pre-line
-                                           leading-7
-                                           text-gray-600
-                                           dark:text-gray-400">
-
-                                    {{ product.ingredients }}
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    }
-
-
-                    <!-- ================================================= -->
-                    <!-- INFORMATIONS MÉDICALES -->
-                    <!-- ================================================= -->
-
-                    <div
-                        class="mt-8
-                               rounded-xl
-                               border
-                               border-gray-200
-                               p-5
-                               dark:border-gray-800">
-
-
-                        <h2
-                            class="mb-4
-                                   text-lg
-                                   font-semibold
-                                   text-gray-900
-                                   dark:text-white">
-
-                            Informations médicales
-
-                        </h2>
-
-
-                        <div
-                            class="grid grid-cols-1
-                                   gap-5
-                                   sm:grid-cols-2">
-
-
-                            <!-- MARQUE -->
-
-                            @if (product.brand) {
-
-                                <div>
-
-                                    <p
-                                        class="text-xs
-                                               text-gray-500
-                                               dark:text-gray-400">
-
-                                        Marque
-
-                                    </p>
-
-                                    <p
-                                        class="mt-1
-                                               font-medium
-                                               text-gray-900
-                                               dark:text-white">
-
-                                        {{ product.brand }}
-
-                                    </p>
-
-                                </div>
-
-                            }
-
-
-                            <!-- PRINCIPE ACTIF -->
-
-                            @if (product.activeIngredient) {
-
-                                <div>
-
-                                    <p
-                                        class="text-xs
-                                               text-gray-500
-                                               dark:text-gray-400">
-
-                                        Principe actif
-
-                                    </p>
-
-                                    <p
-                                        class="mt-1
-                                               font-medium
-                                               text-gray-900
-                                               dark:text-white">
-
-                                        {{ product.activeIngredient }}
-
-                                    </p>
-
-                                </div>
-
-                            }
-
-
-                            <!-- DOSAGE -->
-
-                            @if (product.dosage) {
-
-                                <div>
-
-                                    <p
-                                        class="text-xs
-                                               text-gray-500
-                                               dark:text-gray-400">
-
-                                        Dosage
-
-                                    </p>
-
-                                    <p
-                                        class="mt-1
-                                               font-medium
-                                               text-gray-900
-                                               dark:text-white">
-
-                                        {{ product.dosage }}
-
-                                    </p>
-
-                                </div>
-
-                            }
-
-
-                            <!-- FORME -->
-
-                            @if (product.form) {
-
-                                <div>
-
-                                    <p
-                                        class="text-xs
-                                               text-gray-500
-                                               dark:text-gray-400">
-
-                                        Forme
-
-                                    </p>
-
-                                    <p
-                                        class="mt-1
-                                               font-medium
-                                               text-gray-900
-                                               dark:text-white">
-
-                                        {{ product.form }}
-
-                                    </p>
-
-                                </div>
-
-                            }
-
-
-                            <!-- PRESCRIPTION -->
-
-                            @if (product.requiresPrescription) {
-
-                                <div>
-
-                                    <p
-                                        class="text-xs
-                                               text-gray-500
-                                               dark:text-gray-400">
-
-                                        Prescription
-
-                                    </p>
-
-                                    <p
-                                        class="mt-1
-                                               font-medium
-                                               text-red-600
-                                               dark:text-red-400">
-
-                                        Ordonnance requise
-
-                                    </p>
-
-                                </div>
-
-                            }
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- ================================================= -->
-                    <!-- CATÉGORIES -->
-                    <!-- ================================================= -->
-
-                    @if (
-                        product.categories &&
-                        product.categories.length > 0
-                    ) {
-
-                        <div class="mt-6">
-
-                            <h3
-                                class="mb-3
-                                       font-semibold
-                                       text-gray-900
-                                       dark:text-white">
-
-                                Catégories
-
-                            </h3>
-
-                            <div
-                                class="flex flex-wrap
-                                       gap-2">
-
-                                @for (
-                                    category of product.categories;
-                                    track category
-                                ) {
-
-                                    <span
-                                        class="rounded-full
-                                               bg-gray-100
-                                               px-3 py-1
-                                               text-sm
-                                               text-gray-700
-                                               dark:bg-gray-800
-                                               dark:text-gray-300">
-
-                                        {{ category }}
-
-                                    </span>
-
-                                }
-
-                            </div>
-
-                        </div>
-
-                    }
-
-
-                    <!-- ================================================= -->
-                    <!-- DOMAINES THÉRAPEUTIQUES -->
-                    <!-- ================================================= -->
-
-                    @if (
-                        product.therapeuticAreas &&
-                        product.therapeuticAreas.length > 0
-                    ) {
-
-                        <div class="mt-6">
-
-                            <h3
-                                class="mb-3
-                                       font-semibold
-                                       text-gray-900
-                                       dark:text-white">
-
-                                Domaines thérapeutiques
-
-                            </h3>
-
-                            <div
-                                class="flex flex-wrap
-                                       gap-2">
-
-                                @for (
-                                    area of product.therapeuticAreas;
-                                    track area
-                                ) {
-
-                                    <span
-                                        class="rounded-full
-                                               bg-brand-50
-                                               px-3 py-1
-                                               text-sm
-                                               text-brand-700
-                                               dark:bg-brand-900/30
-                                               dark:text-brand-300">
-
-                                        {{ area }}
-
-                                    </span>
-
-                                }
-
-                            </div>
-
-                        </div>
-
-                    }
-
-
-                    <!-- ================================================= -->
-                    <!-- STOCK -->
-                    <!-- ================================================= -->
-
-                    <div
-                        class="mt-8
-                               rounded-xl
-                               bg-gray-50
-                               p-4
-                               dark:bg-gray-800">
-
-                        <p
-                            class="text-sm
-                                   text-gray-500
-                                   dark:text-gray-400">
-
-                            Disponibilité
-
-                        </p>
-
-                        <p
-                            class="mt-1
-                                   font-semibold
-                                   text-gray-900
-                                   dark:text-white">
-
-                            @if (product.stock > 0) {
-
-                                {{ product.stock }} unité(s)
-                                disponible(s)
-
-                            } @else {
-
-                                <span class="text-red-600">
-                                    Rupture de stock
-                                </span>
-
-                            }
-
-                        </p>
-
-                    </div>
-
-
-                    <!-- ================================================= -->
-                    <!-- PANIER -->
-                    <!-- ================================================= -->
-
-                    <div
-                        class="mt-8
-                               grid grid-cols-1
-                               gap-3
-                               sm:grid-cols-2">
-
-
-                        <!-- AJOUTER AU PANIER -->
-
-                        <button
-                            type="button"
-                            (click)="addToCart()"
-                            [disabled]="
-                                product.stock <= 0 ||
-                                addingToCart
-                            "
-                            class="flex w-full
-                                   items-center
-                                   justify-center
-                                   gap-2
-                                   rounded-lg
-                                   bg-brand-600
-                                   px-4 py-3
-                                   text-sm
-                                   font-semibold
-                                   text-white
-                                   transition
-                                   hover:bg-brand-700
-                                   disabled:cursor-not-allowed
-                                   disabled:opacity-50">
-
-                            @if (!addingToCart) {
-
-                                <span>
-                                    🛒
-                                </span>
-
-                                <span>
-                                    Ajouter au panier
-                                </span>
-
-                            } @else {
-
-                                <span>
-                                    ⏳
-                                </span>
-
-                                <span>
-                                    Ajout en cours...
-                                </span>
-
-                            }
-
-                        </button>
-
-
-                        <!-- VOIR LE PANIER -->
-
-                        <a
-                            routerLink="/cart"
-                            class="flex w-full
-                                   items-center
-                                   justify-center
-                                   gap-2
-                                   rounded-lg
-                                   border border-brand-500
-                                   bg-white
-                                   px-4 py-3
-                                   text-sm
-                                   font-semibold
-                                   text-brand-600
-                                   transition
-                                   hover:bg-brand-50
-                                   dark:bg-gray-900
-                                   dark:text-brand-400
-                                   dark:hover:bg-gray-800">
-
-                            <span>
-                                🛍️
-                            </span>
-
-                            <span>
-                                Voir le panier
-                            </span>
-
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </main>
+            });
 
     }
 
-</div>
+
+    /**
+     * Change l'image principale
+     * lorsqu'une miniature est sélectionnée.
+     */
+    selectImage(imageUrl: string): void {
+
+        this.selectedImage = imageUrl;
+
+    }
+
+
+    addToCart(): void {
+
+        console.log(
+            '🔥 CLICK SUR AJOUTER AU PANIER'
+        );
+
+        if (
+            !this.product ||
+            this.product.stock <= 0
+        ) {
+            return;
+        }
+
+
+        // Vérifier si le client est connecté
+
+        if (!this.authService.isLoggedIn()) {
+
+            alert(
+                'Vous devez créer un compte ou vous connecter pour ajouter un produit au panier.'
+            );
+
+            this.router.navigate([
+                '/signin'
+            ]);
+
+            return;
+        }
+
+
+        // Éviter les doubles clics
+
+        if (this.addingToCart) {
+            return;
+        }
+
+        this.addingToCart = true;
+
+
+        this.cartService
+            .addItem(this.product.id, 1)
+            .subscribe({
+
+                next: (cart) => {
+
+                    console.log(
+                        '✅ Produit ajouté au panier',
+                        cart
+                    );
+
+                    this.addingToCart = false;
+
+                    alert(
+                        'Produit ajouté au panier !'
+                    );
+
+                },
+
+                error: (error) => {
+
+                    console.error(
+                        '❌ Erreur ajout panier',
+                        error
+                    );
+
+                    this.addingToCart = false;
+
+
+                    // Token expiré / invalide
+
+                    if (error.status === 401) {
+
+                        this.authService.logout();
+
+                        this.router.navigate([
+                            '/signin'
+                        ]);
+
+                        return;
+                    }
+
+
+                    alert(
+                        error?.error?.message ??
+                        'Impossible d’ajouter le produit au panier.'
+                    );
+
+                }
+
+            });
+
+    }
+
+
+    formatPrice(price: number): string {
+
+        return new Intl.NumberFormat(
+            'fr-FR'
+        ).format(price) + ' FCFA';
+
+    }
+
+}

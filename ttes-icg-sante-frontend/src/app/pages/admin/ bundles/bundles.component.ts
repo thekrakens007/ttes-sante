@@ -168,6 +168,344 @@ export class BundlesComponent implements OnInit {
     }
 
 
+    /**
+     * Recherche dans toutes les caractéristiques
+     * du pack et de ses produits.
+     */
+    private matchesSearch(
+        bundle: BundleResponse,
+        search: string
+    ): boolean {
+
+        if (!search) {
+
+            return true;
+
+        }
+
+
+        /*
+         * --------------------------------------------------------
+         * CARACTÉRISTIQUES DU PACK
+         * --------------------------------------------------------
+         */
+
+        const bundleFields: string[] = [
+
+            // Nom
+            bundle.name,
+
+            // Description
+            bundle.description,
+
+            // ID
+            String(bundle.id),
+
+            // Prix
+            String(bundle.price),
+
+            // Stock
+            String(bundle.stock)
+
+        ];
+
+
+        /*
+         * --------------------------------------------------------
+         * CARACTÉRISTIQUES DES PRODUITS
+         * --------------------------------------------------------
+         */
+
+        const productFields: string[] = [];
+
+
+        if (
+            bundle.items &&
+            bundle.items.length > 0
+        ) {
+
+            bundle.items.forEach(
+                (item: any) => {
+
+                    /*
+                     * Le backend peut renvoyer
+                     * directement les informations du produit
+                     * ou un objet product imbriqué.
+                     */
+
+                    const product =
+                        item.product ??
+                        item;
+
+
+                    if (!product) {
+
+                        return;
+
+                    }
+
+
+                    // =================================================
+                    // IDENTIFIANTS
+                    // =================================================
+
+                    productFields.push(
+                        String(
+                            product.id ??
+                            ''
+                        )
+                    );
+
+                    productFields.push(
+                        String(
+                            item.productId ??
+                            ''
+                        )
+                    );
+
+
+                    // =================================================
+                    // INFORMATIONS GÉNÉRALES
+                    // =================================================
+
+                    productFields.push(
+                        product.name ??
+                        item.productName ??
+                        ''
+                    );
+
+                    productFields.push(
+                        product.sku ??
+                        ''
+                    );
+
+                    productFields.push(
+                        product.description ??
+                        ''
+                    );
+
+
+                    // =================================================
+                    // CARACTÉRISTIQUES PHARMACEUTIQUES
+                    // =================================================
+
+                    productFields.push(
+                        product.brand ??
+                        ''
+                    );
+
+                    productFields.push(
+                        product.activeIngredient ??
+                        ''
+                    );
+
+                    productFields.push(
+                        product.dosage ??
+                        ''
+                    );
+
+                    productFields.push(
+                        product.form ??
+                        ''
+                    );
+
+                    productFields.push(
+                        product.ingredients ??
+                        ''
+                    );
+
+
+                    // =================================================
+                    // ENTREPRISE
+                    // =================================================
+
+                    productFields.push(
+                        product.companyName ??
+                        ''
+                    );
+
+
+                    productFields.push(
+                        String(
+                            product.companyId ??
+                            ''
+                        )
+                    );
+
+
+                    // =================================================
+                    // CATÉGORIES
+                    // =================================================
+
+                    if (
+                        Array.isArray(
+                            product.categories
+                        )
+                    ) {
+
+                        productFields.push(
+                            ...product.categories
+                        );
+
+                    }
+
+
+                    /*
+                     * Dans certains retours API,
+                     * les catégories peuvent être des objets.
+                     */
+
+                    if (
+                        Array.isArray(
+                            product.categoryNames
+                        )
+                    ) {
+
+                        productFields.push(
+                            ...product.categoryNames
+                        );
+
+                    }
+
+
+                    // =================================================
+                    // DOMAINES THÉRAPEUTIQUES
+                    // =================================================
+
+                    if (
+                        Array.isArray(
+                            product.therapeuticAreas
+                        )
+                    ) {
+
+                        productFields.push(
+                            ...product.therapeuticAreas
+                        );
+
+                    }
+
+
+                    if (
+                        Array.isArray(
+                            product.therapeuticAreaNames
+                        )
+                    ) {
+
+                        productFields.push(
+                            ...product.therapeuticAreaNames
+                        );
+
+                    }
+
+
+                    // =================================================
+                    // PRIX / STOCK
+                    // =================================================
+
+                    productFields.push(
+                        String(
+                            product.price ??
+                            ''
+                        )
+                    );
+
+                    productFields.push(
+                        String(
+                            product.stock ??
+                            item.stock ??
+                            ''
+                        )
+                    );
+
+
+                    // =================================================
+                    // QUANTITÉ DANS LE PACK
+                    // =================================================
+
+                    productFields.push(
+                        String(
+                            item.quantity ??
+                            ''
+                        )
+                    );
+
+                }
+            );
+
+        }
+
+
+        /*
+         * --------------------------------------------------------
+         * CONSTRUCTION DU TEXTE DE RECHERCHE
+         * --------------------------------------------------------
+         */
+
+        const searchableText = [
+            ...bundleFields,
+            ...productFields
+        ]
+            .filter(
+                value =>
+                    value !== null &&
+                    value !== undefined &&
+                    String(value).trim() !== ''
+            )
+            .map(
+                value =>
+                    this.normalizeSearchText(
+                        String(value)
+                    )
+            )
+            .join(' ');
+
+
+        /*
+         * --------------------------------------------------------
+         * RECHERCHE
+         * --------------------------------------------------------
+         */
+
+        const normalizedSearch =
+            this.normalizeSearchText(
+                search
+            );
+
+
+        return searchableText.includes(
+            normalizedSearch
+        );
+
+    }
+
+
+    /**
+     * Normalise le texte afin que :
+     *
+     * "Paracétamol"
+     *
+     * puisse être trouvé avec :
+     *
+     * "paracetamol"
+     *
+     * et inversement.
+     */
+    private normalizeSearchText(
+        value: string
+    ): string {
+
+        return value
+            .normalize('NFD')
+            .replace(
+                /[\u0300-\u036f]/g,
+                ''
+            )
+            .toLowerCase()
+            .trim();
+
+    }
+
+
     // ============================================================
     // FILTRES
     // ============================================================
@@ -193,47 +531,33 @@ export class BundlesComponent implements OnInit {
     applyFilters(): void {
 
         const search =
-            this.searchTerm
-                .trim()
-                .toLowerCase();
+            this.searchTerm.trim();
 
 
         this.filteredBundles =
             this.bundles.filter(
                 bundle => {
 
-                    // ==========================================
-                    // RECHERCHE
-                    // ==========================================
+                    // =================================================
+                    // RECHERCHE GLOBALE
+                    // =================================================
 
-                    if (search) {
+                    if (
+                        search &&
+                        !this.matchesSearch(
+                            bundle,
+                            search
+                        )
+                    ) {
 
-                        const name =
-                            String(
-                                bundle.name ?? ''
-                            ).toLowerCase();
-
-                        const id =
-                            String(
-                                bundle.id
-                            ).toLowerCase();
-
-                        const matchesSearch =
-                            name.includes(search) ||
-                            id.includes(search);
-
-                        if (!matchesSearch) {
-
-                            return false;
-
-                        }
+                        return false;
 
                     }
 
 
-                    // ==========================================
+                    // =================================================
                     // STATUT
-                    // ==========================================
+                    // =================================================
 
                     if (
                         this.statusFilter ===
@@ -257,9 +581,9 @@ export class BundlesComponent implements OnInit {
                     }
 
 
-                    // ==========================================
+                    // =================================================
                     // STOCK
-                    // ==========================================
+                    // =================================================
 
                     const stock =
                         Number(
@@ -309,11 +633,13 @@ export class BundlesComponent implements OnInit {
             );
 
 
-        // Éviter de rester sur une page inexistante
-        // après une recherche ou un filtre.
+        /*
+         * Corriger la page actuelle si nécessaire.
+         */
 
         const totalPages =
             this.totalPages;
+
 
         if (
             totalPages > 0 &&
@@ -361,6 +687,7 @@ export class BundlesComponent implements OnInit {
 
         }
 
+
         return Math.ceil(
             this.filteredBundles.length /
             this.pageSize
@@ -403,7 +730,9 @@ export class BundlesComponent implements OnInit {
     }
 
 
-    goToPage(page: number): void {
+    goToPage(
+        page: number
+    ): void {
 
         if (
             page < 1 ||
@@ -478,8 +807,11 @@ export class BundlesComponent implements OnInit {
     private scrollToTop(): void {
 
         window.scrollTo({
+
             top: 0,
+
             behavior: 'smooth'
+
         });
 
     }

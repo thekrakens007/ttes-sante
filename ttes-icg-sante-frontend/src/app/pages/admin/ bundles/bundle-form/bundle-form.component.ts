@@ -1,4 +1,3 @@
-```ts
 import {
     Component,
     OnInit,
@@ -1759,4 +1758,3 @@ export class BundleFormComponent implements OnInit {
         );
     }
 }
-```

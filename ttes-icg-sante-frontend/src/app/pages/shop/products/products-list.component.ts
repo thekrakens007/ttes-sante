@@ -51,9 +51,11 @@ export class ProductsListComponent implements OnInit {
     // =========================================================
 
     products: Product[] = [];
+
     filteredProducts: Product[] = [];
 
     loading = true;
+
     error = '';
 
 
@@ -69,11 +71,15 @@ export class ProductsListComponent implements OnInit {
     // =========================================================
 
     selectedCategory = '';
+
     selectedCompany = '';
+
     selectedTherapeuticArea = '';
 
     categories: string[] = [];
+
     companies: string[] = [];
+
     therapeuticAreas: string[] = [];
 
 
@@ -83,12 +89,10 @@ export class ProductsListComponent implements OnInit {
 
     currentPage = 0;
 
-    /**
-     * Nombre de produits affichés par page.
-     */
     pageSize = 12;
 
     totalPages = 0;
+
     totalElements = 0;
 
 
@@ -104,6 +108,7 @@ export class ProductsListComponent implements OnInit {
     // =========================================================
 
     cart: CartResponse | null = null;
+
     cartCount = 0;
 
 
@@ -112,7 +117,9 @@ export class ProductsListComponent implements OnInit {
     // =========================================================
 
     ngOnInit(): void {
+
         this.loadProducts();
+
         this.loadCart();
     }
 
@@ -124,9 +131,11 @@ export class ProductsListComponent implements OnInit {
     loadProducts(): void {
 
         this.loading = true;
+
         this.error = '';
 
         const keyword = this.searchTerm.trim();
+
 
         const request$ = keyword
             ? this.productService.searchProductsPaginated(
@@ -139,37 +148,50 @@ export class ProductsListComponent implements OnInit {
                 this.pageSize
             );
 
+
         request$.subscribe({
 
             next: (response) => {
 
-                this.products = response.content ?? [];
+                this.products =
+                    response.content ?? [];
 
-                this.totalPages = response.totalPages ?? 0;
 
-                this.totalElements = response.totalElements ?? 0;
+                this.totalPages =
+                    response.totalPages ?? 0;
+
+
+                this.totalElements =
+                    response.totalElements ?? 0;
+
 
                 this.buildFilters();
 
                 this.applyLocalFilters();
 
+
                 this.loading = false;
             },
 
-            error: (err) => {
+
+            error: (err: unknown) => {
 
                 console.error(
                     'Erreur chargement produits :',
                     err
                 );
 
+
                 this.error =
                     'Impossible de charger les produits.';
 
+
                 this.products = [];
+
                 this.filteredProducts = [];
 
                 this.totalPages = 0;
+
                 this.totalElements = 0;
 
                 this.loading = false;
@@ -191,75 +213,162 @@ export class ProductsListComponent implements OnInit {
 
 
     // =========================================================
-    // FILTRES
+    // CONSTRUCTION DES FILTRES
     // =========================================================
 
     buildFilters(): void {
 
-        const categories = new Set<string>();
-        const companies = new Set<string>();
-        const therapeuticAreas = new Set<string>();
+        const categories =
+            new Set<string>();
+
+
+        const companies =
+            new Set<string>();
+
+
+        const therapeuticAreas =
+            new Set<string>();
+
 
         for (const product of this.products) {
 
-            if (product.category) {
-                categories.add(product.category);
+
+            // -------------------------------------------------
+            // CATÉGORIES
+            // -------------------------------------------------
+
+            if (product.categories) {
+
+                for (
+                    const category
+                    of product.categories
+                ) {
+
+                    if (category) {
+
+                        categories.add(category);
+                    }
+                }
             }
+
+
+            // -------------------------------------------------
+            // ENTREPRISE
+            // -------------------------------------------------
 
             if (product.companyName) {
-                companies.add(product.companyName);
-            }
 
-            if (product.therapeuticArea) {
-                therapeuticAreas.add(
-                    product.therapeuticArea
+                companies.add(
+                    product.companyName
                 );
             }
+
+
+            // -------------------------------------------------
+            // DOMAINES THÉRAPEUTIQUES
+            // -------------------------------------------------
+
+            if (product.therapeuticAreas) {
+
+                for (
+                    const area
+                    of product.therapeuticAreas
+                ) {
+
+                    if (area) {
+
+                        therapeuticAreas.add(area);
+                    }
+                }
+            }
         }
+
 
         this.categories =
             Array.from(categories).sort();
 
+
         this.companies =
             Array.from(companies).sort();
+
 
         this.therapeuticAreas =
             Array.from(therapeuticAreas).sort();
     }
 
 
+    // =========================================================
+    // APPLICATION DES FILTRES
+    // =========================================================
+
     applyLocalFilters(): void {
 
         this.filteredProducts =
-            this.products.filter(product => {
+            this.products.filter(
+                (product) => {
 
-                const matchesCategory =
-                    !this.selectedCategory ||
-                    product.category === this.selectedCategory;
 
-                const matchesCompany =
-                    !this.selectedCompany ||
-                    product.companyName === this.selectedCompany;
+                    // -----------------------------------------
+                    // CATÉGORIE
+                    // -----------------------------------------
 
-                const matchesTherapeuticArea =
-                    !this.selectedTherapeuticArea ||
-                    product.therapeuticArea ===
-                    this.selectedTherapeuticArea;
+                    const matchesCategory =
+                        !this.selectedCategory ||
+                        (
+                            product.categories
+                            ?? []
+                        ).includes(
+                            this.selectedCategory
+                        );
 
-                return (
-                    matchesCategory &&
-                    matchesCompany &&
-                    matchesTherapeuticArea
-                );
-            });
+
+                    // -----------------------------------------
+                    // ENTREPRISE
+                    // -----------------------------------------
+
+                    const matchesCompany =
+                        !this.selectedCompany ||
+                        product.companyName ===
+                        this.selectedCompany;
+
+
+                    // -----------------------------------------
+                    // DOMAINE THÉRAPEUTIQUE
+                    // -----------------------------------------
+
+                    const matchesTherapeuticArea =
+                        !this.selectedTherapeuticArea ||
+                        (
+                            product.therapeuticAreas
+                            ?? []
+                        ).includes(
+                            this.selectedTherapeuticArea
+                        );
+
+
+                    return (
+                        matchesCategory &&
+                        matchesCompany &&
+                        matchesTherapeuticArea
+                    );
+                }
+            );
     }
 
+
+    // =========================================================
+    // CHANGEMENT DE FILTRE
+    // =========================================================
 
     onFilterChange(): void {
 
         this.applyLocalFilters();
     }
 
+
+    // =========================================================
+    // RESET FILTRES
+    // =========================================================
 
     resetFilters(): void {
 
@@ -281,30 +390,24 @@ export class ProductsListComponent implements OnInit {
     // PAGINATION
     // =========================================================
 
-    /**
-     * Retourne les boutons de pagination.
-     *
-     * Exemple avec 50 pages :
-     *
-     * 1 ... 24 25 26 ... 50
-     *
-     * On utilise des objets plutôt que
-     * (number | string)[] afin d'éviter les erreurs
-     * de typage dans les templates Angular.
-     */
     getPaginationPages(): PaginationPage[] {
 
-        const total = this.totalPages;
-        const current = this.currentPage;
+        const total =
+            this.totalPages;
+
+
+        const current =
+            this.currentPage;
+
 
         if (total <= 0) {
+
             return [];
         }
 
 
         // -----------------------------------------------------
-        // Peu de pages :
-        // 1 2 3 4 5 6 7
+        // 7 pages ou moins
         // -----------------------------------------------------
 
         if (total <= 7) {
@@ -312,7 +415,9 @@ export class ProductsListComponent implements OnInit {
             return Array.from(
                 { length: total },
                 (_, index) => ({
+
                     type: 'page' as const,
+
                     value: index
                 })
             );
@@ -323,28 +428,33 @@ export class ProductsListComponent implements OnInit {
 
 
         // -----------------------------------------------------
-        // Première page
+        // PREMIÈRE PAGE
         // -----------------------------------------------------
 
         pages.push({
+
             type: 'page',
+
             value: 0
         });
 
 
-        let start = Math.max(
-            1,
-            current - 1
-        );
+        let start =
+            Math.max(
+                1,
+                current - 1
+            );
 
-        let end = Math.min(
-            total - 2,
-            current + 1
-        );
+
+        let end =
+            Math.min(
+                total - 2,
+                current + 1
+            );
 
 
         // -----------------------------------------------------
-        // Début de pagination
+        // DÉBUT
         //
         // 1 2 3 4 ... 50
         // -----------------------------------------------------
@@ -358,7 +468,7 @@ export class ProductsListComponent implements OnInit {
 
 
         // -----------------------------------------------------
-        // Fin de pagination
+        // FIN
         //
         // 1 ... 47 48 49 50
         // -----------------------------------------------------
@@ -372,19 +482,20 @@ export class ProductsListComponent implements OnInit {
 
 
         // -----------------------------------------------------
-        // "..."
+        // PREMIER "..."
         // -----------------------------------------------------
 
         if (start > 1) {
 
             pages.push({
+
                 type: 'ellipsis'
             });
         }
 
 
         // -----------------------------------------------------
-        // Pages centrales
+        // PAGES CENTRALES
         // -----------------------------------------------------
 
         for (
@@ -394,30 +505,35 @@ export class ProductsListComponent implements OnInit {
         ) {
 
             pages.push({
+
                 type: 'page',
+
                 value: i
             });
         }
 
 
         // -----------------------------------------------------
-        // Deuxième "..."
+        // DEUXIÈME "..."
         // -----------------------------------------------------
 
         if (end < total - 2) {
 
             pages.push({
+
                 type: 'ellipsis'
             });
         }
 
 
         // -----------------------------------------------------
-        // Dernière page
+        // DERNIÈRE PAGE
         // -----------------------------------------------------
 
         pages.push({
+
             type: 'page',
+
             value: total - 1
         });
 
@@ -426,26 +542,44 @@ export class ProductsListComponent implements OnInit {
     }
 
 
+    // =========================================================
+    // ALLER À UNE PAGE
+    // =========================================================
+
     goToPage(page: number): void {
 
         if (
+
             page < 0 ||
+
             page >= this.totalPages ||
+
             page === this.currentPage
+
         ) {
+
             return;
         }
 
+
         this.currentPage = page;
+
 
         this.loadProducts();
 
+
         window.scrollTo({
+
             top: 0,
+
             behavior: 'smooth'
         });
     }
 
+
+    // =========================================================
+    // PAGE SUIVANTE
+    // =========================================================
 
     nextPage(): void {
 
@@ -456,15 +590,23 @@ export class ProductsListComponent implements OnInit {
 
             this.currentPage++;
 
+
             this.loadProducts();
 
+
             window.scrollTo({
+
                 top: 0,
+
                 behavior: 'smooth'
             });
         }
     }
 
+
+    // =========================================================
+    // PAGE PRÉCÉDENTE
+    // =========================================================
 
     previousPage(): void {
 
@@ -472,10 +614,14 @@ export class ProductsListComponent implements OnInit {
 
             this.currentPage--;
 
+
             this.loadProducts();
 
+
             window.scrollTo({
+
                 top: 0,
+
                 behavior: 'smooth'
             });
         }
@@ -488,21 +634,28 @@ export class ProductsListComponent implements OnInit {
 
     loadCart(): void {
 
-        if (!this.authService.isAuthenticated()) {
+        // Le vrai AuthService utilise isLoggedIn()
+        if (!this.authService.isLoggedIn()) {
+
             return;
         }
 
-        this.cartService.getMyCart().subscribe({
 
-            next: (cart) => {
+        // Le vrai CartService utilise getCart()
+        this.cartService.getCart().subscribe({
 
-                this.cart = cart;
+            next: (cart: any) => {
+
+                this.cart =
+                    cart as CartResponse;
+
 
                 this.cartCount =
                     cart?.items?.length ?? 0;
             },
 
-            error: (err) => {
+
+            error: (err: unknown) => {
 
                 console.error(
                     'Erreur chargement panier :',

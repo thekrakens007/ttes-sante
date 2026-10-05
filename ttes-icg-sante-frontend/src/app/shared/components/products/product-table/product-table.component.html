@@ -11,8 +11,20 @@
         <div>
 
             <h2 class="text-xl font-semibold text-gray-900">
-                Produits
+
+                @if (isBundleSelectionMode) {
+
+                    Sélection des produits du pack
+
+                }
+                @else {
+
+                    Produits
+
+                }
+
             </h2>
+
 
             <div
                 class="mt-1 flex flex-wrap items-center gap-2"
@@ -36,21 +48,38 @@
 
             </div>
 
+
+            @if (isBundleSelectionMode) {
+
+                <p
+                    class="mt-2 text-sm text-gray-500"
+                >
+                    Sélectionnez les produits à ajouter au pack.
+                    Votre sélection est conservée pendant la recherche
+                    et la navigation entre les pages.
+                </p>
+
+            }
+
         </div>
 
 
+        <!-- ===================================================== -->
         <!-- ACTIONS -->
+        <!-- ===================================================== -->
 
         <div
             class="flex flex-col gap-3 sm:flex-row sm:items-center"
         >
 
-            @if (selectedProductCount > 0) {
+            @if (isBundleSelectionMode) {
+
+                <!-- RETOUR SANS CONFIRMER -->
 
                 <button
                     type="button"
-                    (click)="continueToBundleCreation()"
-                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
+                    (click)="returnToBundle()"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
                 >
 
                     <svg
@@ -65,30 +94,157 @@
                             stroke-linecap="round"
                             stroke-linejoin="round"
                             stroke-width="2"
-                            d="M12 4v16m8-8H4"
+                            d="M15 19l-7-7 7-7"
                         />
 
                     </svg>
 
-                    Créer un pack
-                    ({{ selectedProductCount }})
+                    Retour au pack
 
                 </button>
 
+
+                <!-- CONFIRMER -->
 
                 <button
                     type="button"
-                    (click)="clearProductSelection()"
-                    class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                    (click)="confirmBundleSelection()"
+                    [disabled]="selectedProductCount === 0"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                    Vider la sélection
+
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M5 13l4 4L19 7"
+                        />
+
+                    </svg>
+
+                    Confirmer la sélection
+
+                    @if (selectedProductCount > 0) {
+
+                        ({{ selectedProductCount }})
+
+                    }
+
                 </button>
+
+            }
+            @else {
+
+                @if (selectedProductCount > 0) {
+
+                    <button
+                        type="button"
+                        (click)="continueToBundleCreation()"
+                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
+                    >
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 4v16m8-8H4"
+                            />
+
+                        </svg>
+
+                        Créer un pack
+                        ({{ selectedProductCount }})
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        (click)="clearProductSelection()"
+                        class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                    >
+                        Vider la sélection
+                    </button>
+
+                }
 
             }
 
         </div>
 
     </div>
+
+
+    <!-- ========================================================= -->
+    <!-- MODE SÉLECTION PACK -->
+    <!-- ========================================================= -->
+
+    @if (isBundleSelectionMode) {
+
+        <div
+            class="rounded-xl border border-blue-200 bg-blue-50 p-4"
+        >
+
+            <div class="flex gap-3">
+
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"
+                    />
+
+                </svg>
+
+
+                <div>
+
+                    <p
+                        class="text-sm font-medium text-blue-900"
+                    >
+                        Sélection des produits du pack
+                    </p>
+
+                    <p
+                        class="mt-1 text-sm text-blue-800"
+                    >
+                        Les produits déjà présents dans le pack sont
+                        automatiquement cochés. Vous pouvez ajouter ou
+                        retirer des produits, rechercher et changer de page
+                        sans perdre votre sélection.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    }
 
 
     <!-- ========================================================= -->
@@ -209,11 +365,13 @@
 
                 </svg>
 
+
                 <h3
                     class="mt-4 text-lg font-semibold text-gray-900"
                 >
                     Aucun produit trouvé
                 </h3>
+
 
                 <p class="mt-1 text-sm text-gray-500">
                     Essayez une autre recherche.
@@ -432,28 +590,72 @@
 
                             <div class="flex gap-2">
 
-                                <a
-                                    [routerLink]="[
-                                        '/admin/products/edit',
-                                        product.id
-                                    ]"
-                                    class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700 transition hover:bg-gray-50"
-                                >
-                                    Modifier
-                                </a>
+                                @if (!isBundleSelectionMode) {
 
-
-                                <button
-                                    type="button"
-                                    (click)="
-                                        deleteProduct(
+                                    <a
+                                        [routerLink]="[
+                                            '/admin/products/edit',
                                             product.id
-                                        )
-                                    "
-                                    class="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 transition hover:bg-red-50"
-                                >
-                                    Supprimer
-                                </button>
+                                        ]"
+                                        class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700 transition hover:bg-gray-50"
+                                    >
+                                        Modifier
+                                    </a>
+
+
+                                    <button
+                                        type="button"
+                                        (click)="
+                                            deleteProduct(
+                                                product.id
+                                            )
+                                        "
+                                        class="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 transition hover:bg-red-50"
+                                    >
+                                        Supprimer
+                                    </button>
+
+                                }
+                                @else {
+
+                                    <button
+                                        type="button"
+                                        (click)="
+                                            toggleProductSelection(
+                                                product.id
+                                            )
+                                        "
+                                        class="w-full rounded-lg px-3 py-2 text-center text-xs font-medium transition"
+                                        [class.bg-blue-600]="
+                                            isProductSelected(product.id)
+                                        "
+                                        [class.text-white]="
+                                            isProductSelected(product.id)
+                                        "
+                                        [class.bg-gray-100]="
+                                            !isProductSelected(product.id)
+                                        "
+                                        [class.text-gray-700]="
+                                            !isProductSelected(product.id)
+                                        "
+                                    >
+
+                                        @if (
+                                            isProductSelected(product.id)
+                                        ) {
+
+                                            Retirer du pack
+
+                                        }
+                                        @else {
+
+                                            Ajouter au pack
+
+                                        }
+
+                                    </button>
+
+                                }
 
                             </div>
 

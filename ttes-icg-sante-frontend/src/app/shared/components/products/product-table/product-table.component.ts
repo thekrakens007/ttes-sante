@@ -4,8 +4,13 @@ import {
     inject
 } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+    CommonModule
+} from '@angular/common';
+
+import {
+    FormsModule
+} from '@angular/forms';
 
 import {
     ActivatedRoute,
@@ -14,7 +19,10 @@ import {
 } from '@angular/router';
 
 import { AdminService } from '../../../../core/services/admin.service';
-import { Product } from '../../../../core/models/product.model';
+
+import {
+    Product
+} from '../../../../core/models/product.model';
 
 
 @Component({
@@ -60,37 +68,16 @@ export class ProductTableComponent
     pages: number[] = [];
 
 
-    /**
-     * Sélection globale.
-     *
-     * Le Set n'est jamais réinitialisé lorsqu'on
-     * change de page ou de recherche.
-     */
     selectedProductIds =
         new Set<number>();
 
 
-    /**
-     * Mode sélection pour création/modification
-     * d'un pack.
-     */
     isBundleSelectionMode = false;
 
-
-    /**
-     * IDs présents lorsque l'utilisateur est
-     * arrivé sur cette page.
-     *
-     * Permet à "Annuler" de restaurer la sélection.
-     */
     initialBundleProductIds: number[] = [];
 
-
     bundleReturnMode:
-        | 'new'
-        | 'edit'
-        = 'new';
-
+        'new' | 'edit' = 'new';
 
     bundleReturnId:
         number | null = null;
@@ -98,41 +85,39 @@ export class ProductTableComponent
 
     ngOnInit(): void {
 
-        this.route.queryParams
-            .subscribe(params => {
+        this.route.queryParams.subscribe(
+            params => {
 
                 this.readBundleSelectionParams(
                     params
                 );
 
                 this.loadProducts();
-            });
+            }
+        );
     }
 
 
-    /**
-     * Lit les paramètres du mode sélection.
-     */
     private readBundleSelectionParams(
         params: any
     ): void {
 
-        const selectionMode =
-            params['bundleSelection'];
-
-
         this.isBundleSelectionMode =
-            selectionMode === true ||
-            selectionMode === 'true';
+            params['bundleSelection'] === true ||
+            params['bundleSelection'] === 'true';
 
 
-        if (!this.isBundleSelectionMode) {
+        if (
+            !this.isBundleSelectionMode
+        ) {
 
             this.initialBundleProductIds = [];
 
-            this.bundleReturnMode = 'new';
+            this.bundleReturnMode =
+                'new';
 
-            this.bundleReturnId = null;
+            this.bundleReturnId =
+                null;
 
             return;
         }
@@ -144,23 +129,16 @@ export class ProductTableComponent
             );
 
 
-        /*
-         * Lors de l'arrivée dans la page,
-         * ces IDs représentent l'état initial.
-         */
         this.selectedProductIds =
             new Set(ids);
+
 
         this.initialBundleProductIds =
             [...ids];
 
 
-        const returnMode =
-            params['returnMode'];
-
-
         this.bundleReturnMode =
-            returnMode === 'edit'
+            params['returnMode'] === 'edit'
                 ? 'edit'
                 : 'new';
 
@@ -179,9 +157,6 @@ export class ProductTableComponent
     }
 
 
-    /**
-     * Parse les productIds.
-     */
     private parseProductIds(
         value: any
     ): number[] {
@@ -203,14 +178,14 @@ export class ProductTableComponent
         const ids: number[] = [];
 
 
-        for (const valueItem of values) {
+        for (
+            const valueItem of values
+        ) {
 
-            const parts =
-                String(valueItem)
-                    .split(',');
-
-
-            for (const part of parts) {
+            for (
+                const part of
+                String(valueItem).split(',')
+            ) {
 
                 const id =
                     Number(part);
@@ -221,6 +196,7 @@ export class ProductTableComponent
                     id > 0 &&
                     !ids.includes(id)
                 ) {
+
                     ids.push(id);
                 }
             }
@@ -231,18 +207,12 @@ export class ProductTableComponent
     }
 
 
-    /**
-     * Nombre de produits sélectionnés.
-     */
     get selectedProductCount(): number {
 
         return this.selectedProductIds.size;
     }
 
 
-    /**
-     * Charge les produits.
-     */
     loadProducts(): void {
 
         this.loading = true;
@@ -273,46 +243,43 @@ export class ProductTableComponent
 
         request.subscribe({
 
-            next: (response: any) => {
+            next:
+                (response: any) => {
 
-                this.products =
-                    response.content ?? [];
+                    this.products =
+                        response.content ?? [];
 
-                this.totalPages =
-                    response.totalPages ?? 0;
+                    this.totalPages =
+                        response.totalPages ?? 0;
 
-                this.totalElements =
-                    response.totalElements ?? 0;
+                    this.totalElements =
+                        response.totalElements ?? 0;
 
+                    this.generatePages();
 
-                this.generatePages();
-
-                this.loading = false;
-            },
-
-
-            error: (error) => {
-
-                console.error(
-                    'Erreur chargement produits :',
-                    error
-                );
+                    this.loading = false;
+                },
 
 
-                this.errorMessage =
-                    'Impossible de charger les produits.';
+            error:
+                error => {
 
-                this.products = [];
+                    console.error(
+                        'Erreur chargement produits :',
+                        error
+                    );
 
-                this.loading = false;
-            }
+                    this.errorMessage =
+                        'Impossible de charger les produits.';
+
+                    this.products = [];
+
+                    this.loading = false;
+                }
         });
     }
 
 
-    /**
-     * Génère les pages.
-     */
     generatePages(): void {
 
         this.pages = [];
@@ -323,14 +290,12 @@ export class ProductTableComponent
             i < this.totalPages;
             i++
         ) {
+
             this.pages.push(i);
         }
     }
 
 
-    /**
-     * Recherche.
-     */
     submitSearch(): void {
 
         this.currentPage = 0;
@@ -339,9 +304,6 @@ export class ProductTableComponent
     }
 
 
-    /**
-     * Change de page.
-     */
     goToPage(
         page: number
     ): void {
@@ -361,9 +323,6 @@ export class ProductTableComponent
     }
 
 
-    /**
-     * Page précédente.
-     */
     previousPage(): void {
 
         if (
@@ -377,9 +336,6 @@ export class ProductTableComponent
     }
 
 
-    /**
-     * Page suivante.
-     */
     nextPage(): void {
 
         if (
@@ -394,107 +350,85 @@ export class ProductTableComponent
     }
 
 
-    /**
-     * Sélectionne/désélectionne un produit.
-     *
-     * Le Set persiste entre les pages.
-     */
     toggleProductSelection(
         productId: number
     ): void {
 
         if (
-            this.selectedProductIds
-                .has(productId)
+            this.selectedProductIds.has(
+                productId
+            )
         ) {
 
-            this.selectedProductIds
-                .delete(productId);
+            this.selectedProductIds.delete(
+                productId
+            );
 
         } else {
 
-            this.selectedProductIds
-                .add(productId);
+            this.selectedProductIds.add(
+                productId
+            );
         }
     }
 
 
-    /**
-     * Vérifie si le produit est sélectionné.
-     */
     isProductSelected(
         productId: number
     ): boolean {
 
-        return this.selectedProductIds
-            .has(productId);
+        return this.selectedProductIds.has(
+            productId
+        );
     }
 
 
-    /**
-     * Sélectionne tous les produits visibles.
-     */
     selectAllVisible(): void {
 
         for (
             const product of this.products
         ) {
 
-            this.selectedProductIds
-                .add(product.id);
+            this.selectedProductIds.add(
+                product.id
+            );
         }
     }
 
 
-    /**
-     * Désélectionne tous les produits visibles.
-     */
     deselectAllVisible(): void {
 
         for (
             const product of this.products
         ) {
 
-            this.selectedProductIds
-                .delete(product.id);
+            this.selectedProductIds.delete(
+                product.id
+            );
         }
     }
 
 
-    /**
-     * Vérifie si tous les produits visibles
-     * sont sélectionnés.
-     */
     areAllVisibleSelected(): boolean {
 
-        if (
-            this.products.length === 0
-        ) {
-            return false;
-        }
-
-
-        return this.products.every(
-            product =>
-                this.selectedProductIds
-                    .has(product.id)
+        return (
+            this.products.length > 0 &&
+            this.products.every(
+                product =>
+                    this.selectedProductIds.has(
+                        product.id
+                    )
+            )
         );
     }
 
 
-    /**
-     * Vide toute la sélection.
-     */
     clearProductSelection(): void {
 
         this.selectedProductIds.clear();
     }
 
 
-    /**
-     * Crée un nouveau pack avec les produits
-     * actuellement sélectionnés.
-     */
     continueToBundleCreation(): void {
 
         const productIds =
@@ -522,46 +456,34 @@ export class ProductTableComponent
     }
 
 
-    /**
-     * Annule la sélection en cours.
-     *
-     * Les changements effectués pendant cette
-     * session sont abandonnés.
-     */
     cancelBundleSelection(): void {
 
-        this.selectedProductIds =
-            new Set(
-                this.initialBundleProductIds
-            );
+        const ids =
+            [
+                ...this.initialBundleProductIds
+            ];
 
 
         this.navigateBackToBundle(
-            this.initialBundleProductIds
+            ids
         );
     }
 
 
-    /**
-     * Confirme la sélection actuelle.
-     */
     confirmBundleSelection(): void {
 
-        const productIds =
+        const ids =
             Array.from(
                 this.selectedProductIds
             );
 
 
         this.navigateBackToBundle(
-            productIds
+            ids
         );
     }
 
 
-    /**
-     * Retourne au formulaire du pack.
-     */
     private navigateBackToBundle(
         productIds: number[]
     ): void {
@@ -570,19 +492,14 @@ export class ProductTableComponent
             [...new Set(productIds)];
 
 
-        /*
-         * IMPORTANT :
-         * On conserve les paramètres permettant
-         * au formulaire de savoir s'il s'agit
-         * d'une création ou d'une modification.
-         */
         if (
             this.bundleReturnMode === 'edit' &&
             this.bundleReturnId !== null
         ) {
 
             this.router.navigate(
-                ['/admin/bundles/edit',
+                [
+                    '/admin/bundles/edit',
                     this.bundleReturnId
                 ],
                 {
@@ -609,9 +526,6 @@ export class ProductTableComponent
     }
 
 
-    /**
-     * Image principale.
-     */
     getMainImage(
         product: Product
     ): string {
@@ -638,19 +552,12 @@ export class ProductTableComponent
     }
 
 
-    /**
-     * Couleur de stock.
-     *
-     * Conservée pour compatibilité éventuelle
-     * avec d'autres templates.
-     */
     getStockColor(
         stock: number
     ):
-        | 'success'
-        | 'warning'
-        | 'error'
-    {
+        'success' |
+        'warning' |
+        'error' {
 
         if (stock <= 0) {
             return 'error';
@@ -666,9 +573,6 @@ export class ProductTableComponent
     }
 
 
-    /**
-     * Label du stock.
-     */
     getStockLabel(
         stock: number
     ): string {
@@ -687,9 +591,6 @@ export class ProductTableComponent
     }
 
 
-    /**
-     * Suppression d'un produit.
-     */
     deleteProduct(
         productId: number
     ): void {
@@ -709,24 +610,25 @@ export class ProductTableComponent
 
                 next: () => {
 
-                    this.selectedProductIds
-                        .delete(productId);
+                    this.selectedProductIds.delete(
+                        productId
+                    );
 
                     this.loadProducts();
                 },
 
 
-                error: (error) => {
+                error:
+                    error => {
 
-                    console.error(
-                        'Erreur suppression produit :',
-                        error
-                    );
+                        console.error(
+                            'Erreur suppression produit :',
+                            error
+                        );
 
-
-                    this.errorMessage =
-                        'Impossible de supprimer le produit.';
-                }
+                        this.errorMessage =
+                            'Impossible de supprimer le produit.';
+                    }
             });
     }
 }

@@ -9,8 +9,11 @@ import {
 } from '@angular/common';
 
 import {
+    FormBuilder,
+    FormGroup,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    Validators
 } from '@angular/forms';
 
 import {
@@ -72,7 +75,11 @@ interface BundleDraft {
     ],
     templateUrl: './bundle-form.component.html'
 })
-export class BundleFormComponent implements OnInit {
+export class BundleFormComponent
+    implements OnInit {
+
+    private fb =
+        inject(FormBuilder);
 
     private bundleService =
         inject(BundleService);
@@ -91,67 +98,100 @@ export class BundleFormComponent implements OnInit {
         'ttes_bundle_draft';
 
 
-    /* =========================================================
+    /* =====================================================
+       FORMULAIRE
+       ===================================================== */
+
+    form: FormGroup;
+
+
+    /* =====================================================
+       ETAT
+       ===================================================== */
+
+    loading = false;
+
+    saving = false;
+
+
+    success = '';
+
+    error = '';
+
+
+    /* =====================================================
        MODE
-       ========================================================= */
+       ===================================================== */
 
     bundleId: number | null = null;
 
     isEditMode = false;
 
 
-    /* =========================================================
-       ETAT
-       ========================================================= */
-
-    loading = false;
-
-    saving = false;
-
-    errorMessage = '';
-
-    successMessage = '';
-
-
-    /* =========================================================
-       INFORMATIONS DU PACK
-       ========================================================= */
-
-    name = '';
-
-    description = '';
-
-    price = 0;
-
-    discountPercentage = 0;
-
-    active = true;
-
-
-    /* =========================================================
+    /* =====================================================
        PRODUITS
-       ========================================================= */
+       ===================================================== */
 
     items: BundleFormItem[] = [];
 
 
-    /* =========================================================
+    /* =====================================================
        IMAGES
-       ========================================================= */
+       ===================================================== */
 
     images: BundleFormImage[] = [];
 
 
-    /* =========================================================
+    /* =====================================================
        SELECTION INITIALE
-       ========================================================= */
+       ===================================================== */
 
     initialProductIds: number[] = [];
 
 
-    /* =========================================================
-       LIFECYCLE
-       ========================================================= */
+    constructor() {
+
+        this.form =
+            this.fb.group({
+
+                name: [
+                    '',
+                    [
+                        Validators.required,
+                        Validators.maxLength(255)
+                    ]
+                ],
+
+                description: [
+                    ''
+                ],
+
+                price: [
+                    0,
+                    [
+                        Validators.required,
+                        Validators.min(0)
+                    ]
+                ],
+
+                discountPercentage: [
+                    0,
+                    [
+                        Validators.min(0),
+                        Validators.max(100)
+                    ]
+                ],
+
+                active: [
+                    true
+                ]
+            });
+    }
+
+
+    /* =====================================================
+       INIT
+       ===================================================== */
 
     ngOnInit(): void {
 
@@ -160,6 +200,7 @@ export class BundleFormComponent implements OnInit {
 
                 const id =
                     params.get('id');
+
 
                 if (id) {
 
@@ -183,9 +224,9 @@ export class BundleFormComponent implements OnInit {
     }
 
 
-    /* =========================================================
-       PRODUITS SELECTIONNES
-       ========================================================= */
+    /* =====================================================
+       GETTERS COMPATIBILITE
+       ===================================================== */
 
     get selectedItems(): BundleFormItem[] {
         return this.items;
@@ -195,7 +236,8 @@ export class BundleFormComponent implements OnInit {
     get selectedProductIds(): number[] {
 
         return this.items.map(
-            item => item.productId
+            item =>
+                item.productId
         );
     }
 
@@ -206,9 +248,41 @@ export class BundleFormComponent implements OnInit {
     }
 
 
-    /* =========================================================
-       TITRES
-       ========================================================= */
+    get name(): string {
+
+        return this.form.get('name')?.value ?? '';
+    }
+
+
+    get description(): string {
+
+        return this.form.get('description')?.value ?? '';
+    }
+
+
+    get price(): number {
+
+        return Number(
+            this.form.get('price')?.value ?? 0
+        );
+    }
+
+
+    get discountPercentage(): number {
+
+        return Number(
+            this.form.get(
+                'discountPercentage'
+            )?.value ?? 0
+        );
+    }
+
+
+    get active(): boolean {
+
+        return this.form.get('active')?.value ?? true;
+    }
+
 
     get pageTitle(): string {
 
@@ -227,15 +301,16 @@ export class BundleFormComponent implements OnInit {
                 : 'Création...';
         }
 
+
         return this.isEditMode
             ? 'Modifier le pack'
             : 'Créer le pack';
     }
 
 
-    /* =========================================================
+    /* =====================================================
        CREATION
-       ========================================================= */
+       ===================================================== */
 
     private initializeCreateMode(): void {
 
@@ -245,58 +320,80 @@ export class BundleFormComponent implements OnInit {
 
         if (draft) {
 
-            this.name =
-                draft.name ?? '';
+            this.form.patchValue({
 
-            this.description =
-                draft.description ?? '';
+                name:
+                    draft.name ?? '',
 
-            this.price =
-                Number(
-                    draft.price ?? 0
-                );
+                description:
+                    draft.description ?? '',
 
-            this.discountPercentage =
-                Number(
-                    draft.discountPercentage ?? 0
-                );
+                price:
+                    Number(
+                        draft.price ?? 0
+                    ),
 
-            this.active =
-                draft.active ?? true;
+                discountPercentage:
+                    Number(
+                        draft.discountPercentage ?? 0
+                    ),
+
+                active:
+                    draft.active ?? true
+            });
 
 
             this.items =
                 Array.isArray(draft.items)
-                    ? draft.items
+                    ? draft.items.map(
+                        item => ({
+                            productId:
+                                Number(
+                                    item.productId
+                                ),
+
+                            productName:
+                                item.productName ?? '',
+
+                            quantity:
+                                Number(
+                                    item.quantity ?? 1
+                                ),
+
+                            stock:
+                                Number(
+                                    item.stock ?? 0
+                                ),
+
+                            imageUrl:
+                                item.imageUrl ?? ''
+                        })
+                    )
                     : [];
 
 
             this.images =
                 Array.isArray(draft.images)
-                    ? draft.images
+                    ? draft.images.map(
+                        (
+                            image,
+                            index
+                        ) => ({
+
+                            imageUrl:
+                                image.imageUrl ?? '',
+
+                            displayOrder:
+                                Number(
+                                    image.displayOrder ??
+                                    index
+                                ),
+
+                            main:
+                                image.main === true
+                        })
+                    )
                     : [];
-
-
-            /*
-             * Compatibilité avec les anciens brouillons
-             * qui n'avaient pas la propriété main.
-             */
-            this.images =
-                this.images.map(
-                    (image, index) => ({
-                        imageUrl:
-                            image.imageUrl ?? '',
-
-                        displayOrder:
-                            Number(
-                                image.displayOrder ??
-                                index
-                            ),
-
-                        main:
-                            image.main === true
-                    })
-                );
 
 
             this.initialProductIds =
@@ -305,6 +402,8 @@ export class BundleFormComponent implements OnInit {
                         item.productId
                 );
 
+
+            this.ensureMainImage();
 
             return;
         }
@@ -339,9 +438,9 @@ export class BundleFormComponent implements OnInit {
     }
 
 
-    /* =========================================================
+    /* =====================================================
        MODIFICATION
-       ========================================================= */
+       ===================================================== */
 
     private loadBundleForEdit(): void {
 
@@ -354,7 +453,7 @@ export class BundleFormComponent implements OnInit {
 
         this.loading = true;
 
-        this.errorMessage = '';
+        this.error = '';
 
 
         this.bundleService
@@ -363,46 +462,45 @@ export class BundleFormComponent implements OnInit {
             )
             .subscribe({
 
-                next: (
-                    bundle: BundleResponse
-                ) => {
+                next:
+                    (
+                        bundle: BundleResponse
+                    ) => {
 
-                    this.fillForm(
-                        bundle
-                    );
-
-
-                    this.initialProductIds =
-                        this.items.map(
-                            item =>
-                                item.productId
+                        this.fillForm(
+                            bundle
                         );
 
+                        this.initialProductIds =
+                            this.items.map(
+                                item =>
+                                    item.productId
+                            );
 
-                    this.loading = false;
-                },
-
-
-                error: error => {
-
-                    console.error(
-                        'Erreur chargement du pack :',
-                        error
-                    );
+                        this.loading = false;
+                    },
 
 
-                    this.errorMessage =
-                        'Impossible de charger le pack.';
+                error:
+                    error => {
 
-                    this.loading = false;
-                }
+                        console.error(
+                            'Erreur chargement pack :',
+                            error
+                        );
+
+                        this.error =
+                            'Impossible de charger le pack.';
+
+                        this.loading = false;
+                    }
             });
     }
 
 
-    /* =========================================================
-       REMPLISSAGE DU FORMULAIRE
-       ========================================================= */
+    /* =====================================================
+       REMPLIR LE FORMULAIRE
+       ===================================================== */
 
     private fillForm(
         bundle: BundleResponse
@@ -412,33 +510,29 @@ export class BundleFormComponent implements OnInit {
             bundle as any;
 
 
-        this.name =
-            data.name ?? '';
+        this.form.patchValue({
+
+            name:
+                data.name ?? '',
+
+            description:
+                data.description ?? '',
+
+            price:
+                Number(
+                    data.price ?? 0
+                ),
+
+            discountPercentage:
+                Number(
+                    data.discountPercentage ?? 0
+                ),
+
+            active:
+                data.active ?? true
+        });
 
 
-        this.description =
-            data.description ?? '';
-
-
-        this.price =
-            Number(
-                data.price ?? 0
-            );
-
-
-        this.discountPercentage =
-            Number(
-                data.discountPercentage ?? 0
-            );
-
-
-        this.active =
-            data.active ?? true;
-
-
-        /*
-         * Produits du pack
-         */
         this.items =
             (data.items ?? []).map(
                 (item: any) => {
@@ -451,12 +545,6 @@ export class BundleFormComponent implements OnInit {
                         Number(
                             item.productId ??
                             product.id
-                        );
-
-
-                    const imageUrl =
-                        this.getProductMainImage(
-                            product
                         );
 
 
@@ -479,18 +567,21 @@ export class BundleFormComponent implements OnInit {
                                 product.stock ?? 0
                             ),
 
-                        imageUrl
+                        imageUrl:
+                            this.getProductMainImage(
+                                product
+                            )
                     };
                 }
             );
 
 
-        /*
-         * Images du pack
-         */
         this.images =
             (data.images ?? []).map(
-                (image: any, index: number) => ({
+                (
+                    image: any,
+                    index: number
+                ) => ({
 
                     imageUrl:
                         image.imageUrl ??
@@ -510,9 +601,9 @@ export class BundleFormComponent implements OnInit {
 
 
         /*
-         * Si aucune image de pack n'existe,
-         * on récupère automatiquement les images
-         * principales des produits.
+         * Si le backend n'a pas envoyé les images
+         * du pack, on utilise les images principales
+         * des produits.
          */
         if (
             this.images.length === 0
@@ -534,25 +625,13 @@ export class BundleFormComponent implements OnInit {
         }
 
 
-        /*
-         * S'il existe des images mais aucune image
-         * principale, la première devient principale.
-         */
-        if (
-            this.images.length > 0 &&
-            !this.images.some(
-                image => image.main
-            )
-        ) {
-
-            this.images[0].main = true;
-        }
+        this.ensureMainImage();
     }
 
 
-    /* =========================================================
-       PARSE IDS
-       ========================================================= */
+    /* =====================================================
+       IDS
+       ===================================================== */
 
     private parseProductIds(
         value: any
@@ -579,13 +658,9 @@ export class BundleFormComponent implements OnInit {
             const valueItem of values
         ) {
 
-            const parts =
-                String(valueItem)
-                    .split(',');
-
-
             for (
-                const part of parts
+                const part of
+                String(valueItem).split(',')
             ) {
 
                 const id =
@@ -608,9 +683,9 @@ export class BundleFormComponent implements OnInit {
     }
 
 
-    /* =========================================================
-       CHARGEMENT DES PRODUITS
-       ========================================================= */
+    /* =====================================================
+       CHARGER LES PRODUITS
+       ===================================================== */
 
     private loadSelectedProducts(
         productIds: number[],
@@ -661,23 +736,19 @@ export class BundleFormComponent implements OnInit {
         ) {
 
             /*
-             * Produit déjà présent :
-             * on ne l'écrase surtout pas.
+             * Ne jamais écraser un produit
+             * déjà présent.
              *
-             * Cela permet de conserver :
-             * - quantité modifiée
-             * - images modifiées
-             * - autres valeurs du formulaire
+             * Cela conserve notamment la quantité
+             * modifiée par l'utilisateur.
              */
-            const existing =
-                this.items.find(
+            if (
+                this.items.some(
                     item =>
                         item.productId ===
                         productId
-                );
-
-
-            if (existing) {
+                )
+            ) {
 
                 finish();
 
@@ -719,9 +790,8 @@ export class BundleFormComponent implements OnInit {
 
 
                             /*
-                             * Nouveau produit :
-                             * ajout automatique de
-                             * son image principale.
+                             * Seulement les nouveaux produits
+                             * ajoutent automatiquement leur image.
                              */
                             if (
                                 idsWithImages.has(
@@ -741,10 +811,10 @@ export class BundleFormComponent implements OnInit {
 
 
                     error:
-                        (error) => {
+                        error => {
 
                             console.error(
-                                `Erreur chargement produit ${productId}:`,
+                                `Erreur produit ${productId} :`,
                                 error
                             );
 
@@ -755,9 +825,9 @@ export class BundleFormComponent implements OnInit {
     }
 
 
-    /* =========================================================
-       IMAGE PRINCIPALE PRODUIT
-       ========================================================= */
+    /* =====================================================
+       IMAGE PRODUIT
+       ===================================================== */
 
     private getProductMainImage(
         product: Product | any
@@ -792,10 +862,6 @@ export class BundleFormComponent implements OnInit {
         );
     }
 
-
-    /* =========================================================
-       METHODES UTILISEES PAR LE HTML
-       ========================================================= */
 
     getMainImage(
         productId: number
@@ -844,24 +910,19 @@ export class BundleFormComponent implements OnInit {
             );
 
 
-        if (!item) {
-            return null;
-        }
-
-
-        return item.stock;
+        return item?.stock ?? null;
     }
 
 
-    /* =========================================================
-       QUANTITE
-       ========================================================= */
+    /* =====================================================
+       QUANTITES
+       ===================================================== */
 
     updateQuantity(
         item: BundleFormItem
     ): void {
 
-        let quantity =
+        const quantity =
             Number(
                 item.quantity
             );
@@ -872,7 +933,9 @@ export class BundleFormComponent implements OnInit {
             quantity < 1
         ) {
 
-            quantity = 1;
+            item.quantity = 1;
+
+            return;
         }
 
 
@@ -899,7 +962,7 @@ export class BundleFormComponent implements OnInit {
         }
 
 
-        const newQuantity =
+        const value =
             Number(
                 quantity ??
                 item.quantity
@@ -907,8 +970,8 @@ export class BundleFormComponent implements OnInit {
 
 
         if (
-            !Number.isFinite(newQuantity) ||
-            newQuantity < 1
+            !Number.isFinite(value) ||
+            value < 1
         ) {
 
             item.quantity = 1;
@@ -918,15 +981,13 @@ export class BundleFormComponent implements OnInit {
 
 
         item.quantity =
-            Math.floor(
-                newQuantity
-            );
+            Math.floor(value);
     }
 
 
-    /* =========================================================
+    /* =====================================================
        PRODUITS
-       ========================================================= */
+       ===================================================== */
 
     removeProduct(
         productId: number
@@ -953,9 +1014,9 @@ export class BundleFormComponent implements OnInit {
     }
 
 
-    /* =========================================================
-       AJOUT PRODUITS
-       ========================================================= */
+    /* =====================================================
+       AJOUTER DES PRODUITS
+       ===================================================== */
 
     addProducts(): void {
 
@@ -965,9 +1026,6 @@ export class BundleFormComponent implements OnInit {
 
     goToProductSelection(): void {
 
-        /*
-         * Sauvegarde avant de quitter la page.
-         */
         this.saveDraft();
 
 
@@ -1027,9 +1085,9 @@ export class BundleFormComponent implements OnInit {
     }
 
 
-    /* =========================================================
+    /* =====================================================
        IMAGES
-       ========================================================= */
+       ===================================================== */
 
     addImage(
         imageUrl?: string
@@ -1039,11 +1097,6 @@ export class BundleFormComponent implements OnInit {
             imageUrl?.trim() ?? '';
 
 
-        /*
-         * Le HTML actuel appelle addImage()
-         * sans argument pour créer une nouvelle
-         * ligne d'image.
-         */
         if (!url) {
 
             this.images.push({
@@ -1072,7 +1125,11 @@ export class BundleFormComponent implements OnInit {
         imageUrl: string
     ): void {
 
-        if (!imageUrl) {
+        const url =
+            imageUrl.trim();
+
+
+        if (!url) {
             return;
         }
 
@@ -1081,7 +1138,7 @@ export class BundleFormComponent implements OnInit {
             this.images.some(
                 image =>
                     image.imageUrl ===
-                    imageUrl
+                    url
             );
 
 
@@ -1092,7 +1149,7 @@ export class BundleFormComponent implements OnInit {
 
         this.images.push({
 
-            imageUrl,
+            imageUrl: url,
 
             displayOrder:
                 this.images.length,
@@ -1108,15 +1165,13 @@ export class BundleFormComponent implements OnInit {
     ): void {
 
         if (
-            !item.imageUrl
-        ) {
-            return;
-        }
-
-
-        this.addImageIfNotExists(
             item.imageUrl
-        );
+        ) {
+
+            this.addImageIfNotExists(
+                item.imageUrl
+            );
+        }
     }
 
 
@@ -1187,20 +1242,7 @@ export class BundleFormComponent implements OnInit {
 
         this.reindexImages();
 
-
-        /*
-         * Toujours avoir une image principale
-         * lorsqu'il reste des images.
-         */
-        if (
-            this.images.length > 0 &&
-            !this.images.some(
-                image => image.main
-            )
-        ) {
-
-            this.images[0].main = true;
-        }
+        this.ensureMainImage();
     }
 
 
@@ -1222,9 +1264,31 @@ export class BundleFormComponent implements OnInit {
     }
 
 
-    /* =========================================================
+    private ensureMainImage(): void {
+
+        if (
+            this.images.length === 0
+        ) {
+            return;
+        }
+
+
+        if (
+            !this.images.some(
+                image =>
+                    image.main
+            )
+        ) {
+
+            this.images[0].main =
+                true;
+        }
+    }
+
+
+    /* =====================================================
        BROUILLON
-       ========================================================= */
+       ===================================================== */
 
     private saveDraft(): void {
 
@@ -1232,24 +1296,33 @@ export class BundleFormComponent implements OnInit {
             BundleDraft = {
 
             name:
-                this.name,
+                this.form.get(
+                    'name'
+                )?.value ?? '',
 
             description:
-                this.description,
+                this.form.get(
+                    'description'
+                )?.value ?? '',
 
             price:
                 Number(
-                    this.price ?? 0
+                    this.form.get(
+                        'price'
+                    )?.value ?? 0
                 ),
 
             discountPercentage:
                 Number(
-                    this.discountPercentage ??
-                    0
+                    this.form.get(
+                        'discountPercentage'
+                    )?.value ?? 0
                 ),
 
             active:
-                this.active,
+                this.form.get(
+                    'active'
+                )?.value ?? true,
 
             items:
                 this.items.map(
@@ -1263,19 +1336,16 @@ export class BundleFormComponent implements OnInit {
 
                         quantity:
                             Number(
-                                item.quantity ??
-                                1
+                                item.quantity
                             ),
 
                         stock:
                             Number(
-                                item.stock ??
-                                0
+                                item.stock
                             ),
 
                         imageUrl:
-                            item.imageUrl ??
-                            ''
+                            item.imageUrl
                     })
                 ),
 
@@ -1327,13 +1397,9 @@ export class BundleFormComponent implements OnInit {
             }
 
 
-            const draft =
-                JSON.parse(
-                    raw
-                );
-
-
-            return draft;
+            return JSON.parse(
+                raw
+            );
 
         } catch (error) {
 
@@ -1356,47 +1422,27 @@ export class BundleFormComponent implements OnInit {
     }
 
 
-    /* =========================================================
+    /* =====================================================
        VALIDATION
-       ========================================================= */
+       ===================================================== */
 
     isFormValid(): boolean {
 
-        if (
-            !this.name.trim()
-        ) {
-            return false;
-        }
-
-
-        if (
-            this.items.length === 0
-        ) {
-            return false;
-        }
-
-
-        if (
-            !Number.isFinite(
-                this.price
-            ) ||
-            this.price < 0
-        ) {
-            return false;
-        }
-
-
-        return this.items.every(
-            item =>
-                item.productId > 0 &&
-                item.quantity >= 1
+        return (
+            this.form.valid &&
+            this.items.length > 0 &&
+            this.items.every(
+                item =>
+                    item.productId > 0 &&
+                    item.quantity >= 1
+            )
         );
     }
 
 
-    /* =========================================================
+    /* =====================================================
        REQUEST BACKEND
-       ========================================================= */
+       ===================================================== */
 
     private buildRequest():
         BundleRequest {
@@ -1404,25 +1450,37 @@ export class BundleFormComponent implements OnInit {
         return {
 
             name:
-                this.name.trim(),
+                String(
+                    this.form.get(
+                        'name'
+                    )?.value ?? ''
+                ).trim(),
 
             description:
-                this.description?.trim() ??
-                '',
+                String(
+                    this.form.get(
+                        'description'
+                    )?.value ?? ''
+                ).trim(),
 
             price:
                 Number(
-                    this.price ?? 0
+                    this.form.get(
+                        'price'
+                    )?.value ?? 0
                 ),
 
             discountPercentage:
                 Number(
-                    this.discountPercentage ??
-                    0
+                    this.form.get(
+                        'discountPercentage'
+                    )?.value ?? 0
                 ),
 
             active:
-                this.active,
+                this.form.get(
+                    'active'
+                )?.value ?? true,
 
             items:
                 this.items.map(
@@ -1457,25 +1515,60 @@ export class BundleFormComponent implements OnInit {
                                 Number(
                                     image.displayOrder ??
                                     index
-                                )
+                                ),
+
+                            main:
+                                image.main === true
                         })
                     )
         };
     }
 
 
-    /* =========================================================
+    /* =====================================================
        SAUVEGARDE
-       ========================================================= */
+       ===================================================== */
 
     save(): void {
 
+        this.success = '';
+
+        this.error = '';
+
+
         if (
-            !this.isFormValid()
+            this.form.invalid
         ) {
 
-            this.errorMessage =
-                'Veuillez renseigner le nom, le prix et ajouter au moins un produit.';
+            this.form.markAllAsTouched();
+
+            this.error =
+                'Veuillez corriger les informations du formulaire.';
+
+            return;
+        }
+
+
+        if (
+            this.items.length === 0
+        ) {
+
+            this.error =
+                'Veuillez ajouter au moins un produit au pack.';
+
+            return;
+        }
+
+
+        if (
+            !this.items.every(
+                item =>
+                    item.quantity >= 1
+            )
+        ) {
+
+            this.error =
+                'La quantité de chaque produit doit être supérieure ou égale à 1.';
 
             return;
         }
@@ -1483,21 +1576,17 @@ export class BundleFormComponent implements OnInit {
 
         this.saving = true;
 
-        this.errorMessage = '';
-
-        this.successMessage = '';
-
 
         const request =
             this.buildRequest();
 
 
         /*
-         * =====================================================
-         * MODIFICATION
-         * =====================================================
+         * IMPORTANT :
          *
-         * PUT /api/admin/bundles/:id
+         * Modification = PUT /:id
+         *
+         * et surtout PAS POST.
          */
         if (
             this.isEditMode &&
@@ -1511,39 +1600,37 @@ export class BundleFormComponent implements OnInit {
                 )
                 .subscribe({
 
-                    next: () => {
+                    next:
+                        () => {
 
-                        this.saving =
-                            false;
+                            this.saving =
+                                false;
+
+                            this.success =
+                                'Pack modifié avec succès.';
+
+                            this.clearDraft();
 
 
-                        this.clearDraft();
-
-
-                        this.successMessage =
-                            'Pack modifié avec succès.';
-
-
-                        this.router.navigate(
-                            ['/admin/bundles']
-                        );
-                    },
+                            this.router.navigate(
+                                ['/admin/bundles']
+                            );
+                        },
 
 
                     error:
-                        (error) => {
+                        error => {
 
                             console.error(
                                 'Erreur modification pack :',
                                 error
                             );
 
-
                             this.saving =
                                 false;
 
-
-                            this.errorMessage =
+                            this.error =
+                                error?.error?.message ??
                                 'Impossible de modifier le pack.';
                         }
                 });
@@ -1554,11 +1641,7 @@ export class BundleFormComponent implements OnInit {
 
 
         /*
-         * =====================================================
-         * CREATION
-         * =====================================================
-         *
-         * POST /api/admin/bundles
+         * Création = POST
          */
         this.bundleService
             .createBundle(
@@ -1566,48 +1649,46 @@ export class BundleFormComponent implements OnInit {
             )
             .subscribe({
 
-                next: () => {
+                next:
+                    () => {
 
-                    this.saving =
-                        false;
+                        this.saving =
+                            false;
+
+                        this.success =
+                            'Pack créé avec succès.';
+
+                        this.clearDraft();
 
 
-                    this.clearDraft();
-
-
-                    this.successMessage =
-                        'Pack créé avec succès.';
-
-
-                    this.router.navigate(
-                        ['/admin/bundles']
-                    );
-                },
+                        this.router.navigate(
+                            ['/admin/bundles']
+                        );
+                    },
 
 
                 error:
-                    (error) => {
+                    error => {
 
                         console.error(
                             'Erreur création pack :',
                             error
                         );
 
-
                         this.saving =
                             false;
 
-
-                        this.errorMessage =
+                        this.error =
+                            error?.error?.message ??
                             'Impossible de créer le pack.';
                     }
             });
     }
 
 
-    /* =========================================================
+    /* =====================================================
        ANNULATION
-       ========================================================= */
+       ===================================================== */
 
     cancelForm(): void {
 

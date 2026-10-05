@@ -321,11 +321,13 @@ export class ProductTableComponent
     }
 
 
-    get selectedCount(): number {
+    get selectedProductCount(): number {
+    return this.selectedProductIds.size;
+}
 
-        return this.selectedProductIds.size;
-
-    }
+get selectedCount(): number {
+    return this.selectedProductIds.size;
+}
 
 
     /*

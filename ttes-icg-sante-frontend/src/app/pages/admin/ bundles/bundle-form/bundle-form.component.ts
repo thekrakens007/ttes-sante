@@ -68,42 +68,78 @@ export class BundleFormComponent implements OnInit {
     success = '';
 
     /**
-     * Produits disponibles pour le sélecteur manuel
+     * Produits disponibles.
      */
     products: Product[] = [];
 
     /**
-     * Produits sélectionnés dans le pack
+     * Produits présents dans le pack.
      */
     selectedItems: BundleFormItem[] = [];
 
+    /**
+     * Produit sélectionné dans le sélecteur
+     * "Ajouter un autre produit".
+     */
     productToAdd: number | null = null;
+
+    /**
+     * Quantité du produit à ajouter.
+     */
     quantityToAdd = 1;
 
     /**
-     * Images du pack
+     * Images du pack.
+     *
+     * En création :
+     * les images principales des produits sélectionnés
+     * sont ajoutées automatiquement.
+     *
+     * En modification :
+     * les images déjà enregistrées du pack sont conservées.
      */
     images: BundleFormImage[] = [];
 
+    /**
+     * Formulaire principal.
+     */
     form = this.fb.group({
-        name: ['', [
-            Validators.required,
-            Validators.maxLength(255)
-        ]],
 
-        description: [''],
+        name: [
+            '',
+            [
+                Validators.required,
+                Validators.maxLength(255)
+            ]
+        ],
 
-        price: [0, [
-            Validators.required,
-            Validators.min(0)
-        ]],
+        description: [
+            ''
+        ],
 
-        active: [true]
+        price: [
+            0,
+            [
+                Validators.required,
+                Validators.min(0)
+            ]
+        ],
+
+        active: [
+            true
+        ]
     });
+
+
+    // =========================================================
+    // INITIALISATION
+    // =========================================================
 
     ngOnInit(): void {
 
-        const id = this.route.snapshot.paramMap.get('id');
+        const id =
+            this.route.snapshot.paramMap.get('id');
+
 
         /*
          * =====================================================
@@ -125,6 +161,7 @@ export class BundleFormComponent implements OnInit {
             return;
         }
 
+
         /*
          * =====================================================
          * MODE CRÉATION
@@ -140,85 +177,118 @@ export class BundleFormComponent implements OnInit {
                     productId > 0
                 );
 
-        this.initializeSelectedProducts(productIds);
 
         /*
-         * On charge les produits sélectionnés
-         * directement par leur ID.
+         * Initialise les produits sélectionnés
+         * avec quantité = 1.
          */
-        this.loadSelectedProducts(productIds);
+        this.initializeSelectedProducts(
+            productIds
+        );
+
 
         /*
-         * On charge également les produits disponibles
-         * pour permettre d'en ajouter manuellement.
+         * Récupère directement les produits sélectionnés
+         * par leur ID.
+         *
+         * Cela permet de récupérer leurs noms,
+         * leurs images, leur stock, etc.
+         */
+        this.loadSelectedProducts(
+            productIds
+        );
+
+
+        /*
+         * Charge également la liste générale des produits
+         * pour le sélecteur d'ajout manuel.
          */
         this.loadProducts();
     }
 
-    /**
-     * =====================================================
-     * INITIALISATION DES PRODUITS SÉLECTIONNÉS
-     * =====================================================
-     */
 
-    private initializeSelectedProducts(productIds: number[]): void {
+    // =========================================================
+    // INITIALISATION DES PRODUITS SÉLECTIONNÉS
+    // =========================================================
 
-        const uniqueIds = [...new Set(productIds)];
+    private initializeSelectedProducts(
+        productIds: number[]
+    ): void {
 
-        this.selectedItems = uniqueIds.map(productId => ({
-            productId,
-            quantity: 1
-        }));
+        const uniqueIds =
+            [...new Set(productIds)];
+
+
+        this.selectedItems =
+            uniqueIds.map(productId => ({
+
+                productId,
+
+                quantity: 1
+
+            }));
     }
 
-    /**
-     * =====================================================
-     * CHARGEMENT DES PRODUITS SÉLECTIONNÉS
-     * =====================================================
-     *
-     * On récupère chaque produit directement avec son ID.
-     *
-     * Exemple :
-     * /api/products/161
-     * /api/products/143
-     * /api/products/162
-     */
 
-    private loadSelectedProducts(productIds: number[]): void {
+    // =========================================================
+    // CHARGER LES PRODUITS SÉLECTIONNÉS
+    // =========================================================
+
+    private loadSelectedProducts(
+        productIds: number[]
+    ): void {
 
         if (productIds.length === 0) {
             return;
         }
 
+
         this.loading = true;
         this.error = '';
 
-        const requests = productIds.map(productId =>
-            this.productService.getProduct(productId)
-        );
+
+        /*
+         * Un appel API par produit sélectionné.
+         *
+         * Exemple :
+         *
+         * GET /api/products/161
+         * GET /api/products/143
+         * GET /api/products/162
+         */
+        const requests =
+            productIds.map(productId =>
+                this.productService.getProduct(
+                    productId
+                )
+            );
+
 
         forkJoin(requests).subscribe({
 
-            next: (products: Product[]) => {
+            next: (loadedProducts: Product[]) => {
 
-                /*
-                 * On ajoute les produits récupérés à la liste
-                 * sans créer de doublons.
-                 */
-                for (const product of products) {
+                for (const product of loadedProducts) {
 
-                    const alreadyLoaded = this.products.some(
-                        existingProduct =>
-                            existingProduct.id === product.id
+                    this.addProductToLocalList(
+                        product
                     );
 
-                    if (!alreadyLoaded) {
-                        this.products.push(product);
-                    }
+
+                    /*
+                     * Ajoute automatiquement l'image
+                     * principale du produit aux images
+                     * du pack.
+                     */
+                    this.addProductMainImage(
+                        product
+                    );
                 }
+
 
                 this.loading = false;
             },
+
 
             error: (error) => {
 
@@ -227,7 +297,9 @@ export class BundleFormComponent implements OnInit {
                     error
                 );
 
+
                 this.loading = false;
+
 
                 this.error =
                     'Impossible de charger les produits sélectionnés.';
@@ -235,141 +307,262 @@ export class BundleFormComponent implements OnInit {
         });
     }
 
-    /**
-     * =====================================================
-     * CHARGEMENT DES PRODUITS DISPONIBLES
-     * =====================================================
-     */
+
+    // =========================================================
+    // AJOUTER PRODUIT À LA LISTE LOCALE
+    // =========================================================
+
+    private addProductToLocalList(
+        product: Product
+    ): void {
+
+        const alreadyLoaded =
+            this.products.some(
+                existingProduct =>
+                    existingProduct.id === product.id
+            );
+
+
+        if (!alreadyLoaded) {
+
+            this.products.push(
+                product
+            );
+        }
+    }
+
+
+    // =========================================================
+    // AJOUT AUTOMATIQUE DE L'IMAGE DU PRODUIT
+    // =========================================================
+
+    private addProductMainImage(
+        product: Product
+    ): void {
+
+        /*
+         * Le produit n'a aucune image.
+         */
+        if (
+            !product.images ||
+            product.images.length === 0
+        ) {
+            return;
+        }
+
+
+        /*
+         * On privilégie l'image marquée "main".
+         *
+         * Si aucune image principale n'existe,
+         * on prend la première.
+         */
+        const mainImage =
+            product.images.find(
+                image => image.main
+            ) ??
+            product.images[0];
+
+
+        if (!mainImage?.imageUrl) {
+            return;
+        }
+
+
+        /*
+         * Évite les doublons.
+         */
+        const alreadyExists =
+            this.images.some(
+                image =>
+                    image.imageUrl ===
+                    mainImage.imageUrl
+            );
+
+
+        if (alreadyExists) {
+            return;
+        }
+
+
+        /*
+         * La première image devient automatiquement
+         * l'image principale du pack.
+         */
+        this.images.push({
+
+            imageUrl:
+                mainImage.imageUrl,
+
+            main:
+                this.images.length === 0,
+
+            displayOrder:
+                this.images.length
+        });
+    }
+
+
+    // =========================================================
+    // CHARGER TOUS LES PRODUITS
+    // =========================================================
 
     loadProducts(): void {
 
-        this.productService.getProducts().subscribe({
+        this.productService
+            .getProducts()
+            .subscribe({
 
-            next: (products: Product[]) => {
+                next: (products: Product[]) => {
 
-                const loadedProducts = products ?? [];
+                    const loadedProducts =
+                        products ?? [];
 
-                /*
-                 * On fusionne avec les produits déjà récupérés
-                 * individuellement.
-                 */
-                for (const product of loadedProducts) {
 
-                    const alreadyLoaded = this.products.some(
-                        existingProduct =>
-                            existingProduct.id === product.id
+                    for (
+                        const product
+                        of loadedProducts
+                    ) {
+
+                        this.addProductToLocalList(
+                            product
+                        );
+                    }
+                },
+
+
+                error: (error) => {
+
+                    console.error(
+                        'Erreur chargement produits :',
+                        error
                     );
 
-                    if (!alreadyLoaded) {
-                        this.products.push(product);
+
+                    /*
+                     * Si les produits sélectionnés
+                     * ont déjà été récupérés correctement,
+                     * on ne remplace pas leur état.
+                     */
+                    if (!this.error) {
+
+                        this.error =
+                            'Impossible de charger les produits.';
                     }
                 }
-            },
-
-            error: (error) => {
-
-                console.error(
-                    'Erreur chargement produits :',
-                    error
-                );
-
-                /*
-                 * Ne pas écraser une éventuelle erreur
-                 * de chargement des produits sélectionnés.
-                 */
-                if (!this.error) {
-                    this.error =
-                        'Impossible de charger les produits.';
-                }
-            }
-        });
+            });
     }
 
-    /**
-     * =====================================================
-     * CHARGEMENT DU PACK EN MODE MODIFICATION
-     * =====================================================
-     */
 
-    loadBundle(id: number): void {
+    // =========================================================
+    // CHARGER LE PACK EN MODE MODIFICATION
+    // =========================================================
+
+    loadBundle(
+        id: number
+    ): void {
 
         this.loading = true;
 
-        this.bundleService.getAdminBundle(id).subscribe({
 
-            next: (bundle: any) => {
+        this.bundleService
+            .getAdminBundle(id)
+            .subscribe({
 
-                this.fillForm(bundle);
+                next: (bundle: any) => {
 
-                /*
-                 * En modification, on récupère également
-                 * les produits du pack par leur ID au cas où
-                 * ils ne seraient pas présents dans la liste.
-                 */
-                const productIds = this.selectedItems.map(
-                    item => item.productId
-                );
+                    this.fillForm(
+                        bundle
+                    );
 
-                this.loadSelectedProductsForEdit(productIds);
 
-                this.loading = false;
-            },
+                    /*
+                     * Récupère les produits du pack
+                     * qui ne seraient pas présents
+                     * dans la liste générale.
+                     */
+                    const productIds =
+                        this.selectedItems.map(
+                            item =>
+                                item.productId
+                        );
 
-            error: (error) => {
 
-                console.error(
-                    'Erreur chargement pack :',
-                    error
-                );
+                    this.loadSelectedProductsForEdit(
+                        productIds
+                    );
 
-                this.loading = false;
 
-                this.error =
-                    'Impossible de charger le pack.';
-            }
-        });
+                    this.loading = false;
+                },
+
+
+                error: (error) => {
+
+                    console.error(
+                        'Erreur chargement pack :',
+                        error
+                    );
+
+
+                    this.loading = false;
+
+
+                    this.error =
+                        'Impossible de charger le pack.';
+                }
+            });
     }
 
-    /**
-     * =====================================================
-     * CHARGEMENT PRODUITS DU PACK EN MODIFICATION
-     * =====================================================
-     */
+
+    // =========================================================
+    // CHARGER LES PRODUITS DU PACK EN MODIFICATION
+    // =========================================================
 
     private loadSelectedProductsForEdit(
         productIds: number[]
     ): void {
 
-        const missingIds = productIds.filter(productId =>
-            !this.products.some(
-                product => product.id === productId
-            )
-        );
+        const missingIds =
+            productIds.filter(
+                productId =>
+                    !this.products.some(
+                        product =>
+                            product.id ===
+                            productId
+                    )
+            );
+
 
         if (missingIds.length === 0) {
             return;
         }
 
-        const requests = missingIds.map(productId =>
-            this.productService.getProduct(productId)
-        );
+
+        const requests =
+            missingIds.map(
+                productId =>
+                    this.productService.getProduct(
+                        productId
+                    )
+            );
+
 
         forkJoin(requests).subscribe({
 
-            next: (products: Product[]) => {
+            next: (loadedProducts: Product[]) => {
 
-                for (const product of products) {
+                for (
+                    const product
+                    of loadedProducts
+                ) {
 
-                    const alreadyLoaded = this.products.some(
-                        existingProduct =>
-                            existingProduct.id === product.id
+                    this.addProductToLocalList(
+                        product
                     );
-
-                    if (!alreadyLoaded) {
-                        this.products.push(product);
-                    }
                 }
             },
+
 
             error: (error) => {
 
@@ -381,17 +574,19 @@ export class BundleFormComponent implements OnInit {
         });
     }
 
-    /**
-     * =====================================================
-     * REMPLISSAGE DU FORMULAIRE
-     * =====================================================
-     */
 
-    fillForm(bundle: any): void {
+    // =========================================================
+    // REMPLIR LE FORMULAIRE
+    // =========================================================
+
+    fillForm(
+        bundle: any
+    ): void {
 
         this.form.patchValue({
 
-            name: bundle.name ?? '',
+            name:
+                bundle.name ?? '',
 
             description:
                 bundle.description ?? '',
@@ -403,6 +598,10 @@ export class BundleFormComponent implements OnInit {
                 bundle.active ?? true
         });
 
+
+        /*
+         * Produits du pack.
+         */
         this.selectedItems =
             (bundle.items ?? [])
                 .map((item: any) => ({
@@ -414,35 +613,47 @@ export class BundleFormComponent implements OnInit {
                     quantity:
                         item.quantity ?? 1
                 }))
-                .filter((item: BundleFormItem) =>
-                    Number.isInteger(item.productId) &&
-                    item.productId > 0
+                .filter(
+                    (item: BundleFormItem) =>
+                        Number.isInteger(
+                            item.productId
+                        ) &&
+                        item.productId > 0
                 );
 
+
+        /*
+         * Images déjà enregistrées
+         * pour le pack.
+         */
         this.images =
             (bundle.images ?? [])
-                .map((image: any, index: number) => ({
+                .map(
+                    (
+                        image: any,
+                        index: number
+                    ) => ({
 
-                    imageUrl:
-                        image.imageUrl ??
-                        image.url ??
-                        '',
+                        imageUrl:
+                            image.imageUrl ??
+                            image.url ??
+                            '',
 
-                    main:
-                        image.main ??
-                        index === 0,
+                        main:
+                            image.main ??
+                            index === 0,
 
-                    displayOrder:
-                        image.displayOrder ??
-                        index
-                }));
+                        displayOrder:
+                            image.displayOrder ??
+                            index
+                    })
+                );
     }
 
-    /**
-     * =====================================================
-     * AJOUT D'UN PRODUIT
-     * =====================================================
-     */
+
+    // =========================================================
+    // AJOUTER UN PRODUIT MANUELLEMENT
+    // =========================================================
 
     addProduct(): void {
 
@@ -453,11 +664,21 @@ export class BundleFormComponent implements OnInit {
             return;
         }
 
+
+        const productId =
+            this.productToAdd;
+
+
+        /*
+         * Vérifie si le produit est déjà présent.
+         */
         const alreadyExists =
             this.selectedItems.some(
                 item =>
-                    item.productId === this.productToAdd
+                    item.productId ===
+                    productId
             );
+
 
         if (alreadyExists) {
 
@@ -467,6 +688,10 @@ export class BundleFormComponent implements OnInit {
             return;
         }
 
+
+        /*
+         * Vérifie la quantité.
+         */
         if (
             !this.quantityToAdd ||
             this.quantityToAdd < 1
@@ -478,13 +703,74 @@ export class BundleFormComponent implements OnInit {
             return;
         }
 
+
+        /*
+         * Ajout du produit au pack.
+         */
         this.selectedItems.push({
 
-            productId: this.productToAdd,
+            productId,
 
             quantity:
-                Math.floor(this.quantityToAdd)
+                Math.floor(
+                    this.quantityToAdd
+                )
         });
+
+
+        /*
+         * Vérifie si le produit est déjà chargé.
+         */
+        const product =
+            this.getProduct(
+                productId
+            );
+
+
+        if (product) {
+
+            /*
+             * Ajoute automatiquement son image principale.
+             */
+            this.addProductMainImage(
+                product
+            );
+
+        } else {
+
+            /*
+             * Sécurité : si le produit n'est pas
+             * dans la liste locale, on le récupère.
+             */
+            this.productService
+                .getProduct(productId)
+                .subscribe({
+
+                    next: (
+                        loadedProduct: Product
+                    ) => {
+
+                        this.addProductToLocalList(
+                            loadedProduct
+                        );
+
+
+                        this.addProductMainImage(
+                            loadedProduct
+                        );
+                    },
+
+
+                    error: (error) => {
+
+                        console.error(
+                            'Erreur chargement du produit :',
+                            error
+                        );
+                    }
+                });
+        }
+
 
         this.productToAdd = null;
         this.quantityToAdd = 1;
@@ -492,22 +778,25 @@ export class BundleFormComponent implements OnInit {
         this.error = '';
     }
 
-    /**
-     * =====================================================
-     * SUPPRESSION D'UN PRODUIT
-     * =====================================================
-     */
 
-    removeProduct(index: number): void {
+    // =========================================================
+    // SUPPRIMER UN PRODUIT
+    // =========================================================
 
-        this.selectedItems.splice(index, 1);
+    removeProduct(
+        index: number
+    ): void {
+
+        this.selectedItems.splice(
+            index,
+            1
+        );
     }
 
-    /**
-     * =====================================================
-     * MODIFICATION QUANTITÉ
-     * =====================================================
-     */
+
+    // =========================================================
+    // MODIFIER LA QUANTITÉ
+    // =========================================================
 
     updateProductQuantity(
         index: number,
@@ -515,27 +804,34 @@ export class BundleFormComponent implements OnInit {
     ): void {
 
         if (!Number.isFinite(quantity)) {
+
             quantity = 1;
         }
 
-        quantity = Math.floor(quantity);
+
+        quantity =
+            Math.floor(quantity);
+
 
         if (quantity < 1) {
+
             quantity = 1;
         }
+
 
         if (!this.selectedItems[index]) {
             return;
         }
 
-        this.selectedItems[index].quantity = quantity;
+
+        this.selectedItems[index].quantity =
+            quantity;
     }
 
-    /**
-     * =====================================================
-     * RÉCUPÉRER UN PRODUIT
-     * =====================================================
-     */
+
+    // =========================================================
+    // RÉCUPÉRER UN PRODUIT
+    // =========================================================
 
     getProduct(
         productId: number
@@ -543,50 +839,65 @@ export class BundleFormComponent implements OnInit {
 
         return this.products.find(
             product =>
-                product.id === productId
+                product.id ===
+                productId
         );
     }
 
-    /**
-     * =====================================================
-     * NOM DU PRODUIT
-     * =====================================================
-     */
 
-    getProductName(productId: number): string {
+    // =========================================================
+    // NOM DU PRODUIT
+    // =========================================================
+
+    getProductName(
+        productId: number
+    ): string {
 
         const product =
-            this.getProduct(productId);
+            this.getProduct(
+                productId
+            );
+
 
         if (product) {
+
             return product.name;
         }
+
 
         return `Produit #${productId}`;
     }
 
-    /**
-     * =====================================================
-     * IMAGE PRINCIPALE
-     * =====================================================
-     */
 
-    getMainImage(productId: number): string {
+    // =========================================================
+    // IMAGE PRINCIPALE DU PRODUIT
+    // =========================================================
+
+    getMainImage(
+        productId: number
+    ): string {
 
         const product =
-            this.getProduct(productId);
+            this.getProduct(
+                productId
+            );
+
 
         if (
             !product?.images ||
             product.images.length === 0
         ) {
+
             return '';
         }
 
+
         const mainImage =
             product.images.find(
-                image => image.main
+                image =>
+                    image.main
             );
+
 
         return (
             mainImage?.imageUrl ??
@@ -595,31 +906,34 @@ export class BundleFormComponent implements OnInit {
         );
     }
 
-    /**
-     * =====================================================
-     * STOCK
-     * =====================================================
-     */
+
+    // =========================================================
+    // STOCK DU PRODUIT
+    // =========================================================
 
     getProductStock(
         productId: number
     ): number | null {
 
         const product =
-            this.getProduct(productId);
+            this.getProduct(
+                productId
+            );
+
 
         if (!product) {
+
             return null;
         }
+
 
         return product.stock ?? null;
     }
 
-    /**
-     * =====================================================
-     * AJOUT IMAGE
-     * =====================================================
-     */
+
+    // =========================================================
+    // AJOUTER UNE IMAGE MANUELLEMENT
+    // =========================================================
 
     addImage(): void {
 
@@ -627,6 +941,10 @@ export class BundleFormComponent implements OnInit {
 
             imageUrl: '',
 
+            /*
+             * Si aucune image n'existe encore,
+             * cette nouvelle image devient principale.
+             */
             main:
                 this.images.length === 0,
 
@@ -635,35 +953,54 @@ export class BundleFormComponent implements OnInit {
         });
     }
 
-    /**
-     * =====================================================
-     * SUPPRESSION IMAGE
-     * =====================================================
-     */
 
-    removeImage(index: number): void {
+    // =========================================================
+    // SUPPRIMER UNE IMAGE
+    // =========================================================
 
-        this.images.splice(index, 1);
+    removeImage(
+        index: number
+    ): void {
 
-        this.images.forEach((image, i) => {
-            image.displayOrder = i;
-        });
+        this.images.splice(
+            index,
+            1
+        );
 
+
+        /*
+         * Réindexation.
+         */
+        this.images.forEach(
+            (image, i) => {
+
+                image.displayOrder =
+                    i;
+            }
+        );
+
+
+        /*
+         * S'il n'existe plus d'image principale,
+         * la première devient principale.
+         */
         if (
             this.images.length > 0 &&
             !this.images.some(
-                image => image.main
+                image =>
+                    image.main
             )
         ) {
-            this.images[0].main = true;
+
+            this.images[0].main =
+                true;
         }
     }
 
-    /**
-     * =====================================================
-     * MODIFICATION URL IMAGE
-     * =====================================================
-     */
+
+    // =========================================================
+    // MODIFIER URL IMAGE
+    // =========================================================
 
     updateImageUrl(
         index: number,
@@ -674,35 +1011,43 @@ export class BundleFormComponent implements OnInit {
             return;
         }
 
-        this.images[index].imageUrl = value;
+
+        this.images[index].imageUrl =
+            value;
     }
 
-    /**
-     * =====================================================
-     * IMAGE PRINCIPALE
-     * =====================================================
-     */
 
-    setMainImage(index: number): void {
+    // =========================================================
+    // CHOISIR IMAGE PRINCIPALE
+    // =========================================================
 
-        this.images.forEach((image, i) => {
+    setMainImage(
+        index: number
+    ): void {
 
-            image.main =
-                i === index;
-        });
+        this.images.forEach(
+            (image, i) => {
+
+                image.main =
+                    i === index;
+            }
+        );
     }
 
-    /**
-     * =====================================================
-     * ENREGISTREMENT
-     * =====================================================
-     */
+
+    // =========================================================
+    // ENREGISTRER
+    // =========================================================
 
     save(): void {
 
         this.error = '';
         this.success = '';
 
+
+        /*
+         * Validation formulaire.
+         */
         if (this.form.invalid) {
 
             this.form.markAllAsTouched();
@@ -713,6 +1058,10 @@ export class BundleFormComponent implements OnInit {
             return;
         }
 
+
+        /*
+         * Il faut au moins un produit.
+         */
         if (
             !this.selectedItems ||
             this.selectedItems.length === 0
@@ -724,12 +1073,19 @@ export class BundleFormComponent implements OnInit {
             return;
         }
 
+
+        /*
+         * Vérification des quantités.
+         */
         const invalidQuantity =
             this.selectedItems.some(
                 item =>
-                    !Number.isInteger(item.quantity) ||
+                    !Number.isInteger(
+                        item.quantity
+                    ) ||
                     item.quantity < 1
             );
+
 
         if (invalidQuantity) {
 
@@ -739,12 +1095,17 @@ export class BundleFormComponent implements OnInit {
             return;
         }
 
+
+        /*
+         * Vérification des URLs d'images.
+         */
         const invalidImage =
             this.images.some(
                 image =>
                     !image.imageUrl ||
                     !image.imageUrl.trim()
             );
+
 
         if (invalidImage) {
 
@@ -754,9 +1115,14 @@ export class BundleFormComponent implements OnInit {
             return;
         }
 
+
         const formValue =
             this.form.getRawValue();
 
+
+        /*
+         * Construction de la requête.
+         */
         const request = {
 
             name:
@@ -766,24 +1132,31 @@ export class BundleFormComponent implements OnInit {
                 formValue.description?.trim() ?? '',
 
             price:
-                Number(formValue.price ?? 0),
+                Number(
+                    formValue.price ?? 0
+                ),
 
             active:
                 formValue.active ?? true,
 
             items:
-                this.selectedItems.map(item => ({
+                this.selectedItems.map(
+                    item => ({
 
-                    productId:
-                        item.productId,
+                        productId:
+                            item.productId,
 
-                    quantity:
-                        item.quantity
-                })),
+                        quantity:
+                            item.quantity
+                    })
+                ),
 
             images:
                 this.images.map(
-                    (image, index) => ({
+                    (
+                        image,
+                        index
+                    ) => ({
 
                         imageUrl:
                             image.imageUrl.trim(),
@@ -798,13 +1171,13 @@ export class BundleFormComponent implements OnInit {
                 )
         };
 
+
         this.saving = true;
 
-        /**
-         * =================================================
-         * MODIFICATION
-         * =================================================
-         */
+
+        // =====================================================
+        // MODIFICATION
+        // =====================================================
 
         if (
             this.isEditMode &&
@@ -825,6 +1198,7 @@ export class BundleFormComponent implements OnInit {
                         this.success =
                             'Pack modifié avec succès.';
 
+
                         setTimeout(() => {
 
                             this.router.navigate(
@@ -834,6 +1208,7 @@ export class BundleFormComponent implements OnInit {
                         }, 800);
                     },
 
+
                     error: (error) => {
 
                         console.error(
@@ -841,7 +1216,9 @@ export class BundleFormComponent implements OnInit {
                             error
                         );
 
+
                         this.saving = false;
+
 
                         this.error =
                             error?.error?.message ??
@@ -849,17 +1226,19 @@ export class BundleFormComponent implements OnInit {
                     }
                 });
 
+
             return;
         }
 
-        /**
-         * =================================================
-         * CRÉATION
-         * =================================================
-         */
+
+        // =====================================================
+        // CRÉATION
+        // =====================================================
 
         this.bundleService
-            .createBundle(request)
+            .createBundle(
+                request
+            )
             .subscribe({
 
                 next: () => {
@@ -868,6 +1247,7 @@ export class BundleFormComponent implements OnInit {
 
                     this.success =
                         'Pack créé avec succès.';
+
 
                     setTimeout(() => {
 
@@ -878,6 +1258,7 @@ export class BundleFormComponent implements OnInit {
                     }, 800);
                 },
 
+
                 error: (error) => {
 
                     console.error(
@@ -885,7 +1266,9 @@ export class BundleFormComponent implements OnInit {
                         error
                     );
 
+
                     this.saving = false;
+
 
                     this.error =
                         error?.error?.message ??

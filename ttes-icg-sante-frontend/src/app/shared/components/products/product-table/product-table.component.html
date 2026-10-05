@@ -1,12 +1,13 @@
 <div class="w-full">
 
     <!-- ========================================================= -->
-    <!-- MODE SÉLECTION DE PRODUITS POUR UN PACK -->
+    <!-- MODE SELECTION PACK -->
     <!-- ========================================================= -->
 
     <div
-    class="absolute left-3 top-3 z-10"
->
+        *ngIf="isBundleSelectionMode"
+        class="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-5"
+    >
 
         <div
             class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
@@ -23,9 +24,8 @@
                 <p
                     class="mt-1 text-sm text-blue-700"
                 >
-                    Sélectionnez les produits à ajouter au pack.
-                    Votre sélection est conservée lorsque vous changez
-                    de page ou effectuez une recherche.
+                    Cochez les produits que vous souhaitez
+                    ajouter au pack.
                 </p>
 
             </div>
@@ -46,10 +46,19 @@
 
                 <button
                     type="button"
+                    (click)="selectAllVisible()"
+                    class="rounded-lg border border-blue-300 bg-white px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100"
+                >
+                    Tout sélectionner
+                </button>
+
+
+                <button
+                    type="button"
                     (click)="deselectAllVisible()"
                     class="rounded-lg border border-blue-300 bg-white px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100"
                 >
-                    Désélectionner cette page
+                    Tout désélectionner
                 </button>
 
 
@@ -65,7 +74,8 @@
                 <button
                     type="button"
                     (click)="confirmBundleSelection()"
-                    class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                    [disabled]="selectedProductCount === 0"
+                    class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     Confirmer la sélection
                 </button>
@@ -78,7 +88,7 @@
 
 
     <!-- ========================================================= -->
-    <!-- EN-TÊTE -->
+    <!-- EN-TETE -->
     <!-- ========================================================= -->
 
     <div
@@ -96,7 +106,8 @@
             <p
                 class="mt-1 text-sm text-gray-500"
             >
-                {{ totalElements }} produit{{ totalElements > 1 ? 's' : '' }}
+                {{ totalElements }}
+                produit{{ totalElements > 1 ? 's' : '' }}
             </p>
 
         </div>
@@ -106,18 +117,6 @@
             class="flex flex-wrap items-center gap-2"
         >
 
-            <!-- Sélectionner tous les produits visibles -->
-            <button
-                
-                type="button"
-                (click)="selectAllVisible()"
-                class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-                Tout sélectionner
-            </button>
-
-
-            <!-- Créer un pack -->
             <button
                 *ngIf="!isBundleSelectionMode"
                 type="button"
@@ -126,11 +125,13 @@
                 class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
                 Créer un pack
+
                 <span
                     *ngIf="selectedProductCount > 0"
                 >
                     ({{ selectedProductCount }})
                 </span>
+
             </button>
 
         </div>
@@ -177,7 +178,7 @@
 
 
     <!-- ========================================================= -->
-    <!-- MESSAGE ERREUR -->
+    <!-- ERREUR -->
     <!-- ========================================================= -->
 
     <div
@@ -245,7 +246,7 @@
 
 
     <!-- ========================================================= -->
-    <!-- LISTE DES PRODUITS -->
+    <!-- LISTE -->
     <!-- ========================================================= -->
 
     <div
@@ -268,18 +269,18 @@
 
             <div
                 *ngIf="isBundleSelectionMode"
-                class="absolute left-3 top-3 z-10"
+                class="absolute left-3 top-3 z-30"
             >
 
                 <label
-                    class="flex cursor-pointer items-center"
+                    class="flex cursor-pointer items-center rounded-lg bg-white p-2 shadow-md"
                 >
 
                     <input
                         type="checkbox"
                         [checked]="isProductSelected(product.id)"
                         (change)="toggleProductSelection(product.id)"
-                        class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        class="h-6 w-6 cursor-pointer rounded border-gray-400 text-blue-600 focus:ring-2 focus:ring-blue-500"
                     >
 
                 </label>
@@ -307,15 +308,18 @@
                     *ngIf="!getMainImage(product)"
                     class="flex h-full items-center justify-center text-gray-400"
                 >
+
                     <span
                         class="text-4xl"
                     >
                         📦
                     </span>
+
                 </div>
 
 
-                <!-- Stock -->
+                <!-- STOCK -->
+
                 <div
                     class="absolute right-3 top-3"
                 >
@@ -364,7 +368,8 @@
                 </div>
 
 
-                <!-- Entreprise -->
+                <!-- ENTREPRISE -->
+
                 <div
                     *ngIf="product.companyName"
                     class="mb-3"
@@ -385,7 +390,8 @@
                 </div>
 
 
-                <!-- Prix -->
+                <!-- PRIX -->
+
                 <div
                     class="mb-4 flex items-center justify-between"
                 >
@@ -406,7 +412,7 @@
 
 
                 <!-- ================================================= -->
-                <!-- ACTIONS MODE NORMAL -->
+                <!-- MODE NORMAL -->
                 <!-- ================================================= -->
 
                 <div
@@ -416,7 +422,10 @@
 
                     <button
                         type="button"
-                        [routerLink]="['/admin/products/edit', product.id]"
+                        [routerLink]="[
+                            '/admin/products/edit',
+                            product.id
+                        ]"
                         class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
                         Modifier
@@ -435,28 +444,36 @@
 
 
                 <!-- ================================================= -->
-                <!-- ACTION MODE SÉLECTION -->
+                <!-- MODE SELECTION -->
                 <!-- ================================================= -->
 
-                <button
+                <div
                     *ngIf="isBundleSelectionMode"
-                    type="button"
-                    (click)="toggleProductSelection(product.id)"
-                    class="w-full rounded-lg px-4 py-2.5 text-sm font-semibold transition"
-                    [class.bg-blue-600]="isProductSelected(product.id)"
-                    [class.text-white]="isProductSelected(product.id)"
-                    [class.hover:bg-blue-700]="isProductSelected(product.id)"
-                    [class.border]="!isProductSelected(product.id)"
-                    [class.border-gray-300]="!isProductSelected(product.id)"
-                    [class.text-gray-700]="!isProductSelected(product.id)"
-                    [class.hover:bg-gray-50]="!isProductSelected(product.id)"
+                    class="mt-2"
                 >
-                    {{
-                        isProductSelected(product.id)
-                            ? 'Produit sélectionné'
-                            : 'Ajouter au pack'
-                    }}
-                </button>
+
+                    <button
+                        type="button"
+                        (click)="toggleProductSelection(product.id)"
+                        class="w-full rounded-lg px-4 py-2.5 text-sm font-semibold transition"
+                        [class.bg-blue-600]="isProductSelected(product.id)"
+                        [class.text-white]="isProductSelected(product.id)"
+                        [class.hover:bg-blue-700]="isProductSelected(product.id)"
+                        [class.border]="!isProductSelected(product.id)"
+                        [class.border-gray-300]="!isProductSelected(product.id)"
+                        [class.text-gray-700]="!isProductSelected(product.id)"
+                        [class.hover:bg-gray-50]="!isProductSelected(product.id)"
+                    >
+
+                        {{
+                            isProductSelected(product.id)
+                                ? '✓ Produit sélectionné'
+                                : '+ Ajouter au pack'
+                        }}
+
+                    </button>
+
+                </div>
 
             </div>
 
@@ -477,18 +494,23 @@
         <p
             class="text-sm text-gray-500"
         >
+
             Page
+
             <span
                 class="font-semibold text-gray-900"
             >
                 {{ currentPage + 1 }}
             </span>
+
             sur
+
             <span
                 class="font-semibold text-gray-900"
             >
                 {{ totalPages }}
             </span>
+
         </p>
 
 
@@ -496,7 +518,6 @@
             class="flex flex-wrap items-center gap-1"
         >
 
-            <!-- Précédent -->
             <button
                 type="button"
                 (click)="previousPage()"
@@ -507,7 +528,6 @@
             </button>
 
 
-            <!-- Pages -->
             <button
                 *ngFor="let page of pages"
                 type="button"
@@ -522,7 +542,6 @@
             </button>
 
 
-            <!-- Suivant -->
             <button
                 type="button"
                 (click)="nextPage()"
@@ -538,12 +557,12 @@
 
 
     <!-- ========================================================= -->
-    <!-- BARRE BASSE DU MODE SÉLECTION -->
+    <!-- BARRE BASSE -->
     <!-- ========================================================= -->
 
     <div
         *ngIf="isBundleSelectionMode"
-        class="sticky bottom-4 z-20 mt-6 rounded-xl border border-gray-200 bg-white p-4 shadow-lg"
+        class="sticky bottom-4 z-40 mt-6 rounded-xl border border-gray-200 bg-white p-4 shadow-lg"
     >
 
         <div
@@ -555,15 +574,21 @@
                 <p
                     class="text-sm font-semibold text-gray-900"
                 >
+
                     {{ selectedProductCount }}
+
                     produit{{ selectedProductCount > 1 ? 's' : '' }}
+
                     sélectionné{{ selectedProductCount > 1 ? 's' : '' }}
+
                 </p>
+
 
                 <p
                     class="text-xs text-gray-500"
                 >
-                    La sélection est conservée entre les pages.
+                    La sélection est conservée lorsque vous changez
+                    de page.
                 </p>
 
             </div>

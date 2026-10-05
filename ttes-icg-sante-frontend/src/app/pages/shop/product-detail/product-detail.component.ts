@@ -54,6 +54,11 @@ export class ProductDetailComponent implements OnInit {
 
     error = '';
 
+    /**
+     * Image actuellement affichée
+     */
+    selectedImage = '';
+
 
     ngOnInit(): void {
 
@@ -94,6 +99,21 @@ export class ProductDetailComponent implements OnInit {
 
                     this.product = product;
 
+
+                    /*
+                     * Sélectionner automatiquement
+                     * la première image du produit.
+                     *
+                     * Si le produit n'a aucune image,
+                     * on garde une chaîne vide.
+                     */
+                    this.selectedImage =
+                        product.images &&
+                        product.images.length > 0
+                            ? product.images[0].imageUrl
+                            : '';
+
+
                     this.loading = false;
 
                 },
@@ -114,6 +134,16 @@ export class ProductDetailComponent implements OnInit {
                 }
 
             });
+
+    }
+
+
+    /**
+     * Change l'image principale.
+     */
+    selectImage(imageUrl: string): void {
+
+        this.selectedImage = imageUrl;
 
     }
 
@@ -217,4 +247,5 @@ export class ProductDetailComponent implements OnInit {
         ).format(price) + ' FCFA';
 
     }
+
 }

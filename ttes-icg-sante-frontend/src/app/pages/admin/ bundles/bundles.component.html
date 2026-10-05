@@ -131,35 +131,32 @@
 
                 <!-- Recherche -->
 
-                <div
-                    class="relative flex-1"
-                >
+               <div class="relative flex-1">
 
-                    <span
-                        class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                    >
-                        🔎
-                    </span>
+    <span
+        class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+    >
+        🔎
+    </span>
 
-                    <input
-                        type="text"
-                        [(ngModel)]="searchTerm"
-                        (input)="onSearch()"
-                        placeholder="Rechercher un pack par nom ou ID..."
-                        class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-10 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-                    />
+    <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Rechercher un pack, produit, entreprise, marque, catégorie..."
+        class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-10 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+    />
 
-                    <button
-                        *ngIf="searchTerm"
-                        type="button"
-                        (click)="clearSearch()"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 dark:hover:text-white"
-                    >
-                        ✕
-                    </button>
+    <button
+        *ngIf="searchTerm"
+        type="button"
+        (click)="clearSearch()"
+        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 dark:hover:text-white"
+    >
+        ✕
+    </button>
 
-                </div>
-
+</div>
 
                 <!-- Statut -->
 

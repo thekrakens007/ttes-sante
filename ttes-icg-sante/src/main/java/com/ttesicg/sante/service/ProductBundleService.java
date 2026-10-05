@@ -525,15 +525,62 @@ public class ProductBundleService {
 
 
                             return new BundleItemResponse(
-                                    item.getId(),
-                                    product.getId(),
-                                    product.getName(),
-                                    product.getSku(),
-                                    item.getQuantity(),
-                                    product.getPrice(),
-                                    availableStock
-                            );
 
+        item.getId(),
+
+        product.getId(),
+
+        product.getName(),
+
+        product.getSku(),
+
+        product.getDescription(),
+
+        product.getBrand(),
+
+        product.getActiveIngredient(),
+
+        product.getDosage(),
+
+        product.getForm(),
+
+        product.getIngredients(),
+
+        product.getPrice(),
+
+        item.getQuantity(),
+
+        availableStock,
+
+        product.getCompany() != null
+                ? product.getCompany().getId()
+                : null,
+
+        product.getCompany() != null
+                ? product.getCompany().getName()
+                : null,
+
+        product.getCategories()
+                .stream()
+                .map(category -> category.getId())
+                .collect(java.util.stream.Collectors.toSet()),
+
+        product.getCategories()
+                .stream()
+                .map(category -> category.getName())
+                .collect(java.util.stream.Collectors.toSet()),
+
+        product.getTherapeuticAreas()
+                .stream()
+                .map(area -> area.getId())
+                .collect(java.util.stream.Collectors.toSet()),
+
+        product.getTherapeuticAreas()
+                .stream()
+                .map(area -> area.getName())
+                .collect(java.util.stream.Collectors.toSet())
+
+);
                         })
                         .toList();
 

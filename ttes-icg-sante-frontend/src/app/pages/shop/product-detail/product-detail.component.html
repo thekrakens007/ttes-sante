@@ -1,44 +1,44 @@
 <div
-        class="min-h-screen bg-gray-50
-               dark:bg-gray-950">
+    class="min-h-screen bg-gray-50
+           dark:bg-gray-950">
 
 
     <!-- HEADER -->
 
     <header
-            class="border-b border-gray-200
-                   bg-white
-                   dark:border-gray-800
-                   dark:bg-gray-900">
+        class="border-b border-gray-200
+               bg-white
+               dark:border-gray-800
+               dark:bg-gray-900">
 
         <div
-                class="mx-auto flex max-w-7xl
-                       items-center justify-between
-                       px-4 py-4
-                       sm:px-6 lg:px-8">
+            class="mx-auto flex max-w-7xl
+                   items-center justify-between
+                   px-4 py-4
+                   sm:px-6 lg:px-8">
 
             <a
-                    routerLink="/"
-                    class="flex items-center gap-3">
+                routerLink="/"
+                class="flex items-center gap-3">
 
                 <img
-                        src="/images/logo/logo.svg"
-                        alt="TTES-ICG Santé"
-                        class="h-10 w-auto">
+                    src="/images/logo/logo.svg"
+                    alt="TTES-ICG Santé"
+                    class="h-10 w-auto">
 
             </a>
 
 
             <a
-                    routerLink="/"
-                    class="rounded-lg
-                           border border-gray-300
-                           px-4 py-2
-                           text-sm font-medium
-                           text-gray-700
-                           hover:bg-gray-50
-                           dark:border-gray-700
-                           dark:text-gray-300">
+                routerLink="/"
+                class="rounded-lg
+                       border border-gray-300
+                       px-4 py-2
+                       text-sm font-medium
+                       text-gray-700
+                       hover:bg-gray-50
+                       dark:border-gray-700
+                       dark:text-gray-300">
 
                 ← Retour à la boutique
 
@@ -54,25 +54,25 @@
     @if (loading) {
 
         <main
-                class="mx-auto max-w-7xl
-                       px-4 py-16
-                       sm:px-6 lg:px-8">
+            class="mx-auto max-w-7xl
+                   px-4 py-16
+                   sm:px-6 lg:px-8">
 
             <div class="flex justify-center">
 
                 <div
-                        class="h-12 w-12
-                               animate-spin
-                               rounded-full
-                               border-4 border-gray-200
-                               border-t-brand-500">
+                    class="h-12 w-12
+                           animate-spin
+                           rounded-full
+                           border-4 border-gray-200
+                           border-t-brand-500">
                 </div>
 
             </div>
 
             <p
-                    class="mt-4 text-center
-                           text-gray-500">
+                class="mt-4 text-center
+                       text-gray-500">
 
                 Chargement du produit...
 
@@ -88,44 +88,44 @@
     @else if (error) {
 
         <main
-                class="mx-auto max-w-3xl
-                       px-4 py-16
-                       sm:px-6 lg:px-8">
+            class="mx-auto max-w-3xl
+                   px-4 py-16
+                   sm:px-6 lg:px-8">
 
             <div
-                    class="rounded-2xl
-                           border border-red-200
-                           bg-red-50 p-8
-                           text-center">
+                class="rounded-2xl
+                       border border-red-200
+                       bg-red-50 p-8
+                       text-center">
 
                 <div class="text-5xl">
                     ⚠️
                 </div>
 
                 <h1
-                        class="mt-4 text-xl
-                               font-bold text-red-700">
+                    class="mt-4 text-xl
+                           font-bold text-red-700">
 
                     Produit introuvable
 
                 </h1>
 
                 <p
-                        class="mt-2 text-red-600">
+                    class="mt-2 text-red-600">
 
                     {{ error }}
 
                 </p>
 
                 <a
-                        routerLink="/"
-                        class="mt-6 inline-flex
-                               rounded-lg
-                               bg-brand-500
-                               px-6 py-3
-                               font-semibold
-                               text-white
-                               hover:bg-brand-600">
+                    routerLink="/"
+                    class="mt-6 inline-flex
+                           rounded-lg
+                           bg-brand-500
+                           px-6 py-3
+                           font-semibold
+                           text-white
+                           hover:bg-brand-600">
 
                     Retour à la boutique
 
@@ -143,9 +143,9 @@
     @else if (product) {
 
         <main
-                class="mx-auto max-w-7xl
-                       px-4 py-10
-                       sm:px-6 lg:px-8">
+            class="mx-auto max-w-7xl
+                   px-4 py-10
+                   sm:px-6 lg:px-8">
 
 
             <!-- BREADCRUMB -->
@@ -153,10 +153,10 @@
             <div class="mb-8">
 
                 <a
-                        routerLink="/"
-                        class="text-sm
-                               text-brand-600
-                               hover:underline">
+                    routerLink="/"
+                    class="text-sm
+                           text-brand-600
+                           hover:underline">
 
                     ← Boutique
 
@@ -168,48 +168,48 @@
             <!-- DETAILS -->
 
             <div
-                    class="grid grid-cols-1
-                           gap-10
-                           lg:grid-cols-2">
+                class="grid grid-cols-1
+                       gap-10
+                       lg:grid-cols-2">
 
 
-                <!-- ========================= -->
+                <!-- ================================================= -->
                 <!-- GALERIE IMAGES -->
-                <!-- ========================= -->
+                <!-- ================================================= -->
 
                 <div>
 
                     <!-- IMAGE PRINCIPALE -->
 
                     <div
-                            class="overflow-hidden
-                                   rounded-2xl
-                                   border border-gray-200
-                                   bg-white
-                                   dark:border-gray-800
-                                   dark:bg-gray-900">
+                        class="overflow-hidden
+                               rounded-2xl
+                               border border-gray-200
+                               bg-white
+                               dark:border-gray-800
+                               dark:bg-gray-900">
 
                         @if (
                             product.images &&
                             product.images.length > 0
-                                ) {
+                        ) {
 
                             <img
-                                    [src]="selectedImage"
-                                    [alt]="product.name"
-                                    class="h-[450px]
-                                           w-full
-                                           object-contain
-                                           transition
-                                           duration-300">
+                                [src]="selectedImage"
+                                [alt]="product.name"
+                                class="h-[450px]
+                                       w-full
+                                       object-contain
+                                       transition
+                                       duration-300">
 
                         } @else {
 
                             <div
-                                    class="flex h-[450px]
-                                           items-center
-                                           justify-center
-                                           text-8xl">
+                                class="flex h-[450px]
+                                       items-center
+                                       justify-center
+                                       text-8xl">
 
                                 💊
 
@@ -225,32 +225,32 @@
                     @if (
                         product.images &&
                         product.images.length > 1
-                            ) {
+                    ) {
 
                         <div
-                                class="mt-4
-                                       flex gap-3
-                                       overflow-x-auto
-                                       pb-2">
+                            class="mt-4
+                                   flex gap-3
+                                   overflow-x-auto
+                                   pb-2">
 
                             @for (
                                 image of product.images;
                                 track image.id
-                                    ) {
+                            ) {
 
                                 <button
-                                        type="button"
-                                        (click)="selectImage(image.imageUrl)"
-                                        [class]="
-                                            selectedImage === image.imageUrl
-                                                ? 'h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border-2 border-brand-500 bg-white shadow-sm dark:bg-gray-900'
-                                                : 'h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border-2 border-transparent bg-white hover:border-gray-300 dark:bg-gray-900 dark:hover:border-gray-700'
-                                        ">
+                                    type="button"
+                                    (click)="selectImage(image.imageUrl)"
+                                    [class]="
+                                        selectedImage === image.imageUrl
+                                            ? 'h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border-2 border-brand-500 bg-white shadow-sm dark:bg-gray-900'
+                                            : 'h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border-2 border-transparent bg-white hover:border-gray-300 dark:bg-gray-900 dark:hover:border-gray-700'
+                                    ">
 
                                     <img
-                                            [src]="image.imageUrl"
-                                            [alt]="product.name"
-                                            class="h-full w-full object-cover">
+                                        [src]="image.imageUrl"
+                                        [alt]="product.name"
+                                        class="h-full w-full object-cover">
 
                                 </button>
 
@@ -266,13 +266,13 @@
                     @if (
                         product.images &&
                         product.images.length > 1
-                            ) {
+                    ) {
 
                         <p
-                                class="mt-2 text-center
-                                       text-xs
-                                       text-gray-500
-                                       dark:text-gray-400">
+                            class="mt-2 text-center
+                                   text-xs
+                                   text-gray-500
+                                   dark:text-gray-400">
 
                             {{ product.images.length }} images disponibles
 
@@ -283,32 +283,35 @@
                 </div>
 
 
-                <!-- ========================= -->
-                <!-- INFORMATIONS -->
-                <!-- ========================= -->
+                <!-- ================================================= -->
+                <!-- INFORMATIONS PRODUIT -->
+                <!-- ================================================= -->
 
                 <div>
 
-                    <!-- Entreprise -->
+                    <!-- ENTREPRISE -->
 
-                    @if (product.companyName && product.companyId) {
+                    @if (
+                        product.companyName &&
+                        product.companyId
+                    ) {
 
                         <a
-                                [routerLink]="[
-                                    '/companies',
-                                    product.companyId
-                                ]"
-                                class="inline-flex items-center gap-2
-                                       text-sm
-                                       font-semibold
-                                       uppercase
-                                       tracking-wide
-                                       text-brand-600
-                                       transition
-                                       hover:text-brand-700
-                                       hover:underline
-                                       dark:text-brand-400
-                                       dark:hover:text-brand-300">
+                            [routerLink]="[
+                                '/companies',
+                                product.companyId
+                            ]"
+                            class="inline-flex items-center gap-2
+                                   text-sm
+                                   font-semibold
+                                   uppercase
+                                   tracking-wide
+                                   text-brand-600
+                                   transition
+                                   hover:text-brand-700
+                                   hover:underline
+                                   dark:text-brand-400
+                                   dark:hover:text-brand-300">
 
                             <span>
                                 🏢
@@ -327,13 +330,13 @@
                     }
 
 
-                    <!-- Nom -->
+                    <!-- NOM -->
 
                     <h1
-                            class="mt-2 text-3xl
-                                   font-bold
-                                   text-gray-900
-                                   dark:text-white">
+                        class="mt-2 text-3xl
+                               font-bold
+                               text-gray-900
+                               dark:text-white">
 
                         {{ product.name }}
 
@@ -343,23 +346,24 @@
                     <!-- SKU -->
 
                     <p
-                            class="mt-2 text-sm
-                                   text-gray-500">
+                        class="mt-2 text-sm
+                               text-gray-500
+                               dark:text-gray-400">
 
                         SKU : {{ product.sku }}
 
                     </p>
 
 
-                    <!-- Prix -->
+                    <!-- PRIX -->
 
                     <div
-                            class="mt-6">
+                        class="mt-6">
 
                         <span
-                                class="text-3xl
-                                       font-bold
-                                       text-brand-600">
+                            class="text-3xl
+                                   font-bold
+                                   text-brand-600">
 
                             {{ formatPrice(product.price) }}
 
@@ -368,55 +372,105 @@
                     </div>
 
 
-                    <!-- Description -->
+                    <!-- ================================================= -->
+                    <!-- DESCRIPTION -->
+                    <!-- ================================================= -->
 
                     @if (product.description) {
 
                         <div
-                                class="mt-8">
+                            class="mt-8">
 
                             <h2
-                                    class="text-lg
-                                           font-semibold
-                                           text-gray-900
-                                           dark:text-white">
+                                class="text-lg
+                                       font-semibold
+                                       text-gray-900
+                                       dark:text-white">
 
                                 Description
 
                             </h2>
 
-                            <p
-                                    class="mt-3
-                                           leading-7
-                                           text-gray-600
-                                           dark:text-gray-400">
+                            <div
+                                class="mt-3
+                                       whitespace-pre-line
+                                       leading-7
+                                       text-gray-600
+                                       dark:text-gray-400">
 
                                 {{ product.description }}
 
-                            </p>
+                            </div>
 
                         </div>
 
                     }
 
 
-                    <!-- Informations médicales -->
+                    <!-- ================================================= -->
+                    <!-- INGREDIENTS -->
+                    <!-- ================================================= -->
 
-                    <div
-                            class="mt-8
-                                   rounded-xl
-                                   border
-                                   border-gray-200
-                                   p-5
-                                   dark:border-gray-800">
+                    @if (product.ingredients) {
 
+                        <div
+                            class="mt-8">
 
-                        <h2
-                                class="mb-4
-                                       text-lg
+                            <h2
+                                class="text-lg
                                        font-semibold
                                        text-gray-900
                                        dark:text-white">
+
+                                Ingrédients
+
+                            </h2>
+
+                            <div
+                                class="mt-3
+                                       rounded-xl
+                                       border border-gray-200
+                                       bg-gray-50
+                                       p-5
+                                       dark:border-gray-800
+                                       dark:bg-gray-900">
+
+                                <div
+                                    class="whitespace-pre-line
+                                           leading-7
+                                           text-gray-600
+                                           dark:text-gray-400">
+
+                                    {{ product.ingredients }}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    }
+
+
+                    <!-- ================================================= -->
+                    <!-- INFORMATIONS MÉDICALES -->
+                    <!-- ================================================= -->
+
+                    <div
+                        class="mt-8
+                               rounded-xl
+                               border
+                               border-gray-200
+                               p-5
+                               dark:border-gray-800">
+
+
+                        <h2
+                            class="mb-4
+                                   text-lg
+                                   font-semibold
+                                   text-gray-900
+                                   dark:text-white">
 
                             Informations médicales
 
@@ -424,27 +478,31 @@
 
 
                         <div
-                                class="grid grid-cols-2
-                                       gap-4">
+                            class="grid grid-cols-1
+                                   gap-5
+                                   sm:grid-cols-2">
 
+
+                            <!-- MARQUE -->
 
                             @if (product.brand) {
 
                                 <div>
 
                                     <p
-                                            class="text-xs
-                                                   text-gray-500">
+                                        class="text-xs
+                                               text-gray-500
+                                               dark:text-gray-400">
 
                                         Marque
 
                                     </p>
 
                                     <p
-                                            class="mt-1
-                                                   font-medium
-                                                   text-gray-900
-                                                   dark:text-white">
+                                        class="mt-1
+                                               font-medium
+                                               text-gray-900
+                                               dark:text-white">
 
                                         {{ product.brand }}
 
@@ -455,23 +513,26 @@
                             }
 
 
+                            <!-- PRINCIPE ACTIF -->
+
                             @if (product.activeIngredient) {
 
                                 <div>
 
                                     <p
-                                            class="text-xs
-                                                   text-gray-500">
+                                        class="text-xs
+                                               text-gray-500
+                                               dark:text-gray-400">
 
                                         Principe actif
 
                                     </p>
 
                                     <p
-                                            class="mt-1
-                                                   font-medium
-                                                   text-gray-900
-                                                   dark:text-white">
+                                        class="mt-1
+                                               font-medium
+                                               text-gray-900
+                                               dark:text-white">
 
                                         {{ product.activeIngredient }}
 
@@ -482,23 +543,26 @@
                             }
 
 
+                            <!-- DOSAGE -->
+
                             @if (product.dosage) {
 
                                 <div>
 
                                     <p
-                                            class="text-xs
-                                                   text-gray-500">
+                                        class="text-xs
+                                               text-gray-500
+                                               dark:text-gray-400">
 
                                         Dosage
 
                                     </p>
 
                                     <p
-                                            class="mt-1
-                                                   font-medium
-                                                   text-gray-900
-                                                   dark:text-white">
+                                        class="mt-1
+                                               font-medium
+                                               text-gray-900
+                                               dark:text-white">
 
                                         {{ product.dosage }}
 
@@ -509,25 +573,58 @@
                             }
 
 
+                            <!-- FORME -->
+
                             @if (product.form) {
 
                                 <div>
 
                                     <p
-                                            class="text-xs
-                                                   text-gray-500">
+                                        class="text-xs
+                                               text-gray-500
+                                               dark:text-gray-400">
 
                                         Forme
 
                                     </p>
 
                                     <p
-                                            class="mt-1
-                                                   font-medium
-                                                   text-gray-900
-                                                   dark:text-white">
+                                        class="mt-1
+                                               font-medium
+                                               text-gray-900
+                                               dark:text-white">
 
                                         {{ product.form }}
+
+                                    </p>
+
+                                </div>
+
+                            }
+
+
+                            <!-- PRESCRIPTION -->
+
+                            @if (product.requiresPrescription) {
+
+                                <div>
+
+                                    <p
+                                        class="text-xs
+                                               text-gray-500
+                                               dark:text-gray-400">
+
+                                        Prescription
+
+                                    </p>
+
+                                    <p
+                                        class="mt-1
+                                               font-medium
+                                               text-red-600
+                                               dark:text-red-400">
+
+                                        Ordonnance requise
 
                                     </p>
 
@@ -540,42 +637,44 @@
                     </div>
 
 
-                    <!-- Catégories -->
+                    <!-- ================================================= -->
+                    <!-- CATÉGORIES -->
+                    <!-- ================================================= -->
 
                     @if (
                         product.categories &&
                         product.categories.length > 0
-                            ) {
+                    ) {
 
                         <div class="mt-6">
 
                             <h3
-                                    class="mb-3
-                                           font-semibold
-                                           text-gray-900
-                                           dark:text-white">
+                                class="mb-3
+                                       font-semibold
+                                       text-gray-900
+                                       dark:text-white">
 
                                 Catégories
 
                             </h3>
 
                             <div
-                                    class="flex flex-wrap
-                                           gap-2">
+                                class="flex flex-wrap
+                                       gap-2">
 
                                 @for (
                                     category of product.categories;
                                     track category
-                                        ) {
+                                ) {
 
                                     <span
-                                            class="rounded-full
-                                                   bg-gray-100
-                                                   px-3 py-1
-                                                   text-sm
-                                                   text-gray-700
-                                                   dark:bg-gray-800
-                                                   dark:text-gray-300">
+                                        class="rounded-full
+                                               bg-gray-100
+                                               px-3 py-1
+                                               text-sm
+                                               text-gray-700
+                                               dark:bg-gray-800
+                                               dark:text-gray-300">
 
                                         {{ category }}
 
@@ -590,40 +689,44 @@
                     }
 
 
-                    <!-- Domaines thérapeutiques -->
+                    <!-- ================================================= -->
+                    <!-- DOMAINES THÉRAPEUTIQUES -->
+                    <!-- ================================================= -->
 
                     @if (
                         product.therapeuticAreas &&
                         product.therapeuticAreas.length > 0
-                            ) {
+                    ) {
 
                         <div class="mt-6">
 
                             <h3
-                                    class="mb-3
-                                           font-semibold
-                                           text-gray-900
-                                           dark:text-white">
+                                class="mb-3
+                                       font-semibold
+                                       text-gray-900
+                                       dark:text-white">
 
                                 Domaines thérapeutiques
 
                             </h3>
 
                             <div
-                                    class="flex flex-wrap
-                                           gap-2">
+                                class="flex flex-wrap
+                                       gap-2">
 
                                 @for (
                                     area of product.therapeuticAreas;
                                     track area
-                                        ) {
+                                ) {
 
                                     <span
-                                            class="rounded-full
-                                                   bg-brand-50
-                                                   px-3 py-1
-                                                   text-sm
-                                                   text-brand-700">
+                                        class="rounded-full
+                                               bg-brand-50
+                                               px-3 py-1
+                                               text-sm
+                                               text-brand-700
+                                               dark:bg-brand-900/30
+                                               dark:text-brand-300">
 
                                         {{ area }}
 
@@ -638,28 +741,31 @@
                     }
 
 
-                    <!-- Stock -->
+                    <!-- ================================================= -->
+                    <!-- STOCK -->
+                    <!-- ================================================= -->
 
                     <div
-                            class="mt-8
-                                   rounded-xl
-                                   bg-gray-50
-                                   p-4
-                                   dark:bg-gray-800">
+                        class="mt-8
+                               rounded-xl
+                               bg-gray-50
+                               p-4
+                               dark:bg-gray-800">
 
                         <p
-                                class="text-sm
-                                       text-gray-500">
+                            class="text-sm
+                                   text-gray-500
+                                   dark:text-gray-400">
 
                             Disponibilité
 
                         </p>
 
                         <p
-                                class="mt-1
-                                       font-semibold
-                                       text-gray-900
-                                       dark:text-white">
+                            class="mt-1
+                                   font-semibold
+                                   text-gray-900
+                                   dark:text-white">
 
                             @if (product.stock > 0) {
 
@@ -668,7 +774,9 @@
 
                             } @else {
 
-                                Rupture de stock
+                                <span class="text-red-600">
+                                    Rupture de stock
+                                </span>
 
                             }
 
@@ -677,30 +785,40 @@
                     </div>
 
 
-                    <!-- ========================= -->
+                    <!-- ================================================= -->
                     <!-- PANIER -->
-                    <!-- ========================= -->
+                    <!-- ================================================= -->
 
                     <div
-                            class="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        class="mt-8
+                               grid grid-cols-1
+                               gap-3
+                               sm:grid-cols-2">
+
 
                         <!-- AJOUTER AU PANIER -->
 
                         <button
-                                type="button"
-                                (click)="addToCart()"
-                                [disabled]="product.stock <= 0 || addingToCart"
-                                class="flex w-full items-center
-                                       justify-center gap-2
-                                       rounded-lg
-                                       bg-brand-600
-                                       px-4 py-3
-                                       text-sm font-semibold
-                                       text-white
-                                       transition
-                                       hover:bg-brand-700
-                                       disabled:cursor-not-allowed
-                                       disabled:opacity-50">
+                            type="button"
+                            (click)="addToCart()"
+                            [disabled]="
+                                product.stock <= 0 ||
+                                addingToCart
+                            "
+                            class="flex w-full
+                                   items-center
+                                   justify-center
+                                   gap-2
+                                   rounded-lg
+                                   bg-brand-600
+                                   px-4 py-3
+                                   text-sm
+                                   font-semibold
+                                   text-white
+                                   transition
+                                   hover:bg-brand-700
+                                   disabled:cursor-not-allowed
+                                   disabled:opacity-50">
 
                             @if (!addingToCart) {
 
@@ -730,20 +848,23 @@
                         <!-- VOIR LE PANIER -->
 
                         <a
-                                routerLink="/cart"
-                                class="flex w-full items-center
-                                       justify-center gap-2
-                                       rounded-lg
-                                       border border-brand-500
-                                       bg-white
-                                       px-4 py-3
-                                       text-sm font-semibold
-                                       text-brand-600
-                                       transition
-                                       hover:bg-brand-50
-                                       dark:bg-gray-900
-                                       dark:text-brand-400
-                                       dark:hover:bg-gray-800">
+                            routerLink="/cart"
+                            class="flex w-full
+                                   items-center
+                                   justify-center
+                                   gap-2
+                                   rounded-lg
+                                   border border-brand-500
+                                   bg-white
+                                   px-4 py-3
+                                   text-sm
+                                   font-semibold
+                                   text-brand-600
+                                   transition
+                                   hover:bg-brand-50
+                                   dark:bg-gray-900
+                                   dark:text-brand-400
+                                   dark:hover:bg-gray-800">
 
                             <span>
                                 🛍️

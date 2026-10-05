@@ -67,18 +67,33 @@ export class ProductTableComponent implements OnInit {
 
 
     // ============================================================
-    // SELECTION DES PRODUITS
+    // SELECTION
     // ============================================================
 
+    /**
+     * Contient toujours les produits actuellement sélectionnés.
+     *
+     * En mode normal :
+     * -> produits sélectionnés pour créer un nouveau pack.
+     *
+     * En mode pack :
+     * -> produits actuellement sélectionnés dans le pack.
+     */
     selectedProductIds = new Set<number>();
 
 
     // ============================================================
-    // MODE SELECTION PACK
+    // MODE SELECTION DEPUIS UN PACK
     // ============================================================
 
     isBundleSelectionMode = false;
 
+    /**
+     * Sélection présente AVANT d'ouvrir le sélecteur
+     * depuis le formulaire du pack.
+     *
+     * Utilisée uniquement pour "Annuler".
+     */
     initialBundleProductIds: number[] = [];
 
     bundleReturnMode:
@@ -95,77 +110,23 @@ export class ProductTableComponent implements OnInit {
 
         this.route.queryParamMap.subscribe(params => {
 
+            /*
+             * ====================================================
+             * Vérification du mode sélection depuis un pack
+             * ====================================================
+             */
+
             const bundleSelection =
                 params.get('bundleSelection');
 
-
-            const returnMode =
-                params.get('returnMode');
-
-
-            const bundleIdParam =
-                params.get('bundleId');
-
-
-            const productIdsParam =
-                params.get('productIds');
-
-
-            /*
-             * ====================================================
-             * MODE SELECTION PACK
-             * ====================================================
-             */
 
             if (
                 bundleSelection === 'true'
             ) {
 
-                this.isBundleSelectionMode =
-                    true;
-
-
-                /*
-                 * Mode création / modification
-                 */
-
-                this.bundleReturnMode =
-                    returnMode === 'edit'
-                        ? 'edit'
-                        : 'new';
-
-
-                /*
-                 * ID du pack si modification
-                 */
-
-                this.bundleReturnId =
-                    bundleIdParam
-                        ? Number(bundleIdParam)
-                        : null;
-
-
-                /*
-                 * Produits déjà présents
-                 */
-
-                const productIds =
-                    productIdsParam
-                        ? this.parseProductIds(
-                            productIdsParam
-                        )
-                        : [];
-
-
-                this.initialBundleProductIds =
-                    [...productIds];
-
-
-                this.selectedProductIds =
-                    new Set(productIds);
-
-
-                this.loadProducts();
+                this.enterBundleSelectionMode(
+                    params
+                );
 
                 return;
             }
@@ -174,28 +135,37 @@ export class ProductTableComponent implements OnInit {
             /*
              * ====================================================
              * MODE NORMAL
+             *
+             * Ici les cases restent visibles.
+             *
+             * La sélection sert à créer un nouveau pack.
              * ====================================================
              */
 
             this.isBundleSelectionMode =
                 false;
 
-
             this.bundleReturnMode =
                 null;
 
-
             this.bundleReturnId =
                 null;
-
 
             this.initialBundleProductIds =
                 [];
 
 
-            this.selectedProductIds =
-                new Set();
-
+            /*
+             * IMPORTANT :
+             *
+             * On ne vide PAS selectedProductIds ici.
+             *
+             * Cela permet à la sélection de rester disponible
+             * pendant les recherches et les changements de page.
+             *
+             * Mais lorsqu'on arrive réellement sur la page
+             * normalement, on démarre avec une sélection vide.
+             */
 
             this.loadProducts();
 
@@ -205,7 +175,92 @@ export class ProductTableComponent implements OnInit {
 
 
     // ============================================================
-    // CHARGEMENT
+    // ENTREE EN MODE SELECTION PACK
+    // ============================================================
+
+    private enterBundleSelectionMode(
+        params: any
+    ): void {
+
+        this.isBundleSelectionMode =
+            true;
+
+
+        /*
+         * Création ou modification.
+         */
+
+        const returnMode =
+            params.get('returnMode');
+
+
+        this.bundleReturnMode =
+            returnMode === 'edit'
+                ? 'edit'
+                : 'new';
+
+
+        /*
+         * ID du pack en modification.
+         */
+
+        const bundleIdParam =
+            params.get('bundleId');
+
+
+        this.bundleReturnId =
+            bundleIdParam
+                ? Number(bundleIdParam)
+                : null;
+
+
+        /*
+         * Produits déjà présents dans le pack.
+         */
+
+        const productIdsParam =
+            params.get('productIds');
+
+
+        const productIds =
+            productIdsParam
+                ? this.parseProductIds(
+                    productIdsParam
+                )
+                : [];
+
+
+        /*
+         * IMPORTANT :
+         *
+         * On mémorise cette sélection pour le bouton Annuler.
+         */
+
+        this.initialBundleProductIds =
+            [...productIds];
+
+
+        /*
+         * Sélection courante.
+         */
+
+        this.selectedProductIds =
+            new Set(productIds);
+
+
+        /*
+         * On recharge depuis la première page.
+         */
+
+        this.currentPage = 0;
+
+        this.loadProducts();
+
+    }
+
+
+    // ============================================================
+    // CHARGEMENT PRODUITS
     // ============================================================
 
     loadProducts(): void {
@@ -442,7 +497,7 @@ export class ProductTableComponent implements OnInit {
 
 
     // ============================================================
-    // SELECTION DE LA PAGE
+    // SELECTION PAGE ACTUELLE
     // ============================================================
 
     selectAllVisible(): void {
@@ -490,7 +545,7 @@ export class ProductTableComponent implements OnInit {
 
 
     // ============================================================
-    // CREATION / MODIFICATION PACK
+    // CREATION DU PACK
     // ============================================================
 
     continueToBundleCreation(): void {
@@ -502,12 +557,26 @@ export class ProductTableComponent implements OnInit {
 
 
         /*
-         * --------------------------------------------------------
-         * MODIFICATION D'UN PACK
-         * --------------------------------------------------------
+         * Le bouton n'est disponible que s'il existe
+         * au moins un produit.
          */
 
         if (
+            productIds.length === 0
+        ) {
+
+            return;
+
+        }
+
+
+        /*
+         * Si nous sommes dans le mode sélection
+         * depuis un pack existant, on revient à CE pack.
+         */
+
+        if (
+            this.isBundleSelectionMode &&
             this.bundleReturnMode === 'edit' &&
             this.bundleReturnId !== null
         ) {
@@ -528,13 +597,45 @@ export class ProductTableComponent implements OnInit {
             );
 
             return;
+
         }
 
 
         /*
-         * --------------------------------------------------------
-         * CREATION D'UN NOUVEAU PACK
-         * --------------------------------------------------------
+         * Si nous sommes dans le mode sélection
+         * depuis un nouveau pack.
+         */
+
+        if (
+            this.isBundleSelectionMode
+        ) {
+
+            this.router.navigate(
+                [
+                    '/admin/bundles/new'
+                ],
+                {
+                    queryParams: {
+
+                        productIds:
+                            productIds.join(',')
+
+                    }
+                }
+            );
+
+            return;
+
+        }
+
+
+        /*
+         * ========================================================
+         * MODE NORMAL
+         *
+         * C'est ici que nous créons un nouveau pack
+         * depuis la liste normale des produits.
+         * ========================================================
          */
 
         this.router.navigate(
@@ -561,6 +662,10 @@ export class ProductTableComponent implements OnInit {
     }
 
 
+    // ============================================================
+    // CONFIRMATION SELECTION PACK
+    // ============================================================
+
     confirmBundleSelection(): void {
 
         this.continueToBundleCreation();
@@ -568,22 +673,21 @@ export class ProductTableComponent implements OnInit {
     }
 
 
-    navigateBackToBundle(): void {
-
-        this.continueToBundleCreation();
-
-    }
-
-
     // ============================================================
-    // ANNULER LA SELECTION
+    // ANNULATION SELECTION PACK
     // ============================================================
 
     cancelBundleSelection(): void {
 
         /*
+         * Cette méthode n'est utilisée que lorsque
+         * nous sommes revenus du formulaire d'un pack.
+         */
+
+
+        /*
          * --------------------------------------------------------
-         * MODIFICATION
+         * EDITION
          * --------------------------------------------------------
          */
 
@@ -600,6 +704,7 @@ export class ProductTableComponent implements OnInit {
             );
 
             return;
+
         }
 
 
@@ -627,6 +732,17 @@ export class ProductTableComponent implements OnInit {
 
 
     // ============================================================
+    // RETOUR AU PACK
+    // ============================================================
+
+    navigateBackToBundle(): void {
+
+        this.confirmBundleSelection();
+
+    }
+
+
+    // ============================================================
     // SUPPRESSION
     // ============================================================
 
@@ -634,10 +750,16 @@ export class ProductTableComponent implements OnInit {
         productId: number
     ): void {
 
+        /*
+         * Dans la liste normale, cette méthode est conservée
+         * pour compatibilité avec ton ancien HTML.
+         *
+         * La suppression réelle du produit du catalogue
+         * doit continuer à passer par ton AdminService/backend.
+         */
+
         if (
-            this.selectedProductIds.has(
-                productId
-            )
+            this.isBundleSelectionMode
         ) {
 
             this.selectedProductIds.delete(
@@ -748,7 +870,7 @@ export class ProductTableComponent implements OnInit {
 
 
     // ============================================================
-    // UTILITAIRE
+    // UTILITAIRE IDS
     // ============================================================
 
     private parseProductIds(

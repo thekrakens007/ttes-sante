@@ -67,14 +67,14 @@ export class ProductTableComponent implements OnInit {
 
 
     // ============================================================
-    // SELECTION PRODUITS
+    // SELECTION
     // ============================================================
 
     selectedProductIds = new Set<number>();
 
 
     // ============================================================
-    // MODE CREATION / MODIFICATION PACK
+    // MODE PACK
     // ============================================================
 
     isBundleSelectionMode = false;
@@ -88,6 +88,14 @@ export class ProductTableComponent implements OnInit {
 
 
     // ============================================================
+    // STOCKAGE DU CONTEXTE
+    // ============================================================
+
+    private readonly SELECTION_CONTEXT_KEY =
+        'ttes_bundle_selection_context';
+
+
+    // ============================================================
     // INITIALISATION
     // ============================================================
 
@@ -95,20 +103,96 @@ export class ProductTableComponent implements OnInit {
 
         this.route.queryParamMap.subscribe(params => {
 
-            this.isBundleSelectionMode =
-                params.get('bundleSelection') === 'true';
+            /*
+             * ====================================================
+             * RECUPERATION DES PARAMETRES URL
+             * ====================================================
+             */
+
+            const bundleSelection =
+                params.get('bundleSelection');
+
+
+            const returnMode =
+                params.get('returnMode');
+
+
+            const bundleIdParam =
+                params.get('bundleId');
+
+
+            const productIdsParam =
+                params.get('productIds');
 
 
             /*
-             * Mode normal :
-             * simple liste des produits.
+             * ====================================================
+             * CAS 1 :
+             *
+             * On arrive directement avec :
+             *
+             * ?bundleSelection=true
+             * ====================================================
              */
 
-            if (!this.isBundleSelectionMode) {
+            if (
+                bundleSelection === 'true'
+            ) {
 
-                this.bundleReturnMode = null;
+                this.isBundleSelectionMode =
+                    true;
 
-                this.bundleReturnId = null;
+
+                /*
+                 * Mode retour.
+                 */
+
+                this.bundleReturnMode =
+                    returnMode === 'edit'
+                        ? 'edit'
+                        : 'new';
+
+
+                /*
+                 * ID du pack en modification.
+                 */
+
+                this.bundleReturnId =
+                    bundleIdParam
+                        ? Number(bundleIdParam)
+                        : null;
+
+
+                /*
+                 * Produits déjà sélectionnés.
+                 */
+
+                const productIds =
+                    productIdsParam
+                        ? this.parseProductIds(
+                            productIdsParam
+                        )
+                        : [];
+
+
+                this.initialBundleProductIds =
+                    [...productIds];
+
+
+                this.selectedProductIds =
+                    new Set(productIds);
+
+
+                /*
+                 * On sauvegarde le contexte.
+                 */
+
+                this.saveSelectionContext();
+
+
+                /*
+                 * Recharger les produits.
+                 */
 
                 this.loadProducts();
 
@@ -117,64 +201,72 @@ export class ProductTableComponent implements OnInit {
 
 
             /*
-             * Mode sélection pour un pack.
+             * ====================================================
+             * CAS 2 :
+             *
+             * L'URL ne contient plus bundleSelection=true,
+             * mais Angular a conservé/rechargé la page.
+             *
+             * On tente de récupérer le contexte.
+             * ====================================================
              */
 
-            const returnMode =
-                params.get('returnMode');
+            const context =
+                this.getSelectionContext();
 
 
-            if (returnMode === 'edit') {
+            if (
+                context &&
+                context.isBundleSelectionMode
+            ) {
 
-                this.bundleReturnMode = 'edit';
+                this.isBundleSelectionMode =
+                    true;
 
-            } else {
 
-                this.bundleReturnMode = 'new';
+                this.bundleReturnMode =
+                    context.bundleReturnMode;
 
+
+                this.bundleReturnId =
+                    context.bundleReturnId;
+
+
+                this.initialBundleProductIds =
+                    [...context.initialBundleProductIds];
+
+
+                this.selectedProductIds =
+                    new Set(
+                        context.selectedProductIds
+                    );
+
+
+                this.loadProducts();
+
+                return;
             }
 
 
-            const bundleId =
-                params.get('bundleId');
+            /*
+             * ====================================================
+             * MODE NORMAL
+             * ====================================================
+             */
 
+            this.resetSelectionContext();
+
+            this.isBundleSelectionMode =
+                false;
+
+            this.bundleReturnMode =
+                null;
 
             this.bundleReturnId =
-                bundleId
-                    ? Number(bundleId)
-                    : null;
-
-
-            /*
-             * Produits déjà présents dans le pack.
-             */
-
-            const productIdsParam =
-                params.get('productIds');
-
-
-            const productIds =
-                productIdsParam
-                    ? this.parseProductIds(
-                        productIdsParam
-                    )
-                    : [];
-
-
-            /*
-             * On mémorise la sélection initiale.
-             *
-             * Cela permet à "Annuler" de restaurer
-             * exactement la sélection précédente.
-             */
-
-            this.initialBundleProductIds =
-                [...productIds];
-
+                null;
 
             this.selectedProductIds =
-                new Set(productIds);
-
+                new Set();
 
             this.loadProducts();
 
@@ -184,7 +276,7 @@ export class ProductTableComponent implements OnInit {
 
 
     // ============================================================
-    // CHARGEMENT DES PRODUITS
+    // CHARGEMENT PRODUITS
     // ============================================================
 
     loadProducts(): void {
@@ -196,11 +288,13 @@ export class ProductTableComponent implements OnInit {
 
         const request =
             this.searchTerm.trim()
+
                 ? this.productService.searchProductsPaginated(
                     this.searchTerm.trim(),
                     this.currentPage,
                     this.pageSize
                 )
+
                 : this.productService.getProductsPaginated(
                     this.currentPage,
                     this.pageSize
@@ -214,17 +308,23 @@ export class ProductTableComponent implements OnInit {
                 this.products =
                     page.content ?? [];
 
+
                 this.totalPages =
                     page.totalPages ?? 0;
+
 
                 this.totalElements =
                     page.totalElements ?? 0;
 
+
                 this.currentPage =
-                    page.number ?? this.currentPage;
+                    page.number ??
+                    this.currentPage;
+
 
                 this.pageSize =
-                    page.size ?? this.pageSize;
+                    page.size ??
+                    this.pageSize;
 
 
                 this.buildPages();
@@ -241,9 +341,11 @@ export class ProductTableComponent implements OnInit {
                     err
                 );
 
+
                 this.errorMessage =
                     err?.error?.message ??
                     'Impossible de charger les produits.';
+
 
                 this.loading = false;
 
@@ -283,9 +385,11 @@ export class ProductTableComponent implements OnInit {
         this.pages =
             Array.from(
                 {
-                    length: this.totalPages
+                    length:
+                        this.totalPages
                 },
-                (_, index) => index
+                (_, index) =>
+                    index
             );
 
     }
@@ -293,8 +397,12 @@ export class ProductTableComponent implements OnInit {
 
     previousPage(): void {
 
-        if (this.currentPage <= 0) {
+        if (
+            this.currentPage <= 0
+        ) {
+
             return;
+
         }
 
 
@@ -311,7 +419,9 @@ export class ProductTableComponent implements OnInit {
             this.currentPage >=
             this.totalPages - 1
         ) {
+
             return;
+
         }
 
 
@@ -322,17 +432,22 @@ export class ProductTableComponent implements OnInit {
     }
 
 
-    goToPage(page: number): void {
+    goToPage(
+        page: number
+    ): void {
 
         if (
             page < 0 ||
             page >= this.totalPages
         ) {
+
             return;
+
         }
 
 
-        this.currentPage = page;
+        this.currentPage =
+            page;
 
         this.loadProducts();
 
@@ -376,8 +491,22 @@ export class ProductTableComponent implements OnInit {
 
         }
 
+
+        /*
+         * Sauvegarder immédiatement la sélection.
+         *
+         * Ainsi elle survit à une recherche,
+         * une pagination ou un retour navigateur.
+         */
+
+        this.saveSelectionContext();
+
     }
 
+
+    // ============================================================
+    // COMPTEUR
+    // ============================================================
 
     get selectedProductCount(): number {
 
@@ -394,36 +523,45 @@ export class ProductTableComponent implements OnInit {
 
 
     // ============================================================
-    // SELECTION DE LA PAGE ACTUELLE
+    // SELECTION PAGE ACTUELLE
     // ============================================================
 
     selectAllVisible(): void {
 
-        this.products.forEach(product => {
+        this.products.forEach(
+            product => {
 
-            this.selectedProductIds.add(
-                product.id
-            );
+                this.selectedProductIds.add(
+                    product.id
+                );
 
-        });
+            }
+        );
+
+
+        this.saveSelectionContext();
 
     }
 
 
     deselectAllVisible(): void {
 
-        this.products.forEach(product => {
+        this.products.forEach(
+            product => {
 
-            this.selectedProductIds.delete(
-                product.id
-            );
+                this.selectedProductIds.delete(
+                    product.id
+                );
 
-        });
+            }
+        );
+
+
+        this.saveSelectionContext();
 
     }
 
 
-    // Compatibilité éventuelle
     selectAllCurrentPage(): void {
 
         this.selectAllVisible();
@@ -439,7 +577,7 @@ export class ProductTableComponent implements OnInit {
 
 
     // ============================================================
-    // CREATION D'UN PACK
+    // CREER / MODIFIER UN PACK
     // ============================================================
 
     continueToBundleCreation(): void {
@@ -451,9 +589,9 @@ export class ProductTableComponent implements OnInit {
 
 
         /*
-         * Si nous sommes déjà dans le flux
-         * d'édition d'un pack, il faut revenir
-         * à CE pack.
+         * ========================================================
+         * MODIFICATION
+         * ========================================================
          */
 
         if (
@@ -461,33 +599,58 @@ export class ProductTableComponent implements OnInit {
             this.bundleReturnId !== null
         ) {
 
+            /*
+             * IMPORTANT :
+             *
+             * On conserve l'ID du pack.
+             */
+
+            const bundleId =
+                this.bundleReturnId;
+
+
+            this.resetSelectionContext();
+
+
             this.router.navigate(
                 [
                     '/admin/bundles/edit',
-                    this.bundleReturnId
+                    bundleId
                 ],
                 {
                     queryParams: {
+
                         productIds:
                             productIds.join(',')
+
                     }
                 }
             );
+
 
             return;
         }
 
 
         /*
-         * Sinon nous sommes dans une création.
+         * ========================================================
+         * CREATION
+         * ========================================================
          */
 
+        this.resetSelectionContext();
+
+
         this.router.navigate(
-            ['/admin/bundles/new'],
+            [
+                '/admin/bundles/new'
+            ],
             {
                 queryParams: {
+
                     productIds:
                         productIds.join(',')
+
                 }
             }
         );
@@ -502,10 +665,6 @@ export class ProductTableComponent implements OnInit {
     }
 
 
-    // ============================================================
-    // CONFIRMATION SELECTION PACK
-    // ============================================================
-
     confirmBundleSelection(): void {
 
         this.continueToBundleCreation();
@@ -513,25 +672,33 @@ export class ProductTableComponent implements OnInit {
     }
 
 
+    navigateBackToBundle(): void {
+
+        this.continueToBundleCreation();
+
+    }
+
+
     // ============================================================
-    // ANNULATION SELECTION PACK
+    // ANNULATION
     // ============================================================
 
     cancelBundleSelection(): void {
 
         /*
-         * On restaure la sélection qui existait
-         * AVANT l'ouverture du sélecteur.
+         * Restaurer la sélection initiale.
          */
 
-        this.selectedProductIds =
-            new Set(
-                this.initialBundleProductIds
-            );
+        const initialIds =
+            [
+                ...this.initialBundleProductIds
+            ];
 
 
         /*
+         * ========================================================
          * EDITION
+         * ========================================================
          */
 
         if (
@@ -539,41 +706,47 @@ export class ProductTableComponent implements OnInit {
             this.bundleReturnId !== null
         ) {
 
+            const bundleId =
+                this.bundleReturnId;
+
+
+            this.resetSelectionContext();
+
+
             this.router.navigate(
                 [
                     '/admin/bundles/edit',
-                    this.bundleReturnId
+                    bundleId
                 ]
             );
+
 
             return;
         }
 
 
         /*
+         * ========================================================
          * CREATION
+         * ========================================================
          */
 
+        this.resetSelectionContext();
+
+
         this.router.navigate(
-            ['/admin/bundles/new'],
+            [
+                '/admin/bundles/new'
+            ],
             {
                 queryParams: {
+
                     productIds:
-                        this.initialBundleProductIds.join(',')
+                        initialIds.join(',')
+
                 }
             }
         );
-
-    }
-
-
-    // ============================================================
-    // RETOUR AU PACK
-    // ============================================================
-
-    navigateBackToBundle(): void {
-
-        this.continueToBundleCreation();
 
     }
 
@@ -587,12 +760,9 @@ export class ProductTableComponent implements OnInit {
     ): void {
 
         /*
-         * IMPORTANT :
-         * Je ne lance pas ici un DELETE backend sans connaître
-         * la méthode exacte de ton AdminService.
-         *
-         * Cette méthode retire au minimum le produit
-         * de la sélection du pack.
+         * Dans le mode sélection pack,
+         * cette action retire simplement le produit
+         * de la sélection.
          */
 
         if (
@@ -605,13 +775,15 @@ export class ProductTableComponent implements OnInit {
                 productId
             );
 
+            this.saveSelectionContext();
+
         }
 
     }
 
 
     // ============================================================
-    // IMAGES
+    // IMAGE
     // ============================================================
 
     getMainImage(
@@ -622,24 +794,30 @@ export class ProductTableComponent implements OnInit {
             !product.images ||
             product.images.length === 0
         ) {
+
             return '';
+
         }
 
 
         const main =
             product.images.find(
-                image => image.main === true
+                image =>
+                    image.main === true
             );
 
 
-        if (main?.imageUrl) {
+        if (
+            main?.imageUrl
+        ) {
 
             return main.imageUrl;
 
         }
 
 
-        return product.images[0]?.imageUrl ?? '';
+        return product.images[0]?.imageUrl ??
+            '';
 
     }
 
@@ -652,14 +830,18 @@ export class ProductTableComponent implements OnInit {
         stock: number
     ): string {
 
-        if (stock <= 0) {
+        if (
+            stock <= 0
+        ) {
 
             return 'bg-red-100 text-red-700';
 
         }
 
 
-        if (stock < 10) {
+        if (
+            stock < 10
+        ) {
 
             return 'bg-orange-100 text-orange-700';
 
@@ -675,14 +857,18 @@ export class ProductTableComponent implements OnInit {
         stock: number
     ): string {
 
-        if (stock <= 0) {
+        if (
+            stock <= 0
+        ) {
 
             return 'Rupture';
 
         }
 
 
-        if (stock < 10) {
+        if (
+            stock < 10
+        ) {
 
             return 'Stock faible';
 
@@ -690,6 +876,151 @@ export class ProductTableComponent implements OnInit {
 
 
         return 'Disponible';
+
+    }
+
+
+    // ============================================================
+    // CONTEXTE SELECTION
+    // ============================================================
+
+    private saveSelectionContext(): void {
+
+        /*
+         * Ne rien sauvegarder si nous sommes dans
+         * le mode normal.
+         */
+
+        if (
+            !this.isBundleSelectionMode
+        ) {
+
+            return;
+
+        }
+
+
+        const context = {
+
+            isBundleSelectionMode:
+                true,
+
+            bundleReturnMode:
+                this.bundleReturnMode,
+
+            bundleReturnId:
+                this.bundleReturnId,
+
+            initialBundleProductIds:
+                [
+                    ...this.initialBundleProductIds
+                ],
+
+            selectedProductIds:
+                Array.from(
+                    this.selectedProductIds
+                )
+
+        };
+
+
+        sessionStorage.setItem(
+            this.SELECTION_CONTEXT_KEY,
+            JSON.stringify(context)
+        );
+
+    }
+
+
+    private getSelectionContext(): {
+        isBundleSelectionMode: boolean;
+        bundleReturnMode:
+            'new' | 'edit' | null;
+        bundleReturnId: number | null;
+        initialBundleProductIds: number[];
+        selectedProductIds: number[];
+    } | null {
+
+        try {
+
+            const raw =
+                sessionStorage.getItem(
+                    this.SELECTION_CONTEXT_KEY
+                );
+
+
+            if (!raw) {
+
+                return null;
+
+            }
+
+
+            const data =
+                JSON.parse(raw);
+
+
+            if (
+                !data?.isBundleSelectionMode
+            ) {
+
+                return null;
+
+            }
+
+
+            return {
+
+                isBundleSelectionMode:
+                    true,
+
+                bundleReturnMode:
+                    data.bundleReturnMode === 'edit'
+                        ? 'edit'
+                        : 'new',
+
+                bundleReturnId:
+                    data.bundleReturnId
+                        ? Number(
+                            data.bundleReturnId
+                        )
+                        : null,
+
+                initialBundleProductIds:
+                    Array.isArray(
+                        data.initialBundleProductIds
+                    )
+                        ? data.initialBundleProductIds
+                        : [],
+
+                selectedProductIds:
+                    Array.isArray(
+                        data.selectedProductIds
+                    )
+                        ? data.selectedProductIds
+                        : []
+
+            };
+
+        } catch (error) {
+
+            console.error(
+                'Erreur lecture contexte sélection :',
+                error
+            );
+
+            return null;
+
+        }
+
+    }
+
+
+    private resetSelectionContext(): void {
+
+        sessionStorage.removeItem(
+            this.SELECTION_CONTEXT_KEY
+        );
 
     }
 
@@ -704,7 +1035,10 @@ export class ProductTableComponent implements OnInit {
 
         return value
             .split(',')
-            .map(id => Number(id))
+            .map(
+                id =>
+                    Number(id)
+            )
             .filter(
                 id =>
                     Number.isInteger(id) &&

@@ -4,13 +4,8 @@ import {
     inject
 } from '@angular/core';
 
-import {
-    CommonModule
-} from '@angular/common';
-
-import {
-    FormsModule
-} from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import {
     ActivatedRoute,
@@ -18,11 +13,8 @@ import {
     RouterModule
 } from '@angular/router';
 
-import { AdminService } from '../../../../core/services/admin.service';
-
-import {
-    Product
-} from '../../../../core/models/product.model';
+import { ProductService } from '../../../../core/services/product.service';
+import { Product } from '../../../../core/models/product.model';
 
 
 @Component({
@@ -38,46 +30,52 @@ import {
 export class ProductTableComponent
     implements OnInit {
 
-    private adminService =
-        inject(AdminService);
-
-    private router =
-        inject(Router);
+    private productService =
+        inject(ProductService);
 
     private route =
         inject(ActivatedRoute);
 
+    private router =
+        inject(Router);
+
 
     products: Product[] = [];
 
-    loading = true;
-
-    errorMessage = '';
+    loading = false;
 
     searchTerm = '';
 
-
     currentPage = 0;
 
-    pageSize = 8;
+    pageSize = 12;
 
     totalPages = 0;
 
     totalElements = 0;
 
-    pages: number[] = [];
 
+    /*
+     * Produits sélectionnés.
+     *
+     * Le Set permet de conserver la sélection
+     * même lorsqu'on change de page.
+     */
 
     selectedProductIds =
         new Set<number>();
 
+
+    /*
+     * Mode sélection pour un pack.
+     */
 
     isBundleSelectionMode = false;
 
     initialBundleProductIds: number[] = [];
 
     bundleReturnMode:
-        'new' | 'edit' = 'new';
+        'new' | 'edit' | null = null;
 
     bundleReturnId:
         number | null = null;
@@ -85,222 +83,150 @@ export class ProductTableComponent
 
     ngOnInit(): void {
 
-        this.route.queryParams.subscribe(
-            params => {
+        this.route.queryParamMap.subscribe(params => {
 
-                this.readBundleSelectionParams(
-                    params
-                );
+            this.isBundleSelectionMode =
+                params.get('bundleSelection') === 'true';
+
+
+            if (!this.isBundleSelectionMode) {
 
                 this.loadProducts();
+
+                return;
             }
-        );
-    }
 
 
-    private readBundleSelectionParams(
-        params: any
-    ): void {
+            /*
+             * Mode création / édition.
+             */
 
-        this.isBundleSelectionMode =
-            params['bundleSelection'] === true ||
-            params['bundleSelection'] === 'true';
-
-
-        if (
-            !this.isBundleSelectionMode
-        ) {
-
-            this.initialBundleProductIds = [];
-
-            this.bundleReturnMode =
-                'new';
-
-            this.bundleReturnId =
-                null;
-
-            return;
-        }
+            const returnMode =
+                params.get('returnMode');
 
 
-        const ids =
-            this.parseProductIds(
-                params['productIds']
-            );
-
-
-        this.selectedProductIds =
-            new Set(ids);
-
-
-        this.initialBundleProductIds =
-            [...ids];
-
-
-        this.bundleReturnMode =
-            params['returnMode'] === 'edit'
-                ? 'edit'
-                : 'new';
-
-
-        const bundleId =
-            Number(
-                params['bundleId']
-            );
-
-
-        this.bundleReturnId =
-            Number.isInteger(bundleId) &&
-            bundleId > 0
-                ? bundleId
-                : null;
-    }
-
-
-    private parseProductIds(
-        value: any
-    ): number[] {
-
-        if (
-            value === null ||
-            value === undefined
-        ) {
-            return [];
-        }
-
-
-        const values =
-            Array.isArray(value)
-                ? value
-                : [value];
-
-
-        const ids: number[] = [];
-
-
-        for (
-            const valueItem of values
-        ) {
-
-            for (
-                const part of
-                String(valueItem).split(',')
+            if (
+                returnMode === 'edit'
             ) {
 
-                const id =
-                    Number(part);
+                this.bundleReturnMode =
+                    'edit';
 
+            } else {
 
-                if (
-                    Number.isInteger(id) &&
-                    id > 0 &&
-                    !ids.includes(id)
-                ) {
+                this.bundleReturnMode =
+                    'new';
 
-                    ids.push(id);
-                }
             }
-        }
 
 
-        return ids;
+            const bundleId =
+                params.get('bundleId');
+
+
+            this.bundleReturnId =
+                bundleId
+                    ? Number(bundleId)
+                    : null;
+
+
+            const productIdsParam =
+                params.get('productIds');
+
+
+            const ids =
+                productIdsParam
+                    ? this.parseProductIds(
+                        productIdsParam
+                    )
+                    : [];
+
+
+            /*
+             * Mémoriser l'état initial.
+             *
+             * Cela permet à "Annuler"
+             * de revenir à la sélection précédente.
+             */
+
+            this.initialBundleProductIds =
+                [...ids];
+
+
+            this.selectedProductIds =
+                new Set(ids);
+
+
+            this.loadProducts();
+
+        });
+
     }
 
 
-    get selectedProductCount(): number {
-
-        return this.selectedProductIds.size;
-    }
-
+    /*
+     * ============================================================
+     * PRODUITS
+     * ============================================================
+     */
 
     loadProducts(): void {
 
         this.loading = true;
 
-        this.errorMessage = '';
-
-
-        const keyword =
-            this.searchTerm.trim();
-
 
         const request =
-            keyword
-
-                ? this.adminService
-                    .searchProductsPaginated(
-                        keyword,
-                        this.currentPage,
-                        this.pageSize
-                    )
-
-                : this.adminService
-                    .getProductsPaginated(
-                        this.currentPage,
-                        this.pageSize
-                    );
+            this.searchTerm.trim()
+                ? this.productService.searchProductsPaginated(
+                    this.searchTerm,
+                    this.currentPage,
+                    this.pageSize
+                )
+                : this.productService.getProductsPaginated(
+                    this.currentPage,
+                    this.pageSize
+                );
 
 
         request.subscribe({
 
-            next:
-                (response: any) => {
+            next: page => {
 
-                    this.products =
-                        response.content ?? [];
+                this.products =
+                    page.content ?? [];
 
-                    this.totalPages =
-                        response.totalPages ?? 0;
+                this.totalPages =
+                    page.totalPages ?? 0;
 
-                    this.totalElements =
-                        response.totalElements ?? 0;
+                this.totalElements =
+                    page.totalElements ?? 0;
 
-                    this.generatePages();
+                this.loading = false;
 
-                    this.loading = false;
-                },
+            },
 
+            error: err => {
 
-            error:
-                error => {
+                console.error(
+                    'Erreur chargement produits :',
+                    err
+                );
 
-                    console.error(
-                        'Erreur chargement produits :',
-                        error
-                    );
+                this.loading = false;
 
-                    this.errorMessage =
-                        'Impossible de charger les produits.';
+            }
 
-                    this.products = [];
-
-                    this.loading = false;
-                }
         });
+
     }
 
 
-    generatePages(): void {
-
-        this.pages = [];
-
-
-        for (
-            let i = 0;
-            i < this.totalPages;
-            i++
-        ) {
-
-            this.pages.push(i);
-        }
-    }
-
-
-    submitSearch(): void {
+    onSearch(): void {
 
         this.currentPage = 0;
 
         this.loadProducts();
+
     }
 
 
@@ -310,8 +236,7 @@ export class ProductTableComponent
 
         if (
             page < 0 ||
-            page >= this.totalPages ||
-            page === this.currentPage
+            page >= this.totalPages
         ) {
             return;
         }
@@ -320,37 +245,28 @@ export class ProductTableComponent
         this.currentPage = page;
 
         this.loadProducts();
+
     }
 
 
-    previousPage(): void {
+    /*
+     * ============================================================
+     * SELECTION
+     * ============================================================
+     */
 
-        if (
-            this.currentPage > 0
-        ) {
+    isSelected(
+        productId: number
+    ): boolean {
 
-            this.currentPage--;
+        return this.selectedProductIds.has(
+            productId
+        );
 
-            this.loadProducts();
-        }
     }
 
 
-    nextPage(): void {
-
-        if (
-            this.currentPage <
-            this.totalPages - 1
-        ) {
-
-            this.currentPage++;
-
-            this.loadProducts();
-        }
-    }
-
-
-    toggleProductSelection(
+    toggleProduct(
         productId: number
     ): void {
 
@@ -369,79 +285,61 @@ export class ProductTableComponent
             this.selectedProductIds.add(
                 productId
             );
+
         }
+
     }
 
 
-    isProductSelected(
-        productId: number
-    ): boolean {
+    selectAllCurrentPage(): void {
 
-        return this.selectedProductIds.has(
-            productId
+        this.products.forEach(
+            product => {
+
+                this.selectedProductIds.add(
+                    product.id
+                );
+
+            }
         );
+
     }
 
 
-    selectAllVisible(): void {
+    deselectAllCurrentPage(): void {
 
-        for (
-            const product of this.products
-        ) {
+        this.products.forEach(
+            product => {
 
-            this.selectedProductIds.add(
-                product.id
-            );
-        }
-    }
+                this.selectedProductIds.delete(
+                    product.id
+                );
 
-
-    deselectAllVisible(): void {
-
-        for (
-            const product of this.products
-        ) {
-
-            this.selectedProductIds.delete(
-                product.id
-            );
-        }
-    }
-
-
-    areAllVisibleSelected(): boolean {
-
-        return (
-            this.products.length > 0 &&
-            this.products.every(
-                product =>
-                    this.selectedProductIds.has(
-                        product.id
-                    )
-            )
+            }
         );
+
     }
 
 
-    clearProductSelection(): void {
+    get selectedCount(): number {
 
-        this.selectedProductIds.clear();
+        return this.selectedProductIds.size;
+
     }
 
 
-    continueToBundleCreation(): void {
+    /*
+     * ============================================================
+     * CREER UN PACK
+     * ============================================================
+     */
+
+    createBundle(): void {
 
         const productIds =
             Array.from(
                 this.selectedProductIds
             );
-
-
-        if (
-            productIds.length === 0
-        ) {
-            return;
-        }
 
 
         this.router.navigate(
@@ -453,43 +351,139 @@ export class ProductTableComponent
                 }
             }
         );
+
     }
 
 
-    cancelBundleSelection(): void {
-
-        const ids =
-            [
-                ...this.initialBundleProductIds
-            ];
-
-
-        this.navigateBackToBundle(
-            ids
-        );
-    }
-
+    /*
+     * ============================================================
+     * CONFIRMER SELECTION
+     * ============================================================
+     */
 
     confirmBundleSelection(): void {
 
-        const ids =
+        const productIds =
             Array.from(
                 this.selectedProductIds
             );
 
 
-        this.navigateBackToBundle(
-            ids
+        /*
+         * EDITION
+         *
+         * On retourne obligatoirement
+         * vers /edit/:id.
+         */
+
+        if (
+            this.bundleReturnMode === 'edit' &&
+            this.bundleReturnId !== null
+        ) {
+
+            this.router.navigate(
+                [
+                    '/admin/bundles/edit',
+                    this.bundleReturnId
+                ],
+                {
+                    queryParams: {
+                        productIds:
+                            productIds.join(',')
+                    }
+                }
+            );
+
+            return;
+        }
+
+
+        /*
+         * CREATION
+         */
+
+        this.router.navigate(
+            ['/admin/bundles/new'],
+            {
+                queryParams: {
+                    productIds:
+                        productIds.join(',')
+                }
+            }
         );
+
     }
 
 
-    private navigateBackToBundle(
-        productIds: number[]
-    ): void {
+    /*
+     * ============================================================
+     * ANNULER LA SELECTION
+     * ============================================================
+     */
 
-        const ids =
-            [...new Set(productIds)];
+    cancelBundleSelection(): void {
+
+        /*
+         * Restaurer exactement les produits
+         * présents avant d'entrer dans le mode
+         * sélection.
+         */
+
+        this.selectedProductIds =
+            new Set(
+                this.initialBundleProductIds
+            );
+
+
+        /*
+         * Retour vers le pack en édition.
+         */
+
+        if (
+            this.bundleReturnMode === 'edit' &&
+            this.bundleReturnId !== null
+        ) {
+
+            this.router.navigate(
+                [
+                    '/admin/bundles/edit',
+                    this.bundleReturnId
+                ]
+            );
+
+            return;
+        }
+
+
+        /*
+         * Retour création.
+         */
+
+        this.router.navigate(
+            ['/admin/bundles/new'],
+            {
+                queryParams: {
+                    productIds:
+                        this.initialBundleProductIds.join(',')
+                }
+            }
+        );
+
+    }
+
+
+    /*
+     * ============================================================
+     * RETOUR AU PACK
+     * ============================================================
+     */
+
+    navigateBackToBundle(): void {
+
+        const productIds =
+            Array.from(
+                this.selectedProductIds
+            );
 
 
         if (
@@ -505,7 +499,7 @@ export class ProductTableComponent
                 {
                     queryParams: {
                         productIds:
-                            ids.join(',')
+                            productIds.join(',')
                     }
                 }
             );
@@ -519,10 +513,33 @@ export class ProductTableComponent
             {
                 queryParams: {
                     productIds:
-                        ids.join(',')
+                        productIds.join(',')
                 }
             }
         );
+
+    }
+
+
+    /*
+     * ============================================================
+     * OUTILS
+     * ============================================================
+     */
+
+    private parseProductIds(
+        value: string
+    ): number[] {
+
+        return value
+            .split(',')
+            .map(id => Number(id))
+            .filter(
+                id =>
+                    Number.isInteger(id) &&
+                    id > 0
+            );
+
     }
 
 
@@ -530,46 +547,44 @@ export class ProductTableComponent
         product: Product
     ): string {
 
-        if (
-            !product.images ||
-            product.images.length === 0
-        ) {
+        if (!product.images?.length) {
             return '';
         }
 
 
-        const mainImage =
+        const main =
             product.images.find(
                 image => image.main
             );
 
 
-        return (
-            mainImage?.imageUrl ??
+        return main?.imageUrl ??
             product.images[0]?.imageUrl ??
-            ''
-        );
+            '';
+
     }
 
 
-    getStockColor(
+    getStockClass(
         stock: number
-    ):
-        'success' |
-        'warning' |
-        'error' {
+    ): string {
 
         if (stock <= 0) {
-            return 'error';
+
+            return 'bg-red-100 text-red-700';
+
         }
 
 
         if (stock < 10) {
-            return 'warning';
+
+            return 'bg-orange-100 text-orange-700';
+
         }
 
 
-        return 'success';
+        return 'bg-green-100 text-green-700';
+
     }
 
 
@@ -583,52 +598,12 @@ export class ProductTableComponent
 
 
         if (stock < 10) {
-            return 'Stock faible';
+            return 'Faible';
         }
 
 
-        return 'En stock';
+        return 'Disponible';
+
     }
 
-
-    deleteProduct(
-        productId: number
-    ): void {
-
-        if (
-            !confirm(
-                'Êtes-vous sûr de vouloir supprimer ce produit ?'
-            )
-        ) {
-            return;
-        }
-
-
-        this.adminService
-            .deleteProduct(productId)
-            .subscribe({
-
-                next: () => {
-
-                    this.selectedProductIds.delete(
-                        productId
-                    );
-
-                    this.loadProducts();
-                },
-
-
-                error:
-                    error => {
-
-                        console.error(
-                            'Erreur suppression produit :',
-                            error
-                        );
-
-                        this.errorMessage =
-                            'Impossible de supprimer le produit.';
-                    }
-            });
-    }
 }

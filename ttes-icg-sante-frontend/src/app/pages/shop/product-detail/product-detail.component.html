@@ -174,10 +174,12 @@
 
 
                 <!-- ========================= -->
-                <!-- IMAGE -->
+                <!-- GALERIE IMAGES -->
                 <!-- ========================= -->
 
                 <div>
+
+                    <!-- IMAGE PRINCIPALE -->
 
                     <div
                             class="overflow-hidden
@@ -193,13 +195,13 @@
                                 ) {
 
                             <img
-                                    [src]="
-                                        product.images[0].imageUrl
-                                    "
+                                    [src]="selectedImage"
                                     [alt]="product.name"
                                     class="h-[450px]
                                            w-full
-                                           object-contain">
+                                           object-contain
+                                           transition
+                                           duration-300">
 
                         } @else {
 
@@ -217,6 +219,67 @@
 
                     </div>
 
+
+                    <!-- MINIATURES -->
+
+                    @if (
+                        product.images &&
+                        product.images.length > 1
+                            ) {
+
+                        <div
+                                class="mt-4
+                                       flex gap-3
+                                       overflow-x-auto
+                                       pb-2">
+
+                            @for (
+                                image of product.images;
+                                track image.id
+                                    ) {
+
+                                <button
+                                        type="button"
+                                        (click)="selectImage(image.imageUrl)"
+                                        [class]="
+                                            selectedImage === image.imageUrl
+                                                ? 'h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border-2 border-brand-500 bg-white shadow-sm dark:bg-gray-900'
+                                                : 'h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border-2 border-transparent bg-white hover:border-gray-300 dark:bg-gray-900 dark:hover:border-gray-700'
+                                        ">
+
+                                    <img
+                                            [src]="image.imageUrl"
+                                            [alt]="product.name"
+                                            class="h-full w-full object-cover">
+
+                                </button>
+
+                            }
+
+                        </div>
+
+                    }
+
+
+                    <!-- NOMBRE D'IMAGES -->
+
+                    @if (
+                        product.images &&
+                        product.images.length > 1
+                            ) {
+
+                        <p
+                                class="mt-2 text-center
+                                       text-xs
+                                       text-gray-500
+                                       dark:text-gray-400">
+
+                            {{ product.images.length }} images disponibles
+
+                        </p>
+
+                    }
+
                 </div>
 
 
@@ -231,34 +294,38 @@
                     @if (product.companyName && product.companyId) {
 
                         <a
-                                [routerLink]="['/companies', product.companyId]"
+                                [routerLink]="[
+                                    '/companies',
+                                    product.companyId
+                                ]"
                                 class="inline-flex items-center gap-2
-                   text-sm
-                   font-semibold
-                   uppercase
-                   tracking-wide
-                   text-brand-600
-                   transition
-                   hover:text-brand-700
-                   hover:underline
-                   dark:text-brand-400
-                   dark:hover:text-brand-300">
-
-        <span>
-            🏢
-        </span>
+                                       text-sm
+                                       font-semibold
+                                       uppercase
+                                       tracking-wide
+                                       text-brand-600
+                                       transition
+                                       hover:text-brand-700
+                                       hover:underline
+                                       dark:text-brand-400
+                                       dark:hover:text-brand-300">
 
                             <span>
-            {{ product.companyName }}
-        </span>
+                                🏢
+                            </span>
+
+                            <span>
+                                {{ product.companyName }}
+                            </span>
 
                             <span class="text-xs">
-            →
-        </span>
+                                →
+                            </span>
 
                         </a>
 
                     }
+
 
                     <!-- Nom -->
 
@@ -597,7 +664,7 @@
                             @if (product.stock > 0) {
 
                                 {{ product.stock }} unité(s)
-                                        disponible(s)
+                                disponible(s)
 
                             } @else {
 
@@ -624,36 +691,36 @@
                                 (click)="addToCart()"
                                 [disabled]="product.stock <= 0 || addingToCart"
                                 class="flex w-full items-center
-                   justify-center gap-2
-                   rounded-lg
-                   bg-brand-600
-                   px-4 py-3
-                   text-sm font-semibold
-                   text-white
-                   transition
-                   hover:bg-brand-700
-                   disabled:cursor-not-allowed
-                   disabled:opacity-50">
+                                       justify-center gap-2
+                                       rounded-lg
+                                       bg-brand-600
+                                       px-4 py-3
+                                       text-sm font-semibold
+                                       text-white
+                                       transition
+                                       hover:bg-brand-700
+                                       disabled:cursor-not-allowed
+                                       disabled:opacity-50">
 
                             @if (!addingToCart) {
 
                                 <span>
-                🛒
-            </span>
+                                    🛒
+                                </span>
 
                                 <span>
-                Ajouter au panier
-            </span>
+                                    Ajouter au panier
+                                </span>
 
                             } @else {
 
                                 <span>
-                ⏳
-            </span>
+                                    ⏳
+                                </span>
 
                                 <span>
-                Ajout en cours...
-            </span>
+                                    Ajout en cours...
+                                </span>
 
                             }
 
@@ -665,26 +732,26 @@
                         <a
                                 routerLink="/cart"
                                 class="flex w-full items-center
-                   justify-center gap-2
-                   rounded-lg
-                   border border-brand-500
-                   bg-white
-                   px-4 py-3
-                   text-sm font-semibold
-                   text-brand-600
-                   transition
-                   hover:bg-brand-50
-                   dark:bg-gray-900
-                   dark:text-brand-400
-                   dark:hover:bg-gray-800">
-
-        <span>
-            🛍️
-        </span>
+                                       justify-center gap-2
+                                       rounded-lg
+                                       border border-brand-500
+                                       bg-white
+                                       px-4 py-3
+                                       text-sm font-semibold
+                                       text-brand-600
+                                       transition
+                                       hover:bg-brand-50
+                                       dark:bg-gray-900
+                                       dark:text-brand-400
+                                       dark:hover:bg-gray-800">
 
                             <span>
-            Voir le panier
-        </span>
+                                🛍️
+                            </span>
+
+                            <span>
+                                Voir le panier
+                            </span>
 
                         </a>
 

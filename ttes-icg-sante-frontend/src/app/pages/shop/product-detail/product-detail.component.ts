@@ -75,7 +75,7 @@ export class ProductDetailComponent implements OnInit {
 
     descriptionExpanded = false;
 
-    readonly descriptionMaxLength = 300;
+    readonly descriptionMaxLength = 150;
 
 
     /* ========================================================= */
@@ -84,7 +84,7 @@ export class ProductDetailComponent implements OnInit {
 
     ingredientsExpanded = false;
 
-    readonly ingredientsMaxLength = 300;
+    readonly ingredientsMaxLength = 150;
 
 
     /* ========================================================= */

@@ -46,6 +46,10 @@ export class ProductDetailComponent implements OnInit {
     private router = inject(Router);
 
 
+    /* ========================================================= */
+    /* ÉTAT */
+    /* ========================================================= */
+
     addingToCart = false;
 
     product: Product | null = null;
@@ -54,11 +58,38 @@ export class ProductDetailComponent implements OnInit {
 
     error = '';
 
+
+    /* ========================================================= */
+    /* GALERIE */
+    /* ========================================================= */
+
     /**
-     * URL de l'image actuellement affichée
+     * Image actuellement affichée
      */
     selectedImage = '';
 
+
+    /* ========================================================= */
+    /* DESCRIPTION */
+    /* ========================================================= */
+
+    descriptionExpanded = false;
+
+    readonly descriptionMaxLength = 300;
+
+
+    /* ========================================================= */
+    /* INGREDIENTS */
+    /* ========================================================= */
+
+    ingredientsExpanded = false;
+
+    readonly ingredientsMaxLength = 300;
+
+
+    /* ========================================================= */
+    /* INITIALISATION */
+    /* ========================================================= */
 
     ngOnInit(): void {
 
@@ -79,6 +110,10 @@ export class ProductDetailComponent implements OnInit {
 
     }
 
+
+    /* ========================================================= */
+    /* CHARGEMENT PRODUIT */
+    /* ========================================================= */
 
     loadProduct(id: number): void {
 
@@ -101,9 +136,20 @@ export class ProductDetailComponent implements OnInit {
 
 
                     /*
-                     * On affiche automatiquement
+                     * Réinitialiser l'état de lecture
+                     * lorsque le produit est chargé.
+                     */
+
+                    this.descriptionExpanded = false;
+
+                    this.ingredientsExpanded = false;
+
+
+                    /*
+                     * Sélectionner automatiquement
                      * la première image du produit.
                      */
+
                     if (
                         product.images &&
                         product.images.length > 0
@@ -143,9 +189,12 @@ export class ProductDetailComponent implements OnInit {
     }
 
 
+    /* ========================================================= */
+    /* GALERIE */
+    /* ========================================================= */
+
     /**
-     * Change l'image principale
-     * lorsqu'une miniature est sélectionnée.
+     * Change l'image principale.
      */
     selectImage(imageUrl: string): void {
 
@@ -154,21 +203,199 @@ export class ProductDetailComponent implements OnInit {
     }
 
 
+    /* ========================================================= */
+    /* DESCRIPTION - LIRE PLUS */
+    /* ========================================================= */
+
+    /**
+     * Vérifie si la description est suffisamment
+     * longue pour afficher "Lire plus".
+     */
+    get descriptionNeedsReadMore(): boolean {
+
+        return !!this.product?.description &&
+            this.product.description.length >
+            this.descriptionMaxLength;
+
+    }
+
+
+    /**
+     * Texte de description à afficher.
+     */
+    get displayedDescription(): string {
+
+        if (!this.product?.description) {
+
+            return '';
+
+        }
+
+
+        /*
+         * Si l'utilisateur a demandé
+         * à voir tout le texte.
+         */
+
+        if (this.descriptionExpanded) {
+
+            return this.product.description;
+
+        }
+
+
+        /*
+         * Si le texte est suffisamment court,
+         * on l'affiche entièrement.
+         */
+
+        if (
+            this.product.description.length <=
+            this.descriptionMaxLength
+        ) {
+
+            return this.product.description;
+
+        }
+
+
+        /*
+         * Sinon, on affiche seulement
+         * les 300 premiers caractères.
+         */
+
+        return (
+            this.product.description
+                .substring(
+                    0,
+                    this.descriptionMaxLength
+                )
+                .trimEnd()
+            + '...'
+        );
+
+    }
+
+
+    /**
+     * Affiche ou masque la description complète.
+     */
+    toggleDescription(): void {
+
+        this.descriptionExpanded =
+            !this.descriptionExpanded;
+
+    }
+
+
+    /* ========================================================= */
+    /* INGREDIENTS - LIRE PLUS */
+    /* ========================================================= */
+
+    /**
+     * Vérifie si les ingrédients sont suffisamment
+     * longs pour afficher "Lire plus".
+     */
+    get ingredientsNeedsReadMore(): boolean {
+
+        return !!this.product?.ingredients &&
+            this.product.ingredients.length >
+            this.ingredientsMaxLength;
+
+    }
+
+
+    /**
+     * Texte des ingrédients à afficher.
+     */
+    get displayedIngredients(): string {
+
+        if (!this.product?.ingredients) {
+
+            return '';
+
+        }
+
+
+        /*
+         * Afficher tous les ingrédients.
+         */
+
+        if (this.ingredientsExpanded) {
+
+            return this.product.ingredients;
+
+        }
+
+
+        /*
+         * Si le texte est suffisamment court,
+         * afficher tout.
+         */
+
+        if (
+            this.product.ingredients.length <=
+            this.ingredientsMaxLength
+        ) {
+
+            return this.product.ingredients;
+
+        }
+
+
+        /*
+         * Sinon, afficher seulement
+         * les 300 premiers caractères.
+         */
+
+        return (
+            this.product.ingredients
+                .substring(
+                    0,
+                    this.ingredientsMaxLength
+                )
+                .trimEnd()
+            + '...'
+        );
+
+    }
+
+
+    /**
+     * Affiche ou masque tous les ingrédients.
+     */
+    toggleIngredients(): void {
+
+        this.ingredientsExpanded =
+            !this.ingredientsExpanded;
+
+    }
+
+
+    /* ========================================================= */
+    /* PANIER */
+    /* ========================================================= */
+
     addToCart(): void {
 
         console.log(
             '🔥 CLICK SUR AJOUTER AU PANIER'
         );
 
+
         if (
             !this.product ||
             this.product.stock <= 0
         ) {
+
             return;
+
         }
 
 
-        // Vérifier si le client est connecté
+        /*
+         * Vérifier si le client est connecté.
+         */
 
         if (!this.authService.isLoggedIn()) {
 
@@ -181,20 +408,29 @@ export class ProductDetailComponent implements OnInit {
             ]);
 
             return;
+
         }
 
 
-        // Éviter les doubles clics
+        /*
+         * Éviter les doubles clics.
+         */
 
         if (this.addingToCart) {
+
             return;
+
         }
+
 
         this.addingToCart = true;
 
 
         this.cartService
-            .addItem(this.product.id, 1)
+            .addItem(
+                this.product.id,
+                1
+            )
             .subscribe({
 
                 next: (cart) => {
@@ -222,7 +458,9 @@ export class ProductDetailComponent implements OnInit {
                     this.addingToCart = false;
 
 
-                    // Token expiré / invalide
+                    /*
+                     * Token expiré / invalide.
+                     */
 
                     if (error.status === 401) {
 
@@ -233,6 +471,7 @@ export class ProductDetailComponent implements OnInit {
                         ]);
 
                         return;
+
                     }
 
 
@@ -247,6 +486,10 @@ export class ProductDetailComponent implements OnInit {
 
     }
 
+
+    /* ========================================================= */
+    /* PRIX */
+    /* ========================================================= */
 
     formatPrice(price: number): string {
 

@@ -4,15 +4,10 @@ import {
     inject
 } from '@angular/core';
 
-import {
-    CommonModule
-} from '@angular/common';
-
+import { CommonModule } from '@angular/common';
 import {
     FormsModule,
-    ReactiveFormsModule,
-    FormBuilder,
-    Validators
+    ReactiveFormsModule
 } from '@angular/forms';
 
 import {
@@ -20,35 +15,42 @@ import {
     Router
 } from '@angular/router';
 
-import { forkJoin } from 'rxjs';
-
 import { BundleService } from '../../../../core/services/bundle.service';
 import { ProductService } from '../../../../core/services/product.service';
-import { Product } from '../../../../core/models/product.model';
+
+import { BundleRequest } from '../../../../core/interfaces/bundle-request.interface';
+import { BundleResponse } from '../../../../core/interfaces/bundle-response.interface';
+
+import {
+    Product,
+    ProductImage
+} from '../../../../core/models/product.model';
+
 
 interface BundleFormItem {
     productId: number;
+    productName: string;
     quantity: number;
+    stock: number;
+    imageUrl: string;
 }
+
 
 interface BundleFormImage {
     imageUrl: string;
-    main: boolean;
     displayOrder: number;
 }
 
+
 interface BundleDraft {
-    form: {
-        name: string;
-        description: string;
-        price: number;
-        active: boolean;
-    };
-
-    selectedItems: BundleFormItem[];
-
+    name: string;
+    description: string;
+    discountPercentage: number;
+    active: boolean;
+    items: BundleFormItem[];
     images: BundleFormImage[];
 }
+
 
 @Component({
     selector: 'app-bundle-form',
@@ -62,775 +64,730 @@ interface BundleDraft {
 })
 export class BundleFormComponent implements OnInit {
 
-    private fb = inject(FormBuilder);
+    private bundleService = inject(BundleService);
+    private productService = inject(ProductService);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
 
-    private bundleService = inject(BundleService);
-    private productService = inject(ProductService);
-
-    // =========================================================
-    // CONSTANTES
-    // =========================================================
-
-    private readonly DRAFT_STORAGE_KEY =
-        'ttes_bundle_draft';
-
-    // =========================================================
-    // MODE
-    // =========================================================
-
-    isEditMode = false;
+    readonly DRAFT_STORAGE_KEY = 'ttes_bundle_draft';
 
     bundleId: number | null = null;
+    isEditMode = false;
 
     loading = false;
-
     saving = false;
 
-    error = '';
+    errorMessage = '';
+    successMessage = '';
 
-    success = '';
+    name = '';
+    description = '';
 
-    // =========================================================
-    // DONNÉES
-    // =========================================================
+    discountPercentage = 0;
+    active = true;
 
-    products: Product[] = [];
-
-    selectedItems: BundleFormItem[] = [];
-
+    items: BundleFormItem[] = [];
     images: BundleFormImage[] = [];
 
-    // =========================================================
-    // FORMULAIRE
-    // =========================================================
+    private initialProductIds: number[] = [];
 
-    form = this.fb.group({
-
-        name: [
-            '',
-            [
-                Validators.required,
-                Validators.maxLength(255)
-            ]
-        ],
-
-        description: [''],
-
-        price: [
-            0,
-            [
-                Validators.required,
-                Validators.min(0)
-            ]
-        ],
-
-        active: [true]
-    });
-
-    // =========================================================
-    // INITIALISATION
-    // =========================================================
 
     ngOnInit(): void {
 
-        const id =
-            this.route.snapshot.paramMap.get('id');
+        this.route.paramMap.subscribe(params => {
 
-        // =====================================================
-        // MODE MODIFICATION
-        // =====================================================
+            const id = params.get('id');
 
-        if (id) {
+            if (id) {
 
-            const parsedId = Number(id);
+                this.bundleId = Number(id);
+                this.isEditMode = true;
 
-            if (
-                !Number.isInteger(parsedId) ||
-                parsedId <= 0
-            ) {
-                this.error =
-                    'Identifiant du pack invalide.';
-                return;
+                this.loadBundleForEdit();
+
+            } else {
+
+                this.bundleId = null;
+                this.isEditMode = false;
+
+                this.initializeCreateMode();
             }
 
-            this.isEditMode = true;
+        });
+    }
 
-            this.bundleId = parsedId;
 
-            // IMPORTANT :
-            // En mode modification, on ne restaure PAS
-            // le brouillon de création.
-            this.loadProducts();
+    /**
+     * Initialise la création d'un nouveau pack.
+     */
+    private initializeCreateMode(): void {
 
-            this.loadBundle(parsedId);
+        const draft = this.loadDraft();
+
+        if (draft) {
+
+            this.name = draft.name ?? '';
+            this.description = draft.description ?? '';
+
+            this.discountPercentage =
+                Number(draft.discountPercentage ?? 0);
+
+            this.active =
+                draft.active ?? true;
+
+            this.items =
+                Array.isArray(draft.items)
+                    ? draft.items
+                    : [];
+
+            this.images =
+                Array.isArray(draft.images)
+                    ? draft.images
+                    : [];
+
+            this.initialProductIds =
+                this.items.map(item => item.productId);
 
             return;
         }
 
-        // =====================================================
-        // MODE CRÉATION
-        // =====================================================
 
-        this.isEditMode = false;
+        this.route.queryParams.subscribe(params => {
 
-        this.bundleId = null;
+            const productIds =
+                this.parseProductIds(params['productIds']);
 
-        const productIds =
-            this.route.snapshot.queryParamMap
-                .getAll('productIds')
-                .map(value => Number(value))
-                .filter(productId =>
-                    Number.isInteger(productId) &&
-                    productId > 0
-                );
-
-        const uniqueProductIds =
-            [...new Set(productIds)];
-
-        // -----------------------------------------------------
-        // Tentative de restauration du brouillon
-        // -----------------------------------------------------
-
-        const draft =
-            this.restoreDraft();
-
-        if (draft) {
-
-            // IDs qui étaient présents dans le brouillon
-            const previousIds =
-                draft.selectedItems
-                    .map(item => item.productId);
-
-            // Les IDs actuellement sélectionnés
-            // deviennent la source de vérité.
-            const draftItemsMap =
-                new Map<number, BundleFormItem>();
-
-            for (
-                const item of draft.selectedItems
-            ) {
-                draftItemsMap.set(
-                    item.productId,
-                    {
-                        productId: item.productId,
-                        quantity: item.quantity
-                    }
-                );
+            if (productIds.length === 0) {
+                return;
             }
 
-            this.selectedItems =
-                uniqueProductIds.map(productId => {
+            this.initialProductIds = [...productIds];
 
-                    const existing =
-                        draftItemsMap.get(productId);
+            this.loadSelectedProducts(
+                productIds,
+                productIds
+            );
+
+        });
+    }
+
+
+    /**
+     * Charge un pack existant.
+     */
+    private loadBundleForEdit(): void {
+
+        if (this.bundleId === null) {
+            return;
+        }
+
+        this.loading = true;
+        this.errorMessage = '';
+
+        this.bundleService
+            .getAdminBundle(this.bundleId)
+            .subscribe({
+
+                next: (bundle: BundleResponse) => {
+
+                    this.fillForm(bundle);
+
+                    this.initialProductIds =
+                        this.items.map(item => item.productId);
+
+                    this.loading = false;
+                },
+
+                error: (error) => {
+
+                    console.error(
+                        'Erreur chargement du pack :',
+                        error
+                    );
+
+                    this.errorMessage =
+                        'Impossible de charger le pack.';
+
+                    this.loading = false;
+                }
+            });
+    }
+
+
+    /**
+     * Remplit le formulaire depuis le backend.
+     */
+    private fillForm(bundle: BundleResponse): void {
+
+        this.name = bundle.name ?? '';
+
+        this.description =
+            bundle.description ?? '';
+
+        this.discountPercentage =
+            Number(
+                (bundle as any).discountPercentage ?? 0
+            );
+
+        this.active =
+            (bundle as any).active ?? true;
+
+
+        this.items =
+            ((bundle as any).items ?? []).map(
+                (item: any): BundleFormItem => {
+
+                    const product =
+                        item.product ?? {};
+
+                    const productId =
+                        Number(
+                            item.productId ??
+                            product.id
+                        );
+
+                    const imageUrl =
+                        this.getProductMainImage(
+                            product
+                        );
 
                     return {
                         productId,
+                        productName:
+                            item.productName ??
+                            product.name ??
+                            `Produit #${productId}`,
                         quantity:
-                            existing?.quantity ?? 1
+                            Number(item.quantity ?? 1),
+                        stock:
+                            Number(product.stock ?? 0),
+                        imageUrl
                     };
-                });
-
-            this.form.patchValue({
-                name: draft.form.name,
-                description: draft.form.description,
-                price: draft.form.price,
-                active: draft.form.active
-            });
-
-            this.images =
-                draft.images.map(image => ({
-                    imageUrl: image.imageUrl,
-                    main: image.main,
-                    displayOrder: image.displayOrder
-                }));
-
-            // -------------------------------------------------
-            // Seuls les NOUVEAUX produits doivent
-            // automatiquement ajouter leur image principale.
-            // -------------------------------------------------
-
-            const newProductIds =
-                uniqueProductIds.filter(
-                    productId =>
-                        !previousIds.includes(productId)
-                );
-
-            this.loadSelectedProducts(
-                uniqueProductIds,
-                newProductIds
+                }
             );
 
-        } else {
 
-            // Aucun brouillon
-            this.initializeSelectedProducts(
-                uniqueProductIds
+        this.images =
+            ((bundle as any).images ?? []).map(
+                (image: any, index: number) => ({
+                    imageUrl:
+                        image.imageUrl ??
+                        image.url ??
+                        '',
+                    displayOrder:
+                        Number(
+                            image.displayOrder ??
+                            index
+                        )
+                })
             );
 
-            this.loadSelectedProducts(
-                uniqueProductIds,
-                uniqueProductIds
-            );
+
+        /*
+         * Si le backend ne renvoie aucune image
+         * mais que les produits en possèdent,
+         * on ajoute automatiquement les images principales.
+         */
+        if (this.images.length === 0) {
+
+            for (const item of this.items) {
+
+                if (item.imageUrl) {
+
+                    this.addImageIfNotExists(
+                        item.imageUrl
+                    );
+                }
+            }
         }
-
-        this.loadProducts();
     }
 
-    // =========================================================
-    // INITIALISATION PRODUITS
-    // =========================================================
 
-    private initializeSelectedProducts(
-        productIds: number[]
+    /**
+     * Parse les IDs provenant des query params.
+     */
+    private parseProductIds(
+        value: any
+    ): number[] {
+
+        if (value === null || value === undefined) {
+            return [];
+        }
+
+        const values =
+            Array.isArray(value)
+                ? value
+                : [value];
+
+        const ids: number[] = [];
+
+        for (const valueItem of values) {
+
+            const parts =
+                String(valueItem)
+                    .split(',');
+
+            for (const part of parts) {
+
+                const id =
+                    Number(part);
+
+                if (
+                    Number.isInteger(id) &&
+                    id > 0 &&
+                    !ids.includes(id)
+                ) {
+                    ids.push(id);
+                }
+            }
+        }
+
+        return ids;
+    }
+
+
+    /**
+     * Charge les produits sélectionnés.
+     *
+     * idsToAddImages = produits pour lesquels
+     * on doit automatiquement ajouter l'image principale.
+     */
+    private loadSelectedProducts(
+        productIds: number[],
+        idsToAddImages: number[] = []
     ): void {
 
         const uniqueIds =
             [...new Set(productIds)];
 
-        this.selectedItems =
-            uniqueIds.map(productId => ({
-                productId,
-                quantity: 1
-            }));
-    }
-
-    // =========================================================
-    // CHARGER PRODUITS SÉLECTIONNÉS
-    // =========================================================
-
-    private loadSelectedProducts(
-        productIds: number[],
-        idsToAddImages: number[] = productIds
-    ): void {
-
-        if (productIds.length === 0) {
+        if (uniqueIds.length === 0) {
             return;
         }
 
         this.loading = true;
 
-        this.error = '';
+        let completed = 0;
 
-        const requests =
-            productIds.map(productId =>
-                this.productService.getProduct(productId)
-            );
+        const idsWithImages =
+            new Set(idsToAddImages);
 
-        forkJoin(requests).subscribe({
 
-            next: (
-                loadedProducts: Product[]
-            ) => {
+        for (const productId of uniqueIds) {
 
-                for (
-                    const product of loadedProducts
-                ) {
-
-                    this.addProductToLocalList(
-                        product
-                    );
-
-                    if (
-                        idsToAddImages.includes(
-                            product.id
-                        )
-                    ) {
-                        this.addProductMainImage(
-                            product
-                        );
-                    }
-                }
-
-                this.loading = false;
-            },
-
-            error: (error) => {
-
-                console.error(
-                    'Erreur chargement des produits sélectionnés :',
-                    error
+            /*
+             * Ne recharge pas inutilement un produit
+             * déjà présent dans le formulaire.
+             */
+            const existing =
+                this.items.find(
+                    item =>
+                        item.productId === productId
                 );
 
-                this.loading = false;
+            if (existing) {
 
-                this.error =
-                    'Impossible de charger les produits sélectionnés.';
+                completed++;
+
+                if (
+                    completed === uniqueIds.length
+                ) {
+                    this.loading = false;
+                }
+
+                continue;
             }
-        });
-    }
 
-    // =========================================================
-    // LISTE LOCALE
-    // =========================================================
 
-    private addProductToLocalList(
-        product: Product
-    ): void {
+            this.productService
+                .getProduct(productId)
+                .subscribe({
 
-        const alreadyLoaded =
-            this.products.some(
-                existingProduct =>
-                    existingProduct.id === product.id
-            );
+                    next: (product: Product) => {
 
-        if (!alreadyLoaded) {
+                        const imageUrl =
+                            this.getProductMainImage(
+                                product
+                            );
 
-            this.products.push(product);
+                        this.items.push({
+
+                            productId:
+                                product.id,
+
+                            productName:
+                                product.name,
+
+                            quantity: 1,
+
+                            stock:
+                                Number(
+                                    product.stock ?? 0
+                                ),
+
+                            imageUrl
+                        });
+
+
+                        /*
+                         * Pour les nouveaux produits,
+                         * l'image principale est ajoutée
+                         * automatiquement.
+                         */
+                        if (
+                            idsWithImages.has(
+                                product.id
+                            ) &&
+                            imageUrl
+                        ) {
+
+                            this.addImageIfNotExists(
+                                imageUrl
+                            );
+                        }
+
+
+                        completed++;
+
+                        if (
+                            completed === uniqueIds.length
+                        ) {
+                            this.loading = false;
+                        }
+                    },
+
+                    error: (error) => {
+
+                        console.error(
+                            `Erreur chargement produit ${productId}:`,
+                            error
+                        );
+
+                        completed++;
+
+                        if (
+                            completed === uniqueIds.length
+                        ) {
+                            this.loading = false;
+                        }
+                    }
+                });
         }
     }
 
-    // =========================================================
-    // IMAGE PRINCIPALE PRODUIT
-    // =========================================================
 
-    private addProductMainImage(
-        product: Product
+    /**
+     * Ajout d'un produit principal dans les images.
+     */
+    private addImageIfNotExists(
+        imageUrl: string
     ): void {
 
-        if (
-            !product.images ||
-            product.images.length === 0
-        ) {
+        if (!imageUrl) {
             return;
         }
 
-        const mainImage =
-            product.images.find(
-                image => image.main
-            ) ??
-            product.images[0];
-
-        if (!mainImage?.imageUrl) {
-            return;
-        }
-
-        const alreadyExists =
+        const exists =
             this.images.some(
                 image =>
-                    image.imageUrl ===
-                    mainImage.imageUrl
+                    image.imageUrl === imageUrl
             );
 
-        if (alreadyExists) {
+        if (exists) {
             return;
         }
 
         this.images.push({
 
-            imageUrl:
-                mainImage.imageUrl,
-
-            main:
-                this.images.length === 0,
+            imageUrl,
 
             displayOrder:
                 this.images.length
         });
     }
 
-    // =========================================================
-    // CHARGER TOUS LES PRODUITS
-    // =========================================================
 
-    loadProducts(): void {
-
-        this.productService
-            .getProducts()
-            .subscribe({
-
-                next: (
-                    products: Product[]
-                ) => {
-
-                    const loadedProducts =
-                        products ?? [];
-
-                    for (
-                        const product
-                        of loadedProducts
-                    ) {
-
-                        this.addProductToLocalList(
-                            product
-                        );
-                    }
-                },
-
-                error: (error) => {
-
-                    console.error(
-                        'Erreur chargement produits :',
-                        error
-                    );
-
-                    if (!this.error) {
-
-                        this.error =
-                            'Impossible de charger les produits.';
-                    }
-                }
-            });
-    }
-
-    // =========================================================
-    // CHARGER LE PACK
-    // =========================================================
-
-    loadBundle(id: number): void {
-
-        this.loading = true;
-
-        this.bundleService
-            .getAdminBundle(id)
-            .subscribe({
-
-                next: (bundle: any) => {
-
-                    this.fillForm(bundle);
-
-                    const productIds =
-                        this.selectedItems.map(
-                            item =>
-                                item.productId
-                        );
-
-                    this.loadSelectedProductsForEdit(
-                        productIds
-                    );
-
-                    this.loading = false;
-                },
-
-                error: (error) => {
-
-                    console.error(
-                        'Erreur chargement pack :',
-                        error
-                    );
-
-                    this.loading = false;
-
-                    this.error =
-                        'Impossible de charger le pack.';
-                }
-            });
-    }
-
-    // =========================================================
-    // PRODUITS DU PACK EN MODIFICATION
-    // =========================================================
-
-    private loadSelectedProductsForEdit(
-        productIds: number[]
-    ): void {
-
-        const missingIds =
-            productIds.filter(
-                productId =>
-                    !this.products.some(
-                        product =>
-                            product.id === productId
-                    )
-            );
-
-        if (missingIds.length === 0) {
-            return;
-        }
-
-        const requests =
-            missingIds.map(
-                productId =>
-                    this.productService
-                        .getProduct(productId)
-            );
-
-        forkJoin(requests).subscribe({
-
-            next: (
-                loadedProducts: Product[]
-            ) => {
-
-                for (
-                    const product
-                    of loadedProducts
-                ) {
-
-                    this.addProductToLocalList(
-                        product
-                    );
-                }
-            },
-
-            error: (error) => {
-
-                console.error(
-                    'Erreur chargement produits du pack :',
-                    error
-                );
-            }
-        });
-    }
-
-    // =========================================================
-    // REMPLIR FORMULAIRE
-    // =========================================================
-
-    fillForm(bundle: any): void {
-
-        this.form.patchValue({
-
-            name:
-                bundle.name ?? '',
-
-            description:
-                bundle.description ?? '',
-
-            price:
-                bundle.price ?? 0,
-
-            active:
-                bundle.active ?? true
-        });
-
-        this.selectedItems =
-            (bundle.items ?? [])
-                .map((item: any) => ({
-
-                    productId:
-                        item.productId ??
-                        item.product?.id,
-
-                    quantity:
-                        item.quantity ?? 1
-
-                }))
-                .filter(
-                    (item: BundleFormItem) =>
-                        Number.isInteger(
-                            item.productId
-                        ) &&
-                        item.productId > 0
-                );
-
-        this.images =
-            (bundle.images ?? [])
-                .map(
-                    (
-                        image: any,
-                        index: number
-                    ) => ({
-
-                        imageUrl:
-                            image.imageUrl ??
-                            image.url ??
-                            '',
-
-                        main:
-                            image.main ??
-                            index === 0,
-
-                        displayOrder:
-                            image.displayOrder ??
-                            index
-                    })
-                );
-    }
-
-    // =========================================================
-    // AJOUTER DES PRODUITS
-    // =========================================================
-
-    goToProductSelection(): void {
-
-        // Sauvegarde du formulaire actuel
-        // avant de quitter la page.
-        this.saveDraft();
-
-        const productIds =
-            this.selectedItems.map(
-                item => item.productId
-            );
-
-        // =====================================================
-        // MODIFICATION
-        // =====================================================
-
-        if (
-            this.isEditMode &&
-            this.bundleId !== null
-        ) {
-
-            this.router.navigate(
-                ['/admin/products'],
-                {
-                    queryParams: {
-
-                        bundleSelection:
-                            'true',
-
-                        returnMode:
-                            'edit',
-
-                        bundleId:
-                            this.bundleId,
-
-                        productIds
-                    }
-                }
-            );
-
-            return;
-        }
-
-        // =====================================================
-        // CRÉATION
-        // =====================================================
-
-        this.router.navigate(
-            ['/admin/products'],
-            {
-                queryParams: {
-
-                    bundleSelection:
-                        'true',
-
-                    returnMode:
-                        'new',
-
-                    productIds
-                }
-            }
-        );
-    }
-
-    // =========================================================
-    // PRODUITS DU PACK
-    // =========================================================
-
-    removeProduct(index: number): void {
-
-        if (
-            index < 0 ||
-            index >= this.selectedItems.length
-        ) {
-            return;
-        }
-
-        this.selectedItems.splice(
-            index,
-            1
-        );
-    }
-
-    updateProductQuantity(
-        index: number,
-        quantity: number
-    ): void {
-
-        if (!Number.isFinite(quantity)) {
-            quantity = 1;
-        }
-
-        quantity = Math.floor(quantity);
-
-        if (quantity < 1) {
-            quantity = 1;
-        }
-
-        if (!this.selectedItems[index]) {
-            return;
-        }
-
-        this.selectedItems[index].quantity =
-            quantity;
-    }
-
-    getProduct(
-        productId: number
-    ): Product | undefined {
-
-        return this.products.find(
-            product =>
-                product.id === productId
-        );
-    }
-
-    getProductName(
-        productId: number
+    /**
+     * Retourne l'image principale d'un produit.
+     */
+    private getProductMainImage(
+        product: Product | any
     ): string {
 
-        const product =
-            this.getProduct(productId);
-
-        if (product) {
-            return product.name;
-        }
-
-        return `Produit #${productId}`;
-    }
-
-    getMainImage(
-        productId: number
-    ): string {
-
-        const product =
-            this.getProduct(productId);
+        const images =
+            product?.images;
 
         if (
-            !product?.images ||
-            product.images.length === 0
+            !Array.isArray(images) ||
+            images.length === 0
         ) {
             return '';
         }
 
         const mainImage =
-            product.images.find(
-                image => image.main
+            images.find(
+                (image: ProductImage | any) =>
+                    image.main === true
             );
 
         return (
             mainImage?.imageUrl ??
-            product.images[0]?.imageUrl ??
+            images[0]?.imageUrl ??
             ''
         );
     }
 
-    getProductStock(
-        productId: number
-    ): number | null {
 
-        const product =
-            this.getProduct(productId);
+    /**
+     * Compatibilité avec l'ancien HTML.
+     *
+     * Certains anciens boutons utilisent encore
+     * addProducts().
+     */
+    addProducts(): void {
+        this.goToProductSelection();
+    }
 
-        if (!product) {
-            return null;
+
+    /**
+     * Ouvre la liste des produits en mode sélection.
+     */
+    goToProductSelection(): void {
+
+        /*
+         * Sauvegarde impérativement le formulaire
+         * avant de quitter la page.
+         */
+        this.saveDraft();
+
+
+        const productIds =
+            this.items.map(
+                item => item.productId
+            );
+
+
+        if (this.isEditMode && this.bundleId !== null) {
+
+            this.router.navigate(
+                ['/admin/products'],
+                {
+                    queryParams: {
+                        bundleSelection: true,
+                        returnMode: 'edit',
+                        bundleId: this.bundleId,
+                        productIds:
+                            productIds.join(',')
+                    }
+                }
+            );
+
+            return;
         }
 
-        return product.stock ?? null;
+
+        this.router.navigate(
+            ['/admin/products'],
+            {
+                queryParams: {
+                    bundleSelection: true,
+                    returnMode: 'new',
+                    productIds:
+                        productIds.join(',')
+                }
+            }
+        );
     }
 
-    // =========================================================
-    // IMAGES
-    // =========================================================
 
-    addImage(): void {
+    /**
+     * Sauvegarde temporairement le formulaire.
+     */
+    private saveDraft(): void {
 
-        this.images.push({
+        const draft: BundleDraft = {
 
-            imageUrl: '',
+            name: this.name,
 
-            main:
-                this.images.length === 0,
+            description:
+                this.description,
 
-            displayOrder:
-                this.images.length
-        });
+            discountPercentage:
+                Number(
+                    this.discountPercentage ?? 0
+                ),
+
+            active:
+                this.active,
+
+            items:
+                this.items.map(
+                    item => ({
+                        productId:
+                            item.productId,
+
+                        productName:
+                            item.productName,
+
+                        quantity:
+                            Number(
+                                item.quantity ?? 1
+                            ),
+
+                        stock:
+                            Number(
+                                item.stock ?? 0
+                            ),
+
+                        imageUrl:
+                            item.imageUrl ?? ''
+                    })
+                ),
+
+            images:
+                this.images.map(
+                    (image, index) => ({
+                        imageUrl:
+                            image.imageUrl,
+
+                        displayOrder:
+                            Number(
+                                image.displayOrder ??
+                                index
+                            )
+                    })
+                )
+        };
+
+
+        sessionStorage.setItem(
+            this.DRAFT_STORAGE_KEY,
+            JSON.stringify(draft)
+        );
     }
 
-    removeImage(index: number): void {
+
+    /**
+     * Récupère le brouillon.
+     */
+    private loadDraft(): BundleDraft | null {
+
+        try {
+
+            const raw =
+                sessionStorage.getItem(
+                    this.DRAFT_STORAGE_KEY
+                );
+
+            if (!raw) {
+                return null;
+            }
+
+            return JSON.parse(raw);
+
+        } catch (error) {
+
+            console.error(
+                'Erreur lecture brouillon :',
+                error
+            );
+
+            return null;
+        }
+    }
+
+
+    /**
+     * Supprime le brouillon.
+     */
+    private clearDraft(): void {
+
+        sessionStorage.removeItem(
+            this.DRAFT_STORAGE_KEY
+        );
+    }
+
+
+    /**
+     * Récupère les IDs actuellement dans le formulaire.
+     */
+    get selectedProductIds(): number[] {
+
+        return this.items.map(
+            item => item.productId
+        );
+    }
+
+
+    /**
+     * Nombre de produits du pack.
+     */
+    get productCount(): number {
+
+        return this.items.length;
+    }
+
+
+    /**
+     * Modifie la quantité d'un produit.
+     */
+    updateQuantity(
+        item: BundleFormItem
+    ): void {
+
+        let quantity =
+            Number(item.quantity);
+
+        if (
+            !Number.isFinite(quantity) ||
+            quantity < 1
+        ) {
+            quantity = 1;
+        }
+
+        item.quantity =
+            Math.floor(quantity);
+    }
+
+
+    /**
+     * Supprime un produit du pack.
+     */
+    removeProduct(
+        productId: number
+    ): void {
+
+        this.items =
+            this.items.filter(
+                item =>
+                    item.productId !== productId
+            );
+    }
+
+
+    /**
+     * Ajoute une image manuellement.
+     */
+    addImage(
+        imageUrl: string
+    ): void {
+
+        const url =
+            imageUrl?.trim();
+
+        if (!url) {
+            return;
+        }
+
+        this.addImageIfNotExists(url);
+    }
+
+
+    /**
+     * Supprime une image.
+     */
+    removeImage(
+        index: number
+    ): void {
 
         if (
             index < 0 ||
@@ -839,336 +796,158 @@ export class BundleFormComponent implements OnInit {
             return;
         }
 
-        const wasMain =
-            this.images[index].main;
-
         this.images.splice(index, 1);
 
-        this.images.forEach(
-            (image, i) => {
-                image.displayOrder = i;
-            }
-        );
-
-        if (
-            this.images.length > 0 &&
-            (
-                wasMain ||
-                !this.images.some(
-                    image => image.main
-                )
-            )
-        ) {
-
-            this.images.forEach(
-                (image, i) => {
-                    image.main = i === 0;
-                }
-            );
-        }
+        this.reindexImages();
     }
 
-    updateImageUrl(
-        index: number,
-        value: string
+
+    /**
+     * Réindexe les images.
+     */
+    private reindexImages(): void {
+
+        this.images =
+            this.images.map(
+                (image, index) => ({
+                    ...image,
+                    displayOrder: index
+                })
+            );
+    }
+
+
+    /**
+     * Ajoute automatiquement l'image principale
+     * d'un produit.
+     */
+    addProductMainImage(
+        item: BundleFormItem
     ): void {
 
-        if (!this.images[index]) {
+        if (!item.imageUrl) {
             return;
         }
 
-        this.images[index].imageUrl =
-            value;
-    }
-
-    setMainImage(index: number): void {
-
-        this.images.forEach(
-            (image, i) => {
-                image.main = i === index;
-            }
+        this.addImageIfNotExists(
+            item.imageUrl
         );
     }
 
-    // =========================================================
-    // BROUILLON SESSION STORAGE
-    // =========================================================
 
-    private saveDraft(): void {
+    /**
+     * Vérifie si le formulaire peut être envoyé.
+     */
+    isFormValid(): boolean {
 
-        const formValue =
-            this.form.getRawValue();
+        if (!this.name.trim()) {
+            return false;
+        }
 
-        const draft: BundleDraft = {
+        if (this.items.length === 0) {
+            return false;
+        }
 
-            form: {
-
-                name:
-                    formValue.name ?? '',
-
-                description:
-                    formValue.description ?? '',
-
-                price:
-                    Number(
-                        formValue.price ?? 0
-                    ),
-
-                active:
-                    formValue.active ?? true
-            },
-
-            selectedItems:
-                this.selectedItems.map(
-                    item => ({
-                        productId:
-                            item.productId,
-                        quantity:
-                            item.quantity
-                    })
-                ),
-
-            images:
-                this.images.map(
-                    image => ({
-                        imageUrl:
-                            image.imageUrl,
-                        main:
-                            image.main,
-                        displayOrder:
-                            image.displayOrder
-                    })
-                )
-        };
-
-        sessionStorage.setItem(
-            this.DRAFT_STORAGE_KEY,
-            JSON.stringify(draft)
+        return this.items.every(
+            item =>
+                item.productId > 0 &&
+                item.quantity >= 1
         );
     }
 
-    private restoreDraft():
-        BundleDraft | null {
 
-        const raw =
-            sessionStorage.getItem(
-                this.DRAFT_STORAGE_KEY
-            );
+    /**
+     * Construit la requête backend.
+     *
+     * Adapte ici uniquement les noms si ton
+     * BundleRequest possède une structure différente.
+     */
+    private buildRequest(): BundleRequest {
 
-        if (!raw) {
-            return null;
-        }
-
-        try {
-
-            return JSON.parse(
-                raw
-            ) as BundleDraft;
-
-        } catch (error) {
-
-            console.error(
-                'Erreur lecture brouillon pack :',
-                error
-            );
-
-            sessionStorage.removeItem(
-                this.DRAFT_STORAGE_KEY
-            );
-
-            return null;
-        }
-    }
-
-    private clearDraft(): void {
-
-        sessionStorage.removeItem(
-            this.DRAFT_STORAGE_KEY
-        );
-    }
-
-    // =========================================================
-    // ANNULER
-    // =========================================================
-
-    cancelForm(): void {
-
-        this.clearDraft();
-
-        this.router.navigate(
-            ['/admin/bundles']
-        );
-    }
-
-    // =========================================================
-    // SAUVEGARDE
-    // =========================================================
-
-    save(): void {
-
-        this.error = '';
-
-        this.success = '';
-
-        // -----------------------------------------------------
-        // VALIDATION FORMULAIRE
-        // -----------------------------------------------------
-
-        if (this.form.invalid) {
-
-            this.form.markAllAsTouched();
-
-            this.error =
-                'Veuillez remplir correctement les informations du pack.';
-
-            return;
-        }
-
-        // -----------------------------------------------------
-        // PRODUITS
-        // -----------------------------------------------------
-
-        if (
-            !this.selectedItems ||
-            this.selectedItems.length === 0
-        ) {
-
-            this.error =
-                'Veuillez sélectionner au moins un produit pour le pack.';
-
-            return;
-        }
-
-        // -----------------------------------------------------
-        // QUANTITÉS
-        // -----------------------------------------------------
-
-        const invalidQuantity =
-            this.selectedItems.some(
-                item =>
-                    !Number.isInteger(
-                        item.quantity
-                    ) ||
-                    item.quantity < 1
-            );
-
-        if (invalidQuantity) {
-
-            this.error =
-                'Toutes les quantités doivent être supérieures à 0.';
-
-            return;
-        }
-
-        // -----------------------------------------------------
-        // IMAGES
-        // -----------------------------------------------------
-
-        const invalidImage =
-            this.images.some(
-                image =>
-                    !image.imageUrl ||
-                    !image.imageUrl.trim()
-            );
-
-        if (invalidImage) {
-
-            this.error =
-                'Toutes les images doivent avoir une URL valide.';
-
-            return;
-        }
-
-        // -----------------------------------------------------
-        // REQUEST
-        // -----------------------------------------------------
-
-        const formValue =
-            this.form.getRawValue();
-
-        const request = {
+        return {
 
             name:
-                formValue.name?.trim() ?? '',
+                this.name.trim(),
 
             description:
-                formValue.description?.trim() ?? '',
+                this.description?.trim() ?? '',
 
-            price:
+            discountPercentage:
                 Number(
-                    formValue.price ?? 0
+                    this.discountPercentage ?? 0
                 ),
 
             active:
-                formValue.active ?? true,
+                this.active,
 
             items:
-                this.selectedItems.map(
+                this.items.map(
                     item => ({
-
                         productId:
                             item.productId,
 
                         quantity:
-                            item.quantity
+                            Number(
+                                item.quantity
+                            )
                     })
                 ),
 
             images:
                 this.images.map(
                     (image, index) => ({
-
                         imageUrl:
-                            image.imageUrl.trim(),
-
-                        main:
-                            image.main,
+                            image.imageUrl,
 
                         displayOrder:
-                            image.displayOrder ??
-                            index
+                            Number(
+                                image.displayOrder ??
+                                index
+                            )
                     })
                 )
-        };
+        } as BundleRequest;
+    }
 
-        console.log(
-            'MODE :',
-            this.isEditMode
-                ? 'MODIFICATION'
-                : 'CRÉATION'
-        );
 
-        console.log(
-            'BUNDLE ID :',
-            this.bundleId
-        );
+    /**
+     * Enregistre le pack.
+     *
+     * CREATE => POST
+     * EDIT   => PUT /:id
+     */
+    save(): void {
 
-        console.log(
-            'REQUEST :',
-            request
-        );
+        if (!this.isFormValid()) {
+
+            this.errorMessage =
+                'Veuillez renseigner le nom du pack et ajouter au moins un produit.';
+
+            return;
+        }
+
 
         this.saving = true;
+        this.errorMessage = '';
+        this.successMessage = '';
 
-        // =====================================================
-        // MODIFICATION
-        // =====================================================
 
+        const request =
+            this.buildRequest();
+
+
+        /*
+         * IMPORTANT :
+         * modification d'un pack existant.
+         */
         if (
             this.isEditMode &&
             this.bundleId !== null
         ) {
 
-            const id =
-                this.bundleId;
-
-            console.log(
-                `Modification du pack #${id}`
-            );
-
             this.bundleService
                 .updateBundle(
-                    id,
+                    this.bundleId,
                     request
                 )
                 .subscribe({
@@ -1179,16 +958,12 @@ export class BundleFormComponent implements OnInit {
 
                         this.clearDraft();
 
-                        this.success =
+                        this.successMessage =
                             'Pack modifié avec succès.';
 
-                        setTimeout(() => {
-
-                            this.router.navigate(
-                                ['/admin/bundles']
-                            );
-
-                        }, 800);
+                        this.router.navigate(
+                            ['/admin/bundles']
+                        );
                     },
 
                     error: (error) => {
@@ -1200,8 +975,7 @@ export class BundleFormComponent implements OnInit {
 
                         this.saving = false;
 
-                        this.error =
-                            error?.error?.message ??
+                        this.errorMessage =
                             'Impossible de modifier le pack.';
                     }
                 });
@@ -1209,14 +983,10 @@ export class BundleFormComponent implements OnInit {
             return;
         }
 
-        // =====================================================
-        // CRÉATION
-        // =====================================================
 
-        console.log(
-            'Création d’un nouveau pack'
-        );
-
+        /*
+         * Création d'un nouveau pack.
+         */
         this.bundleService
             .createBundle(request)
             .subscribe({
@@ -1227,16 +997,12 @@ export class BundleFormComponent implements OnInit {
 
                     this.clearDraft();
 
-                    this.success =
+                    this.successMessage =
                         'Pack créé avec succès.';
 
-                    setTimeout(() => {
-
-                        this.router.navigate(
-                            ['/admin/bundles']
-                        );
-
-                    }, 800);
+                    this.router.navigate(
+                        ['/admin/bundles']
+                    );
                 },
 
                 error: (error) => {
@@ -1248,10 +1014,64 @@ export class BundleFormComponent implements OnInit {
 
                     this.saving = false;
 
-                    this.error =
-                        error?.error?.message ??
+                    this.errorMessage =
                         'Impossible de créer le pack.';
                 }
             });
+    }
+
+
+    /**
+     * Annule le formulaire.
+     */
+    cancelForm(): void {
+
+        this.clearDraft();
+
+        this.router.navigate(
+            ['/admin/bundles']
+        );
+    }
+
+
+    /**
+     * Vérifie si un produit est dans le pack.
+     */
+    hasProduct(
+        productId: number
+    ): boolean {
+
+        return this.items.some(
+            item =>
+                item.productId === productId
+        );
+    }
+
+
+    /**
+     * Titre de la page.
+     */
+    get pageTitle(): string {
+
+        return this.isEditMode
+            ? 'Modifier le pack'
+            : 'Créer un pack';
+    }
+
+
+    /**
+     * Texte du bouton de sauvegarde.
+     */
+    get saveButtonLabel(): string {
+
+        if (this.saving) {
+            return this.isEditMode
+                ? 'Modification...'
+                : 'Création...';
+        }
+
+        return this.isEditMode
+            ? 'Modifier le pack'
+            : 'Créer le pack';
     }
 }

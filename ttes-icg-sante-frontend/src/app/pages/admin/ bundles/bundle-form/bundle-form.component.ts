@@ -179,7 +179,8 @@ export class BundleFormComponent implements OnInit {
 
         this.route.paramMap.subscribe(params => {
 
-            const id = params.get('id');
+            const id =
+                params.get('id');
 
 
             // ====================================================
@@ -188,7 +189,9 @@ export class BundleFormComponent implements OnInit {
 
             if (id) {
 
-                const numericId = Number(id);
+                const numericId =
+                    Number(id);
+
 
                 if (
                     !Number.isInteger(numericId) ||
@@ -213,7 +216,10 @@ export class BundleFormComponent implements OnInit {
                     queryParams => {
 
                         const productIdsParam =
-                            queryParams.get('productIds');
+                            queryParams.get(
+                                'productIds'
+                            );
+
 
                         const productIds =
                             productIdsParam
@@ -240,8 +246,12 @@ export class BundleFormComponent implements OnInit {
             // MODE CREATION
             // ====================================================
 
-            this.bundleId = null;
-            this.isEditMode = false;
+            this.bundleId =
+                null;
+
+            this.isEditMode =
+                false;
+
 
             this.loadCreateMode();
 
@@ -257,51 +267,167 @@ export class BundleFormComponent implements OnInit {
     private loadCreateMode(): void {
 
         this.loading = true;
+
         this.error = '';
 
 
-        /*
-         * IMPORTANT :
-         *
-         * On lit d'abord les productIds de l'URL.
-         *
-         * Exemple :
-         *
-         * /admin/bundles/new?productIds=12,25,30
-         *
-         * Ces IDs ont priorité sur le brouillon.
-         */
+        this.route.queryParamMap.subscribe(
+            params => {
 
-        this.route.queryParamMap.subscribe(params => {
-
-            const productIdsParam =
-                params.get('productIds');
+                const productIdsParam =
+                    params.get(
+                        'productIds'
+                    );
 
 
-            const productIds =
-                productIdsParam
-                    ? this.parseProductIds(
-                        productIdsParam
-                    )
-                    : [];
+                const productIds =
+                    productIdsParam
+                        ? this.parseProductIds(
+                            productIdsParam
+                        )
+                        : [];
 
 
-            // ====================================================
-            // DES PRODUITS SONT PRESENTS DANS L'URL
-            // ====================================================
+                // =================================================
+                // PRODUITS PRESENTS DANS L'URL
+                // =================================================
 
-            if (productIds.length > 0) {
+                if (
+                    productIds.length > 0
+                ) {
 
-                /*
-                 * On récupère éventuellement le brouillon
-                 * pour conserver :
-                 *
-                 * - nom
-                 * - description
-                 * - prix
-                 * - quantités
-                 * - images
-                 */
+                    /*
+                     * Récupérer le brouillon afin de conserver :
+                     *
+                     * - nom
+                     * - description
+                     * - prix
+                     * - quantités
+                     * - images
+                     */
+
+                    const draft =
+                        this.getDraft();
+
+
+                    if (draft) {
+
+                        this.form.patchValue({
+
+                            name:
+                                draft.name,
+
+                            description:
+                                draft.description,
+
+                            price:
+                                draft.price,
+
+                            discountPercentage:
+                                draft.discountPercentage,
+
+                            active:
+                                draft.active
+
+                        });
+
+
+                        this.items =
+                            draft.items ?? [];
+
+
+                        this.images =
+                            draft.images ?? [];
+
+                    }
+
+
+                    const existingProductIds =
+                        this.items.map(
+                            item =>
+                                item.productId
+                        );
+
+
+                    /*
+                     * Produits réellement nouveaux.
+                     */
+
+                    const newProductIds =
+                        productIds.filter(
+                            id =>
+                                !existingProductIds.includes(
+                                    id
+                                )
+                        );
+
+
+                    /*
+                     * Aucun nouveau produit.
+                     */
+
+                    if (
+                        newProductIds.length === 0
+                    ) {
+
+                        const itemsMap =
+                            new Map<
+                                number,
+                                BundleFormItem
+                            >(
+                                this.items.map(
+                                    item => [
+                                        item.productId,
+                                        item
+                                    ]
+                                )
+                            );
+
+
+                        this.items =
+                            productIds
+                                .map(
+                                    id =>
+                                        itemsMap.get(id)
+                                )
+                                .filter(
+                                    (
+                                        item
+                                    ): item is BundleFormItem =>
+                                        !!item
+                                );
+
+
+                        this.initialProductIds =
+                            [...productIds];
+
+
+                        this.loading = false;
+
+                        this.saveDraft();
+
+                        return;
+
+                    }
+
+
+                    /*
+                     * Charger les nouveaux produits.
+                     */
+
+                    this.loadSelectedProducts(
+                        productIds,
+                        newProductIds
+                    );
+
+                    return;
+
+                }
+
+
+                // =================================================
+                // AUCUN PRODUCT ID
+                // =================================================
 
                 const draft =
                     this.getDraft();
@@ -336,163 +462,20 @@ export class BundleFormComponent implements OnInit {
                     this.images =
                         draft.images ?? [];
 
-                }
-
-
-                /*
-                 * Produits actuellement présents dans le draft.
-                 */
-
-                const existingProductIds =
-                    this.items.map(
-                        item =>
-                            item.productId
-                    );
-
-
-                /*
-                 * Produits réellement nouveaux.
-                 *
-                 * Ceux-là devront être récupérés depuis l'API.
-                 */
-
-                const newProductIds =
-                    productIds.filter(
-                        id =>
-                            !existingProductIds.includes(id)
-                    );
-
-
-                /*
-                 * Même si aucun produit n'est nouveau,
-                 * on remet les produits dans l'ordre
-                 * de la sélection.
-                 */
-
-                if (
-                    newProductIds.length === 0
-                ) {
-
-                    const itemsMap =
-                        new Map<
-                            number,
-                            BundleFormItem
-                        >(
-                            this.items.map(
-                                item => [
-                                    item.productId,
-                                    item
-                                ]
-                            )
-                        );
-
-
-                    this.items =
-                        productIds
-                            .map(
-                                id =>
-                                    itemsMap.get(id)
-                            )
-                            .filter(
-                                (
-                                    item
-                                ): item is BundleFormItem =>
-                                    !!item
-                            );
-
 
                     this.initialProductIds =
-                        [...productIds];
+                        this.items.map(
+                            item =>
+                                item.productId
+                        );
 
-
-                    /*
-                     * Si le draft n'avait aucun produit,
-                     * cette situation est normale :
-                     * il n'y aura simplement rien à afficher.
-                     */
-
-                    this.loading = false;
-
-                    this.saveDraft();
-
-                    return;
                 }
 
 
-                /*
-                 * Charger les nouveaux produits.
-                 *
-                 * Ils auront automatiquement :
-                 *
-                 * - quantité = 1
-                 * - nom
-                 * - stock
-                 * - image principale
-                 */
-
-                this.loadSelectedProducts(
-                    productIds,
-                    newProductIds
-                );
-
-                return;
-            }
-
-
-            // ====================================================
-            // AUCUN PRODUCTID DANS L'URL
-            // ====================================================
-
-            /*
-             * On peut alors utiliser le brouillon.
-             */
-
-            const draft =
-                this.getDraft();
-
-
-            if (draft) {
-
-                this.form.patchValue({
-
-                    name:
-                        draft.name,
-
-                    description:
-                        draft.description,
-
-                    price:
-                        draft.price,
-
-                    discountPercentage:
-                        draft.discountPercentage,
-
-                    active:
-                        draft.active
-
-                });
-
-
-                this.items =
-                    draft.items ?? [];
-
-
-                this.images =
-                    draft.images ?? [];
-
-
-                this.initialProductIds =
-                    this.items.map(
-                        item =>
-                            item.productId
-                    );
+                this.loading = false;
 
             }
-
-
-            this.loading = false;
-
-        });
+        );
 
     }
 
@@ -507,6 +490,7 @@ export class BundleFormComponent implements OnInit {
     ): void {
 
         this.loading = true;
+
         this.error = '';
 
 
@@ -532,6 +516,7 @@ export class BundleFormComponent implements OnInit {
                         this.saveDraft();
 
                         return;
+
                     }
 
 
@@ -553,9 +538,6 @@ export class BundleFormComponent implements OnInit {
 
                     /*
                      * Aucun nouveau produit.
-                     *
-                     * On réordonne simplement les produits
-                     * selon la sélection.
                      */
 
                     if (
@@ -597,6 +579,7 @@ export class BundleFormComponent implements OnInit {
                         this.saveDraft();
 
                         return;
+
                     }
 
 
@@ -735,6 +718,12 @@ export class BundleFormComponent implements OnInit {
                 );
 
 
+        /*
+         * Si le pack n'a aucune image,
+         * utiliser les images principales
+         * des produits.
+         */
+
         if (
             this.images.length === 0
         ) {
@@ -751,6 +740,10 @@ export class BundleFormComponent implements OnInit {
     // ============================================================
 
     goToProductSelection(): void {
+
+        /*
+         * Sauvegarder l'état actuel avant de quitter.
+         */
 
         this.saveDraft();
 
@@ -796,7 +789,9 @@ export class BundleFormComponent implements OnInit {
                 }
             );
 
+
             return;
+
         }
 
 
@@ -826,7 +821,7 @@ export class BundleFormComponent implements OnInit {
 
 
     // ============================================================
-    // CHARGEMENT DES PRODUITS SELECTIONNES
+    // CHARGEMENT DES PRODUITS
     // ============================================================
 
     private loadSelectedProducts(
@@ -841,6 +836,7 @@ export class BundleFormComponent implements OnInit {
             this.loading = false;
 
             return;
+
         }
 
 
@@ -848,7 +844,13 @@ export class BundleFormComponent implements OnInit {
 
 
         /*
-         * On conserve les produits déjà présents.
+         * Map des produits déjà présents.
+         *
+         * Cela permet de conserver :
+         *
+         * - quantité
+         * - image
+         * - autres modifications
          */
 
         const existingItems =
@@ -877,7 +879,7 @@ export class BundleFormComponent implements OnInit {
             productId => {
 
                 /*
-                 * Produit déjà chargé.
+                 * Produit déjà présent.
                  */
 
                 if (
@@ -887,6 +889,7 @@ export class BundleFormComponent implements OnInit {
                 ) {
 
                     completed++;
+
 
                     if (
                         completed ===
@@ -900,13 +903,14 @@ export class BundleFormComponent implements OnInit {
 
                     }
 
+
                     return;
+
                 }
 
 
                 /*
-                 * Nouveau produit :
-                 * récupération depuis l'API.
+                 * Nouveau produit.
                  */
 
                 this.productService
@@ -948,8 +952,8 @@ export class BundleFormComponent implements OnInit {
 
 
                             /*
-                             * Ajouter automatiquement
-                             * l'image principale.
+                             * Ajouter l'image principale
+                             * du nouveau produit.
                              */
 
                             if (
@@ -1042,8 +1046,7 @@ export class BundleFormComponent implements OnInit {
 
 
         /*
-         * En modification, on reste toujours
-         * en mode édition.
+         * Toujours conserver le mode édition.
          */
 
         if (
@@ -1103,9 +1106,7 @@ export class BundleFormComponent implements OnInit {
         item.quantity =
             Number.isFinite(value) &&
             value >= 1
-
                 ? Math.floor(value)
-
                 : 1;
 
 
@@ -1114,18 +1115,93 @@ export class BundleFormComponent implements OnInit {
     }
 
 
+    // ============================================================
+    // SUPPRESSION PRODUIT + IMAGE
+    // ============================================================
+
     removeProduct(
         productId: number
     ): void {
 
-        this.items =
-            this.items.filter(
-                item =>
-                    item.productId !==
-                    productId
+        /*
+         * Récupérer le produit avant suppression.
+         */
+        const item =
+            this.items.find(
+                product =>
+                    product.productId === productId
             );
 
 
+        if (!item) {
+            return;
+        }
+
+
+        /*
+         * Supprimer le produit.
+         */
+        this.items =
+            this.items.filter(
+                product =>
+                    product.productId !== productId
+            );
+
+
+        /*
+         * Supprimer l'image principale associée
+         * à ce produit.
+         *
+         * Cela fonctionne aussi bien :
+         *
+         * - en création
+         * - en modification
+         * - après ajout d'un nouveau produit
+         */
+        if (item.imageUrl) {
+
+            this.images =
+                this.images.filter(
+                    image =>
+                        image.imageUrl !==
+                        item.imageUrl
+                );
+
+        }
+
+
+        /*
+         * Réorganiser l'ordre des images.
+         */
+        this.images.forEach(
+            (image, index) => {
+
+                image.displayOrder =
+                    index;
+
+            }
+        );
+
+
+        /*
+         * S'assurer qu'une image reste principale.
+         */
+        if (
+            this.images.length > 0 &&
+            !this.images.some(
+                image =>
+                    image.main === true
+            )
+        ) {
+
+            this.images[0].main = true;
+
+        }
+
+
+        /*
+         * Sauvegarder le nouvel état.
+         */
         this.saveDraft();
 
     }
@@ -1149,8 +1225,7 @@ export class BundleFormComponent implements OnInit {
         const item =
             this.items.find(
                 product =>
-                    product.productId ===
-                    productId
+                    product.productId === productId
             );
 
 
@@ -1167,8 +1242,7 @@ export class BundleFormComponent implements OnInit {
         const item =
             this.items.find(
                 product =>
-                    product.productId ===
-                    productId
+                    product.productId === productId
             );
 
 
@@ -1231,11 +1305,15 @@ export class BundleFormComponent implements OnInit {
         }
 
 
+        /*
+         * Ne pas ajouter deux fois
+         * la même image.
+         */
+
         const exists =
             this.images.some(
                 image =>
-                    image.imageUrl ===
-                    imageUrl
+                    image.imageUrl === imageUrl
             );
 
 
@@ -1394,6 +1472,11 @@ export class BundleFormComponent implements OnInit {
         );
 
 
+        /*
+         * Si l'image principale est supprimée,
+         * la première image restante devient principale.
+         */
+
         if (
             wasMain &&
             this.images.length > 0
@@ -1404,6 +1487,10 @@ export class BundleFormComponent implements OnInit {
 
         }
 
+
+        /*
+         * Réorganiser les positions.
+         */
 
         this.images.forEach(
             (image, i) => {
@@ -1728,8 +1815,7 @@ export class BundleFormComponent implements OnInit {
             active:
                 this.form.get(
                     'active'
-                )?.value ?? true
-                ,
+                )?.value ?? true,
 
             items:
                 this.items.map(

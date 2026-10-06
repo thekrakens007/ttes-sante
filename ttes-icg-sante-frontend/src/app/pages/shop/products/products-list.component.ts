@@ -8,12 +8,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
-import { Product } from '../../../../core/models/product.model';
-import { ProductService } from '../../../../core/services/product.service';
-import { CartService } from '../../../../core/services/cart.service';
-import { AuthService } from '../../../../core/services/auth.service';
+import { Product } from '../../../core/models/product.model';
+import { ProductService } from '../../../core/services/product.service';
+import { CartService } from '../../../core/services/cart.service';
+import { AuthService } from '../../../core/services/auth.service';
 
-import { Cart } from '../../../../core/interfaces/cart.interface';
+import { Cart } from '../../../core/interfaces/cart.interface';
 
 @Component({
     selector: 'app-products-list',

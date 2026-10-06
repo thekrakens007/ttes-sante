@@ -1,283 +1,264 @@
 <div
-        class="min-h-screen bg-gray-50 text-gray-900 transition-colors duration-300
+    class="min-h-screen bg-gray-50 text-gray-900 transition-colors duration-300
            dark:bg-gray-950 dark:text-white">
 
+<!-- ========================================================= -->
+<!-- TOP BAR -->
+<!-- ========================================================= -->
 
-    <!-- ========================================================= -->
-    <!-- TOP BAR (infos pratiques) -->
-    <!-- ========================================================= -->
+<div class="hidden bg-green-950 text-xs text-green-50 md:block">
 
-    <div class="hidden bg-green-950 text-xs text-green-50 md:block">
-
-        <div
-                class="mx-auto flex max-w-7xl items-center
+    <div
+        class="mx-auto flex max-w-7xl items-center
                justify-between gap-4 px-4 py-2.5
                sm:px-6 lg:px-8">
 
-            <div class="flex items-center gap-5">
+        <div class="flex items-center gap-5">
 
-                <span class="flex items-center gap-1.5">
-                    📍 Douala, Cameroun
-                </span>
+            <span class="flex items-center gap-1.5">
+                📍 Douala, Cameroun
+            </span>
 
-                <span class="flex items-center gap-1.5">
-                    🕒 Lun - Sam : 8h - 18h
-                </span>
+            <span class="flex items-center gap-1.5">
+                🕒 Lun - Sam : 8h - 18h
+            </span>
 
-                <span class="flex items-center gap-1.5">
-                    ✉️ contact&#64;tes-icg.com
-                </span>
-
-            </div>
-
-            <div class="flex items-center gap-5">
-
-
-
-                <a
-                        routerLink="/companies"
-                        class="rounded-lg bg-orange-400
-                       px-3 py-1.5 font-bold
-                       text-green-950 transition
-                       hover:bg-orange-300">
-
-                    Prendre rendez-vous
-
-                </a>
-
-            </div>
+            <span class="flex items-center gap-1.5">
+                ✉️ contact&#64;tes-icg.com
+            </span>
 
         </div>
 
+        <a
+            href="https://wa.me/237659147589?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20obtenir%20des%20informations%20et%20une%20orientation."
+            target="_blank"
+            rel="noopener noreferrer"
+            class="rounded-lg bg-orange-400
+                   px-3 py-1.5 font-bold
+                   text-green-950 transition
+                   hover:bg-orange-300">
+
+            Consultation WhatsApp
+
+        </a>
+
     </div>
 
+</div>
 
-    <!-- ========================================================= -->
-    <!-- HEADER -->
-    <!-- ========================================================= -->
 
-    <header
-            class="sticky top-0 z-50 border-b border-gray-200/80
+<!-- ========================================================= -->
+<!-- HEADER -->
+<!-- ========================================================= -->
+
+<header
+    class="sticky top-0 z-50 border-b border-gray-200/80
            bg-white/95 shadow-sm backdrop-blur-md
            transition-colors duration-300
            dark:border-gray-800 dark:bg-gray-900/95">
 
-        <div
-                class="mx-auto flex max-w-7xl items-center
+    <div
+        class="mx-auto flex max-w-7xl items-center
                justify-between gap-4 px-4 py-3
                sm:px-6 lg:px-8">
 
-            <!-- LOGO -->
+        <!-- LOGO -->
+
+        <a
+            routerLink="/"
+            (click)="closeMobileMenu()"
+            class="flex shrink-0 items-center">
+
+            <img
+                src="/images/logo/logo.svg"
+                alt="TES-ICG Santé"
+                class="h-11 w-auto sm:h-12 dark:hidden">
+
+            <img
+                src="/images/logo/logo-dark.svg"
+                alt="TES-ICG Santé"
+                class="hidden h-11 w-auto sm:h-12 dark:block">
+
+        </a>
+
+
+        <!-- NAVIGATION -->
+
+        <nav class="hidden items-center gap-1 md:flex">
 
             <a
-                    routerLink="/"
-                    (click)="closeMobileMenu()"
-                    class="flex shrink-0 items-center">
+                routerLink="/"
+                class="rounded-lg px-3 py-2 text-sm font-bold
+                       uppercase tracking-wide text-gray-700
+                       transition hover:bg-green-50
+                       hover:text-green-700
+                       dark:text-gray-200 dark:hover:bg-green-900/30
+                       dark:hover:text-green-400">
+                Accueil
+            </a>
 
-                <img
-                        src="/images/logo/logo.svg"
-                        alt="TES-ICG Santé"
-                        class="h-11 w-auto sm:h-12 dark:hidden">
+            <a
+                routerLink="/products"
+                class="rounded-lg px-3 py-2 text-sm font-bold
+                       uppercase tracking-wide text-gray-700
+                       transition hover:bg-green-50
+                       hover:text-green-700
+                       dark:text-gray-200 dark:hover:bg-green-900/30
+                       dark:hover:text-green-400">
+                Produits
+            </a>
 
-                <img
-                        src="/images/logo/logo-dark.svg"
-                        alt="TES-ICG Santé"
-                        class="hidden h-11 w-auto sm:h-12 dark:block">
+            <a
+                routerLink="/bundles"
+                class="rounded-lg px-3 py-2 text-sm font-bold
+                       uppercase tracking-wide text-gray-700
+                       transition hover:bg-green-50
+                       hover:text-green-700
+                       dark:text-gray-200 dark:hover:bg-green-900/30
+                       dark:hover:text-green-400">
+                Packs
+            </a>
+
+            <a
+                routerLink="/companies"
+                class="rounded-lg px-3 py-2 text-sm font-bold
+                       uppercase tracking-wide text-gray-700
+                       transition hover:bg-green-50
+                       hover:text-green-700
+                       dark:text-gray-200 dark:hover:bg-green-900/30
+                       dark:hover:text-green-400">
+                Entreprises
+            </a>
+
+        </nav>
+
+
+        <!-- ACTIONS -->
+
+        <div class="hidden items-center gap-2 md:flex">
+
+            <a
+                href="https://wa.me/237659147589?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20une%20consultation."
+                target="_blank"
+                rel="noopener noreferrer"
+                class="rounded-xl bg-orange-400 px-4 py-2.5
+                       text-sm font-bold text-green-950
+                       shadow-sm transition hover:bg-orange-300">
+
+                💬 Consultation
 
             </a>
 
-            <!-- NAVIGATION CENTRÉE -->
-
-            <nav class="hidden items-center gap-1 md:flex">
+            @if (!isLoggedIn()) {
 
                 <a
-                        routerLink="/"
-                        class="rounded-lg px-3 py-2 text-sm font-bold
-                       uppercase tracking-wide text-gray-700
-                       transition hover:bg-green-50
-                       hover:text-green-700
-                       dark:text-gray-200 dark:hover:bg-green-900/30
-                       dark:hover:text-green-400">
-
-                    Accueil
-
-                </a>
-
-                <a
-                        routerLink="/products"
-                        class="rounded-lg px-3 py-2 text-sm font-bold
-                       uppercase tracking-wide text-gray-700
-                       transition hover:bg-green-50
-                       hover:text-green-700
-                       dark:text-gray-200 dark:hover:bg-green-900/30
-                       dark:hover:text-green-400">
-
-                    Produits
-
-                </a>
-
-                <a
-                        routerLink="/bundles"
-                        class="rounded-lg px-3 py-2 text-sm font-bold
-                       uppercase tracking-wide text-gray-700
-                       transition hover:bg-green-50
-                       hover:text-green-700
-                       dark:text-gray-200 dark:hover:bg-green-900/30
-                       dark:hover:text-green-400">
-
-                    Packs
-
-                </a>
-
-                <a
-                        routerLink="/companies"
-                        class="rounded-lg px-3 py-2 text-sm font-bold
-                       uppercase tracking-wide text-gray-700
-                       transition hover:bg-green-50
-                       hover:text-green-700
-                       dark:text-gray-200 dark:hover:bg-green-900/30
-                       dark:hover:text-green-400">
-
-                    Entreprises
-
-                </a>
-
-            </nav>
-
-            <!-- ACTIONS DROITE -->
-
-            <div class="hidden items-center gap-2 md:flex">
-
-                <!-- ICONE RECHERCHE (ouvre la barre en dessous) -->
-
-                <button
-                        type="button"
-                        aria-label="Rechercher"
-                        class="flex h-10 w-10 items-center
-                       justify-center rounded-xl
-                       text-lg text-gray-600 transition
-                       hover:bg-green-50 hover:text-green-700
-                       dark:text-gray-300
-                       dark:hover:bg-green-900/30">
-
-
-
-                </button>
-
-                @if (!isLoggedIn()) {
-
-                <a
-                        routerLink="/signin"
-                        class="rounded-lg px-3 py-2 text-sm font-semibold
+                    routerLink="/signin"
+                    class="rounded-lg px-3 py-2 text-sm font-semibold
                            text-gray-700 transition
                            hover:bg-green-50 hover:text-green-700
-                           dark:text-gray-200 dark:hover:bg-green-900/30
-                           dark:hover:text-green-400">
+                           dark:text-gray-200">
 
                     Se connecter
 
                 </a>
 
                 <a
-                        routerLink="/signup"
-                        class="rounded-xl bg-green-600 px-4 py-2.5
-                           text-sm font-semibold text-white shadow-sm
-                           transition hover:bg-green-700
-                           dark:bg-green-500 dark:hover:bg-green-400">
+                    routerLink="/signup"
+                    class="rounded-xl bg-green-600 px-4 py-2.5
+                           text-sm font-semibold text-white
+                           shadow-sm transition hover:bg-green-700">
 
                     Créer un compte
 
                 </a>
 
-                }
+            }
 
-                @if (isLoggedIn() && isAdmin()) {
+            @if (isLoggedIn() && isAdmin()) {
 
                 <a
-                        routerLink="/admin"
-                        class="rounded-xl bg-green-700 px-4 py-2.5
-                           text-sm font-semibold text-white
-                           shadow-sm transition hover:bg-green-800">
+                    routerLink="/admin"
+                    class="rounded-xl bg-green-700 px-4 py-2.5
+                           text-sm font-semibold text-white">
 
                     ⚙️ Admin
 
                 </a>
 
-                }
+            }
 
-                @if (isLoggedIn() && !isAdmin()) {
+            @if (isLoggedIn() && !isAdmin()) {
 
                 <a
-                        routerLink="/profile"
-                        class="rounded-xl bg-green-600 px-4 py-2.5
-                           text-sm font-semibold text-white
-                           shadow-sm transition hover:bg-green-700">
+                    routerLink="/profile"
+                    class="rounded-xl bg-green-600 px-4 py-2.5
+                           text-sm font-semibold text-white">
 
                     👤 Profil
 
                 </a>
 
-                }
+            }
 
-                @if (isLoggedIn()) {
+            @if (isLoggedIn()) {
 
                 <a
-                        routerLink="/cart"
-                        class="rounded-xl bg-green-600 px-4 py-2.5
-                           text-sm font-semibold text-white
-                           shadow-sm transition hover:bg-green-700">
+                    routerLink="/cart"
+                    class="rounded-xl bg-green-600 px-4 py-2.5
+                           text-sm font-semibold text-white">
 
                     🛒 Panier
 
                 </a>
 
-                }
-
-            </div>
-
-            <!-- MOBILE BUTTON -->
-
-            <button
-                    type="button"
-                    (click)="toggleMobileMenu()"
-                    [attr.aria-expanded]="mobileMenuOpen"
-                    aria-label="Ouvrir le menu"
-                    class="flex h-10 w-10 shrink-0 items-center
-                   justify-center rounded-xl border
-                   border-gray-300 bg-white text-xl
-                   text-gray-700 transition
-                   hover:border-green-500 hover:bg-green-50
-                   hover:text-green-700
-                   dark:border-gray-700 dark:bg-gray-800
-                   dark:text-gray-200 md:hidden">
-
-                @if (mobileMenuOpen) {
-                ✕
-                } @else {
-                ☰
-                }
-
-            </button>
+            }
 
         </div>
 
-        <!-- BARRE DE RECHERCHE (desktop + mobile) -->
 
-        <div
-                class="border-t border-gray-100 bg-white px-4 py-3
+        <!-- MOBILE -->
+
+        <button
+            type="button"
+            (click)="toggleMobileMenu()"
+            [attr.aria-expanded]="mobileMenuOpen"
+            aria-label="Ouvrir le menu"
+            class="flex h-10 w-10 shrink-0
+                   items-center justify-center rounded-xl
+                   border border-gray-300 bg-white text-xl
+                   text-gray-700 transition
+                   hover:border-green-500 hover:bg-green-50
+                   dark:border-gray-700 dark:bg-gray-800
+                   dark:text-gray-200 md:hidden">
+
+            @if (mobileMenuOpen) {
+                ✕
+            } @else {
+                ☰
+            }
+
+        </button>
+
+    </div>
+
+
+    <!-- SEARCH -->
+
+    <div
+        class="border-t border-gray-100 bg-white px-4 py-3
                dark:border-gray-800 dark:bg-gray-900">
 
-            <div class="mx-auto max-w-lg md:max-w-2xl">
+        <div class="mx-auto max-w-lg md:max-w-2xl">
 
-                <div class="relative">
+            <div class="relative">
 
-                    <input
-                            type="text"
-                            [(ngModel)]="searchTerm"
-                            [ngModelOptions]="{standalone: true}"
-                            (ngModelChange)="search()"
-                            placeholder="Rechercher un produit..."
-                            class="h-11 w-full rounded-xl
+                <input
+                    type="text"
+                    [(ngModel)]="searchTerm"
+                    [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="search()"
+                    placeholder="Rechercher un produit..."
+                    class="h-11 w-full rounded-xl
                            border border-gray-200
                            bg-gray-50 px-4 pr-12
                            text-sm text-gray-800
@@ -289,142 +270,132 @@
                            focus:ring-green-600/10
                            dark:border-gray-700
                            dark:bg-gray-800
-                           dark:text-white
-                           dark:placeholder:text-gray-500
-                           dark:focus:border-green-500">
+                           dark:text-white">
 
-                    <span
-                            class="pointer-events-none absolute right-4
+                <span
+                    class="pointer-events-none absolute right-4
                            top-1/2 -translate-y-1/2 text-lg">
                     🔍
                 </span>
-
-                </div>
 
             </div>
 
         </div>
 
-        <!-- MOBILE MENU -->
+    </div>
 
-        @if (mobileMenuOpen) {
+
+    <!-- MOBILE MENU -->
+
+    @if (mobileMenuOpen) {
 
         <div
-                class="border-t border-gray-200 bg-white px-4 py-4
+            class="border-t border-gray-200 bg-white px-4 py-4
                    shadow-lg dark:border-gray-800
                    dark:bg-gray-900 md:hidden">
 
             <div class="flex flex-col gap-2">
 
                 <a
-                        routerLink="/"
-                        (click)="closeMobileMenu()"
-                        class="rounded-xl px-4 py-3 text-sm font-semibold
+                    routerLink="/"
+                    (click)="closeMobileMenu()"
+                    class="rounded-xl px-4 py-3 text-sm font-semibold
                            text-gray-700 hover:bg-green-50
-                           dark:text-gray-200 dark:hover:bg-green-900/30">
-
+                           dark:text-gray-200">
                     🏠 Accueil
-
                 </a>
 
                 <a
-                        routerLink="/products"
-                        (click)="closeMobileMenu()"
-                        class="rounded-xl px-4 py-3 text-sm font-semibold
+                    routerLink="/products"
+                    (click)="closeMobileMenu()"
+                    class="rounded-xl px-4 py-3 text-sm font-semibold
                            text-gray-700 hover:bg-green-50
-                           dark:text-gray-200 dark:hover:bg-green-900/30">
-
+                           dark:text-gray-200">
                     🛍️ Produits
-
                 </a>
 
                 <a
-                        routerLink="/bundles"
-                        (click)="closeMobileMenu()"
-                        class="rounded-xl px-4 py-3 text-sm font-semibold
+                    routerLink="/bundles"
+                    (click)="closeMobileMenu()"
+                    class="rounded-xl px-4 py-3 text-sm font-semibold
                            text-gray-700 hover:bg-green-50
-                           dark:text-gray-200 dark:hover:bg-green-900/30">
-
+                           dark:text-gray-200">
                     📦 Packs
-
                 </a>
 
                 <a
-                        routerLink="/companies"
-                        (click)="closeMobileMenu()"
-                        class="rounded-xl px-4 py-3 text-sm font-semibold
+                    routerLink="/companies"
+                    (click)="closeMobileMenu()"
+                    class="rounded-xl px-4 py-3 text-sm font-semibold
                            text-gray-700 hover:bg-green-50
-                           dark:text-gray-200 dark:hover:bg-green-900/30">
-
+                           dark:text-gray-200">
                     🏢 Entreprises
+                </a>
 
+                <a
+                    href="https://wa.me/237659147589?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20une%20consultation."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="rounded-xl bg-orange-400 px-4 py-3
+                           text-center text-sm font-bold
+                           text-green-950">
+                    💬 Consultation WhatsApp
                 </a>
 
                 @if (!isLoggedIn()) {
 
-                <a
+                    <a
                         routerLink="/signin"
                         (click)="closeMobileMenu()"
                         class="rounded-xl px-4 py-3 text-sm font-semibold
                                text-gray-700 hover:bg-green-50
                                dark:text-gray-200">
+                        🔐 Se connecter
+                    </a>
 
-                    🔐 Se connecter
-
-                </a>
-
-                <a
+                    <a
                         routerLink="/signup"
                         (click)="closeMobileMenu()"
                         class="rounded-xl bg-green-600 px-4 py-3
-                               text-sm font-semibold text-white
-                               hover:bg-green-700">
-
-                    📝 Créer un compte
-
-                </a>
+                               text-sm font-semibold text-white">
+                        📝 Créer un compte
+                    </a>
 
                 }
 
                 @if (isLoggedIn() && isAdmin()) {
 
-                <a
+                    <a
                         routerLink="/admin"
                         (click)="closeMobileMenu()"
                         class="rounded-xl bg-green-700 px-4 py-3
                                text-sm font-semibold text-white">
-
-                    ⚙️ Dashboard Admin
-
-                </a>
+                        ⚙️ Dashboard Admin
+                    </a>
 
                 }
 
                 @if (isLoggedIn() && !isAdmin()) {
 
-                <a
+                    <a
                         routerLink="/profile"
                         (click)="closeMobileMenu()"
                         class="rounded-xl bg-green-600 px-4 py-3
                                text-sm font-semibold text-white">
-
-                    👤 Mon profil
-
-                </a>
+                        👤 Mon profil
+                    </a>
 
                 }
 
                 @if (isLoggedIn()) {
 
-                <a
+                    <a
                         routerLink="/cart"
                         (click)="closeMobileMenu()"
                         class="rounded-xl bg-green-600 px-4 py-3
                                text-sm font-semibold text-white">
-
-                    🛒 Mon panier
-
-                </a>
+                        🛒 Mon panier
+                    </a>
 
                 }
 
@@ -432,339 +403,615 @@
 
         </div>
 
-        }
+    }
 
-    </header>
+</header>
 
 
-    <!-- ========================================================= -->
-    <!-- HERO (plein écran, image de fond + overlay, façon ISUZU) -->
-    <!-- ========================================================= -->
+<!-- ========================================================= -->
+<!-- HERO -->
+<!-- ========================================================= -->
 
-    <section class="relative overflow-hidden">
+<section class="relative min-h-[650px] overflow-hidden">
 
-        <!-- Image de fond -->
+    <!-- IMAGE INTERNET -->
+    <div
+        class="absolute inset-0 bg-cover bg-center"
+        style="background-image: url('https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=2000&q=85');">
+    </div>
 
-        <div
-                class="absolute inset-0 bg-cover bg-center"
-                style="background-image: url('/images/hero/hero-sante.jpg');">
-        </div>
+    <div
+        class="absolute inset-0 bg-gradient-to-r
+               from-green-950/95 via-green-950/80
+               to-green-950/30">
+    </div>
 
-        <!-- Overlay dégradé vert (garde le thème) -->
+    <div
+        class="relative mx-auto flex min-h-[650px]
+               max-w-7xl items-center px-4 py-20
+               sm:px-6 lg:px-8">
 
-        <div
-                class="absolute inset-0 bg-gradient-to-r
-               from-green-950/90 via-green-900/70
-               to-green-950/40">
-        </div>
+        <div class="max-w-3xl">
 
-        <div
-                class="relative mx-auto flex min-h-[520px]
-               max-w-7xl items-center px-4
-               py-20 sm:px-6 lg:px-8">
+            <div
+                class="mb-6 inline-flex items-center gap-2
+                       rounded-full border border-green-300/30
+                       bg-green-900/50 px-4 py-2
+                       text-sm font-semibold text-green-100
+                       backdrop-blur-sm">
 
-            <div class="max-w-2xl">
+                🌱 Approche naturelle • Bien-être • Prévention
 
-                <p
-                        class="mb-4 text-sm font-bold
-                       uppercase tracking-[0.2em]
-                       text-green-200">
+            </div>
 
-                    Votre santé au quotidien
+            <p
+                class="mb-4 text-sm font-bold uppercase
+                       tracking-[0.25em] text-orange-300">
 
-                </p>
+                Comprendre sa santé pour mieux en prendre soin
 
-                <h1
-                        class="text-4xl font-extrabold
-                       uppercase leading-tight
-                       tracking-tight text-white
-                       sm:text-5xl lg:text-6xl">
+            </p>
 
-                    Prenez soin
-                    <span class="block text-orange-300">
-                    de votre santé
+            <h1
+                class="text-4xl font-extrabold leading-tight
+                       tracking-tight text-white sm:text-5xl
+                       lg:text-6xl">
+
+                Votre santé commence
+                <span class="block text-orange-300">
+                    au cœur de vos cellules
                 </span>
 
-                </h1>
+            </h1>
 
-                <p
-                        class="mt-6 max-w-xl text-base
-                       leading-8 text-green-50
-                       sm:text-lg">
+            <p
+                class="mt-6 max-w-2xl text-base leading-8
+                       text-green-50 sm:text-lg">
 
-                    Découvrez nos produits de santé et nos packs
-                    soigneusement sélectionnés pour répondre
-                    à vos besoins au quotidien.
+                Découvrez une approche complémentaire du bien-être
+                qui s'intéresse à la nutrition, à l'équilibre de
+                l'organisme et aux ressources végétales.
 
-                </p>
+            </p>
 
-                <div
-                        class="mt-8 flex flex-col gap-3 sm:flex-row">
+            <p
+                class="mt-4 max-w-2xl text-sm leading-7
+                       text-green-100">
 
-                    <a
-                            routerLink="/bundles"
-                            class="inline-flex items-center
-                           justify-center gap-2
-                           rounded-lg bg-green-600
-                           px-6 py-3.5 text-sm
-                           font-bold uppercase
-                           tracking-wide text-white
-                           shadow-lg transition
-                           hover:bg-green-500">
+                Informez-vous, découvrez nos solutions et échangez
+                avec nous afin d'identifier l'accompagnement
+                complémentaire adapté à vos besoins.
 
-                        Lire la suite →
+            </p>
 
-                    </a>
+            <div class="mt-8 flex flex-col gap-3 sm:flex-row">
 
-                    <a
-                            href="#produits"
-                            class="inline-flex items-center
-                           justify-center gap-2
-                           rounded-lg border
+                <a
+                    href="https://wa.me/237659147589?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20une%20consultation."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center justify-center
+                           gap-2 rounded-xl bg-orange-400
+                           px-6 py-4 text-sm font-extrabold
+                           uppercase tracking-wide text-green-950
+                           shadow-xl transition hover:bg-orange-300">
+
+                    💬 Demander une consultation
+
+                </a>
+
+                <a
+                    routerLink="/products"
+                    class="inline-flex items-center justify-center
+                           gap-2 rounded-xl border
                            border-white/40 bg-white/10
-                           px-6 py-3.5 text-sm
-                           font-bold uppercase
-                           tracking-wide text-white
+                           px-6 py-4 text-sm font-bold
+                           uppercase tracking-wide text-white
                            backdrop-blur-sm transition
                            hover:bg-white/20">
 
-                        Contactez-nous →
-
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ========================================================= -->
-    <!-- BANDEAU D'ICÔNES (façon Roadmap / Web Dev / Reliable / Blog) -->
-    <!-- ========================================================= -->
-
-    <section
-            class="border-b border-gray-200 bg-white
-           dark:border-gray-800 dark:bg-gray-900">
-
-        <div
-                class="mx-auto max-w-7xl px-4 py-12
-               sm:px-6 lg:px-8">
-
-            <div
-                    class="grid grid-cols-1 gap-8
-                   sm:grid-cols-2 lg:grid-cols-4">
-
-                <a
-                        routerLink="/products"
-                        class="group flex flex-col gap-3">
-
-                    <span class="text-2xl text-green-600 dark:text-green-400">
-                        🛍️
-                    </span>
-
-                    <h3
-                            class="font-bold text-gray-900
-                           dark:text-white">
-
-                        Nos produits
-
-                    </h3>
-
-                    <p
-                            class="text-sm leading-6 text-gray-500
-                           dark:text-gray-400">
-
-                        Découvrez notre catalogue de produits
-                        de santé sélectionnés pour vous.
-
-                    </p>
-
-                </a>
-
-
-                <a
-                        routerLink="/bundles"
-                        class="group flex flex-col gap-3">
-
-                    <span class="text-2xl text-orange-500">
-                        📦
-                    </span>
-
-                    <h3
-                            class="font-bold text-gray-900
-                           dark:text-white">
-
-                        Nos packs
-
-                    </h3>
-
-                    <p
-                            class="text-sm leading-6 text-gray-500
-                           dark:text-gray-400">
-
-                        Des solutions prêtes à l'emploi,
-                        pensées pour vos besoins.
-
-                    </p>
-
-                </a>
-
-
-                <a
-                        routerLink="/companies"
-                        class="group flex flex-col gap-3">
-
-                    <span class="text-2xl text-green-600 dark:text-green-400">
-                        🏢
-                    </span>
-
-                    <h3
-                            class="font-bold text-gray-900
-                           dark:text-white">
-
-                        Entreprises
-
-                    </h3>
-
-                    <p
-                            class="text-sm leading-6 text-gray-500
-                           dark:text-gray-400">
-
-                        Découvrez nos partenaires
-                        et fournisseurs de confiance.
-
-                    </p>
-
-                </a>
-
-
-                <a
-                        href="#produits"
-                        class="group flex flex-col gap-3">
-
-                    <span class="text-2xl text-orange-500">
-                        💬
-                    </span>
-
-                    <h3
-                            class="font-bold text-gray-900
-                           dark:text-white">
-
-                        Besoin d'aide ?
-
-                    </h3>
-
-                    <p
-                            class="text-sm leading-6 text-gray-500
-                           dark:text-gray-400">
-
-                        Contactez notre équipe pour
-                        toute question sur nos produits.
-
-                    </p>
+                    Découvrir nos produits →
 
                 </a>
 
             </div>
 
+            <p class="mt-6 text-xs text-green-100/80">
+                Les informations présentées ont une vocation
+                éducative et ne remplacent pas l'avis d'un professionnel
+                de santé.
+            </p>
+
         </div>
 
-    </section>
+    </div>
+
+</section>
 
 
-    <!-- ========================================================= -->
-    <!-- CONTENU -->
-    <!-- ========================================================= -->
+<!-- ========================================================= -->
+<!-- BANDEAU : ENTREPRISES / CONSULTATION -->
+<!-- ========================================================= -->
 
-    <main
-            class="mx-auto max-w-7xl px-4 py-16
-           sm:px-6 lg:px-8">
-
-
-
-    </main>
-
-
-    <!-- ========================================================= -->
-    <!-- FOOTER / CTA -->
-    <!-- ========================================================= -->
-
-    <section
-            class="border-t border-gray-200 bg-white
+<section
+    class="border-b border-gray-200 bg-white
            dark:border-gray-800 dark:bg-gray-900">
 
-        <div
-                class="mx-auto max-w-7xl px-4 py-12
+    <div
+        class="mx-auto max-w-7xl px-4 py-8
                sm:px-6 lg:px-8">
 
+        <div
+            class="flex flex-col items-center
+                   justify-between gap-5 rounded-2xl
+                   bg-green-50 p-6 text-center
+                   dark:bg-green-950/30
+                   md:flex-row md:text-left">
+
+            <div>
+
+                <p
+                    class="text-lg font-extrabold text-green-900
+                           dark:text-green-300">
+
+                    Vous recherchez les produits d'une entreprise
+                    précise ?
+
+                </p>
+
+                <p
+                    class="mt-1 text-sm text-gray-600
+                           dark:text-gray-400">
+
+                    Consultez directement notre catalogue par entreprise
+                    et découvrez les produits disponibles.
+
+                </p>
+
+            </div>
+
+            <a
+                routerLink="/companies"
+                class="shrink-0 rounded-xl bg-green-700
+                       px-6 py-3 text-sm font-bold
+                       text-white transition hover:bg-green-800">
+
+                🏢 Voir les entreprises
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================= -->
+<!-- MESSAGE DE SANTÉ / ENSEIGNEMENT -->
+<!-- ========================================================= -->
+
+<section
+    class="bg-white py-20 dark:bg-gray-950">
+
+    <div
+        class="mx-auto max-w-7xl px-4
+               sm:px-6 lg:px-8">
+
+        <div class="mx-auto max-w-3xl text-center">
+
+            <span
+                class="text-sm font-bold uppercase
+                       tracking-[0.2em] text-green-600
+                       dark:text-green-400">
+
+                Comprendre avant d'agir
+
+            </span>
+
+            <h2
+                class="mt-3 text-3xl font-extrabold
+                       text-gray-900 sm:text-4xl
+                       dark:text-white">
+
+                La santé se construit aussi
+                par la connaissance
+
+            </h2>
+
+            <p
+                class="mt-6 text-base leading-8
+                       text-gray-600 dark:text-gray-400">
+
+                Notre organisme est composé de milliards de cellules
+                qui travaillent continuellement pour assurer le
+                fonctionnement des tissus et des organes.
+                Comprendre leur rôle permet de mieux comprendre
+                l'importance de l'alimentation, du repos, de l'activité
+                physique et d'une hygiène de vie équilibrée.
+
+            </p>
+
+        </div>
+
+
+        <div
+            class="mt-12 grid gap-6 md:grid-cols-3">
+
             <div
-                    class="flex flex-col items-center
-                   justify-between gap-6
-                   rounded-3xl
-                   bg-gradient-to-r
-                   from-green-800 to-green-600
-                   p-8 text-center
-                   sm:p-10 lg:flex-row
-                   lg:text-left">
+                class="rounded-2xl border border-gray-200
+                       bg-gray-50 p-7 dark:border-gray-800
+                       dark:bg-gray-900">
 
-                <div>
+                <div class="text-4xl">🧬</div>
+
+                <h3
+                    class="mt-5 text-xl font-extrabold">
+                    Les cellules
+                </h3>
+
+                <p
+                    class="mt-3 text-sm leading-7
+                           text-gray-600 dark:text-gray-400">
+
+                    Les cellules sont les unités fondamentales
+                    de notre organisme. Elles se renouvellent,
+                    communiquent et remplissent des fonctions
+                    spécialisées.
+
+                </p>
+
+            </div>
+
+
+            <div
+                class="rounded-2xl border border-gray-200
+                       bg-gray-50 p-7 dark:border-gray-800
+                       dark:bg-gray-900">
+
+                <div class="text-4xl">🌿</div>
+
+                <h3
+                    class="mt-5 text-xl font-extrabold">
+                    Les ressources végétales
+                </h3>
+
+                <p
+                    class="mt-3 text-sm leading-7
+                           text-gray-600 dark:text-gray-400">
+
+                    Certaines plantes contiennent des molécules
+                    et composés étudiés pour leurs propriétés
+                    nutritionnelles et biologiques.
+
+                </p>
+
+            </div>
+
+
+            <div
+                class="rounded-2xl border border-gray-200
+                       bg-gray-50 p-7 dark:border-gray-800
+                       dark:bg-gray-900">
+
+                <div class="text-4xl">❤️</div>
+
+                <h3
+                    class="mt-5 text-xl font-extrabold">
+                    L'équilibre global
+                </h3>
+
+                <p
+                    class="mt-3 text-sm leading-7
+                           text-gray-600 dark:text-gray-400">
+
+                    Une bonne hygiène de vie repose sur plusieurs
+                    facteurs : alimentation équilibrée, activité
+                    physique, sommeil, gestion du stress et suivi
+                    médical lorsque cela est nécessaire.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================= -->
+<!-- CELLULE + CORPS HUMAIN : 3 IMAGES -->
+<!-- ========================================================= -->
+
+<section
+    class="bg-gray-100 py-20 dark:bg-gray-900">
+
+    <div
+        class="mx-auto max-w-7xl px-4
+               sm:px-6 lg:px-8">
+
+        <div class="mb-12 max-w-3xl">
+
+            <span
+                class="text-sm font-bold uppercase
+                       tracking-[0.2em] text-orange-500">
+
+                De la cellule à l'organisme
+
+            </span>
+
+            <h2
+                class="mt-3 text-3xl font-extrabold
+                       sm:text-4xl">
+
+                Comprendre ce qui se passe
+                à l'intérieur du corps
+
+            </h2>
+
+            <p
+                class="mt-5 text-gray-600
+                       dark:text-gray-400">
+
+                La cellule, le tissu, l'organe et l'organisme
+                fonctionnent ensemble. Cette organisation complexe
+                explique pourquoi la santé ne se résume pas à un
+                seul élément.
+
+            </p>
+
+        </div>
+
+
+        <div class="grid gap-6 md:grid-cols-3">
+
+            <!-- CELLULE -->
+
+            <article
+                class="group overflow-hidden rounded-3xl
+                       bg-white shadow-lg
+                       dark:bg-gray-950">
+
+                <div class="h-64 overflow-hidden">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=1000&q=85"
+                        alt="Observation scientifique de cellules"
+                        class="h-full w-full object-cover
+                               transition duration-700
+                               group-hover:scale-105">
+
+                </div>
+
+                <div class="p-7">
+
+                    <span
+                        class="text-xs font-bold uppercase
+                               tracking-wider text-green-600">
+
+                        01 • La cellule
+
+                    </span>
+
+                    <h3
+                        class="mt-2 text-xl font-extrabold">
+
+                        L'unité fondamentale
+
+                    </h3>
 
                     <p
-                            class="text-sm font-bold
-                           uppercase tracking-wider
-                           text-orange-300">
+                        class="mt-3 text-sm leading-7
+                               text-gray-600
+                               dark:text-gray-400">
 
-                        TES-ICG Santé
-
-                    </p>
-
-                    <h2
-                            class="mt-2 text-2xl font-extrabold
-                           text-white sm:text-3xl">
-
-                        Besoin d'une solution adaptée ?
-
-                    </h2>
-
-                    <p
-                            class="mt-2 max-w-xl text-sm
-                           text-green-50">
-
-                        Découvrez nos packs ou contactez-nous
-                        pour en savoir plus sur nos produits.
+                        Chaque cellule possède une structure et
+                        une fonction particulières. Certaines
+                        peuvent se renouveler ou se spécialiser
+                        au cours du développement.
 
                     </p>
 
                 </div>
+
+            </article>
+
+
+            <!-- CELLULE VEGETALE -->
+
+            <article
+                class="group overflow-hidden rounded-3xl
+                       bg-white shadow-lg
+                       dark:bg-gray-950">
+
+                <div class="h-64 overflow-hidden">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=1000&q=85"
+                        alt="Ressources végétales et cellules végétales"
+                        class="h-full w-full object-cover
+                               transition duration-700
+                               group-hover:scale-105">
+
+                </div>
+
+                <div class="p-7">
+
+                    <span
+                        class="text-xs font-bold uppercase
+                               tracking-wider text-green-600">
+
+                        02 • Végétal
+
+                    </span>
+
+                    <h3
+                        class="mt-2 text-xl font-extrabold">
+
+                        Les ressources du monde végétal
+
+                    </h3>
+
+                    <p
+                        class="mt-3 text-sm leading-7
+                               text-gray-600
+                               dark:text-gray-400">
+
+                        Le monde végétal constitue une importante
+                        source de molécules étudiées en nutrition,
+                        en cosmétique et dans différents domaines
+                        des sciences du vivant.
+
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <!-- CORPS HUMAIN -->
+
+            <article
+                class="group overflow-hidden rounded-3xl
+                       bg-white shadow-lg
+                       dark:bg-gray-950">
+
+                <div class="h-64 overflow-hidden">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&w=1000&q=85"
+                        alt="Anatomie et corps humain"
+                        class="h-full w-full object-cover
+                               transition duration-700
+                               group-hover:scale-105">
+
+                </div>
+
+                <div class="p-7">
+
+                    <span
+                        class="text-xs font-bold uppercase
+                               tracking-wider text-green-600">
+
+                        03 • Organisme
+
+                    </span>
+
+                    <h3
+                        class="mt-2 text-xl font-extrabold">
+
+                        Un système en équilibre
+
+                    </h3>
+
+                    <p
+                        class="mt-3 text-sm leading-7
+                               text-gray-600
+                               dark:text-gray-400">
+
+                        Les différents systèmes de l'organisme
+                        travaillent ensemble. La prévention
+                        commence notamment par les habitudes
+                        quotidiennes favorables à la santé.
+
+                    </p>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================= -->
+<!-- REPARATION CELLULAIRE -->
+<!-- ========================================================= -->
+
+<section
+    class="bg-white py-20 dark:bg-gray-950">
+
+    <div
+        class="mx-auto max-w-7xl px-4
+               sm:px-6 lg:px-8">
+
+        <div
+            class="grid items-center gap-12 lg:grid-cols-2">
+
+            <div class="overflow-hidden rounded-3xl">
+
+                <img
+                    src="https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=1400&q=85"
+                    alt="Recherche scientifique et cellules"
+                    class="h-[500px] w-full object-cover">
+
+            </div>
+
+
+            <div>
+
+                <span
+                    class="text-sm font-bold uppercase
+                           tracking-[0.2em] text-green-600
+                           dark:text-green-400">
+
+                    Comprendre la réparation cellulaire
+
+                </span>
+
+                <h2
+                    class="mt-3 text-3xl font-extrabold
+                           sm:text-4xl">
+
+                    Qu'est-ce que la réparation cellulaire ?
+
+                </h2>
+
+                <p
+                    class="mt-6 text-base leading-8
+                           text-gray-600 dark:text-gray-400">
+
+                    Notre organisme possède naturellement des mécanismes
+                    permettant de remplacer certaines cellules
+                    vieillissantes ou endommagées. Cette capacité
+                    varie cependant selon le type de cellule,
+                    le tissu concerné et les conditions biologiques.
+
+                </p>
+
+                <p
+                    class="mt-4 text-base leading-8
+                           text-gray-600 dark:text-gray-400">
+
+                    Les cellules souches sont particulièrement
+                    intéressantes en biologie parce qu'elles peuvent,
+                    selon leur type et leur environnement, produire
+                    différentes cellules spécialisées.
+
+                </p>
 
                 <div
-                        class="flex flex-col gap-3 sm:flex-row">
+                    class="mt-7 rounded-2xl border-l-4
+                           border-green-600 bg-green-50 p-5
+                           dark:bg-green-950/30">
 
-                    <a
-                            routerLink="/bundles"
-                            class="rounded-xl bg-orange-400
-                           px-5 py-3 text-sm font-bold
-                           text-green-950 transition
-                           hover:bg-orange-300">
+                    <p
+                        class="text-sm font-semibold leading-7
+                               text-green-900 dark:text-green-200">
 
-                        Voir les packs
+                        À retenir : « réparation cellulaire » est
+                        avant tout un concept biologique. Un produit
+                        commercial ne doit pas être présenté comme
+                        capable de réparer ou régénérer directement
+                        les cellules humaines sans preuves cliniques
+                        adaptées.
 
-                    </a>
-
-                    <a
-                            routerLink="/companies"
-                            class="rounded-xl border
-                           border-white/30 bg-white/10
-                           px-5 py-3 text-sm font-bold
-                           text-white transition
-                           hover:bg-white/20">
-
-                        Nos entreprises
-
-                    </a>
+                    </p>
 
                 </div>
 
@@ -772,7 +1019,1359 @@
 
         </div>
 
-    </section>
+    </div>
 
+</section>
+
+
+<!-- ========================================================= -->
+<!-- CELLULE SOUCHE ET DIFFERENCIATION -->
+<!-- ========================================================= -->
+
+<section
+    class="bg-green-950 py-20 text-white">
+
+    <div
+        class="mx-auto max-w-7xl px-4
+               sm:px-6 lg:px-8">
+
+        <div class="grid gap-12 lg:grid-cols-2">
+
+            <div>
+
+                <span
+                    class="text-sm font-bold uppercase
+                           tracking-[0.2em] text-orange-300">
+
+                    Cellule souche & différenciation
+
+                </span>
+
+                <h2
+                    class="mt-3 text-3xl font-extrabold
+                           sm:text-4xl">
+
+                    De la cellule souche
+                    à la cellule spécialisée
+
+                </h2>
+
+                <p
+                    class="mt-6 leading-8 text-green-100">
+
+                    Une cellule souche possède une capacité particulière :
+                    selon son type, elle peut se multiplier et donner
+                    naissance à des cellules plus spécialisées.
+
+                </p>
+
+                <div class="mt-8 space-y-5">
+
+                    <div class="flex gap-4">
+
+                        <div
+                            class="flex h-10 w-10 shrink-0
+                                   items-center justify-center
+                                   rounded-full bg-orange-400
+                                   font-bold text-green-950">
+                            1
+                        </div>
+
+                        <div>
+
+                            <h3 class="font-bold">
+                                Cellule souche
+                            </h3>
+
+                            <p class="mt-1 text-sm leading-6 text-green-100">
+                                Une cellule présentant un potentiel
+                                de renouvellement et de différenciation.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="flex gap-4">
+
+                        <div
+                            class="flex h-10 w-10 shrink-0
+                                   items-center justify-center
+                                   rounded-full bg-orange-400
+                                   font-bold text-green-950">
+                            2
+                        </div>
+
+                        <div>
+
+                            <h3 class="font-bold">
+                                Différenciation
+                            </h3>
+
+                            <p class="mt-1 text-sm leading-6 text-green-100">
+                                La cellule acquiert progressivement
+                                des caractéristiques correspondant
+                                à une fonction particulière.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="flex gap-4">
+
+                        <div
+                            class="flex h-10 w-10 shrink-0
+                                   items-center justify-center
+                                   rounded-full bg-orange-400
+                                   font-bold text-green-950">
+                            3
+                        </div>
+
+                        <div>
+
+                            <h3 class="font-bold">
+                                Cellule spécialisée
+                            </h3>
+
+                            <p class="mt-1 text-sm leading-6 text-green-100">
+                                Elle peut alors participer à la formation
+                                ou au fonctionnement d'un tissu spécialisé.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="overflow-hidden rounded-3xl
+                       border border-white/10">
+
+                <img
+                    src="https://images.unsplash.com/photo-1581093458791-9d42e3c7e1f9?auto=format&fit=crop&w=1400&q=85"
+                    alt="Recherche et biologie cellulaire"
+                    class="h-full min-h-[450px] w-full object-cover">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================= -->
+<!-- CELLULE SOUCHE BIOVEGETAL -->
+<!-- ========================================================= -->
+
+<section
+    class="bg-gray-100 py-20 dark:bg-gray-900">
+
+    <div
+        class="mx-auto max-w-7xl px-4
+               sm:px-6 lg:px-8">
+
+        <div
+            class="grid items-center gap-12 lg:grid-cols-2">
+
+            <div class="order-2 lg:order-1">
+
+                <span
+                    class="text-sm font-bold uppercase
+                           tracking-[0.2em] text-green-600">
+
+                    Cellule souche biovégétale
+
+                </span>
+
+                <h2
+                    class="mt-3 text-3xl font-extrabold
+                           sm:text-4xl">
+
+                    Pourquoi s'intéresser aux cellules végétales ?
+
+                </h2>
+
+                <p
+                    class="mt-6 leading-8 text-gray-600
+                           dark:text-gray-400">
+
+                    Les tissus végétaux possèdent leurs propres
+                    cellules méristématiques, capables de se diviser
+                    et de contribuer à la croissance de la plante.
+                    Ces phénomènes constituent un sujet important
+                    de recherche en biologie végétale.
+
+                </p>
+
+                <p
+                    class="mt-4 leading-8 text-gray-600
+                           dark:text-gray-400">
+
+                    Dans l'univers des compléments alimentaires,
+                    certaines entreprises utilisent le concept de
+                    cellules ou d'extraits végétaux comme composante
+                    de leurs formulations. Il est cependant important
+                    de distinguer ce concept biologique des cellules
+                    souches humaines utilisées en recherche médicale.
+
+                </p>
+
+                <a
+                    routerLink="/products"
+                    class="mt-7 inline-flex rounded-xl
+                           bg-green-700 px-6 py-3
+                           text-sm font-bold text-white
+                           transition hover:bg-green-800">
+
+                    Découvrir les produits →
+
+                </a>
+
+            </div>
+
+
+            <div
+                class="order-1 overflow-hidden rounded-3xl
+                       lg:order-2">
+
+                <img
+                    src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1400&q=85"
+                    alt="Monde végétal et ressources naturelles"
+                    class="h-[500px] w-full object-cover">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================= -->
+<!-- PREVENTION -->
+<!-- ========================================================= -->
+
+<section
+    class="bg-white py-20 dark:bg-gray-950">
+
+    <div
+        class="mx-auto max-w-7xl px-4
+               sm:px-6 lg:px-8">
+
+        <div class="mx-auto max-w-3xl text-center">
+
+            <span
+                class="text-sm font-bold uppercase
+                       tracking-[0.2em] text-orange-500">
+
+                Prévention
+
+            </span>
+
+            <h2
+                class="mt-3 text-3xl font-extrabold
+                       sm:text-4xl">
+
+                Comment réduire les facteurs de risque
+                des maladies chroniques et dégénératives ?
+
+            </h2>
+
+            <p
+                class="mt-5 leading-8 text-gray-600
+                       dark:text-gray-400">
+
+                Aucune méthode ne garantit d'empêcher l'apparition
+                d'une maladie. Cependant, plusieurs habitudes de vie
+                sont généralement favorables à la santé et peuvent
+                contribuer à réduire certains facteurs de risque.
+
+            </p>
+
+        </div>
+
+
+        <div
+            class="mt-12 grid gap-5 sm:grid-cols-2
+                   lg:grid-cols-4">
+
+            <div
+                class="rounded-2xl bg-gray-50 p-6
+                       dark:bg-gray-900">
+
+                <div class="text-3xl">🥗</div>
+
+                <h3 class="mt-4 font-extrabold">
+                    Alimentation
+                </h3>
+
+                <p class="mt-2 text-sm leading-6 text-gray-600
+                          dark:text-gray-400">
+
+                    Favoriser une alimentation variée,
+                    équilibrée et adaptée à ses besoins.
+
+                </p>
+
+            </div>
+
+
+            <div
+                class="rounded-2xl bg-gray-50 p-6
+                       dark:bg-gray-900">
+
+                <div class="text-3xl">🏃</div>
+
+                <h3 class="mt-4 font-extrabold">
+                    Activité physique
+                </h3>
+
+                <p class="mt-2 text-sm leading-6 text-gray-600
+                          dark:text-gray-400">
+
+                    Maintenir une activité physique régulière
+                    selon ses capacités.
+
+                </p>
+
+            </div>
+
+
+            <div
+                class="rounded-2xl bg-gray-50 p-6
+                       dark:bg-gray-900">
+
+                <div class="text-3xl">😴</div>
+
+                <h3 class="mt-4 font-extrabold">
+                    Sommeil
+                </h3>
+
+                <p class="mt-2 text-sm leading-6 text-gray-600
+                          dark:text-gray-400">
+
+                    Accorder une place suffisante au repos
+                    et à la récupération.
+
+                </p>
+
+            </div>
+
+
+            <div
+                class="rounded-2xl bg-gray-50 p-6
+                       dark:bg-gray-900">
+
+                <div class="text-3xl">🩺</div>
+
+                <h3 class="mt-4 font-extrabold">
+                    Suivi de santé
+                </h3>
+
+                <p class="mt-2 text-sm leading-6 text-gray-600
+                          dark:text-gray-400">
+
+                    Effectuer les contrôles et dépistages
+                    recommandés selon son âge et sa situation.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================= -->
+<!-- INTERET DES COMPLEMENTS ALIMENTAIRES -->
+<!-- ========================================================= -->
+
+<section
+    class="bg-green-50 py-20 dark:bg-green-950/20">
+
+    <div
+        class="mx-auto max-w-7xl px-4
+               sm:px-6 lg:px-8">
+
+        <div class="mx-auto max-w-3xl text-center">
+
+            <span
+                class="text-sm font-bold uppercase
+                       tracking-[0.2em] text-green-600">
+
+                Compléments alimentaires
+
+            </span>
+
+            <h2
+                class="mt-3 text-3xl font-extrabold
+                       sm:text-4xl">
+
+                Pourquoi certaines personnes choisissent
+                des compléments alimentaires ?
+
+            </h2>
+
+            <p
+                class="mt-5 text-gray-600 dark:text-gray-400">
+
+                Un complément alimentaire peut compléter
+                l'alimentation dans certaines situations.
+                Il ne remplace toutefois ni une alimentation
+                équilibrée, ni un diagnostic ou un traitement médical.
+
+            </p>
+
+        </div>
+
+
+        <div
+            class="mt-12 grid gap-4 md:grid-cols-2">
+
+            <div
+                class="rounded-2xl bg-white p-5 shadow-sm
+                       dark:bg-gray-900">
+
+                <span class="font-bold text-green-700">
+                    01.
+                </span>
+
+                <span class="ml-2">
+                    Compléter certains apports nutritionnels lorsque
+                    l'alimentation seule ne suffit pas.
+                </span>
+
+            </div>
+
+            <div
+                class="rounded-2xl bg-white p-5 shadow-sm
+                       dark:bg-gray-900">
+
+                <span class="font-bold text-green-700">
+                    02.
+                </span>
+
+                <span class="ml-2">
+                    Adapter certains apports à des besoins nutritionnels
+                    particuliers.
+                </span>
+
+            </div>
+
+            <div
+                class="rounded-2xl bg-white p-5 shadow-sm
+                       dark:bg-gray-900">
+
+                <span class="font-bold text-green-700">
+                    03.
+                </span>
+
+                <span class="ml-2">
+                    Accompagner une alimentation déjà équilibrée.
+                </span>
+
+            </div>
+
+            <div
+                class="rounded-2xl bg-white p-5 shadow-sm
+                       dark:bg-gray-900">
+
+                <span class="font-bold text-green-700">
+                    04.
+                </span>
+
+                <span class="ml-2">
+                    Intégrer certains nutriments ou extraits végétaux
+                    à son quotidien.
+                </span>
+
+            </div>
+
+            <div
+                class="rounded-2xl bg-white p-5 shadow-sm
+                       dark:bg-gray-900">
+
+                <span class="font-bold text-green-700">
+                    05.
+                </span>
+
+                <span class="ml-2">
+                    Rechercher une solution pratique pour certains
+                    besoins nutritionnels identifiés.
+                </span>
+
+            </div>
+
+            <div
+                class="rounded-2xl bg-white p-5 shadow-sm
+                       dark:bg-gray-900">
+
+                <span class="font-bold text-green-700">
+                    06.
+                </span>
+
+                <span class="ml-2">
+                    Privilégier une approche globale associant
+                    alimentation et hygiène de vie.
+                </span>
+
+            </div>
+
+            <div
+                class="rounded-2xl bg-white p-5 shadow-sm
+                       dark:bg-gray-900">
+
+                <span class="font-bold text-green-700">
+                    07.
+                </span>
+
+                <span class="ml-2">
+                    Découvrir différentes formulations nutritionnelles
+                    disponibles.
+                </span>
+
+            </div>
+
+            <div
+                class="rounded-2xl bg-white p-5 shadow-sm
+                       dark:bg-gray-900">
+
+                <span class="font-bold text-green-700">
+                    08.
+                </span>
+
+                <span class="ml-2">
+                    Choisir les produits en fonction de leur composition
+                    et de leurs besoins réels.
+                </span>
+
+            </div>
+
+            <div
+                class="rounded-2xl bg-white p-5 shadow-sm
+                       dark:bg-gray-900">
+
+                <span class="font-bold text-green-700">
+                    09.
+                </span>
+
+                <span class="ml-2">
+                    S'informer avant l'achat et privilégier des produits
+                    clairement étiquetés.
+                </span>
+
+            </div>
+
+            <div
+                class="rounded-2xl bg-white p-5 shadow-sm
+                       dark:bg-gray-900">
+
+                <span class="font-bold text-green-700">
+                    10.
+                </span>
+
+                <span class="ml-2">
+                    Demander conseil lorsque l'utilisation d'un
+                    complément soulève une question particulière.
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- PRODUITS MIS EN AVANT -->
+
+        <div
+            class="mt-12 grid gap-6 md:grid-cols-3">
+
+            <a
+                routerLink="/products"
+                class="group overflow-hidden rounded-3xl
+                       bg-white shadow-md
+                       dark:bg-gray-900">
+
+                <div class="h-52 overflow-hidden">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=900&q=85"
+                        alt="Compléments alimentaires"
+                        class="h-full w-full object-cover
+                               transition duration-500
+                               group-hover:scale-105">
+
+                </div>
+
+                <div class="p-6">
+
+                    <h3 class="text-xl font-extrabold">
+                        Nutrition complémentaire
+                    </h3>
+
+                    <p class="mt-2 text-sm text-gray-500">
+                        Découvrir notre sélection →
+                    </p>
+
+                </div>
+
+            </a>
+
+
+            <a
+                routerLink="/products"
+                class="group overflow-hidden rounded-3xl
+                       bg-white shadow-md
+                       dark:bg-gray-900">
+
+                <div class="h-52 overflow-hidden">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=900&q=85"
+                        alt="Plantes et nutrition"
+                        class="h-full w-full object-cover
+                               transition duration-500
+                               group-hover:scale-105">
+
+                </div>
+
+                <div class="p-6">
+
+                    <h3 class="text-xl font-extrabold">
+                        Solutions végétales
+                    </h3>
+
+                    <p class="mt-2 text-sm text-gray-500">
+                        Explorer les produits →
+                    </p>
+
+                </div>
+
+            </a>
+
+
+            <a
+                routerLink="/bundles"
+                class="group overflow-hidden rounded-3xl
+                       bg-white shadow-md
+                       dark:bg-gray-900">
+
+                <div class="h-52 overflow-hidden">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=85"
+                        alt="Alimentation saine et équilibre"
+                        class="h-full w-full object-cover
+                               transition duration-500
+                               group-hover:scale-105">
+
+                </div>
+
+                <div class="p-6">
+
+                    <h3 class="text-xl font-extrabold">
+                        Nos packs
+                    </h3>
+
+                    <p class="mt-2 text-sm text-gray-500">
+                        Découvrir les packs →
+                    </p>
+
+                </div>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================= -->
+<!-- NOS SOLUTIONS -->
+<!-- ========================================================= -->
+
+<section
+    class="bg-white py-20 dark:bg-gray-950">
+
+    <div
+        class="mx-auto max-w-7xl px-4
+               sm:px-6 lg:px-8">
+
+        <div class="text-center">
+
+            <span
+                class="text-sm font-bold uppercase
+                       tracking-[0.2em] text-orange-500">
+
+                Nos solutions
+
+            </span>
+
+            <h2
+                class="mt-3 text-3xl font-extrabold
+                       sm:text-4xl">
+
+                Deux approches complémentaires
+
+            </h2>
+
+        </div>
+
+
+        <div
+            class="mt-12 grid gap-8 md:grid-cols-2">
+
+            <!-- REPARATION CELLULAIRE -->
+
+            <div
+                class="relative overflow-hidden rounded-3xl
+                       bg-green-950 p-8 text-white">
+
+                <div class="relative z-10">
+
+                    <div class="text-4xl">🧬</div>
+
+                    <h3
+                        class="mt-5 text-2xl font-extrabold">
+
+                        Réparation cellulaire
+
+                    </h3>
+
+                    <p
+                        class="mt-4 leading-7 text-green-100">
+
+                        Une rubrique pédagogique consacrée aux cellules,
+                        aux mécanismes de renouvellement, aux cellules
+                        souches et aux recherches portant sur la
+                        régénération des tissus.
+
+                    </p>
+
+                    <p
+                        class="mt-4 text-sm leading-6 text-green-200">
+
+                        Objectif : comprendre les concepts scientifiques
+                        plutôt que présenter des promesses de guérison.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- COMPLEMENTS -->
+
+            <div
+                class="relative overflow-hidden rounded-3xl
+                       bg-orange-50 p-8
+                       dark:bg-orange-950/20">
+
+                <div class="text-4xl">🌿</div>
+
+                <h3
+                    class="mt-5 text-2xl font-extrabold">
+
+                    Compléments alimentaires
+
+                </h3>
+
+                <p
+                    class="mt-4 leading-7 text-gray-600
+                           dark:text-gray-400">
+
+                    Découvrez des produits destinés à compléter
+                    l'alimentation et à accompagner une démarche
+                    globale de bien-être.
+
+                </p>
+
+                <a
+                    routerLink="/products"
+                    class="mt-6 inline-flex rounded-xl
+                           bg-green-700 px-5 py-3
+                           text-sm font-bold text-white
+                           transition hover:bg-green-800">
+
+                    Voir les produits →
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================= -->
+<!-- PRODUITS : LECITHINE / CALCIUM / THE / DETOX -->
+<!-- ========================================================= -->
+
+<section
+    class="bg-gray-100 py-20 dark:bg-gray-900">
+
+    <div
+        class="mx-auto max-w-7xl px-4
+               sm:px-6 lg:px-8">
+
+        <div class="max-w-3xl">
+
+            <span
+                class="text-sm font-bold uppercase
+                       tracking-[0.2em] text-green-600">
+
+                À découvrir
+
+            </span>
+
+            <h2
+                class="mt-3 text-3xl font-extrabold
+                       sm:text-4xl">
+
+                Une sélection pensée autour
+                du bien-être quotidien
+
+            </h2>
+
+        </div>
+
+
+        <div
+            class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+
+            <a
+                routerLink="/products"
+                class="rounded-2xl bg-white p-6 shadow-sm
+                       transition hover:-translate-y-1
+                       hover:shadow-lg dark:bg-gray-950">
+
+                <div class="text-3xl">🧠</div>
+
+                <h3 class="mt-4 font-extrabold">
+                    Lécithine + Calcium
+                </h3>
+
+                <p
+                    class="mt-2 text-sm leading-6
+                           text-gray-500">
+
+                    Découvrez la composition et les informations
+                    disponibles sur ce produit.
+
+                </p>
+
+            </a>
+
+
+            <a
+                routerLink="/products"
+                class="rounded-2xl bg-white p-6 shadow-sm
+                       transition hover:-translate-y-1
+                       hover:shadow-lg dark:bg-gray-950">
+
+                <div class="text-3xl">🍵</div>
+
+                <h3 class="mt-4 font-extrabold">
+                    Thé Équilibre
+                </h3>
+
+                <p
+                    class="mt-2 text-sm leading-6
+                           text-gray-500">
+
+                    Une formule à découvrir dans notre catalogue.
+
+                </p>
+
+            </a>
+
+
+            <a
+                routerLink="/products"
+                class="rounded-2xl bg-white p-6 shadow-sm
+                       transition hover:-translate-y-1
+                       hover:shadow-lg dark:bg-gray-950">
+
+                <div class="text-3xl">🌿</div>
+
+                <h3 class="mt-4 font-extrabold">
+                    Thé Détox
+                </h3>
+
+                <p
+                    class="mt-2 text-sm leading-6
+                           text-gray-500">
+
+                    Consultez la composition, les recommandations
+                    d'utilisation et les informations du produit.
+
+                </p>
+
+            </a>
+
+
+            <a
+                routerLink="/products"
+                class="rounded-2xl bg-white p-6 shadow-sm
+                       transition hover:-translate-y-1
+                       hover:shadow-lg dark:bg-gray-950">
+
+                <div class="text-3xl">🌱</div>
+
+                <h3 class="mt-4 font-extrabold">
+                    Cellule souche biovégétale
+                </h3>
+
+                <p
+                    class="mt-2 text-sm leading-6
+                           text-gray-500">
+
+                    Explorez les produits associés à cette approche
+                    et leurs informations.
+
+                </p>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================= -->
+<!-- ANNONCES / PUBLICITES -->
+<!-- ========================================================= -->
+
+<section
+    class="bg-white py-20 dark:bg-gray-950">
+
+    <div
+        class="mx-auto max-w-7xl px-4
+               sm:px-6 lg:px-8">
+
+        <div
+            class="flex flex-col justify-between gap-4
+                   md:flex-row md:items-end">
+
+            <div>
+
+                <span
+                    class="text-sm font-bold uppercase
+                           tracking-[0.2em] text-orange-500">
+
+                    Actualités
+
+                </span>
+
+                <h2
+                    class="mt-3 text-3xl font-extrabold">
+
+                    Annonces & informations
+
+                </h2>
+
+            </div>
+
+            <a
+                routerLink="/products"
+                class="text-sm font-bold text-green-700
+                       hover:text-green-900
+                       dark:text-green-400">
+
+                Voir le catalogue →
+
+            </a>
+
+        </div>
+
+
+        <div
+            class="mt-10 grid gap-6 md:grid-cols-3">
+
+            <article
+                class="overflow-hidden rounded-3xl
+                       border border-gray-200 bg-white
+                       shadow-sm dark:border-gray-800
+                       dark:bg-gray-900">
+
+                <div class="h-48 overflow-hidden">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=85"
+                        alt="Alimentation équilibrée"
+                        class="h-full w-full object-cover">
+
+                </div>
+
+                <div class="p-6">
+
+                    <span
+                        class="text-xs font-bold uppercase
+                               text-orange-500">
+
+                        Conseil santé
+
+                    </span>
+
+                    <h3
+                        class="mt-2 text-xl font-extrabold">
+
+                        Une alimentation équilibrée
+                        avant tout
+
+                    </h3>
+
+                    <p
+                        class="mt-3 text-sm leading-6 text-gray-500">
+
+                        Les compléments alimentaires viennent
+                        compléter l'alimentation et non la remplacer.
+
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article
+                class="overflow-hidden rounded-3xl
+                       border border-gray-200 bg-white
+                       shadow-sm dark:border-gray-800
+                       dark:bg-gray-900">
+
+                <div class="h-48 overflow-hidden">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=900&q=85"
+                        alt="Consultation et conseil"
+                        class="h-full w-full object-cover">
+
+                </div>
+
+                <div class="p-6">
+
+                    <span
+                        class="text-xs font-bold uppercase
+                               text-orange-500">
+
+                        Consultation
+
+                    </span>
+
+                    <h3
+                        class="mt-2 text-xl font-extrabold">
+
+                        Besoin d'informations ?
+
+                    </h3>
+
+                    <p
+                        class="mt-3 text-sm leading-6 text-gray-500">
+
+                        Échangez avec notre équipe pour obtenir
+                        davantage d'informations sur nos produits.
+
+                    </p>
+
+                    <a
+                        href="https://wa.me/237659147589?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20obtenir%20des%20informations%20sur%20vos%20produits."
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="mt-5 inline-flex font-bold
+                               text-green-700">
+
+                        Contacter sur WhatsApp →
+
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <article
+                class="overflow-hidden rounded-3xl
+                       border border-gray-200 bg-white
+                       shadow-sm dark:border-gray-800
+                       dark:bg-gray-900">
+
+                <div class="h-48 overflow-hidden">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=900&q=85"
+                        alt="Professionnels de santé"
+                        class="h-full w-full object-cover">
+
+                </div>
+
+                <div class="p-6">
+
+                    <span
+                        class="text-xs font-bold uppercase
+                               text-orange-500">
+
+                        Information
+
+                    </span>
+
+                    <h3
+                        class="mt-2 text-xl font-extrabold">
+
+                        Informez-vous avant de choisir
+
+                    </h3>
+
+                    <p
+                        class="mt-3 text-sm leading-6 text-gray-500">
+
+                        Composition, utilisation, précautions :
+                        découvrez les informations disponibles
+                        avant tout achat.
+
+                    </p>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================= -->
+<!-- CTA WHATSAPP -->
+<!-- ========================================================= -->
+
+<section
+    class="border-t border-gray-200 bg-white
+           py-16 dark:border-gray-800 dark:bg-gray-900">
+
+    <div
+        class="mx-auto max-w-7xl px-4
+               sm:px-6 lg:px-8">
+
+        <div
+            class="relative overflow-hidden rounded-3xl
+                   bg-gradient-to-r from-green-900
+                   via-green-800 to-green-600
+                   p-8 text-center sm:p-12">
+
+            <div class="relative z-10">
+
+                <p
+                    class="text-sm font-bold uppercase
+                           tracking-[0.2em] text-orange-300">
+
+                    TES-ICG Santé
+
+                </p>
+
+                <h2
+                    class="mt-3 text-3xl font-extrabold
+                           text-white sm:text-4xl">
+
+                    Vous souhaitez être orienté ?
+
+                </h2>
+
+                <p
+                    class="mx-auto mt-4 max-w-2xl
+                           text-green-50">
+
+                    Posez vos questions sur nos produits,
+                    leurs compositions et les différentes solutions
+                    disponibles.
+
+                </p>
+
+                <a
+                    href="https://wa.me/237659147589?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20une%20consultation%20et%20des%20informations%20sur%20vos%20solutions."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="mt-8 inline-flex items-center
+                           justify-center gap-2 rounded-xl
+                           bg-orange-400 px-7 py-4
+                           text-sm font-extrabold
+                           text-green-950 shadow-xl
+                           transition hover:bg-orange-300">
+
+                    💬 Démarrer une consultation WhatsApp
+
+                </a>
+
+                <p class="mt-4 text-xs text-green-100/70">
+                    +237 6 59 14 75 89
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================= -->
+<!-- FOOTER -->
+<!-- ========================================================= -->
+
+<footer
+    class="bg-green-950 py-12 text-green-100">
+
+    <div
+        class="mx-auto grid max-w-7xl gap-10
+               px-4 sm:px-6 md:grid-cols-4
+               lg:px-8">
+
+        <div>
+
+            <img
+                src="/images/logo/logo-dark.svg"
+                alt="TES-ICG Santé"
+                class="h-12 w-auto">
+
+            <p
+                class="mt-4 text-sm leading-6 text-green-200">
+
+                Une plateforme dédiée à l'information,
+                au bien-être et à la découverte de solutions
+                complémentaires.
+
+            </p>
+
+        </div>
+
+
+        <div>
+
+            <h3 class="font-bold text-white">
+                Navigation
+            </h3>
+
+            <div class="mt-4 space-y-3 text-sm">
+
+                <a
+                    routerLink="/"
+                    class="block hover:text-orange-300">
+                    Accueil
+                </a>
+
+                <a
+                    routerLink="/products"
+                    class="block hover:text-orange-300">
+                    Produits
+                </a>
+
+                <a
+                    routerLink="/bundles"
+                    class="block hover:text-orange-300">
+                    Packs
+                </a>
+
+                <a
+                    routerLink="/companies"
+                    class="block hover:text-orange-300">
+                    Entreprises
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <h3 class="font-bold text-white">
+                Nos thématiques
+            </h3>
+
+            <div class="mt-4 space-y-3 text-sm">
+
+                <p>🧬 Biologie cellulaire</p>
+
+                <p>🌱 Ressources végétales</p>
+
+                <p>🥗 Nutrition</p>
+
+                <p>❤️ Prévention & bien-être</p>
+
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <h3 class="font-bold text-white">
+                Contact
+            </h3>
+
+            <div class="mt-4 space-y-3 text-sm">
+
+                <p>
+                    📍 Douala, Cameroun
+                </p>
+
+                <p>
+                    📞 +237 6 59 14 75 89
+                </p>
+
+                <a
+                    href="https://wa.me/237659147589"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex font-bold
+                           text-orange-300 hover:text-orange-200">
+
+                    💬 WhatsApp
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div
+        class="mx-auto mt-10 max-w-7xl
+               border-t border-green-800 px-4 pt-6
+               text-center text-xs text-green-300
+               sm:px-6 lg:px-8">
+
+        Les informations présentées sur ce site sont destinées
+        à l'information et à l'éducation. Elles ne constituent
+        pas un diagnostic médical et ne remplacent pas l'avis
+        d'un professionnel de santé.
+
+    </div>
+
+</footer>
 
 </div>

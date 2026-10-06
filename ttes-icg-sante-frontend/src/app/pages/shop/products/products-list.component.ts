@@ -8,7 +8,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
-import { Product } from '../../../core/models/product.model';
+import {
+    Product,
+    ProductPage
+} from '../../../core/models/product.model';
+
 import { ProductService } from '../../../core/services/product.service';
 import { CartService } from '../../../core/services/cart.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -44,12 +48,15 @@ export class ProductsListComponent implements OnInit {
     products: Product[] = [];
 
     loading = true;
+
     error = '';
 
     totalElements = 0;
+
     totalPages = 0;
 
     currentPage = 0;
+
     pageSize = 8;
 
 
@@ -138,10 +145,14 @@ export class ProductsListComponent implements OnInit {
     isAdmin(): boolean {
 
         if (!this.isLoggedIn()) {
+
             return false;
+
         }
 
-        return this.authService.hasRole('ROLE_ADMIN');
+        return this.authService.hasRole(
+            'ROLE_ADMIN'
+        );
 
     }
 
@@ -171,7 +182,8 @@ export class ProductsListComponent implements OnInit {
 
     toggleMobileMenu(): void {
 
-        this.mobileMenuOpen = !this.mobileMenuOpen;
+        this.mobileMenuOpen =
+            !this.mobileMenuOpen;
 
     }
 
@@ -193,18 +205,85 @@ export class ProductsListComponent implements OnInit {
 
         this.error = '';
 
+        const keyword =
+            this.searchTerm.trim();
+
+
+        // =====================================================
+        // RECHERCHE + PAGINATION
+        // =====================================================
+
+        if (keyword.length > 0) {
+
+            this.productService
+                .searchProductsPaginated(
+                    keyword,
+                    this.currentPage,
+                    this.pageSize
+                )
+                .subscribe({
+
+                    next: (
+                        response: ProductPage
+                    ) => {
+
+                        this.products =
+                            response?.content ?? [];
+
+                        this.totalElements =
+                            response?.totalElements ?? 0;
+
+                        this.totalPages =
+                            response?.totalPages ?? 0;
+
+                        this.loading = false;
+
+                    },
+
+                    error: (
+                        error: any
+                    ) => {
+
+                        console.error(
+                            'Erreur recherche produits :',
+                            error
+                        );
+
+                        this.products = [];
+
+                        this.totalElements = 0;
+
+                        this.totalPages = 0;
+
+                        this.error =
+                            error?.error?.message ??
+                            'Impossible de rechercher les produits.';
+
+                        this.loading = false;
+
+                    }
+
+                });
+
+            return;
+
+        }
+
+
+        // =====================================================
+        // PRODUITS + PAGINATION
+        // =====================================================
+
         this.productService
-            .getProducts(
+            .getProductsPaginated(
                 this.currentPage,
-                this.pageSize,
-                this.searchTerm,
-                this.selectedCategory ?? undefined,
-                this.selectedCompany ?? undefined,
-                this.selectedTherapeuticArea ?? undefined
+                this.pageSize
             )
             .subscribe({
 
-                next: (response: any) => {
+                next: (
+                    response: ProductPage
+                ) => {
 
                     this.products =
                         response?.content ?? [];
@@ -219,7 +298,9 @@ export class ProductsListComponent implements OnInit {
 
                 },
 
-                error: (error: any) => {
+                error: (
+                    error: any
+                ) => {
 
                     console.error(
                         'Erreur chargement produits :',
@@ -277,6 +358,20 @@ export class ProductsListComponent implements OnInit {
 
         this.currentPage = 0;
 
+        /*
+         * Pour le moment, le ProductService fourni ne possède
+         * pas encore d'endpoint permettant de filtrer par :
+         *
+         * - catégorie
+         * - entreprise
+         * - domaine thérapeutique
+         *
+         * On recharge donc la liste avec la pagination actuelle.
+         *
+         * Les filtres pourront être connectés au backend ensuite
+         * sans modifier le reste du composant.
+         */
+
         this.loadProducts();
 
     }
@@ -306,7 +401,9 @@ export class ProductsListComponent implements OnInit {
     previousPage(): void {
 
         if (this.currentPage <= 0) {
+
             return;
+
         }
 
         this.currentPage--;
@@ -323,8 +420,13 @@ export class ProductsListComponent implements OnInit {
 
     nextPage(): void {
 
-        if (this.currentPage >= this.totalPages - 1) {
+        if (
+            this.currentPage >=
+            this.totalPages - 1
+        ) {
+
             return;
+
         }
 
         this.currentPage++;
@@ -339,14 +441,18 @@ export class ProductsListComponent implements OnInit {
     }
 
 
-    goToPage(page: number): void {
+    goToPage(
+        page: number
+    ): void {
 
         if (
             page < 0 ||
             page >= this.totalPages ||
             page === this.currentPage
         ) {
+
             return;
+
         }
 
         this.currentPage = page;
@@ -363,8 +469,12 @@ export class ProductsListComponent implements OnInit {
 
     getPaginationPages(): number[] {
 
-        if (this.totalPages <= 0) {
+        if (
+            this.totalPages <= 0
+        ) {
+
             return [];
+
         }
 
         const pages: number[] = [];
@@ -375,10 +485,12 @@ export class ProductsListComponent implements OnInit {
             Math.max(
                 0,
                 this.currentPage -
-                Math.floor(maxVisiblePages / 2)
+                Math.floor(
+                    maxVisiblePages / 2
+                )
             );
 
-        let end =
+        const end =
             Math.min(
                 this.totalPages,
                 start + maxVisiblePages
@@ -418,7 +530,9 @@ export class ProductsListComponent implements OnInit {
 
     loadCart(): void {
 
-        if (!this.authService.isLoggedIn()) {
+        if (
+            !this.authService.isLoggedIn()
+        ) {
 
             this.cart = null;
 
@@ -432,7 +546,9 @@ export class ProductsListComponent implements OnInit {
             .getCart()
             .subscribe({
 
-                next: (cart: Cart) => {
+                next: (
+                    cart: Cart
+                ) => {
 
                     this.cart = cart;
 
@@ -440,7 +556,9 @@ export class ProductsListComponent implements OnInit {
 
                 },
 
-                error: (error: unknown) => {
+                error: (
+                    error: unknown
+                ) => {
 
                     console.error(
                         'Erreur chargement panier :',
@@ -460,7 +578,9 @@ export class ProductsListComponent implements OnInit {
 
     updateCartCount(): void {
 
-        if (!this.cart?.items) {
+        if (
+            !this.cart?.items
+        ) {
 
             this.cartCount = 0;
 
@@ -486,7 +606,9 @@ export class ProductsListComponent implements OnInit {
         productId: number
     ): number {
 
-        if (!this.cart?.items) {
+        if (
+            !this.cart?.items
+        ) {
 
             return 0;
 
@@ -516,11 +638,13 @@ export class ProductsListComponent implements OnInit {
         product: Product
     ): void {
 
-        // -----------------------------------------------------
-        // Vérification connexion
-        // -----------------------------------------------------
+        // =====================================================
+        // VÉRIFICATION CONNEXION
+        // =====================================================
 
-        if (!this.authService.isLoggedIn()) {
+        if (
+            !this.authService.isLoggedIn()
+        ) {
 
             this.router.navigate(
                 ['/signin'],
@@ -537,9 +661,9 @@ export class ProductsListComponent implements OnInit {
         }
 
 
-        // -----------------------------------------------------
-        // Vérification stock
-        // -----------------------------------------------------
+        // =====================================================
+        // VÉRIFICATION STOCK
+        // =====================================================
 
         if (
             product.stock === undefined ||
@@ -556,9 +680,9 @@ export class ProductsListComponent implements OnInit {
         }
 
 
-        // -----------------------------------------------------
-        // Éviter les doubles clics
-        // -----------------------------------------------------
+        // =====================================================
+        // ÉVITER LES DOUBLES CLICS
+        // =====================================================
 
         if (
             this.addingProductId ===
@@ -578,9 +702,9 @@ export class ProductsListComponent implements OnInit {
         this.cartError = '';
 
 
-        // -----------------------------------------------------
-        // Ajout au panier
-        // -----------------------------------------------------
+        // =====================================================
+        // AJOUT AU PANIER
+        // =====================================================
 
         this.cartService
             .addItem(
@@ -589,7 +713,9 @@ export class ProductsListComponent implements OnInit {
             )
             .subscribe({
 
-                next: (cart: Cart) => {
+                next: (
+                    cart: Cart
+                ) => {
 
                     this.cart = cart;
 
@@ -605,7 +731,9 @@ export class ProductsListComponent implements OnInit {
 
                 },
 
-                error: (error: any) => {
+                error: (
+                    error: any
+                ) => {
 
                     console.error(
                         'Erreur ajout produit au panier :',
@@ -616,13 +744,12 @@ export class ProductsListComponent implements OnInit {
                         null;
 
 
-                    // -------------------------------------------------
-                    // Session expirée
-                    // -------------------------------------------------
+                    // =========================================
+                    // SESSION EXPIRÉE
+                    // =========================================
 
                     if (
-                        error?.status ===
-                        401
+                        error?.status === 401
                     ) {
 
                         this.authService.logout();
@@ -719,8 +846,7 @@ export class ProductsListComponent implements OnInit {
     // =========================================================
 
     formatPrice(
-        price: number | undefined |
-            null
+        price: number | undefined | null
     ): string {
 
         return (
@@ -736,7 +862,7 @@ export class ProductsListComponent implements OnInit {
 
 
     // =========================================================
-    // RECHERCHE / AFFICHAGE
+    // CATÉGORIES
     // =========================================================
 
     getProductCategories(
@@ -747,6 +873,10 @@ export class ProductsListComponent implements OnInit {
 
     }
 
+
+    // =========================================================
+    // DOMAINES THÉRAPEUTIQUES
+    // =========================================================
 
     getProductTherapeuticAreas(
         product: Product

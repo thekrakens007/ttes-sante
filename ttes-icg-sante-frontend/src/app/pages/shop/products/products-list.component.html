@@ -25,6 +25,7 @@
                 </span>
             </a>
 
+
             <!-- Desktop navigation -->
             <nav class="hidden items-center gap-6 md:flex">
 
@@ -58,14 +59,17 @@
 
             </nav>
 
+
             <!-- Desktop actions -->
             <div class="hidden items-center gap-3 md:flex">
 
+                <!-- Panier -->
                 <a
                     routerLink="/cart"
                     class="relative rounded-lg p-2 text-gray-600 transition hover:bg-gray-100 hover:text-green-600"
                     title="Panier"
                 >
+
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         class="h-6 w-6"
@@ -81,15 +85,21 @@
                         />
                     </svg>
 
+
                     @if (cartCount > 0) {
+
                         <span
                             class="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-green-600 px-1 text-xs font-bold text-white"
                         >
                             {{ cartCount }}
                         </span>
+
                     }
+
                 </a>
 
+
+                <!-- Connexion -->
                 <a
                     routerLink="/signin"
                     class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-green-600 hover:text-green-600"
@@ -97,6 +107,8 @@
                     Connexion
                 </a>
 
+
+                <!-- Inscription -->
                 <a
                     routerLink="/signup"
                     class="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700"
@@ -106,6 +118,7 @@
 
             </div>
 
+
             <!-- Mobile menu button -->
             <button
                 type="button"
@@ -113,7 +126,9 @@
                 (click)="toggleMobileMenu()"
                 aria-label="Ouvrir le menu"
             >
+
                 @if (!mobileMenuOpen) {
+
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         class="h-6 w-6"
@@ -128,7 +143,9 @@
                             d="M4 6h16M4 12h16M4 18h16"
                         />
                     </svg>
+
                 } @else {
+
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         class="h-6 w-6"
@@ -143,15 +160,23 @@
                             d="M6 18L18 6M6 6l12 12"
                         />
                     </svg>
+
                 }
+
             </button>
 
         </div>
     </div>
 
-    <!-- Mobile navigation -->
+
+    <!-- ===================================================== -->
+    <!-- MOBILE NAVIGATION -->
+    <!-- ===================================================== -->
+
     @if (mobileMenuOpen) {
+
         <div class="border-t border-gray-200 bg-white md:hidden">
+
             <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6">
 
                 <nav class="flex flex-col gap-1">
@@ -164,6 +189,7 @@
                         Accueil
                     </a>
 
+
                     <a
                         routerLink="/products"
                         (click)="closeMobileMenu()"
@@ -171,6 +197,7 @@
                     >
                         Produits
                     </a>
+
 
                     <a
                         routerLink="/bundles"
@@ -180,6 +207,7 @@
                         Packs
                     </a>
 
+
                     <a
                         routerLink="/companies"
                         (click)="closeMobileMenu()"
@@ -188,20 +216,31 @@
                         Entreprises
                     </a>
 
+
                     <a
                         routerLink="/cart"
                         (click)="closeMobileMenu()"
                         class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
+
                         Panier
+
                         @if (cartCount > 0) {
-                            <span class="ml-2 rounded-full bg-green-600 px-2 py-0.5 text-xs text-white">
+
+                            <span
+                                class="ml-2 rounded-full bg-green-600 px-2 py-0.5 text-xs text-white"
+                            >
                                 {{ cartCount }}
                             </span>
+
                         }
+
                     </a>
 
-                    <div class="mt-2 grid grid-cols-2 gap-2 border-t border-gray-100 pt-3">
+
+                    <div
+                        class="mt-2 grid grid-cols-2 gap-2 border-t border-gray-100 pt-3"
+                    >
 
                         <a
                             routerLink="/signin"
@@ -210,6 +249,7 @@
                         >
                             Connexion
                         </a>
+
 
                         <a
                             routerLink="/signup"
@@ -224,8 +264,11 @@
                 </nav>
 
             </div>
+
         </div>
+
     }
+
 </header>
 
 
@@ -235,10 +278,15 @@
 
 <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
-    <!-- Page title -->
+
+    <!-- ===================================================== -->
+    <!-- PAGE TITLE -->
+    <!-- ===================================================== -->
+
     <div class="mb-8">
 
         <div class="mb-2 flex flex-wrap items-center gap-2 text-sm text-gray-500">
+
             <a
                 routerLink="/"
                 class="transition hover:text-green-600"
@@ -251,11 +299,16 @@
             <span class="text-gray-700">
                 Produits
             </span>
+
         </div>
 
-        <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+
+        <h1
+            class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
+        >
             Nos produits
         </h1>
+
 
         <p class="mt-2 max-w-2xl text-gray-600">
             Découvrez notre catalogue de produits de santé et trouvez les produits adaptés à vos besoins.
@@ -268,13 +321,16 @@
     <!-- SEARCH + FILTERS -->
     <!-- ===================================================== -->
 
-    <section class="mb-8 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+    <section
+        class="mb-8 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6"
+    >
 
         <!-- Search -->
         <form
             class="mb-5"
             (ngSubmit)="submitSearch()"
         >
+
             <div class="relative">
 
                 <input
@@ -284,6 +340,7 @@
                     placeholder="Rechercher un produit..."
                     class="w-full rounded-xl border border-gray-300 bg-white py-3 pl-11 pr-28 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-100"
                 >
+
 
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -300,6 +357,7 @@
                     />
                 </svg>
 
+
                 <button
                     type="submit"
                     class="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700"
@@ -308,20 +366,25 @@
                 </button>
 
             </div>
+
         </form>
 
 
         <!-- Filters -->
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div
+            class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        >
 
             <!-- Category -->
             <div>
+
                 <label
                     for="category"
                     class="mb-2 block text-sm font-medium text-gray-700"
                 >
                     Catégorie
                 </label>
+
 
                 <select
                     id="category"
@@ -330,27 +393,38 @@
                     (ngModelChange)="onFilterChange()"
                     class="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-700 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100"
                 >
+
                     <option value="">
                         Toutes les catégories
                     </option>
 
-                    @for (category of categories; track category) {
+
+                    @for (
+                        category of categories;
+                        track category
+                    ) {
+
                         <option [value]="category">
                             {{ category }}
                         </option>
+
                     }
+
                 </select>
+
             </div>
 
 
             <!-- Company -->
             <div>
+
                 <label
                     for="company"
                     class="mb-2 block text-sm font-medium text-gray-700"
                 >
                     Entreprise
                 </label>
+
 
                 <select
                     id="company"
@@ -359,27 +433,38 @@
                     (ngModelChange)="onFilterChange()"
                     class="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-700 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100"
                 >
+
                     <option value="">
                         Toutes les entreprises
                     </option>
 
-                    @for (company of companies; track company) {
+
+                    @for (
+                        company of companies;
+                        track company
+                    ) {
+
                         <option [value]="company">
                             {{ company }}
                         </option>
+
                     }
+
                 </select>
+
             </div>
 
 
             <!-- Therapeutic area -->
             <div>
+
                 <label
                     for="therapeuticArea"
                     class="mb-2 block text-sm font-medium text-gray-700"
                 >
                     Domaine thérapeutique
                 </label>
+
 
                 <select
                     id="therapeuticArea"
@@ -388,16 +473,25 @@
                     (ngModelChange)="onFilterChange()"
                     class="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-700 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100"
                 >
+
                     <option value="">
                         Tous les domaines
                     </option>
 
-                    @for (area of therapeuticAreas; track area) {
+
+                    @for (
+                        area of therapeuticAreas;
+                        track area
+                    ) {
+
                         <option [value]="area">
                             {{ area }}
                         </option>
+
                     }
+
                 </select>
+
             </div>
 
 
@@ -425,10 +519,14 @@
 
     @if (!loading && !error) {
 
-        <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div
+            class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+        >
 
             <div>
+
                 <p class="text-sm text-gray-600">
+
                     <span class="font-semibold text-gray-900">
                         {{ filteredProducts.length }}
                     </span>
@@ -436,15 +534,23 @@
                     produit(s) affiché(s)
 
                     @if (totalElements > 0) {
+
                         <span>
+
                             sur
+
                             <span class="font-semibold text-gray-900">
                                 {{ totalElements }}
                             </span>
+
                         </span>
+
                     }
+
                 </p>
+
             </div>
+
 
             @if (
                 selectedCategory ||
@@ -452,6 +558,7 @@
                 selectedTherapeuticArea ||
                 searchTerm
             ) {
+
                 <button
                     type="button"
                     (click)="resetFilters()"
@@ -459,7 +566,76 @@
                 >
                     Effacer les filtres
                 </button>
+
             }
+
+        </div>
+
+    }
+
+
+    <!-- ===================================================== -->
+    <!-- SUCCESS / CART MESSAGE -->
+    <!-- ===================================================== -->
+
+    @if (cartMessage) {
+
+        <div
+            class="mb-6 flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700"
+        >
+
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m5 12 4 4L19 6"
+                />
+            </svg>
+
+            <span>
+                {{ cartMessage }}
+            </span>
+
+        </div>
+
+    }
+
+
+    <!-- ===================================================== -->
+    <!-- CART ERROR -->
+    <!-- ===================================================== -->
+
+    @if (cartError) {
+
+        <div
+            class="mb-6 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v3.5m0 3h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"
+                />
+            </svg>
+
+            <span>
+                {{ cartError }}
+            </span>
 
         </div>
 
@@ -472,25 +648,45 @@
 
     @if (loading) {
 
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div
+            class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        >
 
-            @for (item of [1, 2, 3, 4, 5, 6, 7, 8]; track item) {
+            @for (
+                item of [1, 2, 3, 4, 5, 6, 7, 8];
+                track item
+            ) {
 
-                <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+                <div
+                    class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
+                >
 
-                    <div class="h-56 animate-pulse bg-gray-200"></div>
+                    <div
+                        class="h-56 animate-pulse bg-gray-200"
+                    ></div>
+
 
                     <div class="space-y-3 p-5">
 
-                        <div class="h-4 w-1/3 animate-pulse rounded bg-gray-200"></div>
+                        <div
+                            class="h-4 w-1/3 animate-pulse rounded bg-gray-200"
+                        ></div>
 
-                        <div class="h-6 w-4/5 animate-pulse rounded bg-gray-200"></div>
+                        <div
+                            class="h-6 w-4/5 animate-pulse rounded bg-gray-200"
+                        ></div>
 
-                        <div class="h-4 w-full animate-pulse rounded bg-gray-200"></div>
+                        <div
+                            class="h-4 w-full animate-pulse rounded bg-gray-200"
+                        ></div>
 
-                        <div class="h-4 w-3/4 animate-pulse rounded bg-gray-200"></div>
+                        <div
+                            class="h-4 w-3/4 animate-pulse rounded bg-gray-200"
+                        ></div>
 
-                        <div class="mt-5 h-10 w-full animate-pulse rounded-lg bg-gray-200"></div>
+                        <div
+                            class="mt-5 h-10 w-full animate-pulse rounded-lg bg-gray-200"
+                        ></div>
 
                     </div>
 
@@ -509,9 +705,13 @@
 
     @if (!loading && error) {
 
-        <div class="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
+        <div
+            class="rounded-2xl border border-red-200 bg-red-50 p-8 text-center"
+        >
 
-            <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+            <div
+                class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100"
+            >
 
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -530,13 +730,16 @@
 
             </div>
 
+
             <h2 class="text-lg font-semibold text-red-900">
                 Une erreur est survenue
             </h2>
 
+
             <p class="mt-2 text-sm text-red-700">
                 {{ error }}
             </p>
+
 
             <button
                 type="button"
@@ -561,9 +764,13 @@
         filteredProducts.length === 0
     ) {
 
-        <div class="rounded-2xl border border-gray-200 bg-white p-10 text-center shadow-sm">
+        <div
+            class="rounded-2xl border border-gray-200 bg-white p-10 text-center shadow-sm"
+        >
 
-            <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+            <div
+                class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100"
+            >
 
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -582,13 +789,16 @@
 
             </div>
 
+
             <h2 class="text-xl font-semibold text-gray-900">
                 Aucun produit trouvé
             </h2>
 
+
             <p class="mx-auto mt-2 max-w-md text-sm text-gray-500">
                 Aucun produit ne correspond aux critères de recherche ou aux filtres sélectionnés.
             </p>
+
 
             <button
                 type="button"
@@ -613,7 +823,9 @@
         filteredProducts.length > 0
     ) {
 
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div
+            class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        >
 
             @for (
                 product of filteredProducts;
@@ -626,7 +838,10 @@
 
                     <!-- Product image -->
                     <a
-                        [routerLink]="['/products', product.id]"
+                        [routerLink]="[
+                            '/products',
+                            product.id
+                        ]"
                         class="relative block overflow-hidden bg-gray-100"
                     >
 
@@ -679,6 +894,7 @@
 
                         }
 
+
                         <!-- Stock badge -->
                         @if (product.stock <= 0) {
 
@@ -702,12 +918,16 @@
 
 
                     <!-- Product content -->
-                    <div class="flex flex-1 flex-col p-5">
+                    <div
+                        class="flex flex-1 flex-col p-5"
+                    >
 
                         <!-- Company -->
                         @if (product.companyName) {
 
-                            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-green-600">
+                            <p
+                                class="mb-2 text-xs font-semibold uppercase tracking-wide text-green-600"
+                            >
                                 {{ product.companyName }}
                             </p>
 
@@ -716,7 +936,10 @@
 
                         <!-- Name -->
                         <a
-                            [routerLink]="['/products', product.id]"
+                            [routerLink]="[
+                                '/products',
+                                product.id
+                            ]"
                             class="line-clamp-2 text-lg font-bold text-gray-900 transition hover:text-green-600"
                         >
                             {{ product.name }}
@@ -739,7 +962,9 @@
                             product.categories.length > 0
                         ) {
 
-                            <div class="mt-3 flex flex-wrap gap-1.5">
+                            <div
+                                class="mt-3 flex flex-wrap gap-1.5"
+                            >
 
                                 @for (
                                     category of product.categories.slice(0, 2);
@@ -754,7 +979,10 @@
 
                                 }
 
-                                @if (product.categories.length > 2) {
+
+                                @if (
+                                    product.categories.length > 2
+                                ) {
 
                                     <span
                                         class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600"
@@ -772,7 +1000,9 @@
                         <!-- Description -->
                         @if (product.description) {
 
-                            <p class="mt-3 line-clamp-3 text-sm leading-6 text-gray-600">
+                            <p
+                                class="mt-3 line-clamp-3 text-sm leading-6 text-gray-600"
+                            >
                                 {{ product.description }}
                             </p>
 
@@ -787,11 +1017,16 @@
 
                             <div class="mt-3">
 
-                                <p class="mb-1 text-xs font-semibold text-gray-500">
+                                <p
+                                    class="mb-1 text-xs font-semibold text-gray-500"
+                                >
                                     Domaine thérapeutique
                                 </p>
 
-                                <div class="flex flex-wrap gap-1">
+
+                                <div
+                                    class="flex flex-wrap gap-1"
+                                >
 
                                     @for (
                                         area of product.therapeuticAreas.slice(0, 2);
@@ -813,10 +1048,16 @@
                         }
 
 
-                        <!-- Bottom -->
+                        <!-- ================================================= -->
+                        <!-- BOTTOM -->
+                        <!-- ================================================= -->
+
                         <div class="mt-auto pt-5">
 
-                            <div class="mb-4 flex items-end justify-between gap-3">
+                            <!-- Prix + stock -->
+                            <div
+                                class="mb-4 flex items-end justify-between gap-3"
+                            >
 
                                 <div>
 
@@ -824,21 +1065,32 @@
                                         Prix
                                     </p>
 
-                                    <p class="text-xl font-bold text-green-700">
-                                        {{ product.price | number:'1.0-0' }} FCFA
+                                    <p
+                                        class="text-xl font-bold text-green-700"
+                                    >
+                                        {{
+                                            product.price
+                                                | number:'1.0-0'
+                                        }}
+                                        FCFA
                                     </p>
 
                                 </div>
 
+
                                 @if (product.stock > 0) {
 
-                                    <span class="text-xs font-medium text-green-600">
+                                    <span
+                                        class="text-xs font-medium text-green-600"
+                                    >
                                         En stock
                                     </span>
 
                                 } @else {
 
-                                    <span class="text-xs font-medium text-red-600">
+                                    <span
+                                        class="text-xs font-medium text-red-600"
+                                    >
                                         Indisponible
                                     </span>
 
@@ -847,11 +1099,225 @@
                             </div>
 
 
-                            <!-- Details button -->
-                            <a
-                                [routerLink]="['/products', product.id]"
-                                class="flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-green-700"
+                            <!-- ================================================= -->
+                            <!-- QUANTITÉ DANS LE PANIER -->
+                            <!-- ================================================= -->
+
+                            @if (
+                                getProductCartQuantity(product.id) > 0
+                            ) {
+
+                                <div
+                                    class="mb-3 flex items-center justify-center gap-2 rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700"
+                                >
+
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-4 w-4 shrink-0"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 5h13m-2-5v5m-7-5v5"
+                                        />
+                                    </svg>
+
+
+                                    <span>
+
+                                        <span class="font-bold">
+                                            {{
+                                                getProductCartQuantity(
+                                                    product.id
+                                                )
+                                            }}
+                                        </span>
+
+
+                                        {{
+                                            getProductCartQuantity(
+                                                product.id
+                                            ) > 1
+                                                ? 'unités'
+                                                : 'unité'
+                                        }}
+
+                                        dans le panier
+
+                                    </span>
+
+                                </div>
+
+                            }
+
+
+                            <!-- ================================================= -->
+                            <!-- AJOUTER + PANIER -->
+                            <!-- ================================================= -->
+
+                            <div
+                                class="grid grid-cols-2 gap-2"
                             >
+
+                                <!-- Ajouter au panier -->
+                                <button
+                                    type="button"
+                                    (click)="addToCart(product)"
+                                    [disabled]="
+                                        product.stock <= 0 ||
+                                        addingToCartId === product.id
+                                    "
+                                    class="flex items-center justify-center gap-1.5 rounded-xl bg-green-600 px-3 py-3 text-xs font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-300 sm:text-sm"
+                                >
+
+                                    @if (
+                                        addingToCartId === product.id
+                                    ) {
+
+                                        <svg
+                                            class="h-4 w-4 animate-spin"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle
+                                                class="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                stroke-width="4"
+                                            ></circle>
+
+                                            <path
+                                                class="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                            ></path>
+                                        </svg>
+
+
+                                        <span>
+                                            Ajout...
+                                        </span>
+
+                                    } @else {
+
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            class="h-4 w-4 shrink-0"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M12 4v16m8-8H4"
+                                            />
+                                        </svg>
+
+
+                                        <span>
+                                            Ajouter
+                                        </span>
+
+
+                                        <!-- Quantité du produit -->
+                                        @if (
+                                            getProductCartQuantity(
+                                                product.id
+                                            ) > 0
+                                        ) {
+
+                                            <span
+                                                class="flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1.5 text-xs font-bold text-green-700"
+                                            >
+                                                {{
+                                                    getProductCartQuantity(
+                                                        product.id
+                                                    )
+                                                }}
+                                            </span>
+
+                                        }
+
+                                    }
+
+                                </button>
+
+
+                                <!-- ================================================= -->
+                                <!-- VOIR LE PANIER -->
+                                <!-- ================================================= -->
+
+                                <a
+                                    routerLink="/cart"
+                                    class="flex items-center justify-center gap-1.5 rounded-xl border border-green-600 bg-white px-3 py-3 text-xs font-semibold text-green-700 transition hover:bg-green-50 sm:text-sm"
+                                >
+
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-4 w-4 shrink-0"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 5h13m-2-5v5m-7-5v5"
+                                        />
+                                    </svg>
+
+
+                                    <span>
+                                        Panier
+                                    </span>
+
+
+                                    <!-- Quantité de ce produit -->
+                                    @if (
+                                        getProductCartQuantity(
+                                            product.id
+                                        ) > 0
+                                    ) {
+
+                                        <span
+                                            class="flex h-5 min-w-5 items-center justify-center rounded-full bg-green-600 px-1.5 text-xs font-bold text-white"
+                                        >
+                                            {{
+                                                getProductCartQuantity(
+                                                    product.id
+                                                )
+                                            }}
+                                        </span>
+
+                                    }
+
+                                </a>
+
+                            </div>
+
+
+                            <!-- ================================================= -->
+                            <!-- VOIR LE PRODUIT -->
+                            <!-- ================================================= -->
+
+                            <a
+                                [routerLink]="[
+                                    '/products',
+                                    product.id
+                                ]"
+                                class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:border-green-500 hover:bg-green-50 hover:text-green-700"
+                            >
+
                                 Voir le produit
 
                                 <svg
@@ -868,6 +1334,7 @@
                                         d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
                                     />
                                 </svg>
+
                             </a>
 
                         </div>
@@ -895,7 +1362,9 @@
 
         <div class="mt-10">
 
-            <div class="flex flex-wrap items-center justify-center gap-2">
+            <div
+                class="flex flex-wrap items-center justify-center gap-2"
+            >
 
                 <!-- Previous -->
                 <button
@@ -904,6 +1373,7 @@
                     [disabled]="currentPage === 0"
                     class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-green-500 hover:bg-green-50 hover:text-green-700 disabled:cursor-not-allowed disabled:opacity-40"
                 >
+
                     <span class="hidden sm:inline">
                         ← Précédent
                     </span>
@@ -911,6 +1381,7 @@
                     <span class="sm:hidden">
                         ←
                     </span>
+
                 </button>
 
 
@@ -920,7 +1391,9 @@
                     track $index
                 ) {
 
-                    @if (page.type === 'ellipsis') {
+                    @if (
+                        page.type === 'ellipsis'
+                    ) {
 
                         <span
                             class="flex h-10 min-w-10 items-center justify-center px-1 text-sm font-semibold text-gray-500"
@@ -933,12 +1406,24 @@
                         <button
                             type="button"
                             (click)="goToPage(page.value!)"
-                            [class.bg-green-600]="page.value === currentPage"
-                            [class.text-white]="page.value === currentPage"
-                            [class.border-green-600]="page.value === currentPage"
-                            [class.bg-white]="page.value !== currentPage"
-                            [class.text-gray-700]="page.value !== currentPage"
-                            [class.border-gray-300]="page.value !== currentPage"
+                            [class.bg-green-600]="
+                                page.value === currentPage
+                            "
+                            [class.text-white]="
+                                page.value === currentPage
+                            "
+                            [class.border-green-600]="
+                                page.value === currentPage
+                            "
+                            [class.bg-white]="
+                                page.value !== currentPage
+                            "
+                            [class.text-gray-700]="
+                                page.value !== currentPage
+                            "
+                            [class.border-gray-300]="
+                                page.value !== currentPage
+                            "
                             class="flex h-10 min-w-10 items-center justify-center rounded-lg border px-3 text-sm font-semibold transition hover:border-green-500 hover:bg-green-50 hover:text-green-700"
                         >
                             {{ page.value! + 1 }}
@@ -953,9 +1438,12 @@
                 <button
                     type="button"
                     (click)="nextPage()"
-                    [disabled]="currentPage === totalPages - 1"
+                    [disabled]="
+                        currentPage >= totalPages - 1
+                    "
                     class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-green-500 hover:bg-green-50 hover:text-green-700 disabled:cursor-not-allowed disabled:opacity-40"
                 >
+
                     <span class="hidden sm:inline">
                         Suivant →
                     </span>
@@ -963,15 +1451,19 @@
                     <span class="sm:hidden">
                         →
                     </span>
+
                 </button>
 
             </div>
 
 
             <!-- Pagination information -->
-            <p class="mt-4 text-center text-sm text-gray-500">
+            <p
+                class="mt-4 text-center text-sm text-gray-500"
+            >
 
                 Page
+
                 <span class="font-semibold text-gray-800">
                     {{ currentPage + 1 }}
                 </span>
@@ -982,12 +1474,15 @@
                     {{ totalPages }}
                 </span>
 
+
                 @if (totalElements > 0) {
 
                     <span>
+
                         ·
                         {{ totalElements }}
                         produit(s)
+
                     </span>
 
                 }
@@ -999,6 +1494,5 @@
     }
 
 </main>
-
 
 </div>

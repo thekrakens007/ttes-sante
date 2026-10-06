@@ -738,151 +738,106 @@ export class ProductsListComponent implements OnInit {
     /* PANIER : AJOUTER UN PRODUIT */
     /* ===================================================== */
 
-    addToCart(
-        product: Product
-    ): void {
+    ```typescript
+addToCart(product: Product): void {
 
-        /* --------------------------------------------- */
-        /* Vérifier connexion */
-        /* --------------------------------------------- */
+    /*
+     * Si l'utilisateur n'est pas connecté,
+     * on le redirige directement vers la page de connexion.
+     */
+    if (!this.authService.isLoggedIn()) {
 
-        if (
-            !this.authService.isLoggedIn()
-        ) {
+        this.router.navigate(['/signin']);
 
-            this.cartError =
-                'Connectez-vous pour ajouter un produit au panier.';
-
-
-            this.cartMessage = '';
+        return;
+    }
 
 
-            setTimeout(() => {
+    /*
+     * Vérifier le stock.
+     */
+    if (product.stock <= 0) {
 
-                this.cartError = '';
-
-            }, 4000);
-
-
-            return;
-        }
-
-
-        /* --------------------------------------------- */
-        /* Vérifier le stock */
-        /* --------------------------------------------- */
-
-        if (
-            product.stock <= 0
-        ) {
-
-            this.cartError =
-                'Ce produit est actuellement en rupture de stock.';
-
-
-            this.cartMessage = '';
-
-
-            setTimeout(() => {
-
-                this.cartError = '';
-
-            }, 4000);
-
-
-            return;
-        }
-
-
-        /* --------------------------------------------- */
-        /* Empêcher les doubles clics */
-        /* --------------------------------------------- */
-
-        if (
-            this.addingToCartId !== null
-        ) {
-            return;
-        }
-
-
-        this.addingToCartId =
-            product.id;
-
+        this.cartError =
+            'Ce produit est actuellement en rupture de stock.';
 
         this.cartMessage = '';
 
-        this.cartError = '';
+        setTimeout(() => {
+            this.cartError = '';
+        }, 4000);
 
-
-        /* --------------------------------------------- */
-        /* Ajouter le produit */
-        /* --------------------------------------------- */
-
-        this.cartService
-            .addItem(
-                product.id,
-                1
-            )
-            .subscribe({
-
-                /*
-                 * Le backend renvoie
-                 * le panier mis à jour.
-                 */
-                next: (
-                    cart: Cart
-                ) => {
-
-                    this.cart =
-                        cart;
-
-
-                    this.updateCartCount();
-
-
-                    this.cartMessage =
-                        `${product.name} a été ajouté au panier.`;
-
-
-                    this.addingToCartId =
-                        null;
-
-
-                    setTimeout(() => {
-
-                        this.cartMessage = '';
-
-                    }, 3000);
-                },
-
-
-                error: (
-                    err: unknown
-                ) => {
-
-                    console.error(
-                        'Erreur ajout au panier :',
-                        err
-                    );
-
-
-                    this.cartError =
-                        'Impossible d’ajouter ce produit au panier.';
-
-
-                    this.addingToCartId =
-                        null;
-
-
-                    setTimeout(() => {
-
-                        this.cartError = '';
-
-                    }, 4000);
-                }
-            });
+        return;
     }
 
+
+    /*
+     * Empêcher plusieurs clics simultanés.
+     */
+    if (this.addingToCartId !== null) {
+        return;
+    }
+
+
+    this.addingToCartId = product.id;
+
+    this.cartMessage = '';
+    this.cartError = '';
+
+
+    /*
+     * Ajouter le produit au panier.
+     */
+    this.cartService
+        .addItem(product.id, 1)
+        .subscribe({
+
+            next: (cart: Cart) => {
+
+                /*
+                 * Le backend renvoie le panier
+                 * mis à jour.
+                 */
+                this.cart = cart;
+
+                this.updateCartCount();
+
+
+                this.cartMessage =
+                    `${product.name} a été ajouté au panier.`;
+
+
+                this.addingToCartId = null;
+
+
+                setTimeout(() => {
+                    this.cartMessage = '';
+                }, 3000);
+            },
+
+
+            error: (err: unknown) => {
+
+                console.error(
+                    'Erreur ajout au panier :',
+                    err
+                );
+
+
+                this.cartError =
+                    'Impossible d’ajouter ce produit au panier.';
+
+
+                this.addingToCartId = null;
+
+
+                setTimeout(() => {
+                    this.cartError = '';
+                }, 4000);
+            }
+        });
+}
+```
 
     /* ===================================================== */
     /* MENU MOBILE */

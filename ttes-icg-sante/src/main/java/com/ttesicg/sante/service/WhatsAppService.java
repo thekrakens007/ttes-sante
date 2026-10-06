@@ -17,7 +17,7 @@ public class WhatsAppService {
      * format international sans +
      * Exemple Cameroun : 237691085447
      */
-    private final String ADMIN_NUMBER = "237691085447";
+    private final String ADMIN_NUMBER = "237659147589";
 
 
     // ==========================================================

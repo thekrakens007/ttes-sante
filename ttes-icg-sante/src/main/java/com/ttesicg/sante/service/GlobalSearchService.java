@@ -37,8 +37,20 @@ public class GlobalSearchService {
             int size
     ) {
 
+        /*
+         * Normalisation de la recherche.
+         *
+         * Exemples :
+         *
+         * "Médicaments" -> "medicaments"
+         * "Médicament"  -> "medicament"
+         * "MEDICAMENT"  -> "medicament"
+         * "Medic"       -> "medic"
+         * "Me"          -> "me"
+         * "M"           -> "m"
+         */
         String normalizedKeyword =
-                normalizeText(keyword);
+                normalize(keyword);
 
 
         // =====================================================
@@ -66,11 +78,16 @@ public class GlobalSearchService {
 
 
         // =====================================================
-        // 1. TOUS LES PACKS ACTIFS
+        // 1. RÉCUPÉRER TOUS LES PACKS ACTIFS
         // =====================================================
 
         List<BundleResponse> allBundles =
                 productBundleService.findAllActive();
+
+
+        if (allBundles == null) {
+            allBundles = List.of();
+        }
 
 
         // =====================================================
@@ -78,10 +95,12 @@ public class GlobalSearchService {
         // =====================================================
 
         /*
-         * On récupère tous les produits correspondants.
+         * IMPORTANT :
          *
-         * Cela permet ensuite de retrouver tous les packs
-         * contenant ces produits.
+         * On ne limite pas la recherche à 8 produits.
+         *
+         * Cela permet de retrouver un produit même s'il se
+         * trouve très loin dans les résultats.
          */
         Pageable pageable =
                 Pageable.unpaged(
@@ -92,9 +111,23 @@ public class GlobalSearchService {
                 );
 
 
+        /*
+         * Attention :
+         *
+         * Le repository utilise actuellement LIKE/LOWER.
+         * La suppression des accents est donc gérée ici
+         * principalement pour les recherches effectuées
+         * dans les réponses des packs.
+         *
+         * Pour la recherche SQL "Médicament" -> "Medicament",
+         * nous verrons ensuite la version PostgreSQL avec
+         * unaccent si nécessaire.
+         */
         productService
                 .searchAvailableProductsPaginated(
-                        keyword.trim(),
+                        keyword == null
+                                ? ""
+                                : keyword.trim(),
                         pageable
                 )
                 .getContent()
@@ -115,7 +148,7 @@ public class GlobalSearchService {
 
 
         // =====================================================
-        // 3. RECHERCHE DANS LES PACKS
+        // 3. PARCOURIR LES PACKS
         // =====================================================
 
         for (BundleResponse bundle : allBundles) {
@@ -143,7 +176,7 @@ public class GlobalSearchService {
             if (bundleMatches) {
 
                 /*
-                 * Le pack correspond.
+                 * Le pack lui-même apparaît.
                  */
                 bundles.put(
                         bundle.id(),
@@ -152,8 +185,7 @@ public class GlobalSearchService {
 
 
                 /*
-                 * Tous les produits du pack sont également
-                 * retournés.
+                 * Tous les produits du pack apparaissent.
                  */
                 addProductsFromBundle(
                         bundle,
@@ -178,6 +210,10 @@ public class GlobalSearchService {
                 }
 
 
+                /*
+                 * Le produit contenu dans le pack correspond
+                 * à la recherche.
+                 */
                 if (
                         matchesBundleProduct(
                                 item,
@@ -186,7 +222,7 @@ public class GlobalSearchService {
                 ) {
 
                     /*
-                     * Le pack contenant le produit apparaît.
+                     * Le pack contenant ce produit apparaît.
                      */
                     bundles.put(
                             bundle.id(),
@@ -195,7 +231,7 @@ public class GlobalSearchService {
 
 
                     /*
-                     * Le produit apparaît également.
+                     * Le produit correspondant apparaît.
                      */
                     addProductFromBundleItem(
                             item,
@@ -207,20 +243,23 @@ public class GlobalSearchService {
 
 
         // =====================================================
-        // 4. PRODUIT → PACKS
+        // 4. RETROUVER LES PACKS DES PRODUITS TROUVÉS
         // =====================================================
 
         /*
          * Exemple :
          *
-         * Recherche : "Sanofi"
+         * Recherche :
          *
-         * Les produits de Sanofi sont trouvés.
+         *     "medic"
          *
-         * On cherche ensuite tous les packs contenant
-         * ces produits.
+         * Produit trouvé :
+         *
+         *     Médicament X
+         *
+         * Si un pack contient ce produit,
+         * le pack est également retourné.
          */
-
         for (ProductResponse product : products.values()) {
 
             if (
@@ -267,7 +306,7 @@ public class GlobalSearchService {
 
 
         // =====================================================
-        // 5. RETOUR
+        // 5. RETOUR FINAL
         // =====================================================
 
         return new GlobalSearchResponse(
@@ -296,7 +335,7 @@ public class GlobalSearchService {
         // -----------------------------------------------------
 
         if (
-                containsIgnoreCaseAndAccent(
+                containsIgnoreCase(
                         bundle.name(),
                         keyword
                 )
@@ -311,7 +350,7 @@ public class GlobalSearchService {
         // -----------------------------------------------------
 
         if (
-                containsIgnoreCaseAndAccent(
+                containsIgnoreCase(
                         bundle.description(),
                         keyword
                 )
@@ -326,7 +365,7 @@ public class GlobalSearchService {
 
 
     // =========================================================
-    // VÉRIFIER UN PRODUIT CONTENU DANS UN PACK
+    // VÉRIFIER SI UN PRODUIT DU PACK CORRESPOND
     // =========================================================
 
     private boolean matchesBundleProduct(
@@ -344,11 +383,12 @@ public class GlobalSearchService {
         // -----------------------------------------------------
 
         if (
-                containsIgnoreCaseAndAccent(
+                containsIgnoreCase(
                         item.productName(),
                         keyword
                 )
         ) {
+
             return true;
         }
 
@@ -358,11 +398,12 @@ public class GlobalSearchService {
         // -----------------------------------------------------
 
         if (
-                containsIgnoreCaseAndAccent(
+                containsIgnoreCase(
                         item.sku(),
                         keyword
                 )
         ) {
+
             return true;
         }
 
@@ -372,11 +413,12 @@ public class GlobalSearchService {
         // -----------------------------------------------------
 
         if (
-                containsIgnoreCaseAndAccent(
+                containsIgnoreCase(
                         item.description(),
                         keyword
                 )
         ) {
+
             return true;
         }
 
@@ -386,11 +428,12 @@ public class GlobalSearchService {
         // -----------------------------------------------------
 
         if (
-                containsIgnoreCaseAndAccent(
+                containsIgnoreCase(
                         item.brand(),
                         keyword
                 )
         ) {
+
             return true;
         }
 
@@ -400,11 +443,12 @@ public class GlobalSearchService {
         // -----------------------------------------------------
 
         if (
-                containsIgnoreCaseAndAccent(
+                containsIgnoreCase(
                         item.activeIngredient(),
                         keyword
                 )
         ) {
+
             return true;
         }
 
@@ -414,11 +458,12 @@ public class GlobalSearchService {
         // -----------------------------------------------------
 
         if (
-                containsIgnoreCaseAndAccent(
+                containsIgnoreCase(
                         item.dosage(),
                         keyword
                 )
         ) {
+
             return true;
         }
 
@@ -428,11 +473,12 @@ public class GlobalSearchService {
         // -----------------------------------------------------
 
         if (
-                containsIgnoreCaseAndAccent(
+                containsIgnoreCase(
                         item.form(),
                         keyword
                 )
         ) {
+
             return true;
         }
 
@@ -442,11 +488,12 @@ public class GlobalSearchService {
         // -----------------------------------------------------
 
         if (
-                containsIgnoreCaseAndAccent(
+                containsIgnoreCase(
                         item.ingredients(),
                         keyword
                 )
         ) {
+
             return true;
         }
 
@@ -456,11 +503,12 @@ public class GlobalSearchService {
         // -----------------------------------------------------
 
         if (
-                containsIgnoreCaseAndAccent(
+                containsIgnoreCase(
                         item.companyName(),
                         keyword
                 )
         ) {
+
             return true;
         }
 
@@ -477,7 +525,7 @@ public class GlobalSearchService {
                         .filter(Objects::nonNull)
                         .anyMatch(
                                 category ->
-                                        containsIgnoreCaseAndAccent(
+                                        containsIgnoreCase(
                                                 category,
                                                 keyword
                                         )
@@ -500,7 +548,7 @@ public class GlobalSearchService {
                         .filter(Objects::nonNull)
                         .anyMatch(
                                 area ->
-                                        containsIgnoreCaseAndAccent(
+                                        containsIgnoreCase(
                                                 area,
                                                 keyword
                                         )
@@ -516,7 +564,7 @@ public class GlobalSearchService {
 
 
     // =========================================================
-    // AJOUTER TOUS LES PRODUITS DU PACK
+    // AJOUTER TOUS LES PRODUITS D'UN PACK
     // =========================================================
 
     private void addProductsFromBundle(
@@ -544,7 +592,7 @@ public class GlobalSearchService {
 
 
     // =========================================================
-    // AJOUTER UN PRODUIT
+    // AJOUTER UN PRODUIT D'UN PACK
     // =========================================================
 
     private void addProductFromBundleItem(
@@ -561,6 +609,10 @@ public class GlobalSearchService {
         }
 
 
+        /*
+         * Si le produit est déjà présent,
+         * on ne refait pas la requête.
+         */
         if (
                 products.containsKey(
                         item.productId()
@@ -593,52 +645,70 @@ public class GlobalSearchService {
         } catch (Exception exception) {
 
             /*
-             * On ignore un produit supprimé ou indisponible
-             * sans bloquer toute la recherche.
+             * Le produit peut avoir été supprimé ou
+             * être devenu indisponible.
+             *
+             * On ne bloque pas la recherche globale.
              */
         }
     }
 
 
     // =========================================================
-    // NORMALISATION DU TEXTE
+    // NORMALISATION
     // =========================================================
 
     /**
-     * Transforme par exemple :
+     * Normalise une chaîne pour la recherche.
+     *
+     * Exemples :
      *
      * Médicaments -> medicaments
-     * MÉDICAMENTS -> medicaments
-     * médicament  -> medicament
-     * Équipement  -> equipement
+     * Médicament  -> medicament
+     * MÉDICAMENT  -> medicament
+     * Médic        -> medic
      */
-    private String normalizeText(String value) {
+    private String normalize(String value) {
 
         if (value == null) {
             return "";
         }
 
 
-        return Normalizer
-                .normalize(
-                        value.trim(),
+        String normalized =
+                Normalizer.normalize(
+                        value,
                         Normalizer.Form.NFD
-                )
-                .replaceAll(
+                );
+
+
+        /*
+         * Suppression des accents.
+         *
+         * é -> e
+         * è -> e
+         * ê -> e
+         * à -> a
+         * ç -> c
+         */
+        normalized =
+                normalized.replaceAll(
                         "\\p{M}",
                         ""
-                )
-                .toLowerCase(
-                        Locale.ROOT
                 );
+
+
+        return normalized
+                .trim()
+                .toLowerCase(Locale.ROOT);
     }
 
 
     // =========================================================
-    // RECHERCHE PARTIELLE + SANS ACCENT
+    // CONTAINS IGNORE CASE + ACCENTS
     // =========================================================
 
-    private boolean containsIgnoreCaseAndAccent(
+    private boolean containsIgnoreCase(
             String value,
             String keyword
     ) {
@@ -653,11 +723,16 @@ public class GlobalSearchService {
 
 
         String normalizedValue =
-                normalizeText(value);
+                normalize(value);
 
 
         String normalizedKeyword =
-                normalizeText(keyword);
+                normalize(keyword);
+
+
+        if (normalizedKeyword.isBlank()) {
+            return false;
+        }
 
 
         return normalizedValue.contains(

@@ -16,50 +16,20 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     boolean existsBySku(String sku);
 
-
     // =========================================================
     // RECHERCHE ADMIN
     // =========================================================
 
     @Query("""
-        SELECT DISTINCT p
+        SELECT p
         FROM Product p
-        LEFT JOIN p.categories c
-        LEFT JOIN p.therapeuticAreas ta
         LEFT JOIN p.company company
         WHERE
-            unaccent(LOWER(p.name))
-                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-            OR unaccent(LOWER(p.sku))
-                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-            OR unaccent(LOWER(COALESCE(p.brand, '')))
-                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-            OR unaccent(LOWER(COALESCE(p.activeIngredient, '')))
-                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-            OR unaccent(LOWER(COALESCE(p.description, '')))
-                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-            OR unaccent(LOWER(COALESCE(p.ingredients, '')))
-                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-            OR unaccent(LOWER(COALESCE(p.dosage, '')))
-                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-            OR unaccent(LOWER(COALESCE(p.form, '')))
-                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-            OR unaccent(LOWER(COALESCE(company.name, '')))
-                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-            OR unaccent(LOWER(COALESCE(c.name, '')))
-                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-            OR unaccent(LOWER(COALESCE(ta.name, '')))
-                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+            LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(COALESCE(p.brand, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(COALESCE(p.activeIngredient, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(COALESCE(company.name, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
         """)
     Page<Product> searchProducts(
             @Param("keyword") String keyword,
@@ -78,7 +48,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             p.active = true
             AND p.inventory.quantity > 0
         """)
-    Page<Product> findAvailableProducts(Pageable pageable);
+    Page<Product> findAvailableProducts(
+            Pageable pageable
+    );
 
 
     // =========================================================
@@ -98,39 +70,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             AND (
                 :keyword IS NULL
                 OR :keyword = ''
-
-                OR unaccent(LOWER(p.name))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-                OR unaccent(LOWER(p.sku))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-                OR unaccent(LOWER(COALESCE(p.brand, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-                OR unaccent(LOWER(COALESCE(p.activeIngredient, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-                OR unaccent(LOWER(COALESCE(p.description, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-                OR unaccent(LOWER(COALESCE(p.ingredients, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-                OR unaccent(LOWER(COALESCE(p.dosage, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-                OR unaccent(LOWER(COALESCE(p.form, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-                OR unaccent(LOWER(COALESCE(company.name, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-                OR unaccent(LOWER(COALESCE(c.name, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-
-                OR unaccent(LOWER(COALESCE(ta.name, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+                OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(COALESCE(p.brand, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(COALESCE(p.activeIngredient, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(COALESCE(company.name, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
             )
 
             AND (
@@ -140,7 +84,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
             AND (
                 :companyId IS NULL
-                OR p.company.id = :companyId
+                OR company.id = :companyId
             )
 
             AND (
@@ -158,58 +102,28 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
     // =========================================================
-    // PRODUITS DISPONIBLES + RECHERCHE GLOBALE
+    // PRODUITS DISPONIBLES + RECHERCHE
     // =========================================================
 
     @Query("""
-    SELECT DISTINCT p
-    FROM Product p
-    LEFT JOIN p.categories c
-    LEFT JOIN p.therapeuticAreas ta
-    LEFT JOIN p.company company
-    WHERE
-        p.active = true
-        AND p.inventory.quantity > 0
-
-        AND (
-            function('unaccent', LOWER(p.name))
-                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
-
-            OR function('unaccent', LOWER(p.sku))
-                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
-
-            OR function('unaccent', LOWER(COALESCE(p.brand, '')))
-                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
-
-            OR function('unaccent', LOWER(COALESCE(p.activeIngredient, '')))
-                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
-
-            OR function('unaccent', LOWER(COALESCE(p.description, '')))
-                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
-
-            OR function('unaccent', LOWER(COALESCE(p.ingredients, '')))
-                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
-
-            OR function('unaccent', LOWER(COALESCE(p.dosage, '')))
-                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
-
-            OR function('unaccent', LOWER(COALESCE(p.form, '')))
-                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
-
-            OR function('unaccent', LOWER(COALESCE(company.name, '')))
-                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
-
-            OR function('unaccent', LOWER(COALESCE(c.name, '')))
-                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
-
-            OR function('unaccent', LOWER(COALESCE(ta.name, '')))
-                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
-        )
-    """)
-Page<Product> searchAvailableProducts(
-        @Param("keyword") String keyword,
-        Pageable pageable
-);
+        SELECT p
+        FROM Product p
+        LEFT JOIN p.company company
+        WHERE
+            p.active = true
+            AND p.inventory.quantity > 0
+            AND (
+                LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(COALESCE(p.brand, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(COALESCE(p.activeIngredient, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(COALESCE(company.name, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            )
+        """)
+    Page<Product> searchAvailableProducts(
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
 
 
     // =========================================================

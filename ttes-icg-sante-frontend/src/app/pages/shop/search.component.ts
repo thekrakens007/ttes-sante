@@ -37,9 +37,7 @@ import {
 
 
 interface FilterOption {
-
     id: number;
-
     name: string;
 }
 
@@ -63,25 +61,27 @@ export class SearchComponent implements OnInit {
     // SERVICES
     // =========================================================
 
-    private route =
-        inject(ActivatedRoute);
+    private route = inject(ActivatedRoute);
 
-    private router =
-        inject(Router);
+    private router = inject(Router);
 
-    private searchService =
-        inject(SearchService);
+    private searchService = inject(SearchService);
 
-    private productService =
-        inject(ProductService);
+    private productService = inject(ProductService);
 
 
     // =========================================================
     // RECHERCHE
     // =========================================================
 
+    /**
+     * Mot-clé réellement utilisé par la recherche.
+     */
     keyword = '';
 
+    /**
+     * Valeur actuellement présente dans le champ de recherche.
+     */
     searchInput = '';
 
 
@@ -89,16 +89,42 @@ export class SearchComponent implements OnInit {
     // PAGINATION
     // =========================================================
 
+    /**
+     * Spring Data utilise une pagination 0-based :
+     *
+     * page 0 = première page
+     * page 1 = deuxième page
+     * page 2 = troisième page
+     */
     currentPage = 0;
 
+    /**
+     * Nombre de produits demandés par page.
+     */
     pageSize = 8;
 
+
+    /**
+     * Nombre total de produits.
+     */
     totalProducts = 0;
 
+
+    /**
+     * Nombre total de packs.
+     */
     totalBundles = 0;
 
+
+    /**
+     * Nombre total de pages produits.
+     */
     totalProductPages = 0;
 
+
+    /**
+     * Nombre total de pages packs.
+     */
     totalBundlePages = 0;
 
 
@@ -106,14 +132,11 @@ export class SearchComponent implements OnInit {
     // FILTRES
     // =========================================================
 
-    selectedCategoryId:
-        number | null = null;
+    selectedCategoryId: number | null = null;
 
-    selectedCompanyId:
-        number | null = null;
+    selectedCompanyId: number | null = null;
 
-    selectedTherapeuticAreaId:
-        number | null = null;
+    selectedTherapeuticAreaId: number | null = null;
 
 
     categories: FilterOption[] = [];
@@ -140,8 +163,7 @@ export class SearchComponent implements OnInit {
 
     error = '';
 
-    currentYear =
-        new Date().getFullYear();
+    currentYear = new Date().getFullYear();
 
 
     // =========================================================
@@ -150,171 +172,255 @@ export class SearchComponent implements OnInit {
 
     ngOnInit(): void {
 
+        // Charger les listes des filtres.
         this.loadFilters();
 
 
-        this.route.queryParams.subscribe(
-            params => {
+        /*
+         * IMPORTANT
+         *
+         * On écoute les paramètres de l'URL.
+         *
+         * Exemple :
+         *
+         * /search?q=paracetamol&page=0
+         *
+         * puis :
+         *
+         * /search?q=paracetamol&page=1
+         *
+         * Ici, on NE remet surtout PAS currentPage à 0.
+         */
+        this.route.queryParams.subscribe(params => {
 
-                const keyword =
-                    (
-                        params['q'] ||
-                        ''
-                    ).trim();
+            // -------------------------------------------------
+            // MOT-CLE
+            // -------------------------------------------------
 
-
-                this.keyword =
-                    keyword;
-
-
-                this.searchInput =
-                    keyword;
-
-
-                this.currentPage =
-                    Number(
-                        params['page'] || 0
-                    );
-
-
-                if (!keyword) {
-
-                    this.products = [];
-
-                    this.bundles = [];
-
-                    return;
-                }
+            const keyword =
+                (params['q'] || '').trim();
 
 
-                this.search();
+            // -------------------------------------------------
+            // PAGE
+            // -------------------------------------------------
+
+            const pageFromUrl =
+                Number(params['page'] ?? 0);
+
+
+            // -------------------------------------------------
+            // ASSIGNATION
+            // -------------------------------------------------
+
+            this.keyword = keyword;
+
+            this.searchInput = keyword;
+
+
+            /*
+             * Vérification de la page.
+             *
+             * Si l'URL contient :
+             *
+             * page=1
+             *
+             * currentPage devient 1.
+             *
+             * On ne remet PAS à 0.
+             */
+            this.currentPage =
+                Number.isFinite(pageFromUrl) &&
+                pageFromUrl >= 0
+                    ? pageFromUrl
+                    : 0;
+
+
+            // -------------------------------------------------
+            // PAS DE MOT-CLE
+            // -------------------------------------------------
+
+            if (!keyword) {
+
+                this.products = [];
+
+                this.bundles = [];
+
+                this.totalProducts = 0;
+
+                this.totalBundles = 0;
+
+                this.totalProductPages = 0;
+
+                this.totalBundlePages = 0;
+
+                this.loading = false;
+
+                return;
             }
-        );
+
+
+            // -------------------------------------------------
+            // RECHERCHE
+            // -------------------------------------------------
+
+            this.executeSearch();
+        });
     }
 
 
     // =========================================================
-    // CHARGEMENT FILTRES
+    // CHARGEMENT DES FILTRES
     // =========================================================
 
     loadFilters(): void {
 
-        /*
-         * Adapte ces méthodes aux méthodes
-         * déjà présentes dans ton ProductService.
-         */
+        // -----------------------------------------------------
+        // CATEGORIES
+        // -----------------------------------------------------
 
         this.productService
             .getCategories()
             .subscribe({
 
-                next: categories => {
+                next: (categories: any[]) => {
 
                     this.categories =
-                        (categories ?? [])
-                            .map(
-                                (category: any) => ({
-                                    id: category.id,
-                                    name: category.name
-                                })
-                            );
+                        (categories ?? []).map(
+                            category => ({
+                                id: Number(category.id),
+
+                                name:
+                                    category.name
+                            })
+                        );
                 },
 
-                error: error => {
+                error: (error) => {
 
                     console.error(
-                        'Erreur catégories',
+                        'Erreur chargement catégories :',
                         error
                     );
+
+                    this.categories = [];
                 }
             });
 
+
+        // -----------------------------------------------------
+        // ENTREPRISES
+        // -----------------------------------------------------
 
         this.productService
             .getCompanies()
             .subscribe({
 
-                next: companies => {
+                next: (companies: any[]) => {
 
                     this.companies =
-                        (companies ?? [])
-                            .map(
-                                (company: any) => ({
-                                    id: company.id,
-                                    name: company.name
-                                })
-                            );
+                        (companies ?? []).map(
+                            company => ({
+                                id: Number(company.id),
+
+                                name:
+                                    company.name
+                            })
+                        );
                 },
 
-                error: error => {
+                error: (error) => {
 
                     console.error(
-                        'Erreur entreprises',
+                        'Erreur chargement entreprises :',
                         error
                     );
+
+                    this.companies = [];
                 }
             });
 
+
+        // -----------------------------------------------------
+        // DOMAINES THERAPEUTIQUES
+        // -----------------------------------------------------
 
         this.productService
             .getTherapeuticAreas()
             .subscribe({
 
-                next: areas => {
+                next: (areas: any[]) => {
 
                     this.therapeuticAreas =
-                        (areas ?? [])
-                            .map(
-                                (area: any) => ({
-                                    id: area.id,
-                                    name:
-                                        area.name ??
-                                        area.label
-                                })
-                            );
+                        (areas ?? []).map(
+                            area => ({
+                                id: Number(area.id),
+
+                                name:
+                                    area.name ??
+                                    area.label
+                            })
+                        );
                 },
 
-                error: error => {
+                error: (error) => {
 
                     console.error(
-                        'Erreur domaines thérapeutiques',
+                        'Erreur chargement domaines thérapeutiques :',
                         error
                     );
+
+                    this.therapeuticAreas = [];
                 }
             });
     }
 
 
     // =========================================================
-    // RECHERCHE
+    // NOUVELLE RECHERCHE
     // =========================================================
 
     search(): void {
 
+        /*
+         * Récupération du texte.
+         */
         const keyword =
             this.searchInput.trim();
 
 
-        this.keyword =
-            keyword;
+        /*
+         * Mise à jour du mot-clé utilisé.
+         */
+        this.keyword = keyword;
 
 
-        this.currentPage =
-            0;
+        /*
+         * Une NOUVELLE recherche commence
+         * toujours à la première page.
+         */
+        this.currentPage = 0;
 
 
+        /*
+         * Mettre à jour l'URL.
+         *
+         * Le subscribe de queryParams
+         * appellera ensuite executeSearch().
+         */
         this.updateUrl();
-
-
-        this.executeSearch();
     }
 
 
     // =========================================================
-    // EXECUTER RECHERCHE
+    // EXECUTION RECHERCHE
     // =========================================================
 
     private executeSearch(): void {
+
+        // -----------------------------------------------------
+        // PAS DE MOT-CLE
+        // -----------------------------------------------------
 
         if (!this.keyword) {
 
@@ -322,104 +428,179 @@ export class SearchComponent implements OnInit {
 
             this.bundles = [];
 
+            this.totalProducts = 0;
+
+            this.totalBundles = 0;
+
+            this.totalProductPages = 0;
+
+            this.totalBundlePages = 0;
+
             return;
         }
 
+
+        // -----------------------------------------------------
+        // LOADING
+        // -----------------------------------------------------
 
         this.loading = true;
 
         this.error = '';
 
 
+        // -----------------------------------------------------
+        // APPEL API
+        // -----------------------------------------------------
+
         this.searchService
             .search(
-
                 this.keyword,
-
                 this.currentPage,
-
                 this.pageSize,
-
                 this.selectedCategoryId,
-
                 this.selectedCompanyId,
-
                 this.selectedTherapeuticAreaId
-
             )
             .subscribe({
 
-                next:
-                    (
-                        response:
-                        GlobalSearchResponse
-                    ) => {
+                // =============================================
+                // SUCCESS
+                // =============================================
 
-                        this.products =
-                            response.products ?? [];
+                next: (
+                    response: GlobalSearchResponse
+                ) => {
 
+                    console.log(
+                        'Recherche page :',
+                        this.currentPage
+                    );
 
-                        this.bundles =
-                            response.bundles ?? [];
-
-
-                        this.totalProducts =
-                            response.totalProducts ?? 0;
-
-
-                        this.totalBundles =
-                            response.totalBundles ?? 0;
+                    console.log(
+                        'Réponse recherche :',
+                        response
+                    );
 
 
-                        this.totalProductPages =
-                            response.totalProductPages ?? 0;
+                    // -----------------------------------------
+                    // PRODUITS
+                    // -----------------------------------------
+
+                    this.products =
+                        response.products ?? [];
 
 
-                        this.totalBundlePages =
-                            response.totalBundlePages ?? 0;
+                    // -----------------------------------------
+                    // PACKS
+                    // -----------------------------------------
+
+                    this.bundles =
+                        response.bundles ?? [];
 
 
-                        this.loading =
-                            false;
-                    },
+                    // -----------------------------------------
+                    // TOTAL PRODUITS
+                    // -----------------------------------------
 
-
-                error:
-                    error => {
-
-                        console.error(
-                            'Erreur recherche globale',
-                            error
+                    this.totalProducts =
+                        Number(
+                            response.totalProducts ?? 0
                         );
 
 
-                        this.products = [];
+                    // -----------------------------------------
+                    // TOTAL PACKS
+                    // -----------------------------------------
 
-                        this.bundles = [];
+                    this.totalBundles =
+                        Number(
+                            response.totalBundles ?? 0
+                        );
 
 
-                        this.error =
-                            'Impossible de récupérer les résultats de recherche.';
+                    // -----------------------------------------
+                    // PAGES PRODUITS
+                    // -----------------------------------------
+
+                    this.totalProductPages =
+                        Number(
+                            response.totalProductPages ?? 0
+                        );
 
 
-                        this.loading =
-                            false;
-                    }
+                    // -----------------------------------------
+                    // PAGES PACKS
+                    // -----------------------------------------
+
+                    this.totalBundlePages =
+                        Number(
+                            response.totalBundlePages ?? 0
+                        );
+
+
+                    // -----------------------------------------
+                    // FIN LOADING
+                    // -----------------------------------------
+
+                    this.loading = false;
+                },
+
+
+                // =============================================
+                // ERROR
+                // =============================================
+
+                error: (error) => {
+
+                    console.error(
+                        'Erreur recherche globale :',
+                        error
+                    );
+
+
+                    this.products = [];
+
+                    this.bundles = [];
+
+
+                    this.totalProducts = 0;
+
+                    this.totalBundles = 0;
+
+                    this.totalProductPages = 0;
+
+                    this.totalBundlePages = 0;
+
+
+                    this.error =
+                        'Impossible de récupérer les résultats de recherche.';
+
+
+                    this.loading = false;
+                }
             });
     }
 
 
     // =========================================================
-    // FILTRE
+    // FILTRES
     // =========================================================
 
     applyFilters(): void {
 
+        /*
+         * Lorsqu'un filtre change,
+         * on revient à la première page.
+         */
         this.currentPage = 0;
 
-        this.updateUrl();
 
-        this.executeSearch();
+        /*
+         * On conserve le mot-clé
+         * et on met à jour la page.
+         */
+        this.updateUrl();
     }
 
 
@@ -435,11 +616,17 @@ export class SearchComponent implements OnInit {
 
         this.selectedTherapeuticAreaId = null;
 
+
+        /*
+         * Retour première page.
+         */
         this.currentPage = 0;
 
-        this.updateUrl();
 
-        this.executeSearch();
+        /*
+         * Relancer la recherche.
+         */
+        this.updateUrl();
     }
 
 
@@ -449,6 +636,12 @@ export class SearchComponent implements OnInit {
 
     nextPage(): void {
 
+        /*
+         * Sécurité :
+         *
+         * si on est déjà à la dernière page,
+         * on ne fait rien.
+         */
         if (
             this.currentPage + 1 >=
             this.maxPages
@@ -457,12 +650,28 @@ export class SearchComponent implements OnInit {
         }
 
 
+        /*
+         * Incrémentation.
+         *
+         * 0 -> 1
+         * 1 -> 2
+         * 2 -> 3
+         */
         this.currentPage++;
 
+
+        /*
+         * Mise à jour URL.
+         *
+         * Le subscribe queryParams appellera
+         * executeSearch() avec la nouvelle page.
+         */
         this.updateUrl();
 
-        this.executeSearch();
 
+        /*
+         * Remonter en haut.
+         */
         window.scrollTo({
             top: 0,
             behavior: 'smooth'
@@ -476,17 +685,32 @@ export class SearchComponent implements OnInit {
 
     previousPage(): void {
 
+        /*
+         * On est déjà à la première page.
+         */
         if (this.currentPage <= 0) {
             return;
         }
 
 
+        /*
+         * Exemple :
+         *
+         * 2 -> 1
+         * 1 -> 0
+         */
         this.currentPage--;
 
+
+        /*
+         * Mise à jour URL.
+         */
         this.updateUrl();
 
-        this.executeSearch();
 
+        /*
+         * Remonter en haut.
+         */
         window.scrollTo({
             top: 0,
             behavior: 'smooth'
@@ -498,10 +722,11 @@ export class SearchComponent implements OnInit {
     // ALLER A UNE PAGE
     // =========================================================
 
-    goToPage(
-        page: number
-    ): void {
+    goToPage(page: number): void {
 
+        /*
+         * Vérification.
+         */
         if (
             page < 0 ||
             page >= this.maxPages
@@ -510,14 +735,21 @@ export class SearchComponent implements OnInit {
         }
 
 
-        this.currentPage =
-            page;
+        /*
+         * Définir la page.
+         */
+        this.currentPage = page;
 
 
+        /*
+         * Mise à jour URL.
+         */
         this.updateUrl();
 
-        this.executeSearch();
 
+        /*
+         * Remonter en haut.
+         */
         window.scrollTo({
             top: 0,
             behavior: 'smooth'
@@ -526,7 +758,7 @@ export class SearchComponent implements OnInit {
 
 
     // =========================================================
-    // PAGES
+    // NOMBRE MAXIMUM DE PAGES
     // =========================================================
 
     get maxPages(): number {
@@ -537,6 +769,10 @@ export class SearchComponent implements OnInit {
         );
     }
 
+
+    // =========================================================
+    // NUMEROS DE PAGES
+    // =========================================================
 
     get pages(): number[] {
 
@@ -549,14 +785,39 @@ export class SearchComponent implements OnInit {
         }
 
 
+        /*
+         * On affiche maximum 5 boutons.
+         *
+         * Exemple :
+         *
+         * page 0 :
+         * 1 2 3 4 5
+         *
+         * page 5 :
+         * 4 5 6 7 8
+         */
         const result: number[] = [];
 
 
-        const start =
+        let start =
             Math.max(
                 0,
                 this.currentPage - 2
             );
+
+
+        /*
+         * Empêcher start de dépasser
+         * la fin de la pagination.
+         */
+        if (start + 5 > total) {
+
+            start =
+                Math.max(
+                    0,
+                    total - 5
+                );
+        }
 
 
         const end =
@@ -586,21 +847,30 @@ export class SearchComponent implements OnInit {
 
     private updateUrl(): void {
 
+        /*
+         * IMPORTANT :
+         *
+         * On utilise uniquement q et page.
+         *
+         * Les filtres restent dans l'état Angular
+         * et ne provoquent pas de boucle.
+         */
         this.router.navigate(
             [],
             {
-                relativeTo:
-                    this.route,
+                relativeTo: this.route,
 
                 queryParams: {
-                    q: this.keyword,
+
+                    q:
+                        this.keyword ||
+                        null,
 
                     page:
                         this.currentPage
                 },
 
-                queryParamsHandling:
-                    'merge'
+                queryParamsHandling: 'merge'
             }
         );
     }
@@ -636,23 +906,35 @@ export class SearchComponent implements OnInit {
         }
 
 
+        /*
+         * Chercher l'image principale.
+         */
         const mainImage =
             product.images.find(
                 image => image.main
             );
 
 
-        if (mainImage?.imageUrl) {
+        if (
+            mainImage &&
+            mainImage.imageUrl
+        ) {
 
             return mainImage.imageUrl;
         }
 
 
+        /*
+         * Sinon première image.
+         */
         const firstImage =
             product.images[0];
 
 
-        if (firstImage?.imageUrl) {
+        if (
+            firstImage &&
+            firstImage.imageUrl
+        ) {
 
             return firstImage.imageUrl;
         }
@@ -679,23 +961,35 @@ export class SearchComponent implements OnInit {
         }
 
 
+        /*
+         * Image principale.
+         */
         const mainImage =
             bundle.images.find(
                 image => image.main
             );
 
 
-        if (mainImage?.imageUrl) {
+        if (
+            mainImage &&
+            mainImage.imageUrl
+        ) {
 
             return mainImage.imageUrl;
         }
 
 
+        /*
+         * Première image.
+         */
         const firstImage =
             bundle.images[0];
 
 
-        if (firstImage?.imageUrl) {
+        if (
+            firstImage &&
+            firstImage.imageUrl
+        ) {
 
             return firstImage.imageUrl;
         }
@@ -706,7 +1000,7 @@ export class SearchComponent implements OnInit {
 
 
     // =========================================================
-    // PRODUIT
+    // OUVRIR PRODUIT
     // =========================================================
 
     openProduct(
@@ -726,7 +1020,7 @@ export class SearchComponent implements OnInit {
 
 
     // =========================================================
-    // PACK
+    // OUVRIR PACK
     // =========================================================
 
     openBundle(

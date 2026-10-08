@@ -162,54 +162,54 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // =========================================================
 
     @Query("""
-        SELECT DISTINCT p
-        FROM Product p
-        LEFT JOIN p.categories c
-        LEFT JOIN p.therapeuticAreas ta
-        LEFT JOIN p.company company
-        WHERE
-            p.active = true
-            AND p.inventory.quantity > 0
+    SELECT DISTINCT p
+    FROM Product p
+    LEFT JOIN p.categories c
+    LEFT JOIN p.therapeuticAreas ta
+    LEFT JOIN p.company company
+    WHERE
+        p.active = true
+        AND p.inventory.quantity > 0
 
-            AND (
-                unaccent(LOWER(p.name))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+        AND (
+            function('unaccent', LOWER(p.name))
+                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
 
-                OR unaccent(LOWER(p.sku))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+            OR function('unaccent', LOWER(p.sku))
+                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
 
-                OR unaccent(LOWER(COALESCE(p.brand, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+            OR function('unaccent', LOWER(COALESCE(p.brand, '')))
+                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
 
-                OR unaccent(LOWER(COALESCE(p.activeIngredient, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+            OR function('unaccent', LOWER(COALESCE(p.activeIngredient, '')))
+                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
 
-                OR unaccent(LOWER(COALESCE(p.description, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+            OR function('unaccent', LOWER(COALESCE(p.description, '')))
+                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
 
-                OR unaccent(LOWER(COALESCE(p.ingredients, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+            OR function('unaccent', LOWER(COALESCE(p.ingredients, '')))
+                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
 
-                OR unaccent(LOWER(COALESCE(p.dosage, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+            OR function('unaccent', LOWER(COALESCE(p.dosage, '')))
+                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
 
-                OR unaccent(LOWER(COALESCE(p.form, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+            OR function('unaccent', LOWER(COALESCE(p.form, '')))
+                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
 
-                OR unaccent(LOWER(COALESCE(company.name, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+            OR function('unaccent', LOWER(COALESCE(company.name, '')))
+                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
 
-                OR unaccent(LOWER(COALESCE(c.name, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+            OR function('unaccent', LOWER(COALESCE(c.name, '')))
+                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
 
-                OR unaccent(LOWER(COALESCE(ta.name, '')))
-                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
-            )
-        """)
-    Page<Product> searchAvailableProducts(
-            @Param("keyword") String keyword,
-            Pageable pageable
-    );
+            OR function('unaccent', LOWER(COALESCE(ta.name, '')))
+                LIKE CONCAT('%', function('unaccent', LOWER(:keyword)), '%')
+        )
+    """)
+Page<Product> searchAvailableProducts(
+        @Param("keyword") String keyword,
+        Pageable pageable
+);
 
 
     // =========================================================

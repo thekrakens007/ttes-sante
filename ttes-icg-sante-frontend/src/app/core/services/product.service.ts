@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+
 import {
     HttpClient,
     HttpParams
@@ -10,6 +11,7 @@ import {
     Product,
     ProductPage
 } from '../models/product.model';
+
 
 @Injectable({
     providedIn: 'root'
@@ -30,84 +32,107 @@ export class ProductService {
         return this.http.get<Product[]>(
             this.API_URL
         );
-
     }
 
 
     // =========================================================
-    // PRODUITS AVEC PAGINATION + FILTRES
+    // PRODUITS PAGINÉS
+    // RECHERCHE + FILTRES
     // =========================================================
 
     getProductsPaginated(
+
         page: number = 0,
-        size: number = 12,
+
+        size: number = 8,
+
         keyword?: string,
+
         categoryId?: number | null,
+
         companyId?: number | null,
+
         therapeuticAreaId?: number | null
+
     ): Observable<ProductPage> {
 
-        let params = new HttpParams()
-            .set('page', page)
-            .set('size', size);
+        let params =
+            new HttpParams()
+                .set(
+                    'page',
+                    page.toString()
+                )
+                .set(
+                    'size',
+                    size.toString()
+                );
 
 
-        // -----------------------------------------------------
+        // =====================================================
         // RECHERCHE
-        // -----------------------------------------------------
+        // =====================================================
 
-        if (keyword && keyword.trim().length > 0) {
+        if (
+            keyword &&
+            keyword.trim().length > 0
+        ) {
 
-            params = params.set(
-                'keyword',
-                keyword.trim()
-            );
-
+            params =
+                params.set(
+                    'keyword',
+                    keyword.trim()
+                );
         }
 
 
-        // -----------------------------------------------------
+        // =====================================================
         // CATÉGORIE
-        // -----------------------------------------------------
+        // =====================================================
 
-        if (categoryId !== null && categoryId !== undefined) {
+        if (
+            categoryId !== null &&
+            categoryId !== undefined
+        ) {
 
-            params = params.set(
-                'categoryId',
-                categoryId
-            );
-
+            params =
+                params.set(
+                    'categoryId',
+                    categoryId.toString()
+                );
         }
 
 
-        // -----------------------------------------------------
+        // =====================================================
         // ENTREPRISE
-        // -----------------------------------------------------
+        // =====================================================
 
-        if (companyId !== null && companyId !== undefined) {
+        if (
+            companyId !== null &&
+            companyId !== undefined
+        ) {
 
-            params = params.set(
-                'companyId',
-                companyId
-            );
-
+            params =
+                params.set(
+                    'companyId',
+                    companyId.toString()
+                );
         }
 
 
-        // -----------------------------------------------------
+        // =====================================================
         // DOMAINE THÉRAPEUTIQUE
-        // -----------------------------------------------------
+        // =====================================================
 
         if (
             therapeuticAreaId !== null &&
             therapeuticAreaId !== undefined
         ) {
 
-            params = params.set(
-                'therapeuticAreaId',
-                therapeuticAreaId
-            );
-
+            params =
+                params.set(
+                    'therapeuticAreaId',
+                    therapeuticAreaId.toString()
+                );
         }
 
 
@@ -117,33 +142,38 @@ export class ProductService {
                 params
             }
         );
-
     }
 
 
     // =========================================================
-    // RECHERCHE AVEC PAGINATION
+    // RECHERCHE PAGINÉE
     // =========================================================
 
     searchProductsPaginated(
+
         keyword: string,
+
         page: number = 0,
-        size: number = 12
+
+        size: number = 8
+
     ): Observable<ProductPage> {
 
-        const params = new HttpParams()
-            .set(
-                'keyword',
-                keyword.trim()
-            )
-            .set(
-                'page',
-                page
-            )
-            .set(
-                'size',
-                size
-            );
+        const params =
+            new HttpParams()
+                .set(
+                    'keyword',
+                    keyword.trim()
+                )
+                .set(
+                    'page',
+                    page.toString()
+                )
+                .set(
+                    'size',
+                    size.toString()
+                );
+
 
         return this.http.get<ProductPage>(
             `${this.API_URL}/search`,
@@ -151,7 +181,6 @@ export class ProductService {
                 params
             }
         );
-
     }
 
 
@@ -166,7 +195,6 @@ export class ProductService {
         return this.http.get<Product>(
             `${this.API_URL}/${productId}`
         );
-
     }
 
 
@@ -178,11 +206,12 @@ export class ProductService {
         name: string
     ): Observable<Product[]> {
 
-        const params = new HttpParams()
-            .set(
-                'name',
-                name.trim()
-            );
+        const params =
+            new HttpParams()
+                .set(
+                    'name',
+                    name.trim()
+                );
 
         return this.http.get<Product[]>(
             `${this.API_URL}/search`,
@@ -190,7 +219,6 @@ export class ProductService {
                 params
             }
         );
-
     }
 
 
@@ -205,7 +233,6 @@ export class ProductService {
         return this.http.get<Product[]>(
             `${this.API_URL}/company/${companyId}`
         );
-
     }
 
 
@@ -218,7 +245,6 @@ export class ProductService {
         return this.http.get<any[]>(
             '/api/categories'
         );
-
     }
 
 
@@ -231,7 +257,6 @@ export class ProductService {
         return this.http.get<any[]>(
             '/api/companies'
         );
-
     }
 
 
@@ -244,7 +269,5 @@ export class ProductService {
         return this.http.get<any[]>(
             '/api/therapeutic-areas'
         );
-
     }
-
 }

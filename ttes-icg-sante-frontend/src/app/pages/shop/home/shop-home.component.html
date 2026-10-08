@@ -1,8 +1,102 @@
-<!-- =====================================================================
-  À COLLER dans votre template, entre </header> et <footer>.
-  Le top bar, le header et le footer existants restent inchangés.
-  Ajoutez dans le composant :  partners = [...]  et  products = [...]  (voir bas de fichier)
-===================================================================== -->
+<div class="min-h-screen bg-gray-50 text-gray-900 transition-colors duration-300 dark:bg-gray-950 dark:text-white">
+
+<!-- TOP BAR -->
+<div class="hidden bg-green-950 text-xs text-green-50 md:block">
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2.5 sm:px-6 lg:px-8">
+        <div class="flex items-center gap-5">
+            <span>📍 Douala, Cameroun</span>
+            <span>🕒 Lun - Sam : 8h - 18h</span>
+            <span>✉️ contact&#64;tes-icg.com</span>
+        </div>
+        <a href="https://wa.me/237659147589?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20une%20consultation." target="_blank" rel="noopener noreferrer"
+           class="rounded-lg bg-orange-400 px-3 py-1.5 font-bold text-green-950 transition hover:bg-orange-300">
+            Consultation WhatsApp
+        </a>
+    </div>
+</div>
+
+<!-- HEADER -->
+<header class="sticky top-0 z-50 border-b border-gray-200/80 bg-white/95 shadow-sm backdrop-blur-md transition-colors duration-300 dark:border-gray-800 dark:bg-gray-900/95">
+
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+
+        <a routerLink="/" (click)="closeMobileMenu()" class="flex shrink-0 items-center">
+            <img src="/images/logo/logo.svg" alt="TES-ICG Santé" class="h-11 w-auto sm:h-12 dark:hidden">
+            <img src="/images/logo/logo-dark.svg" alt="TES-ICG Santé" class="hidden h-11 w-auto sm:h-12 dark:block">
+        </a>
+
+        <nav class="hidden items-center gap-1 md:flex">
+            <a routerLink="/" class="rounded-lg px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200 dark:hover:bg-green-900/30 dark:hover:text-green-400">Accueil</a>
+            <a routerLink="/products" class="rounded-lg px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200 dark:hover:bg-green-900/30 dark:hover:text-green-400">Produits</a>
+            <a routerLink="/bundles" class="rounded-lg px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200 dark:hover:bg-green-900/30 dark:hover:text-green-400">Packs</a>
+            <a routerLink="/companies" class="rounded-lg px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200 dark:hover:bg-green-900/30 dark:hover:text-green-400">Entreprises</a>
+        </nav>
+
+        <div class="hidden items-center gap-2 md:flex">
+            <a href="https://wa.me/237659147589?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20une%20consultation." target="_blank" rel="noopener noreferrer"
+               class="rounded-xl bg-orange-400 px-4 py-2.5 text-sm font-bold text-green-950 shadow-sm transition hover:bg-orange-300">💬 Consultation</a>
+
+            @if (!isLoggedIn()) {
+                <a routerLink="/signin" class="rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200">Se connecter</a>
+                <a routerLink="/signup" class="rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700">Créer un compte</a>
+            }
+            @if (isLoggedIn() && isAdmin()) {
+                <a routerLink="/admin" class="rounded-xl bg-green-700 px-4 py-2.5 text-sm font-semibold text-white">⚙️ Admin</a>
+            }
+            @if (isLoggedIn() && !isAdmin()) {
+                <a routerLink="/profile" class="rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white">👤 Profil</a>
+            }
+            @if (isLoggedIn()) {
+                <a routerLink="/cart" class="rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white">🛒 Panier</a>
+            }
+        </div>
+
+        <button type="button" (click)="toggleMobileMenu()" [attr.aria-expanded]="mobileMenuOpen" aria-label="Ouvrir le menu"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-white text-xl text-gray-700 transition hover:border-green-500 hover:bg-green-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 md:hidden">
+            @if (mobileMenuOpen) { ✕ } @else { ☰ }
+        </button>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="border-t border-gray-100 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-900">
+        <div class="mx-auto max-w-lg md:max-w-2xl">
+            <div class="relative">
+                <input type="text" [(ngModel)]="searchTerm" [ngModelOptions]="{standalone: true}" (ngModelChange)="search()"
+                       placeholder="Rechercher un produit..."
+                       class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 pr-12 text-sm text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-600/10 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-lg">🔍</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE MENU -->
+    @if (mobileMenuOpen) {
+        <div class="border-t border-gray-200 bg-white px-4 py-4 shadow-lg dark:border-gray-800 dark:bg-gray-900 md:hidden">
+            <div class="flex flex-col gap-2">
+                <a routerLink="/" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">🏠 Accueil</a>
+                <a routerLink="/products" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">🛍️ Produits</a>
+                <a routerLink="/bundles" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">📦 Packs</a>
+                <a routerLink="/companies" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">🏢 Entreprises</a>
+                <a href="https://wa.me/237659147589?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20une%20consultation." target="_blank" rel="noopener noreferrer"
+                   class="rounded-xl bg-orange-400 px-4 py-3 text-center text-sm font-bold text-green-950">💬 Consultation WhatsApp</a>
+
+                @if (!isLoggedIn()) {
+                    <a routerLink="/signin" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">🔐 Se connecter</a>
+                    <a routerLink="/signup" (click)="closeMobileMenu()" class="rounded-xl bg-green-600 px-4 py-3 text-sm font-semibold text-white">📝 Créer un compte</a>
+                }
+                @if (isLoggedIn() && isAdmin()) {
+                    <a routerLink="/admin" (click)="closeMobileMenu()" class="rounded-xl bg-green-700 px-4 py-3 text-sm font-semibold text-white">⚙️ Dashboard Admin</a>
+                }
+                @if (isLoggedIn() && !isAdmin()) {
+                    <a routerLink="/profile" (click)="closeMobileMenu()" class="rounded-xl bg-green-600 px-4 py-3 text-sm font-semibold text-white">👤 Mon profil</a>
+                }
+                @if (isLoggedIn()) {
+                    <a routerLink="/cart" (click)="closeMobileMenu()" class="rounded-xl bg-green-600 px-4 py-3 text-sm font-semibold text-white">🛒 Mon panier</a>
+                }
+            </div>
+        </div>
+    }
+</header>
 
 <!-- HERO -->
 <section class="relative min-h-[620px] overflow-hidden">
@@ -46,12 +140,7 @@
 <!-- RÉASSURANCE -->
 <section class="border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
   <div class="mx-auto grid max-w-7xl gap-4 px-4 py-8 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
-    @for (item of [
-      {i:'🚚', t:'Livraison', d:'Douala, Yaoundé et autres villes'},
-      {i:'💬', t:'Conseil par WhatsApp', d:'Une équipe à votre écoute'},
-      {i:'📋', t:'Produits clairement étiquetés', d:'Composition et mode d\'emploi'},
-      {i:'🔒', t:'Paiement sécurisé', d:'Commande simple depuis votre compte'}
-    ]; track item.t) {
+    @for (item of reassurance; track item.t) {
       <div class="flex items-center gap-4 rounded-2xl bg-green-50 p-4 dark:bg-green-950/30">
         <span class="text-3xl">{{ item.i }}</span>
         <div>
@@ -109,7 +198,7 @@
     </div>
 
     <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-      @for (p of products; track p.name) {
+      @for (p of featuredProducts; track p.name) {
         <article class="group overflow-hidden rounded-3xl bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:bg-gray-950">
           <div class="h-48 overflow-hidden">
             <img [src]="p.image" [alt]="p.name"
@@ -149,11 +238,7 @@
         hydratation, hygiène de vie et compléments alimentaires.
       </p>
       <div class="mt-8 space-y-5">
-        @for (s of [
-          {n:1, t:'Échangez avec nous', d:'Par WhatsApp ou dans l\'une de nos villes de présence.'},
-          {n:2, t:'Recevez des conseils personnalisés', d:'Produits, doses indiquées sur l\'étiquette, durée d\'utilisation.'},
-          {n:3, t:'Restez accompagné', d:'Nous restons disponibles pour répondre à vos questions.'}
-        ]; track s.n) {
+        @for (s of steps; track s.n) {
           <div class="flex gap-4">
             <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-400 font-bold text-green-950">{{ s.n }}</div>
             <div>
@@ -187,11 +272,7 @@
       </p>
     </div>
     <div class="mt-10 grid gap-6 md:grid-cols-3">
-      @for (pk of [
-        {t:'Pack Découverte', d:'Pour essayer la gamme et trouver vos produits préférés.', img:'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=900&q=85'},
-        {t:'Pack Routine', d:'Une sélection pour l\'utilisation quotidienne sur plusieurs semaines.', img:'https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=900&q=85'},
-        {t:'Pack Famille', d:'Plusieurs produits à partager, avec un meilleur prix.', img:'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=85'}
-      ]; track pk.t) {
+      @for (pk of packs; track pk.t) {
         <a routerLink="/bundles" class="group overflow-hidden rounded-3xl bg-gray-50 shadow-md dark:bg-gray-900">
           <div class="h-48 overflow-hidden">
             <img [src]="pk.img" [alt]="pk.t" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
@@ -249,45 +330,55 @@
   </div>
 </section>
 
-<!-- =====================================================================
-  À AJOUTER dans le composant (.ts)
-===================================================================== -->
-<!--
-partners = [
-  { id: 1, name: 'DAS Group Cameroun',      category: 'Laboratoire pharmaceutique', active: false },
-  { id: 2, name: 'PhytoScience Cameroun',   category: 'Pharmacies',                 active: false },
-  { id: 3, name: 'TIENS Cameroun',          category: 'Pharmacies',                 active: false },
-  { id: 4, name: 'VESTIGE Cameroun',        category: 'Pharmacies',                 active: false },
-  { id: 5, name: 'YUPI Global Cameroun',    category: 'Pharmacies',                 active: false },
-  { id: 6, name: 'LONGRICH Cameroun',       category: 'Pharmacies',                 active: false },
-  { id: 7, name: 'Forever Living Cameroun', category: 'Soins à base d\'aloe vera',  active: false },
-  { id: 8, name: 'Dynace Global Cameroun',  category: 'Bien-être',                  active: false },
-];
 
-products = [
-  { name: 'Double Stemcell', tag: 'Complément alimentaire',
-    desc: 'Sachets de complément alimentaire à base d\'extraits végétaux (pomme, raisin), à intégrer à votre routine.',
-    image: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=900&q=85' },
-  { name: 'Crystal Cell', tag: 'Complément alimentaire',
-    desc: 'Préparation en sachet à base d\'extraits végétaux, pratique à emporter.',
-    image: 'https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=900&q=85' },
-  { name: 'NuLite', tag: 'Boisson botanique',
-    desc: 'Mélange de boisson botanique au psyllium, pour accompagner une alimentation riche en fibres.',
-    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=85' },
-  { name: 'SnowPhyll Forte', tag: 'Boisson botanique',
-    desc: 'Mélange à base d\'herbe de blé, de chlorophylle et d\'algues des neiges.',
-    image: 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=85' },
-  { name: 'iiQ Plus', tag: 'Boisson aux fruits',
-    desc: 'Mélange de jus de fruits avec lutéine, à savourer au quotidien.',
-    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=85' },
-  { name: 'Triple Stemcell', tag: 'Soin de la peau',
-    desc: 'Gamme de soins : hydratant H2O et essence intense pour le soin quotidien de la peau.',
-    image: 'https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=900&q=85' },
-  { name: 'NuForte', tag: 'Complément alimentaire',
-    desc: 'Complément alimentaire en sachets. Voir la fiche pour la composition complète.',
-    image: 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&w=900&q=85' },
-  { name: 'Actual Plus', tag: 'Complément alimentaire',
-    desc: 'Complément alimentaire. Voir la fiche pour la composition et le mode d\'emploi.',
-    image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=900&q=85' },
-];
--->
+<!-- FOOTER -->
+<footer class="bg-green-950 py-12 text-green-100">
+    <div class="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 md:grid-cols-4 lg:px-8">
+
+        <div>
+            <img src="/images/logo/logo-dark.svg" alt="TES-ICG Santé" class="h-12 w-auto">
+            <p class="mt-4 text-sm leading-6 text-green-200">
+                Une plateforme dédiée à l'information, au bien-être et à la découverte de solutions complémentaires.
+            </p>
+        </div>
+
+        <div>
+            <h3 class="font-bold text-white">Navigation</h3>
+            <div class="mt-4 space-y-3 text-sm">
+                <a routerLink="/" class="block hover:text-orange-300">Accueil</a>
+                <a routerLink="/products" class="block hover:text-orange-300">Produits</a>
+                <a routerLink="/bundles" class="block hover:text-orange-300">Packs</a>
+                <a routerLink="/companies" class="block hover:text-orange-300">Entreprises</a>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="font-bold text-white">Nos thématiques</h3>
+            <div class="mt-4 space-y-3 text-sm">
+                <p>🧬 Biologie cellulaire</p>
+                <p>🌱 Ressources végétales</p>
+                <p>🥗 Nutrition</p>
+                <p>❤️ Prévention & bien-être</p>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="font-bold text-white">Contact</h3>
+            <div class="mt-4 space-y-3 text-sm">
+                <p>📍 Douala, Cameroun</p>
+                <p>📞 +237 6 59 14 75 89</p>
+                <a href="https://wa.me/237659147589" target="_blank" rel="noopener noreferrer"
+                   class="inline-flex font-bold text-orange-300 hover:text-orange-200">💬 WhatsApp</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="mx-auto mt-10 max-w-7xl border-t border-green-800 px-4 pt-6 text-center text-xs text-green-300 sm:px-6 lg:px-8">
+        Les informations présentées sur ce site sont destinées à l'information et à l'éducation.
+        Les compléments alimentaires ne remplacent pas une alimentation variée ni un traitement médical,
+        et ne constituent pas un diagnostic. En cas de maladie ou de traitement en cours, demandez l'avis d'un professionnel de santé.
+        © {{ currentYear }} TES-ICG Santé.
+    </div>
+</footer>
+
+</div>

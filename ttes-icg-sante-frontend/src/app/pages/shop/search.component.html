@@ -7,15 +7,18 @@
     <header
         class="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur dark:border-gray-800 dark:bg-gray-900/95"
     >
+
         <div
             class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
         >
 
-            <!-- Logo -->
+            <!-- LOGO -->
+
             <a
                 routerLink="/"
                 class="flex items-center gap-3"
             >
+
                 <img
                     src="/images/logo/logo.svg"
                     alt="TTES-ICG Santé"
@@ -23,6 +26,7 @@
                 >
 
                 <div class="hidden sm:block">
+
                     <p
                         class="text-sm font-bold text-gray-900 dark:text-white"
                     >
@@ -34,54 +38,63 @@
                     >
                         Santé & Bien-être
                     </p>
+
                 </div>
+
             </a>
 
-            <!-- Navigation -->
+
+            <!-- NAVIGATION -->
+
             <nav
                 class="hidden items-center gap-6 md:flex"
             >
+
                 <a
                     routerLink="/"
-                    class="text-sm font-medium text-gray-600 transition hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400"
+                    class="text-sm font-medium text-gray-600 hover:text-green-600 dark:text-gray-300"
                 >
                     Accueil
                 </a>
 
                 <a
                     routerLink="/products"
-                    class="text-sm font-medium text-gray-600 transition hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400"
+                    class="text-sm font-medium text-gray-600 hover:text-green-600 dark:text-gray-300"
                 >
                     Produits
                 </a>
 
                 <a
                     routerLink="/bundles"
-                    class="text-sm font-medium text-gray-600 transition hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400"
+                    class="text-sm font-medium text-gray-600 hover:text-green-600 dark:text-gray-300"
                 >
                     Packs
                 </a>
 
                 <a
                     routerLink="/companies"
-                    class="text-sm font-medium text-gray-600 transition hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400"
+                    class="text-sm font-medium text-gray-600 hover:text-green-600 dark:text-gray-300"
                 >
                     Entreprises
                 </a>
+
             </nav>
 
-            <!-- Retour -->
+
+            <!-- RETOUR -->
+
             <a
                 routerLink="/"
-                class="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-green-600 hover:text-green-600 dark:border-gray-700 dark:text-gray-200 dark:hover:border-green-500 dark:hover:text-green-400"
+                class="rounded-xl border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:border-green-600 hover:text-green-600 dark:border-gray-700 dark:text-gray-200"
             >
-                <span>←</span>
+                ←
                 <span class="hidden sm:inline">
                     Retour
                 </span>
             </a>
 
         </div>
+
     </header>
 
 
@@ -93,53 +106,212 @@
         class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"
     >
 
+
         <!-- ================================================= -->
-        <!-- TITRE -->
+        <!-- RECHERCHE + FILTRES -->
         <!-- ================================================= -->
 
-        <section class="mb-8">
+        <section
+            class="mb-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+        >
+
+            <!-- TITRE -->
+
+            <div class="mb-5">
+
+                <p
+                    class="text-sm font-medium text-green-600 dark:text-green-400"
+                >
+                    Recherche globale
+                </p>
+
+                <h1
+                    class="mt-1 text-2xl font-bold text-gray-900 dark:text-white"
+                >
+                    Trouvez vos produits et packs
+                </h1>
+
+            </div>
+
+
+            <!-- BARRE -->
+
+            <form
+                (ngSubmit)="search()"
+                class="flex flex-col gap-3 md:flex-row"
+            >
+
+                <div
+                    class="relative flex-1"
+                >
+
+                    <span
+                        class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                    >
+                        🔍
+                    </span>
+
+                    <input
+                        type="text"
+                        name="search"
+                        [(ngModel)]="searchInput"
+                        placeholder="Rechercher un produit, une entreprise, un médicament..."
+                        class="h-12 w-full rounded-xl border border-gray-300 bg-white pl-11 pr-4 text-sm text-gray-900 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="h-12 rounded-xl bg-green-600 px-6 text-sm font-semibold text-white transition hover:bg-green-700"
+                >
+                    Rechercher
+                </button>
+
+            </form>
+
+
+            <!-- FILTRES -->
+
+            <div
+                class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4"
+            >
+
+                <!-- CATEGORIE -->
+
+                <select
+                    [(ngModel)]="selectedCategoryId"
+                    name="category"
+                    (change)="applyFilters()"
+                    class="h-11 rounded-xl border border-gray-300 bg-white px-3 text-sm text-gray-700 outline-none focus:border-green-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                >
+
+                    <option
+                        [ngValue]="null"
+                    >
+                        Toutes les catégories
+                    </option>
+
+                    <option
+                        *ngFor="let category of categories"
+                        [ngValue]="category.id"
+                    >
+                        {{ category.name }}
+                    </option>
+
+                </select>
+
+
+                <!-- ENTREPRISE -->
+
+                <select
+                    [(ngModel)]="selectedCompanyId"
+                    name="company"
+                    (change)="applyFilters()"
+                    class="h-11 rounded-xl border border-gray-300 bg-white px-3 text-sm text-gray-700 outline-none focus:border-green-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                >
+
+                    <option
+                        [ngValue]="null"
+                    >
+                        Toutes les entreprises
+                    </option>
+
+                    <option
+                        *ngFor="let company of companies"
+                        [ngValue]="company.id"
+                    >
+                        {{ company.name }}
+                    </option>
+
+                </select>
+
+
+                <!-- DOMAINE THERAPEUTIQUE -->
+
+                <select
+                    [(ngModel)]="selectedTherapeuticAreaId"
+                    name="therapeuticArea"
+                    (change)="applyFilters()"
+                    class="h-11 rounded-xl border border-gray-300 bg-white px-3 text-sm text-gray-700 outline-none focus:border-green-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                >
+
+                    <option
+                        [ngValue]="null"
+                    >
+                        Tous les domaines
+                    </option>
+
+                    <option
+                        *ngFor="let area of therapeuticAreas"
+                        [ngValue]="area.id"
+                    >
+                        {{ area.name }}
+                    </option>
+
+                </select>
+
+
+                <!-- RESET -->
+
+                <button
+                    type="button"
+                    (click)="resetFilters()"
+                    class="h-11 rounded-xl border border-gray-300 px-4 text-sm font-medium text-gray-700 transition hover:border-green-600 hover:text-green-600 dark:border-gray-700 dark:text-gray-200"
+                >
+                    Réinitialiser
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================================= -->
+        <!-- TITRE RESULTATS -->
+        <!-- ================================================= -->
+
+        <section
+            class="mb-8"
+        >
 
             <div
                 class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900"
             >
 
+                <p
+                    class="mb-1 text-sm font-medium text-green-600 dark:text-green-400"
+                >
+                    Résultats
+                </p>
+
+                <h2
+                    class="text-2xl font-bold text-gray-900 dark:text-white"
+                >
+                    Recherche pour
+
+                    <span
+                        class="text-green-600 dark:text-green-400"
+                    >
+                        "{{ keyword }}"
+                    </span>
+                </h2>
+
                 <div
-                    class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+                    *ngIf="!loading"
+                    class="mt-3 flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400"
                 >
 
-                    <div>
+                    <span>
+                        {{ totalProducts }}
+                        produit(s)
+                    </span>
 
-                        <p
-                            class="mb-1 text-sm font-medium text-green-600 dark:text-green-400"
-                        >
-                            Recherche
-                        </p>
-
-                        <h1
-                            class="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl"
-                        >
-                            Résultats pour
-                            <span
-                                class="text-green-600 dark:text-green-400"
-                            >
-                                "{{ keyword }}"
-                            </span>
-                        </h1>
-
-                        <p
-                            class="mt-2 text-sm text-gray-500 dark:text-gray-400"
-                        >
-                            Retrouvez les produits et les packs correspondant à votre recherche.
-                        </p>
-
-                    </div>
-
-                    <a
-                        routerLink="/products"
-                        class="inline-flex shrink-0 items-center justify-center rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700"
-                    >
-                        Voir tous les produits
-                    </a>
+                    <span>
+                        {{ totalBundles }}
+                        pack(s)
+                    </span>
 
                 </div>
 
@@ -149,7 +321,7 @@
 
 
         <!-- ================================================= -->
-        <!-- CHARGEMENT -->
+        <!-- LOADING -->
         <!-- ================================================= -->
 
         <section
@@ -166,7 +338,7 @@
                 ></div>
 
                 <p
-                    class="mt-4 text-sm text-gray-500 dark:text-gray-400"
+                    class="mt-4 text-sm text-gray-500"
                 >
                     Recherche en cours...
                 </p>
@@ -186,32 +358,10 @@
         >
 
             <div
-                class="rounded-2xl border border-red-200 bg-red-50 p-5 dark:border-red-900/50 dark:bg-red-950/30"
+                class="rounded-2xl border border-red-200 bg-red-50 p-5 text-red-700 dark:border-red-900 dark:bg-red-950/30"
             >
 
-                <div class="flex items-start gap-3">
-
-                    <span class="text-xl">
-                        ⚠️
-                    </span>
-
-                    <div>
-
-                        <h2
-                            class="font-semibold text-red-800 dark:text-red-300"
-                        >
-                            Une erreur est survenue
-                        </h2>
-
-                        <p
-                            class="mt-1 text-sm text-red-700 dark:text-red-400"
-                        >
-                            {{ error }}
-                        </p>
-
-                    </div>
-
-                </div>
+                {{ error }}
 
             </div>
 
@@ -227,38 +377,16 @@
             class="mb-12"
         >
 
-            <div
-                class="mb-5 flex items-center justify-between"
-            >
+            <div class="mb-5">
 
-                <div>
-
-                    <h2
-                        class="text-xl font-bold text-gray-900 dark:text-white"
-                    >
-                        Produits
-                    </h2>
-
-                    <p
-                        class="mt-1 text-sm text-gray-500 dark:text-gray-400"
-                    >
-                        {{ products.length }}
-                        résultat(s)
-                    </p>
-
-                </div>
-
-                <a
-                    routerLink="/products"
-                    class="text-sm font-semibold text-green-600 hover:text-green-700 dark:text-green-400"
+                <h2
+                    class="text-xl font-bold text-gray-900 dark:text-white"
                 >
-                    Voir tous →
-                </a>
+                    Produits
+                </h2>
 
             </div>
 
-
-            <!-- Grille produits -->
 
             <div
                 class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
@@ -270,8 +398,6 @@
                     class="group cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900"
                 >
 
-                    <!-- Image -->
-
                     <div
                         class="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-800"
                     >
@@ -281,8 +407,6 @@
                             [alt]="product.name"
                             class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                         >
-
-                        <!-- Stock -->
 
                         <div
                             *ngIf="product.stock > 0"
@@ -294,21 +418,15 @@
                     </div>
 
 
-                    <!-- Informations produit -->
-
                     <div class="p-4">
-
-                        <!-- Entreprise -->
 
                         <p
                             *ngIf="product.companyName"
-                            class="mb-1 text-xs font-medium uppercase tracking-wide text-green-600 dark:text-green-400"
+                            class="mb-1 text-xs font-medium uppercase tracking-wide text-green-600"
                         >
                             {{ product.companyName }}
                         </p>
 
-
-                        <!-- Nom -->
 
                         <h3
                             class="line-clamp-2 text-base font-semibold text-gray-900 dark:text-white"
@@ -317,53 +435,35 @@
                         </h3>
 
 
-                        <!-- Marque -->
-
                         <p
                             *ngIf="product.brand"
-                            class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+                            class="mt-1 text-sm text-gray-500"
                         >
                             {{ product.brand }}
                         </p>
 
 
-                        <!-- Description -->
-
                         <p
                             *ngIf="product.description"
-                            class="mt-2 line-clamp-2 text-sm text-gray-500 dark:text-gray-400"
+                            class="mt-2 line-clamp-2 text-sm text-gray-500"
                         >
                             {{ product.description }}
                         </p>
 
 
-                        <!-- Prix -->
-
                         <div
-                            class="mt-4 flex items-center justify-between gap-3"
+                            class="mt-4 flex items-center justify-between"
                         >
 
-                            <div>
-
-                                <p
-                                    class="text-lg font-bold text-green-600 dark:text-green-400"
-                                >
-                                    {{ product.price | number:'1.0-0' }}
-                                    FCFA
-                                </p>
-
-                                <p
-                                    *ngIf="product.stock !== undefined"
-                                    class="mt-0.5 text-xs text-gray-400"
-                                >
-                                    Stock :
-                                    {{ product.stock }}
-                                </p>
-
-                            </div>
+                            <p
+                                class="text-lg font-bold text-green-600"
+                            >
+                                {{ product.price | number:'1.0-0' }}
+                                FCFA
+                            </p>
 
                             <span
-                                class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-green-50 text-green-600 transition group-hover:bg-green-600 group-hover:text-white dark:bg-green-950/40 dark:text-green-400"
+                                class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-50 text-green-600 group-hover:bg-green-600 group-hover:text-white"
                             >
                                 →
                             </span>
@@ -388,38 +488,16 @@
             class="mb-12"
         >
 
-            <div
-                class="mb-5 flex items-center justify-between"
-            >
+            <div class="mb-5">
 
-                <div>
-
-                    <h2
-                        class="text-xl font-bold text-gray-900 dark:text-white"
-                    >
-                        Packs
-                    </h2>
-
-                    <p
-                        class="mt-1 text-sm text-gray-500 dark:text-gray-400"
-                    >
-                        {{ bundles.length }}
-                        résultat(s)
-                    </p>
-
-                </div>
-
-                <a
-                    routerLink="/bundles"
-                    class="text-sm font-semibold text-green-600 hover:text-green-700 dark:text-green-400"
+                <h2
+                    class="text-xl font-bold text-gray-900 dark:text-white"
                 >
-                    Voir tous →
-                </a>
+                    Packs
+                </h2>
 
             </div>
 
-
-            <!-- Grille packs -->
 
             <div
                 class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
@@ -431,8 +509,6 @@
                     class="group cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900"
                 >
 
-                    <!-- Image -->
-
                     <div
                         class="relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-gray-800"
                     >
@@ -443,10 +519,7 @@
                             class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                         >
 
-                        <!-- Badge -->
-
                         <div
-                            *ngIf="bundle.active"
                             class="absolute left-3 top-3 rounded-full bg-green-600 px-2.5 py-1 text-xs font-semibold text-white"
                         >
                             Pack
@@ -454,8 +527,6 @@
 
                     </div>
 
-
-                    <!-- Informations pack -->
 
                     <div class="p-4">
 
@@ -468,40 +539,25 @@
 
                         <p
                             *ngIf="bundle.description"
-                            class="mt-2 line-clamp-3 text-sm text-gray-500 dark:text-gray-400"
+                            class="mt-2 line-clamp-3 text-sm text-gray-500"
                         >
                             {{ bundle.description }}
                         </p>
 
 
-                        <!-- Prix -->
-
                         <div
-                            class="mt-4 flex items-center justify-between gap-3"
+                            class="mt-4 flex items-center justify-between"
                         >
 
-                            <div>
-
-                                <p
-                                    class="text-lg font-bold text-green-600 dark:text-green-400"
-                                >
-                                    {{ bundle.price | number:'1.0-0' }}
-                                    FCFA
-                                </p>
-
-                                <p
-                                    *ngIf="bundle.stock !== undefined"
-                                    class="mt-0.5 text-xs text-gray-400"
-                                >
-                                    Stock :
-                                    {{ bundle.stock }}
-                                </p>
-
-                            </div>
-
+                            <p
+                                class="text-lg font-bold text-green-600"
+                            >
+                                {{ bundle.price | number:'1.0-0' }}
+                                FCFA
+                            </p>
 
                             <span
-                                class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-green-50 text-green-600 transition group-hover:bg-green-600 group-hover:text-white dark:bg-green-950/40 dark:text-green-400"
+                                class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-50 text-green-600 group-hover:bg-green-600 group-hover:text-white"
                             >
                                 →
                             </span>
@@ -518,11 +574,80 @@
 
 
         <!-- ================================================= -->
+        <!-- PAGINATION -->
+        <!-- ================================================= -->
+
+        <section
+            *ngIf="!loading && maxPages > 1"
+            class="mb-12"
+        >
+
+            <div
+                class="flex flex-col items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white p-4 sm:flex-row dark:border-gray-800 dark:bg-gray-900"
+            >
+
+                <!-- PRECEDENT -->
+
+                <button
+                    type="button"
+                    (click)="previousPage()"
+                    [disabled]="currentPage === 0"
+                    class="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-green-600 hover:text-green-600 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:text-gray-200"
+                >
+                    ← Précédent
+                </button>
+
+
+                <!-- NUMEROS -->
+
+                <div
+                    class="flex items-center gap-1"
+                >
+
+                    <button
+                        *ngFor="let page of pages"
+                        type="button"
+                        (click)="goToPage(page)"
+                        class="h-10 min-w-10 rounded-xl px-3 text-sm font-semibold transition"
+                        [ngClass]="
+                            page === currentPage
+                                ? 'bg-green-600 text-white'
+                                : 'text-gray-600 hover:bg-green-50 hover:text-green-600 dark:text-gray-300 dark:hover:bg-green-950/40'
+                        "
+                    >
+                        {{ page + 1 }}
+                    </button>
+
+                </div>
+
+
+                <!-- SUIVANT -->
+
+                <button
+                    type="button"
+                    (click)="nextPage()"
+                    [disabled]="currentPage + 1 >= maxPages"
+                    class="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-green-600 hover:text-green-600 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:text-gray-200"
+                >
+                    Suivant →
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================================= -->
         <!-- AUCUN RESULTAT -->
         <!-- ================================================= -->
 
         <section
-            *ngIf="!loading && !hasResults"
+            *ngIf="
+                !loading &&
+                !error &&
+                !hasResults &&
+                keyword
+            "
             class="py-16"
         >
 
@@ -547,32 +672,23 @@
                 <p
                     class="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400"
                 >
-                    Aucun produit ou pack ne correspond à votre recherche
-                    <strong class="text-gray-700 dark:text-gray-200">
+                    Aucun produit ou pack ne correspond à :
+
+                    <strong
+                        class="text-gray-700 dark:text-gray-200"
+                    >
                         "{{ keyword }}"
-                    </strong>.
+                    </strong>
                 </p>
 
 
-                <div
-                    class="mt-6 flex flex-col justify-center gap-3 sm:flex-row"
+                <button
+                    type="button"
+                    (click)="resetFilters()"
+                    class="mt-6 rounded-xl bg-green-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-green-700"
                 >
-
-                    <a
-                        routerLink="/products"
-                        class="inline-flex items-center justify-center rounded-xl bg-green-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700"
-                    >
-                        Parcourir les produits
-                    </a>
-
-                    <a
-                        routerLink="/bundles"
-                        class="inline-flex items-center justify-center rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-green-600 hover:text-green-600 dark:border-gray-700 dark:text-gray-200 dark:hover:border-green-500 dark:hover:text-green-400"
-                    >
-                        Parcourir les packs
-                    </a>
-
-                </div>
+                    Réinitialiser les filtres
+                </button>
 
             </div>
 
@@ -590,13 +706,14 @@
     >
 
         <div
-            class="mx-auto max-w-7xl px-4 py-6 text-center sm:px-6 lg:px-8"
+            class="mx-auto max-w-7xl px-4 py-6 text-center"
         >
 
             <p
                 class="text-sm text-gray-500 dark:text-gray-400"
             >
-                © {{ currentYear }} TTES-ICG Santé.
+                © {{ currentYear }}
+                TTES-ICG Santé.
                 Tous droits réservés.
             </p>
 

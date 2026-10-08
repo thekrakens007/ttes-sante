@@ -74,6 +74,12 @@ export class ProductsListComponent implements OnInit {
     loadingFilters = false;
 
     /* ============================================================
+       MENU MOBILE
+       ============================================================ */
+
+    mobileMenuOpen = false;
+
+    /* ============================================================
        PANIER
        ============================================================ */
 
@@ -81,7 +87,25 @@ export class ProductsListComponent implements OnInit {
 
     cartLoading = false;
 
-    addingToCartId: number | null = null;
+    /*
+     * ID du produit actuellement en cours d'ajout.
+     *
+     * Le HTML utilise addingProductId.
+     */
+    addingProductId: number | null = null;
+
+    /*
+     * Messages affichés dans le HTML.
+     */
+    cartMessage = '';
+
+    cartError = '';
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+
+    currentYear = new Date().getFullYear();
 
     /* ============================================================
        INITIALISATION
@@ -91,6 +115,48 @@ export class ProductsListComponent implements OnInit {
         this.loadFilterData();
         this.loadProducts();
         this.loadCart();
+    }
+
+    /* ============================================================
+       MENU MOBILE
+       ============================================================ */
+
+    toggleMobileMenu(): void {
+        this.mobileMenuOpen = !this.mobileMenuOpen;
+    }
+
+    closeMobileMenu(): void {
+        this.mobileMenuOpen = false;
+    }
+
+    /* ============================================================
+       AUTHENTIFICATION
+       ============================================================ */
+
+    /*
+     * Le HTML utilise isLoggedIn().
+     *
+     * On vérifie ici simplement la présence du token
+     * actuellement utilisé par l'application.
+     */
+    isLoggedIn(): boolean {
+        return !!localStorage.getItem('ttes_icg_sante_token');
+    }
+
+    /*
+     * Déconnexion.
+     *
+     * Le token utilisé par ton application est supprimé,
+     * puis l'utilisateur est redirigé vers la connexion.
+     */
+    logout(): void {
+        localStorage.removeItem('ttes_icg_sante_token');
+
+        this.cart = null;
+
+        this.closeMobileMenu();
+
+        this.router.navigate(['/signin']);
     }
 
     /* ============================================================
@@ -108,6 +174,7 @@ export class ProductsListComponent implements OnInit {
             next: (categories) => {
                 this.categories = categories ?? [];
             },
+
             error: (err) => {
                 console.error(
                     'Erreur lors du chargement des catégories:',
@@ -125,6 +192,7 @@ export class ProductsListComponent implements OnInit {
             next: (companies) => {
                 this.companies = companies ?? [];
             },
+
             error: (err) => {
                 console.error(
                     'Erreur lors du chargement des entreprises:',
@@ -143,6 +211,7 @@ export class ProductsListComponent implements OnInit {
                 this.therapeuticAreas = areas ?? [];
                 this.loadingFilters = false;
             },
+
             error: (err) => {
                 console.error(
                     'Erreur lors du chargement des domaines thérapeutiques:',
@@ -338,11 +407,14 @@ export class ProductsListComponent implements OnInit {
     }
 
     /*
-     * Ton HTML utilise "pages".
+     * Le HTML actuel utilise getPaginationPages().
      *
-     * On retourne ici les numéros de pages en base 0.
+     * Les pages sont en base 0 :
+     * 0 = page 1
+     * 1 = page 2
+     * etc.
      */
-    get pages(): number[] {
+    getPaginationPages(): number[] {
 
         if (this.totalPages <= 0) {
             return [];
@@ -354,17 +426,18 @@ export class ProductsListComponent implements OnInit {
         );
     }
 
+    /*
+     * Conservé au cas où une autre partie du HTML
+     * utilise encore "pages".
+     */
+    get pages(): number[] {
+        return this.getPaginationPages();
+    }
+
     /* ============================================================
        INFORMATIONS PAGINATION
        ============================================================ */
 
-    /*
-     * Ton HTML utilise firstDisplayedProduct.
-     *
-     * Exemple :
-     * page 0 / 8 produits => 1
-     * page 1 / 8 produits => 9
-     */
     get firstDisplayedProduct(): number {
 
         if (this.totalElements === 0) {
@@ -376,9 +449,6 @@ export class ProductsListComponent implements OnInit {
         ) + 1;
     }
 
-    /*
-     * Ton HTML utilise lastDisplayedProduct.
-     */
     get lastDisplayedProduct(): number {
 
         if (this.totalElements === 0) {
@@ -398,6 +468,15 @@ export class ProductsListComponent implements OnInit {
        ============================================================ */
 
     loadCart(): void {
+
+        /*
+         * Si l'utilisateur n'est pas connecté,
+         * inutile d'appeler l'API du panier.
+         */
+        if (!this.isLoggedIn()) {
+            this.cart = null;
+            return;
+        }
 
         this.cartLoading = true;
 
@@ -427,10 +506,14 @@ export class ProductsListComponent implements OnInit {
     /*
      * Ajouter un produit au panier.
      *
-     * IMPORTANT :
      * CartService possède addItem(), pas addToCart().
      */
     addToCart(product: Product): void {
+
+        if (!this.isLoggedIn()) {
+            this.router.navigate(['/signin']);
+            return;
+        }
 
         if (!product?.id) {
 
@@ -443,12 +526,15 @@ export class ProductsListComponent implements OnInit {
         }
 
         if (
-            this.addingToCartId === product.id
+            this.addingProductId === product.id
         ) {
             return;
         }
 
-        this.addingToCartId = product.id;
+        this.cartMessage = '';
+        this.cartError = '';
+
+        this.addingProductId = product.id;
 
         this.cartService
             .addItem(product.id, 1)
@@ -462,7 +548,17 @@ export class ProductsListComponent implements OnInit {
                      */
                     this.cart = cart;
 
-                    this.addingToCartId = null;
+                    this.addingProductId = null;
+
+                    this.cartMessage =
+                        `${product.name} a été ajouté au panier.`;
+
+                    /*
+                     * On retire le message après quelques secondes.
+                     */
+                    setTimeout(() => {
+                        this.cartMessage = '';
+                    }, 3000);
                 },
 
                 error: (err) => {
@@ -472,13 +568,20 @@ export class ProductsListComponent implements OnInit {
                         err
                     );
 
-                    this.addingToCartId = null;
+                    this.addingProductId = null;
+
+                    this.cartError =
+                        'Impossible d’ajouter le produit au panier.';
+
+                    setTimeout(() => {
+                        this.cartError = '';
+                    }, 4000);
                 }
             });
     }
 
     /*
-     * Ton HTML utilise cartCount.
+     * Nombre total d'articles dans le panier.
      */
     get cartCount(): number {
 
@@ -504,6 +607,67 @@ export class ProductsListComponent implements OnInit {
         );
     }
 
+    /*
+     * Quantité d'un produit précis dans le panier.
+     */
+    getProductCartQuantity(
+        productId: number
+    ): number {
+
+        if (
+            !this.cart ||
+            !this.cart.items
+        ) {
+            return 0;
+        }
+
+        const item = this.cart.items.find(
+            (cartItem: any) => {
+
+                /*
+                 * Cas 1 :
+                 * { productId: 10 }
+                 */
+                if (
+                    Number(cartItem?.productId) ===
+                    Number(productId)
+                ) {
+                    return true;
+                }
+
+                /*
+                 * Cas 2 :
+                 * { product: { id: 10 } }
+                 */
+                if (
+                    Number(cartItem?.product?.id) ===
+                    Number(productId)
+                ) {
+                    return true;
+                }
+
+                /*
+                 * Cas 3 :
+                 * { product: { productId: 10 } }
+                 */
+                if (
+                    Number(cartItem?.product?.productId) ===
+                    Number(productId)
+                ) {
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        if (!item) {
+            return 0;
+        }
+
+        return Number(item.quantity) || 0;
+    }
+
     /* ============================================================
        STOCK
        ============================================================ */
@@ -520,6 +684,14 @@ export class ProductsListComponent implements OnInit {
         return (
             (product.stock ?? 0) <= 0
         );
+    }
+
+    isLowStock(product: Product): boolean {
+
+        const stock =
+            product.stock ?? 0;
+
+        return stock > 0 && stock <= 5;
     }
 
     getStockLabel(product: Product): string {
@@ -562,7 +734,10 @@ export class ProductsListComponent implements OnInit {
        IMAGE PRODUIT
        ============================================================ */
 
-    getProductImage(
+    /*
+     * Le HTML actuel utilise getMainImage(product).
+     */
+    getMainImage(
         product: Product
     ): string {
 
@@ -571,14 +746,6 @@ export class ProductsListComponent implements OnInit {
             product.images.length > 0
         ) {
 
-            /*
-             * On utilise "any" ici parce que ton modèle
-             * ProductImage semble exposer une structure dont
-             * TypeScript déduit actuellement url comme {}.
-             *
-             * Cela évite l'erreur :
-             * Type '{}' is not assignable to type 'string'.
-             */
             const firstImage: any =
                 product.images[0];
 
@@ -614,7 +781,7 @@ export class ProductsListComponent implements OnInit {
             }
 
             /*
-             * Structure éventuelle :
+             * Structure :
              * { path: "..." }
              */
             if (
@@ -626,6 +793,15 @@ export class ProductsListComponent implements OnInit {
         }
 
         return '/images/products/default-product.jpg';
+    }
+
+    /*
+     * Ancien nom conservé pour compatibilité.
+     */
+    getProductImage(
+        product: Product
+    ): string {
+        return this.getMainImage(product);
     }
 
     /* ============================================================

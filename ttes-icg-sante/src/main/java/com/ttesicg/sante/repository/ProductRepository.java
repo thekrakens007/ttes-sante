@@ -16,24 +16,56 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     boolean existsBySku(String sku);
 
+
     // =========================================================
     // RECHERCHE ADMIN
     // =========================================================
 
     @Query("""
-        SELECT p
+        SELECT DISTINCT p
         FROM Product p
+        LEFT JOIN p.categories c
+        LEFT JOIN p.therapeuticAreas ta
+        LEFT JOIN p.company company
         WHERE
-            LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(COALESCE(p.brand, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(COALESCE(p.activeIngredient, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(COALESCE(p.company.name, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            unaccent(LOWER(p.name))
+                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+            OR unaccent(LOWER(p.sku))
+                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+            OR unaccent(LOWER(COALESCE(p.brand, '')))
+                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+            OR unaccent(LOWER(COALESCE(p.activeIngredient, '')))
+                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+            OR unaccent(LOWER(COALESCE(p.description, '')))
+                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+            OR unaccent(LOWER(COALESCE(p.ingredients, '')))
+                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+            OR unaccent(LOWER(COALESCE(p.dosage, '')))
+                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+            OR unaccent(LOWER(COALESCE(p.form, '')))
+                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+            OR unaccent(LOWER(COALESCE(company.name, '')))
+                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+            OR unaccent(LOWER(COALESCE(c.name, '')))
+                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+            OR unaccent(LOWER(COALESCE(ta.name, '')))
+                LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
         """)
     Page<Product> searchProducts(
             @Param("keyword") String keyword,
             Pageable pageable
     );
+
 
     // =========================================================
     // PRODUITS DISPONIBLES
@@ -48,6 +80,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         """)
     Page<Product> findAvailableProducts(Pageable pageable);
 
+
     // =========================================================
     // PRODUITS DISPONIBLES + RECHERCHE + FILTRES
     // =========================================================
@@ -57,6 +90,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         FROM Product p
         LEFT JOIN p.categories c
         LEFT JOIN p.therapeuticAreas ta
+        LEFT JOIN p.company company
         WHERE
             p.active = true
             AND p.inventory.quantity > 0
@@ -64,11 +98,39 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             AND (
                 :keyword IS NULL
                 OR :keyword = ''
-                OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(COALESCE(p.brand, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(COALESCE(p.activeIngredient, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(COALESCE(p.company.name, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+
+                OR unaccent(LOWER(p.name))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(p.sku))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(p.brand, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(p.activeIngredient, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(p.description, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(p.ingredients, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(p.dosage, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(p.form, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(company.name, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(c.name, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(ta.name, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
             )
 
             AND (
@@ -94,22 +156,54 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             Pageable pageable
     );
 
+
     // =========================================================
-    // PRODUITS DISPONIBLES + RECHERCHE
+    // PRODUITS DISPONIBLES + RECHERCHE GLOBALE
     // =========================================================
 
     @Query("""
-        SELECT p
+        SELECT DISTINCT p
         FROM Product p
+        LEFT JOIN p.categories c
+        LEFT JOIN p.therapeuticAreas ta
+        LEFT JOIN p.company company
         WHERE
             p.active = true
             AND p.inventory.quantity > 0
+
             AND (
-                LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(COALESCE(p.brand, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(COALESCE(p.activeIngredient, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(COALESCE(p.company.name, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                unaccent(LOWER(p.name))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(p.sku))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(p.brand, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(p.activeIngredient, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(p.description, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(p.ingredients, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(p.dosage, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(p.form, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(company.name, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(c.name, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
+
+                OR unaccent(LOWER(COALESCE(ta.name, '')))
+                    LIKE CONCAT('%', unaccent(LOWER(:keyword)), '%')
             )
         """)
     Page<Product> searchAvailableProducts(
@@ -117,17 +211,20 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             Pageable pageable
     );
 
+
     // =========================================================
     // PAR ENTREPRISE
     // =========================================================
 
     List<Product> findByCompanyId(Long companyId);
 
+
     // =========================================================
     // PRODUITS ACTIFS
     // =========================================================
 
     List<Product> findByActiveTrue();
+
 
     // =========================================================
     // RECHERCHE SIMPLE PAR NOM

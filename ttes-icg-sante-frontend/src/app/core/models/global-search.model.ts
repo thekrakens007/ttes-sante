@@ -1,26 +1,43 @@
 import { Product } from './product.model';
 
-export interface GlobalSearchResponse {
-  products: Product[];
-  bundles: Bundle[];
+export interface BundleImage {
+    id?: number;
+    imageUrl?: string;
+    main?: boolean;
 }
 
 export interface Bundle {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  active: boolean;
-  stock: number;
-  items: any[];
-  images: BundleImage[];
-  createdAt: string;
-  updatedAt: string;
+
+    id: number;
+
+    name: string;
+
+    description?: string;
+
+    price: number;
+
+    stock?: number;
+
+    active?: boolean;
+
+    images?: BundleImage[];
 }
 
-export interface BundleImage {
-  id: number;
-  imageUrl: string;
-  main: boolean;
-  displayOrder: number;
+export interface GlobalSearchResponse {
+
+    products: Product[];
+
+    bundles: Bundle[];
+
+    page: number;
+
+    size: number;
+
+    totalProducts: number;
+
+    totalBundles: number;
+
+    totalProductPages: number;
+
+    totalBundlePages: number;
 }

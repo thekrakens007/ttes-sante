@@ -67,7 +67,35 @@ public Page<ProductResponse> getAvailableProductsPaginated(
             .map(this::map);
 }
 
+// =========================================================
+// RECHERCHE PRODUITS DISPONIBLES + FILTRES + PAGINATION
+// Compatibilité avec GlobalSearchService
+// =========================================================
 
+public Page<ProductResponse> searchAvailableProductsPaginatedWithFilters(
+        String keyword,
+        Long categoryId,
+        Long companyId,
+        Long therapeuticAreaId,
+        Pageable pageable
+) {
+
+    String normalizedKeyword =
+            keyword != null
+                    ? keyword.trim()
+                    : "";
+
+    return productRepository
+            .findAvailableProductsWithFilters(
+                    normalizedKeyword,
+                    categoryId,
+                    companyId,
+                    therapeuticAreaId,
+                    pageable
+            )
+            .map(this::map);
+}
+    
 // =========================================================
 // PRODUITS DISPONIBLES
 // RECHERCHE + FILTRES + PAGINATION

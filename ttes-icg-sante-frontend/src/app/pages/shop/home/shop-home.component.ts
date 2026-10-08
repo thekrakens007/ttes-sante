@@ -89,7 +89,65 @@ export class ShopHomeComponent implements OnInit {
 
     // ===================== CONTENU STATIQUE DE LA PAGE D'ACCUEIL =====================
 
-  partners = [...]  et  products = [...]  (voir bas de fichier)
+    partners = [
+      { id: 1, name: 'DAS Group Cameroun',      category: 'Laboratoire pharmaceutique', active: false },
+      { id: 2, name: 'PhytoScience Cameroun',   category: 'Pharmacies',                 active: false },
+      { id: 3, name: 'TIENS Cameroun',          category: 'Pharmacies',                 active: false },
+      { id: 4, name: 'VESTIGE Cameroun',        category: 'Pharmacies',                 active: false },
+      { id: 5, name: 'YUPI Global Cameroun',    category: 'Pharmacies',                 active: false },
+      { id: 6, name: 'LONGRICH Cameroun',       category: 'Pharmacies',                 active: false },
+      { id: 7, name: 'Forever Living Cameroun', category: 'Soins à base d\'aloe vera',  active: false },
+      { id: 8, name: 'Dynace Global Cameroun',  category: 'Bien-être',                  active: false },
+    ];
+
+    reassurance = [
+      { i: '🚚', t: 'Livraison',                      d: 'Douala, Yaoundé et autres villes' },
+      { i: '💬', t: 'Conseil par WhatsApp',           d: 'Une équipe à votre écoute' },
+      { i: '📋', t: 'Produits clairement étiquetés',  d: 'Composition et mode d\'emploi' },
+      { i: '🔒', t: 'Paiement sécurisé',              d: 'Commande simple depuis votre compte' },
+    ];
+
+    steps = [
+      { n: 1, t: 'Échangez avec nous',                 d: 'Par WhatsApp ou dans l\'une de nos villes de présence.' },
+      { n: 2, t: 'Recevez des conseils personnalisés', d: 'Produits, doses indiquées sur l\'étiquette, durée d\'utilisation.' },
+      { n: 3, t: 'Restez accompagné',                  d: 'Nous restons disponibles pour répondre à vos questions.' },
+    ];
+
+    packs = [
+      { t: 'Pack Découverte', d: 'Pour essayer la gamme et trouver vos produits préférés.',
+        img: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=900&q=85' },
+      { t: 'Pack Routine', d: 'Une sélection pour l\'utilisation quotidienne sur plusieurs semaines.',
+        img: 'https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=900&q=85' },
+      { t: 'Pack Famille', d: 'Plusieurs produits à partager, avec un meilleur prix.',
+        img: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=85' },
+    ];
+
+    featuredProducts = [
+      { name: 'Double Stemcell', tag: 'Complément alimentaire',
+        desc: 'Sachets de complément alimentaire à base d\'extraits végétaux (pomme, raisin), à intégrer à votre routine.',
+        image: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=900&q=85' },
+      { name: 'Crystal Cell', tag: 'Complément alimentaire',
+        desc: 'Préparation en sachet à base d\'extraits végétaux, pratique à emporter.',
+        image: 'https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=900&q=85' },
+      { name: 'NuLite', tag: 'Boisson botanique',
+        desc: 'Mélange de boisson botanique au psyllium, pour accompagner une alimentation riche en fibres.',
+        image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=85' },
+      { name: 'SnowPhyll Forte', tag: 'Boisson botanique',
+        desc: 'Mélange à base d\'herbe de blé, de chlorophylle et d\'algues des neiges.',
+        image: 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=85' },
+      { name: 'iiQ Plus', tag: 'Boisson aux fruits',
+        desc: 'Mélange de jus de fruits avec lutéine, à savourer au quotidien.',
+        image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=85' },
+      { name: 'Triple Stemcell', tag: 'Soin de la peau',
+        desc: 'Gamme de soins : hydratant H2O et essence intense pour le soin quotidien de la peau.',
+        image: 'https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=900&q=85' },
+      { name: 'NuForte', tag: 'Complément alimentaire',
+        desc: 'Complément alimentaire en sachets. Voir la fiche pour la composition complète.',
+        image: 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&w=900&q=85' },
+      { name: 'Actual Plus', tag: 'Complément alimentaire',
+        desc: 'Complément alimentaire. Voir la fiche pour la composition et le mode d\'emploi.',
+        image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=900&q=85' },
+    ];
 
     // ===================== INIT =====================
 

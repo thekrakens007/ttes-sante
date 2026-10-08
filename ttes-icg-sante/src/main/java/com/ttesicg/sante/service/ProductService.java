@@ -59,6 +59,27 @@ public class ProductService {
                 .map(this::map);
     }
 
+    public Page<ProductResponse> searchAvailableProductsPaginatedWithFilters(
+        String keyword,
+        Long categoryId,
+        Long companyId,
+        Long therapeuticAreaId,
+        Pageable pageable
+) {
+
+    Page<Product> products =
+            productRepository.findAvailableProductsWithFilters(
+                    keyword == null ? "" : keyword,
+                    categoryId,
+                    companyId,
+                    therapeuticAreaId,
+                    pageable
+            );
+
+    return products.map(
+            this::mapToProductResponse
+    );
+}
 
     // =========================================================
     // PRODUITS PAGINÉS

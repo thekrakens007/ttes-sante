@@ -45,6 +45,7 @@ export class SearchComponent implements OnInit {
     // =========================================================
 
     keyword = '';
+currentYear = new Date().getFullYear();
 
     // =========================================================
     // RESULTATS

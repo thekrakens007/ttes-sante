@@ -1,7 +1,11 @@
 package com.ttesicg.sante.controller;
 
+import com.ttesicg.sante.dto.CategoryResponse;
 import com.ttesicg.sante.dto.ProductResponse;
+import com.ttesicg.sante.dto.TherapeuticAreaResponse;
+import com.ttesicg.sante.service.CategoryService;
 import com.ttesicg.sante.service.ProductService;
+import com.ttesicg.sante.service.TherapeuticAreaService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +24,8 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final CategoryService categoryService;
+    private final TherapeuticAreaService therapeuticAreaService;
 
 
     // =========================================================
@@ -130,6 +136,28 @@ public class ProductController {
                         keyword,
                         pageable
                 );
+    }
+
+
+    // =========================================================
+    // CATÉGORIES
+    // =========================================================
+
+    @GetMapping("/categories")
+    public List<CategoryResponse> getCategories() {
+
+        return categoryService.findAll();
+    }
+
+
+    // =========================================================
+    // DOMAINES THÉRAPEUTIQUES
+    // =========================================================
+
+    @GetMapping("/therapeutic-areas")
+    public List<TherapeuticAreaResponse> getTherapeuticAreas() {
+
+        return therapeuticAreaService.findAll();
     }
 
 

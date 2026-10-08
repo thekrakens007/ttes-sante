@@ -68,7 +68,7 @@ export const routes: Routes = [
     loadComponent: () =>
         import('./pages/shop/search.component')
             .then(m => m.SearchComponent)
-}
+},
   {
     path: 'profile',
     component: ProfileComponent,

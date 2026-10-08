@@ -1,134 +1,191 @@
 import {
-  Component,
-  OnInit,
-  inject
+    Component,
+    OnInit,
+    inject
 } from '@angular/core';
 
+import { CommonModule } from '@angular/common';
 import {
-  CommonModule
-} from '@angular/common';
-
-import {
-  ActivatedRoute,
-  Router,
-  RouterModule
+    ActivatedRoute,
+    Router,
+    RouterModule
 } from '@angular/router';
 
-import {
-  SearchService
-} from '../../core/services/search.service';
+import { SearchService } from '../../core/services/search.service';
+
+import { Product } from '../../core/models/product.model';
 
 import {
-  Bundle
+    GlobalSearchResponse,
+    Bundle
 } from '../../core/models/global-search.model';
 
-import {
-  Product
-} from '../../core/models/product.model';
-
-
 @Component({
-  selector: 'app-search',
-  standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule
-  ],
-  templateUrl: './search.component.html'
+    selector: 'app-search',
+    standalone: true,
+    imports: [
+        CommonModule,
+        RouterModule
+    ],
+    templateUrl: './search.component.html'
 })
 export class SearchComponent implements OnInit {
 
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private searchService = inject(SearchService);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    private searchService = inject(SearchService);
 
+    keyword = '';
 
-  keyword = '';
+    products: Product[] = [];
+    bundles: Bundle[] = [];
 
-  products: Product[] = [];
+    loading = false;
+    error = '';
 
-  bundles: Bundle[] = [];
+    ngOnInit(): void {
 
-  loading = false;
+        this.route.queryParams.subscribe(params => {
 
-  error = '';
+            const keyword = (params['q'] || '').trim();
 
+            this.keyword = keyword;
 
-  ngOnInit(): void {
+            if (!keyword) {
+                this.products = [];
+                this.bundles = [];
+                return;
+            }
 
-    this.route.queryParamMap.subscribe(params => {
-
-      this.keyword =
-        params.get('q')?.trim() || '';
-
-      if (this.keyword) {
-        this.search();
-      }
-
-    });
-  }
-
-
-  search(): void {
-
-    if (!this.keyword) {
-      return;
+            this.search();
+        });
     }
 
-    this.loading = true;
-    this.error = '';
+    /**
+     * Effectue la recherche globale
+     * produits + packs.
+     */
+    search(): void {
 
-    this.searchService
-      .search(this.keyword)
-      .subscribe({
+        const keyword = this.keyword.trim();
 
-        next: response => {
-
-          this.products =
-              response.products || [];
-
-          this.bundles =
-              response.bundles || [];
-
-          this.loading = false;
-        },
-
-        error: error => {
-
-          console.error(
-            'Erreur recherche globale :',
-            error
-          );
-
-          this.loading = false;
-
-          this.error =
-              'Impossible d’effectuer la recherche.';
+        if (!keyword) {
+            return;
         }
 
-      });
-  }
+        this.loading = true;
+        this.error = '';
 
+        this.searchService
+            .search(keyword, 0, 8)
+            .subscribe({
 
-  openProduct(product: Product): void {
+                next: (response: GlobalSearchResponse) => {
 
-    this.router.navigate(
-      ['/products', product.id]
-    );
-  }
+                    this.products = response.products || [];
 
+                    this.bundles = response.bundles || [];
 
-  openBundle(bundle: Bundle): void {
+                    this.loading = false;
+                },
 
-    this.router.navigate(
-      ['/bundles', bundle.id]
-    );
-  }
+                error: (err) => {
 
+                    console.error(
+                        'Erreur recherche globale :',
+                        err
+                    );
 
-  get hasResults(): boolean {
+                    this.error =
+                        'Impossible de récupérer les résultats de recherche.';
 
-    return this.products.length > 0
-        || this.bundles.length > 0;
-  }
+                    this.products = [];
+                    this.bundles = [];
+
+                    this.loading = false;
+                }
+            });
+    }
+
+    /**
+     * Retourne l'image principale d'un produit.
+     */
+    getProductImage(product: Product): string {
+
+        if (
+            !product.images ||
+            product.images.length === 0
+        ) {
+            return '/images/products/default-product.jpg';
+        }
+
+        const image = product.images[0];
+
+        if (typeof image === 'string') {
+            return image;
+        }
+
+        if (image?.imageUrl) {
+            return image.imageUrl;
+        }
+
+        if (image?.url) {
+            return image.url;
+        }
+
+        if (image?.path) {
+            return image.path;
+        }
+
+        return '/images/products/default-product.jpg';
+    }
+
+    /**
+     * Retourne l'image principale d'un pack.
+     */
+    getBundleImage(bundle: Bundle): string {
+
+        if (
+            !bundle.images ||
+            bundle.images.length === 0
+        ) {
+            return '/images/products/default-product.jpg';
+        }
+
+        const mainImage = bundle.images.find(
+            image => image.main
+        );
+
+        if (mainImage?.imageUrl) {
+            return mainImage.imageUrl;
+        }
+
+        if (bundle.images[0]?.imageUrl) {
+            return bundle.images[0].imageUrl;
+        }
+
+        return '/images/products/default-product.jpg';
+    }
+
+    /**
+     * Ouvre la page d'un produit.
+     */
+    openProduct(productId: number): void {
+
+        this.router.navigate([
+            '/products',
+            productId
+        ]);
+    }
+
+    /**
+     * Ouvre la page d'un pack.
+     */
+    openBundle(bundleId: number): void {
+
+        this.router.navigate([
+            '/bundles',
+            bundleId
+        ]);
+    }
 }

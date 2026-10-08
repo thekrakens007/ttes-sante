@@ -87,16 +87,8 @@ export class ProductsListComponent implements OnInit {
 
     cartLoading = false;
 
-    /*
-     * ID du produit actuellement en cours d'ajout.
-     *
-     * Le HTML utilise addingProductId.
-     */
     addingProductId: number | null = null;
 
-    /*
-     * Messages affichés dans le HTML.
-     */
     cartMessage = '';
 
     cartError = '';
@@ -112,8 +104,11 @@ export class ProductsListComponent implements OnInit {
        ============================================================ */
 
     ngOnInit(): void {
+
         this.loadFilterData();
+
         this.loadProducts();
+
         this.loadCart();
     }
 
@@ -122,10 +117,13 @@ export class ProductsListComponent implements OnInit {
        ============================================================ */
 
     toggleMobileMenu(): void {
-        this.mobileMenuOpen = !this.mobileMenuOpen;
+
+        this.mobileMenuOpen =
+            !this.mobileMenuOpen;
     }
 
     closeMobileMenu(): void {
+
         this.mobileMenuOpen = false;
     }
 
@@ -133,30 +131,26 @@ export class ProductsListComponent implements OnInit {
        AUTHENTIFICATION
        ============================================================ */
 
-    /*
-     * Le HTML utilise isLoggedIn().
-     *
-     * On vérifie ici simplement la présence du token
-     * actuellement utilisé par l'application.
-     */
     isLoggedIn(): boolean {
-        return !!localStorage.getItem('ttes_icg_sante_token');
+
+        return !!localStorage.getItem(
+            'ttes_icg_sante_token'
+        );
     }
 
-    /*
-     * Déconnexion.
-     *
-     * Le token utilisé par ton application est supprimé,
-     * puis l'utilisateur est redirigé vers la connexion.
-     */
     logout(): void {
-        localStorage.removeItem('ttes_icg_sante_token');
+
+        localStorage.removeItem(
+            'ttes_icg_sante_token'
+        );
 
         this.cart = null;
 
         this.closeMobileMenu();
 
-        this.router.navigate(['/signin']);
+        this.router.navigate([
+            '/signin'
+        ]);
     }
 
     /* ============================================================
@@ -167,61 +161,86 @@ export class ProductsListComponent implements OnInit {
 
         this.loadingFilters = true;
 
-        /*
-         * Catégories
-         */
-        this.productService.getCategories().subscribe({
-            next: (categories) => {
-                this.categories = categories ?? [];
-            },
+        /* ========================================================
+           CATÉGORIES
+        ======================================================== */
 
-            error: (err) => {
-                console.error(
-                    'Erreur lors du chargement des catégories:',
-                    err
-                );
+        this.productService
+            .getCategories()
+            .subscribe({
 
-                this.categories = [];
-            }
-        });
+                next: (categories) => {
 
-        /*
-         * Entreprises
-         */
-        this.productService.getCompanies().subscribe({
-            next: (companies) => {
-                this.companies = companies ?? [];
-            },
+                    this.categories =
+                        categories ?? [];
+                },
 
-            error: (err) => {
-                console.error(
-                    'Erreur lors du chargement des entreprises:',
-                    err
-                );
+                error: (err) => {
 
-                this.companies = [];
-            }
-        });
+                    console.error(
+                        'Erreur lors du chargement des catégories:',
+                        err
+                    );
 
-        /*
-         * Domaines thérapeutiques
-         */
-        this.productService.getTherapeuticAreas().subscribe({
-            next: (areas) => {
-                this.therapeuticAreas = areas ?? [];
-                this.loadingFilters = false;
-            },
+                    this.categories = [];
+                }
+            });
 
-            error: (err) => {
-                console.error(
-                    'Erreur lors du chargement des domaines thérapeutiques:',
-                    err
-                );
+        /* ========================================================
+           ENTREPRISES
+        ======================================================== */
 
-                this.therapeuticAreas = [];
-                this.loadingFilters = false;
-            }
-        });
+        this.productService
+            .getCompanies()
+            .subscribe({
+
+                next: (companies) => {
+
+                    this.companies =
+                        companies ?? [];
+                },
+
+                error: (err) => {
+
+                    console.error(
+                        'Erreur lors du chargement des entreprises:',
+                        err
+                    );
+
+                    this.companies = [];
+                }
+            });
+
+        /* ========================================================
+           DOMAINES THÉRAPEUTIQUES
+        ======================================================== */
+
+        this.productService
+            .getTherapeuticAreas()
+            .subscribe({
+
+                next: (areas) => {
+
+                    this.therapeuticAreas =
+                        areas ?? [];
+
+                    this.loadingFilters =
+                        false;
+                },
+
+                error: (err) => {
+
+                    console.error(
+                        'Erreur lors du chargement des domaines thérapeutiques:',
+                        err
+                    );
+
+                    this.therapeuticAreas = [];
+
+                    this.loadingFilters =
+                        false;
+                }
+            });
     }
 
     /* ============================================================
@@ -231,6 +250,7 @@ export class ProductsListComponent implements OnInit {
     loadProducts(): void {
 
         this.loading = true;
+
         this.error = '';
 
         const keyword =
@@ -246,10 +266,19 @@ export class ProductsListComponent implements OnInit {
                 this.selectedTherapeuticArea
             )
             .subscribe({
+
                 next: (response) => {
 
-                    this.products =
+                    /* =================================================
+                       RÉCUPÉRATION DES PRODUITS
+                    ================================================= */
+
+                    const receivedProducts =
                         response?.content ?? [];
+
+                    /* =================================================
+                       MÉTADONNÉES PAGINATION
+                    ================================================= */
 
                     this.totalElements =
                         response?.totalElements ?? 0;
@@ -257,14 +286,16 @@ export class ProductsListComponent implements OnInit {
                     this.totalPages =
                         response?.totalPages ?? 0;
 
-                    /*
-                     * Si la page demandée n'existe plus,
-                     * revenir sur la dernière page.
-                     */
+                    /* =================================================
+                       VÉRIFICATION DE LA PAGE
+                    ================================================= */
+
                     if (
                         this.totalPages > 0 &&
-                        this.currentPage >= this.totalPages
+                        this.currentPage >=
+                        this.totalPages
                     ) {
+
                         this.currentPage =
                             this.totalPages - 1;
 
@@ -272,6 +303,19 @@ export class ProductsListComponent implements OnInit {
 
                         return;
                     }
+
+                    /* =================================================
+                       MÉLANGE ALÉATOIRE
+                       
+                       IMPORTANT :
+                       On crée une copie avant le mélange afin de
+                       ne pas modifier directement response.content.
+                    ================================================= */
+
+                    this.products =
+                        this.shuffleProducts(
+                            receivedProducts
+                        );
 
                     this.loading = false;
                 },
@@ -286,6 +330,7 @@ export class ProductsListComponent implements OnInit {
                     this.products = [];
 
                     this.totalElements = 0;
+
                     this.totalPages = 0;
 
                     this.error =
@@ -294,6 +339,46 @@ export class ProductsListComponent implements OnInit {
                     this.loading = false;
                 }
             });
+    }
+
+    /* ============================================================
+       MÉLANGE ALÉATOIRE DES PRODUITS
+       ============================================================ */
+
+    /**
+     * Mélange les produits de manière aléatoire.
+     *
+     * Fisher-Yates est utilisé pour obtenir un mélange
+     * correctement réparti.
+     */
+    private shuffleProducts(
+        products: Product[]
+    ): Product[] {
+
+        const shuffled =
+            [...products];
+
+        for (
+            let i = shuffled.length - 1;
+            i > 0;
+            i--
+        ) {
+
+            const j =
+                Math.floor(
+                    Math.random() * (i + 1)
+                );
+
+            [
+                shuffled[i],
+                shuffled[j]
+            ] = [
+                shuffled[j],
+                shuffled[i]
+            ];
+        }
+
+        return shuffled;
     }
 
     /* ============================================================
@@ -307,7 +392,9 @@ export class ProductsListComponent implements OnInit {
         this.loadProducts();
     }
 
-    onSearchKeydown(event: KeyboardEvent): void {
+    onSearchKeydown(
+        event: KeyboardEvent
+    ): void {
 
         if (event.key === 'Enter') {
 
@@ -351,7 +438,9 @@ export class ProductsListComponent implements OnInit {
        PAGINATION
        ============================================================ */
 
-    goToPage(page: number): void {
+    goToPage(
+        page: number
+    ): void {
 
         if (
             page < 0 ||
@@ -406,14 +495,10 @@ export class ProductsListComponent implements OnInit {
         });
     }
 
-    /*
-     * Le HTML actuel utilise getPaginationPages().
-     *
-     * Les pages sont en base 0 :
-     * 0 = page 1
-     * 1 = page 2
-     * etc.
-     */
+    /* ============================================================
+       PAGES DE PAGINATION
+       ============================================================ */
+
     getPaginationPages(): number[] {
 
         if (this.totalPages <= 0) {
@@ -421,16 +506,15 @@ export class ProductsListComponent implements OnInit {
         }
 
         return Array.from(
-            { length: this.totalPages },
+            {
+                length: this.totalPages
+            },
             (_, index) => index
         );
     }
 
-    /*
-     * Conservé au cas où une autre partie du HTML
-     * utilise encore "pages".
-     */
     get pages(): number[] {
+
         return this.getPaginationPages();
     }
 
@@ -440,18 +524,23 @@ export class ProductsListComponent implements OnInit {
 
     get firstDisplayedProduct(): number {
 
-        if (this.totalElements === 0) {
+        if (
+            this.totalElements === 0
+        ) {
             return 0;
         }
 
         return (
-            this.currentPage * this.pageSize
+            this.currentPage *
+            this.pageSize
         ) + 1;
     }
 
     get lastDisplayedProduct(): number {
 
-        if (this.totalElements === 0) {
+        if (
+            this.totalElements === 0
+        ) {
             return 0;
         }
 
@@ -469,49 +558,56 @@ export class ProductsListComponent implements OnInit {
 
     loadCart(): void {
 
-        /*
-         * Si l'utilisateur n'est pas connecté,
-         * inutile d'appeler l'API du panier.
-         */
         if (!this.isLoggedIn()) {
+
             this.cart = null;
+
             return;
         }
 
         this.cartLoading = true;
 
-        this.cartService.getCart().subscribe({
+        this.cartService
+            .getCart()
+            .subscribe({
 
-            next: (cart) => {
+                next: (cart) => {
 
-                this.cart = cart;
+                    this.cart = cart;
 
-                this.cartLoading = false;
-            },
+                    this.cartLoading =
+                        false;
+                },
 
-            error: (err) => {
+                error: (err) => {
 
-                console.error(
-                    'Erreur lors du chargement du panier:',
-                    err
-                );
+                    console.error(
+                        'Erreur lors du chargement du panier:',
+                        err
+                    );
 
-                this.cart = null;
+                    this.cart = null;
 
-                this.cartLoading = false;
-            }
-        });
+                    this.cartLoading =
+                        false;
+                }
+            });
     }
 
-    /*
-     * Ajouter un produit au panier.
-     *
-     * CartService possède addItem(), pas addToCart().
-     */
-    addToCart(product: Product): void {
+    /* ============================================================
+       AJOUT AU PANIER
+       ============================================================ */
+
+    addToCart(
+        product: Product
+    ): void {
 
         if (!this.isLoggedIn()) {
-            this.router.navigate(['/signin']);
+
+            this.router.navigate([
+                '/signin'
+            ]);
+
             return;
         }
 
@@ -526,38 +622,40 @@ export class ProductsListComponent implements OnInit {
         }
 
         if (
-            this.addingProductId === product.id
+            this.addingProductId ===
+            product.id
         ) {
             return;
         }
 
         this.cartMessage = '';
+
         this.cartError = '';
 
-        this.addingProductId = product.id;
+        this.addingProductId =
+            product.id;
 
         this.cartService
-            .addItem(product.id, 1)
+            .addItem(
+                product.id,
+                1
+            )
             .subscribe({
 
                 next: (cart) => {
 
-                    /*
-                     * addItem() retourne directement
-                     * le panier mis à jour.
-                     */
                     this.cart = cart;
 
-                    this.addingProductId = null;
+                    this.addingProductId =
+                        null;
 
                     this.cartMessage =
                         `${product.name} a été ajouté au panier.`;
 
-                    /*
-                     * On retire le message après quelques secondes.
-                     */
                     setTimeout(() => {
+
                         this.cartMessage = '';
+
                     }, 3000);
                 },
 
@@ -568,21 +666,25 @@ export class ProductsListComponent implements OnInit {
                         err
                     );
 
-                    this.addingProductId = null;
+                    this.addingProductId =
+                        null;
 
                     this.cartError =
                         'Impossible d’ajouter le produit au panier.';
 
                     setTimeout(() => {
+
                         this.cartError = '';
+
                     }, 4000);
                 }
             });
     }
 
-    /*
-     * Nombre total d'articles dans le panier.
-     */
+    /* ============================================================
+       NOMBRE D'ARTICLES DU PANIER
+       ============================================================ */
+
     get cartCount(): number {
 
         if (
@@ -600,16 +702,21 @@ export class ProductsListComponent implements OnInit {
 
                 return (
                     total +
-                    (Number(item.quantity) || 0)
+                    (
+                        Number(
+                            item.quantity
+                        ) || 0
+                    )
                 );
             },
             0
         );
     }
 
-    /*
-     * Quantité d'un produit précis dans le panier.
-     */
+    /* ============================================================
+       QUANTITÉ PRODUIT DANS LE PANIER
+       ============================================================ */
+
     getProductCartQuantity(
         productId: number
     ): number {
@@ -621,80 +728,94 @@ export class ProductsListComponent implements OnInit {
             return 0;
         }
 
-        const item = this.cart.items.find(
-            (cartItem: any) => {
+        const item =
+            this.cart.items.find(
+                (cartItem: any) => {
 
-                /*
-                 * Cas 1 :
-                 * { productId: 10 }
-                 */
-                if (
-                    Number(cartItem?.productId) ===
-                    Number(productId)
-                ) {
-                    return true;
+                    /* productId direct */
+
+                    if (
+                        Number(
+                            cartItem?.productId
+                        ) ===
+                        Number(productId)
+                    ) {
+                        return true;
+                    }
+
+                    /* product.id */
+
+                    if (
+                        Number(
+                            cartItem?.product?.id
+                        ) ===
+                        Number(productId)
+                    ) {
+                        return true;
+                    }
+
+                    /* product.productId */
+
+                    if (
+                        Number(
+                            cartItem?.product?.productId
+                        ) ===
+                        Number(productId)
+                    ) {
+                        return true;
+                    }
+
+                    return false;
                 }
-
-                /*
-                 * Cas 2 :
-                 * { product: { id: 10 } }
-                 */
-                if (
-                    Number(cartItem?.product?.id) ===
-                    Number(productId)
-                ) {
-                    return true;
-                }
-
-                /*
-                 * Cas 3 :
-                 * { product: { productId: 10 } }
-                 */
-                if (
-                    Number(cartItem?.product?.productId) ===
-                    Number(productId)
-                ) {
-                    return true;
-                }
-
-                return false;
-            }
-        );
+            );
 
         if (!item) {
             return 0;
         }
 
-        return Number(item.quantity) || 0;
+        return (
+            Number(item.quantity) || 0
+        );
     }
 
     /* ============================================================
        STOCK
        ============================================================ */
 
-    isInStock(product: Product): boolean {
+    isInStock(
+        product: Product
+    ): boolean {
 
         return (
             (product.stock ?? 0) > 0
         );
     }
 
-    isOutOfStock(product: Product): boolean {
+    isOutOfStock(
+        product: Product
+    ): boolean {
 
         return (
             (product.stock ?? 0) <= 0
         );
     }
 
-    isLowStock(product: Product): boolean {
+    isLowStock(
+        product: Product
+    ): boolean {
 
         const stock =
             product.stock ?? 0;
 
-        return stock > 0 && stock <= 5;
+        return (
+            stock > 0 &&
+            stock <= 5
+        );
     }
 
-    getStockLabel(product: Product): string {
+    getStockLabel(
+        product: Product
+    ): string {
 
         const stock =
             product.stock ?? 0;
@@ -734,9 +855,6 @@ export class ProductsListComponent implements OnInit {
        IMAGE PRODUIT
        ============================================================ */
 
-    /*
-     * Le HTML actuel utilise getMainImage(product).
-     */
     getMainImage(
         product: Product
     ): string {
@@ -749,45 +867,46 @@ export class ProductsListComponent implements OnInit {
             const firstImage: any =
                 product.images[0];
 
-            /*
-             * Image stockée directement comme string.
-             */
+            /* Image = string */
+
             if (
-                typeof firstImage === 'string'
+                typeof firstImage ===
+                'string'
             ) {
+
                 return firstImage;
             }
 
-            /*
-             * Structure :
-             * { url: "..." }
-             */
+            /* { url: "..." } */
+
             if (
                 firstImage?.url &&
-                typeof firstImage.url === 'string'
+                typeof firstImage.url ===
+                'string'
             ) {
+
                 return firstImage.url;
             }
 
-            /*
-             * Structure :
-             * { imageUrl: "..." }
-             */
+            /* { imageUrl: "..." } */
+
             if (
                 firstImage?.imageUrl &&
-                typeof firstImage.imageUrl === 'string'
+                typeof firstImage.imageUrl ===
+                'string'
             ) {
+
                 return firstImage.imageUrl;
             }
 
-            /*
-             * Structure :
-             * { path: "..." }
-             */
+            /* { path: "..." } */
+
             if (
                 firstImage?.path &&
-                typeof firstImage.path === 'string'
+                typeof firstImage.path ===
+                'string'
             ) {
+
                 return firstImage.path;
             }
         }
@@ -795,23 +914,26 @@ export class ProductsListComponent implements OnInit {
         return '/images/products/default-product.jpg';
     }
 
-    /*
-     * Ancien nom conservé pour compatibilité.
-     */
     getProductImage(
         product: Product
     ): string {
-        return this.getMainImage(product);
+
+        return this.getMainImage(
+            product
+        );
     }
 
     /* ============================================================
        ERREUR IMAGE
        ============================================================ */
 
-    onImageError(event: Event): void {
+    onImageError(
+        event: Event
+    ): void {
 
         const image =
-            event.target as HTMLImageElement;
+            event.target as
+            HTMLImageElement;
 
         if (!image) {
             return;
@@ -833,6 +955,7 @@ export class ProductsListComponent implements OnInit {
             !product.categories ||
             product.categories.length === 0
         ) {
+
             return 'Non catégorisé';
         }
 
@@ -840,8 +963,10 @@ export class ProductsListComponent implements OnInit {
             .map((category: any) => {
 
                 if (
-                    typeof category === 'string'
+                    typeof category ===
+                    'string'
                 ) {
+
                     return category;
                 }
 
@@ -863,6 +988,7 @@ export class ProductsListComponent implements OnInit {
             !product.therapeuticAreas ||
             product.therapeuticAreas.length === 0
         ) {
+
             return 'Non défini';
         }
 
@@ -870,8 +996,10 @@ export class ProductsListComponent implements OnInit {
             .map((area: any) => {
 
                 if (
-                    typeof area === 'string'
+                    typeof area ===
+                    'string'
                 ) {
+
                     return area;
                 }
 

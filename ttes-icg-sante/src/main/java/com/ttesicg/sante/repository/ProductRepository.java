@@ -16,11 +16,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     boolean existsBySku(String sku);
 
-    /*
-     * =========================================================
-     * RECHERCHE ADMIN
-     * =========================================================
-     */
+    // =========================================================
+    // RECHERCHE ADMIN
+    // =========================================================
+
     @Query("""
         SELECT p
         FROM Product p
@@ -36,24 +35,69 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             Pageable pageable
     );
 
-    /*
-     * =========================================================
-     * PRODUITS DISPONIBLES
-     * =========================================================
-     */
+    // =========================================================
+    // PRODUITS DISPONIBLES
+    // =========================================================
+
     @Query("""
         SELECT p
         FROM Product p
-        WHERE p.active = true
-          AND p.inventory.quantity > 0
+        WHERE
+            p.active = true
+            AND p.inventory.quantity > 0
         """)
     Page<Product> findAvailableProducts(Pageable pageable);
 
-    /*
-     * =========================================================
-     * RECHERCHE CLIENT
-     * =========================================================
-     */
+    // =========================================================
+    // PRODUITS DISPONIBLES + RECHERCHE + FILTRES
+    // =========================================================
+
+    @Query("""
+        SELECT DISTINCT p
+        FROM Product p
+        LEFT JOIN p.categories c
+        LEFT JOIN p.therapeuticAreas ta
+        WHERE
+            p.active = true
+            AND p.inventory.quantity > 0
+
+            AND (
+                :keyword IS NULL
+                OR :keyword = ''
+                OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(COALESCE(p.brand, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(COALESCE(p.activeIngredient, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(COALESCE(p.company.name, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            )
+
+            AND (
+                :categoryId IS NULL
+                OR c.id = :categoryId
+            )
+
+            AND (
+                :companyId IS NULL
+                OR p.company.id = :companyId
+            )
+
+            AND (
+                :therapeuticAreaId IS NULL
+                OR ta.id = :therapeuticAreaId
+            )
+        """)
+    Page<Product> findAvailableProductsWithFilters(
+            @Param("keyword") String keyword,
+            @Param("categoryId") Long categoryId,
+            @Param("companyId") Long companyId,
+            @Param("therapeuticAreaId") Long therapeuticAreaId,
+            Pageable pageable
+    );
+
+    // =========================================================
+    // PRODUITS DISPONIBLES + RECHERCHE
+    // =========================================================
+
     @Query("""
         SELECT p
         FROM Product p
@@ -73,9 +117,21 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             Pageable pageable
     );
 
+    // =========================================================
+    // PAR ENTREPRISE
+    // =========================================================
+
     List<Product> findByCompanyId(Long companyId);
 
+    // =========================================================
+    // PRODUITS ACTIFS
+    // =========================================================
+
     List<Product> findByActiveTrue();
+
+    // =========================================================
+    // RECHERCHE SIMPLE PAR NOM
+    // =========================================================
 
     List<Product> findByNameContainingIgnoreCase(String name);
 }

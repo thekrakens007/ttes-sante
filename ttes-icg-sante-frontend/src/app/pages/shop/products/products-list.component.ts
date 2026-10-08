@@ -4,8 +4,14 @@ import {
     inject
 } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+    CommonModule
+} from '@angular/common';
+
+import {
+    FormsModule
+} from '@angular/forms';
+
 import {
     Router,
     RouterModule
@@ -16,15 +22,18 @@ import {
     ProductPage
 } from '../../../core/models/product.model';
 
-import { ProductService } from '../../../core/services/product.service';
-import { CartService } from '../../../core/services/cart.service';
-import { AuthService } from '../../../core/services/auth.service';
+import {
+    ProductService
+} from '../../../core/services/product.service';
 
-import { Cart } from '../../../core/interfaces/cart.interface';
+import {
+    CartService
+} from '../../../core/services/cart.service';
 
 
 @Component({
     selector: 'app-products-list',
+
     standalone: true,
 
     imports: [
@@ -41,21 +50,18 @@ export class ProductsListComponent implements OnInit {
     // SERVICES
     // =========================================================
 
-    private productService =
+    private readonly productService =
         inject(ProductService);
 
-    private cartService =
+    private readonly cartService =
         inject(CartService);
 
-    private authService =
-        inject(AuthService);
-
-    private router =
+    private readonly router =
         inject(Router);
 
 
     // =========================================================
-    // DONNÉES PRODUITS
+    // PRODUITS
     // =========================================================
 
     products: Product[] = [];
@@ -63,6 +69,11 @@ export class ProductsListComponent implements OnInit {
     loading = true;
 
     error = '';
+
+
+    // =========================================================
+    // PAGINATION
+    // =========================================================
 
     totalElements = 0;
 
@@ -106,30 +117,7 @@ export class ProductsListComponent implements OnInit {
     // PANIER
     // =========================================================
 
-    cart: Cart | null = null;
-
     cartCount = 0;
-
-    addingProductId: number | null = null;
-
-    cartMessage = '';
-
-    cartError = '';
-
-
-    // =========================================================
-    // MENU MOBILE
-    // =========================================================
-
-    mobileMenuOpen = false;
-
-
-    // =========================================================
-    // ANNÉE COURANTE
-    // =========================================================
-
-    currentYear =
-        new Date().getFullYear();
 
 
     // =========================================================
@@ -143,71 +131,6 @@ export class ProductsListComponent implements OnInit {
         this.loadProducts();
 
         this.loadCart();
-
-    }
-
-
-    // =========================================================
-    // AUTHENTIFICATION
-    // =========================================================
-
-    isLoggedIn(): boolean {
-
-        return this.authService.isLoggedIn();
-
-    }
-
-
-    isAdmin(): boolean {
-
-        if (!this.isLoggedIn()) {
-
-            return false;
-
-        }
-
-        return this.authService.hasRole(
-            'ROLE_ADMIN'
-        );
-
-    }
-
-
-    logout(): void {
-
-        this.authService.logout();
-
-        this.cart = null;
-
-        this.cartCount = 0;
-
-        this.cartMessage = '';
-
-        this.cartError = '';
-
-        this.closeMobileMenu();
-
-        this.router.navigate(['/']);
-
-    }
-
-
-    // =========================================================
-    // MENU MOBILE
-    // =========================================================
-
-    toggleMobileMenu(): void {
-
-        this.mobileMenuOpen =
-            !this.mobileMenuOpen;
-
-    }
-
-
-    closeMobileMenu(): void {
-
-        this.mobileMenuOpen = false;
-
     }
 
 
@@ -217,26 +140,28 @@ export class ProductsListComponent implements OnInit {
 
     loadFilterData(): void {
 
-        // =====================================================
+        // -----------------------------------------------------
         // CATÉGORIES
-        // =====================================================
+        // -----------------------------------------------------
 
         this.productService
             .getCategories()
             .subscribe({
 
-                next: (
-                    data: any[]
-                ) => {
+                next: (data: any[]) => {
+
+                    console.log(
+                        'Catégories reçues :',
+                        data
+                    );
 
                     this.categories =
-                        data ?? [];
-
+                        Array.isArray(data)
+                            ? data
+                            : [];
                 },
 
-                error: (
-                    error: any
-                ) => {
+                error: (error: any) => {
 
                     console.error(
                         'Erreur chargement catégories :',
@@ -244,32 +169,32 @@ export class ProductsListComponent implements OnInit {
                     );
 
                     this.categories = [];
-
                 }
-
             });
 
 
-        // =====================================================
+        // -----------------------------------------------------
         // ENTREPRISES
-        // =====================================================
+        // -----------------------------------------------------
 
         this.productService
             .getCompanies()
             .subscribe({
 
-                next: (
-                    data: any[]
-                ) => {
+                next: (data: any[]) => {
+
+                    console.log(
+                        'Entreprises reçues :',
+                        data
+                    );
 
                     this.companies =
-                        data ?? [];
-
+                        Array.isArray(data)
+                            ? data
+                            : [];
                 },
 
-                error: (
-                    error: any
-                ) => {
+                error: (error: any) => {
 
                     console.error(
                         'Erreur chargement entreprises :',
@@ -277,32 +202,32 @@ export class ProductsListComponent implements OnInit {
                     );
 
                     this.companies = [];
-
                 }
-
             });
 
 
-        // =====================================================
+        // -----------------------------------------------------
         // DOMAINES THÉRAPEUTIQUES
-        // =====================================================
+        // -----------------------------------------------------
 
         this.productService
             .getTherapeuticAreas()
             .subscribe({
 
-                next: (
-                    data: any[]
-                ) => {
+                next: (data: any[]) => {
+
+                    console.log(
+                        'Domaines thérapeutiques reçus :',
+                        data
+                    );
 
                     this.therapeuticAreas =
-                        data ?? [];
-
+                        Array.isArray(data)
+                            ? data
+                            : [];
                 },
 
-                error: (
-                    error: any
-                ) => {
+                error: (error: any) => {
 
                     console.error(
                         'Erreur chargement domaines thérapeutiques :',
@@ -310,11 +235,8 @@ export class ProductsListComponent implements OnInit {
                     );
 
                     this.therapeuticAreas = [];
-
                 }
-
             });
-
     }
 
 
@@ -327,6 +249,7 @@ export class ProductsListComponent implements OnInit {
         this.loading = true;
 
         this.error = '';
+
 
         const keyword =
             this.searchTerm.trim();
@@ -350,31 +273,36 @@ export class ProductsListComponent implements OnInit {
             )
             .subscribe({
 
-                next: (
-                    response: ProductPage
-                ) => {
+                next: (response: ProductPage) => {
+
+                    console.log(
+                        'Produits reçus :',
+                        response
+                    );
+
 
                     this.products =
                         response?.content ?? [];
 
+
                     this.totalElements =
                         response?.totalElements ?? 0;
+
 
                     this.totalPages =
                         response?.totalPages ?? 0;
 
-                    this.loading = false;
 
+                    this.loading = false;
                 },
 
-                error: (
-                    error: any
-                ) => {
+                error: (error: any) => {
 
                     console.error(
                         'Erreur chargement produits :',
                         error
                     );
+
 
                     this.products = [];
 
@@ -382,16 +310,15 @@ export class ProductsListComponent implements OnInit {
 
                     this.totalPages = 0;
 
+
                     this.error =
                         error?.error?.message ??
                         'Impossible de charger les produits.';
 
+
                     this.loading = false;
-
                 }
-
             });
-
     }
 
 
@@ -404,23 +331,26 @@ export class ProductsListComponent implements OnInit {
         this.currentPage = 0;
 
         this.loadProducts();
-
-    }
-
-
-    clearSearch(): void {
-
-        this.searchTerm = '';
-
-        this.currentPage = 0;
-
-        this.loadProducts();
-
     }
 
 
     // =========================================================
-    // FILTRES
+    // RECHERCHE AVEC ENTER
+    // =========================================================
+
+    onSearchKeydown(event: KeyboardEvent): void {
+
+        if (event.key === 'Enter') {
+
+            event.preventDefault();
+
+            this.submitSearch();
+        }
+    }
+
+
+    // =========================================================
+    // CHANGEMENT DE FILTRE
     // =========================================================
 
     onFilterChange(): void {
@@ -428,9 +358,12 @@ export class ProductsListComponent implements OnInit {
         this.currentPage = 0;
 
         this.loadProducts();
-
     }
 
+
+    // =========================================================
+    // RESET
+    // =========================================================
 
     resetFilters(): void {
 
@@ -445,293 +378,188 @@ export class ProductsListComponent implements OnInit {
         this.currentPage = 0;
 
         this.loadProducts();
-
     }
 
 
     // =========================================================
-    // PAGINATION
+    // PAGE PRÉCÉDENTE
     // =========================================================
 
     previousPage(): void {
 
-        if (
-            this.currentPage <= 0
-        ) {
+        if (this.currentPage > 0) {
 
-            return;
+            this.currentPage--;
 
+            this.loadProducts();
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
-
-        this.currentPage--;
-
-        this.loadProducts();
-
-        window.scrollTo({
-
-            top: 0,
-
-            behavior: 'smooth'
-
-        });
-
     }
 
+
+    // =========================================================
+    // PAGE SUIVANTE
+    // =========================================================
 
     nextPage(): void {
 
         if (
-            this.currentPage >=
+            this.currentPage <
             this.totalPages - 1
         ) {
 
-            return;
+            this.currentPage++;
 
+            this.loadProducts();
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
-
-        this.currentPage++;
-
-        this.loadProducts();
-
-        window.scrollTo({
-
-            top: 0,
-
-            behavior: 'smooth'
-
-        });
-
     }
 
 
-    goToPage(
-        page: number
-    ): void {
+    // =========================================================
+    // ALLER À UNE PAGE
+    // =========================================================
+
+    goToPage(page: number): void {
 
         if (
-            page < 0 ||
-            page >= this.totalPages ||
-            page === this.currentPage
+            page >= 0 &&
+            page < this.totalPages
         ) {
 
-            return;
+            this.currentPage = page;
 
+            this.loadProducts();
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
-
-        this.currentPage = page;
-
-        this.loadProducts();
-
-        window.scrollTo({
-
-            top: 0,
-
-            behavior: 'smooth'
-
-        });
-
     }
 
 
-    getPaginationPages(): number[] {
+    // =========================================================
+    // PAGES À AFFICHER
+    // =========================================================
 
-        if (
-            this.totalPages <= 0
-        ) {
-
-            return [];
-
-        }
-
+    get pages(): number[] {
 
         const pages: number[] = [];
 
-        const maxVisiblePages = 5;
+        const maxPagesToShow = 5;
+
+        if (this.totalPages <= maxPagesToShow) {
+
+            for (
+                let i = 0;
+                i < this.totalPages;
+                i++
+            ) {
+
+                pages.push(i);
+            }
+
+            return pages;
+        }
 
 
         let start =
             Math.max(
-
                 0,
-
-                this.currentPage -
-                Math.floor(
-                    maxVisiblePages / 2
-                )
-
+                this.currentPage - 2
             );
 
 
-        const end =
+        let end =
             Math.min(
-
-                this.totalPages,
-
-                start +
-                maxVisiblePages
-
+                this.totalPages - 1,
+                start + maxPagesToShow - 1
             );
 
 
         if (
             end - start <
-            maxVisiblePages
+            maxPagesToShow - 1
         ) {
 
             start =
                 Math.max(
-
                     0,
-
-                    end -
-                    maxVisiblePages
-
+                    end - maxPagesToShow + 1
                 );
-
         }
 
 
         for (
-            let page = start;
-            page < end;
-            page++
+            let i = start;
+            i <= end;
+            i++
         ) {
 
-            pages.push(page);
-
+            pages.push(i);
         }
 
 
         return pages;
-
     }
 
 
     // =========================================================
-    // PANIER
+    // CHARGEMENT PANIER
     // =========================================================
 
     loadCart(): void {
-
-        if (
-            !this.authService.isLoggedIn()
-        ) {
-
-            this.cart = null;
-
-            this.cartCount = 0;
-
-            return;
-
-        }
-
 
         this.cartService
             .getCart()
             .subscribe({
 
-                next: (
-                    cart: Cart
-                ) => {
+                next: (cart: any) => {
 
-                    this.cart = cart;
+                    if (
+                        cart &&
+                        Array.isArray(cart.items)
+                    ) {
 
-                    this.updateCartCount();
+                        this.cartCount =
+                            cart.items.reduce(
+                                (
+                                    total: number,
+                                    item: any
+                                ) =>
+                                    total +
+                                    (
+                                        item.quantity ?? 0
+                                    ),
+                                0
+                            );
 
+                        return;
+                    }
+
+
+                    this.cartCount = 0;
                 },
 
-                error: (
-                    error: unknown
-                ) => {
+                error: (error: any) => {
 
                     console.error(
                         'Erreur chargement panier :',
                         error
                     );
 
-                    this.cart = null;
-
                     this.cartCount = 0;
-
                 }
-
             });
-
-    }
-
-
-    updateCartCount(): void {
-
-        if (
-            !this.cart?.items
-        ) {
-
-            this.cartCount = 0;
-
-            return;
-
-        }
-
-
-        this.cartCount =
-            this.cart.items.reduce(
-
-                (
-                    total,
-                    item
-                ) =>
-
-                    total +
-                    (item.quantity ?? 0),
-
-                0
-
-            );
-
-    }
-
-
-    getProductCartQuantity(
-        productId: number
-    ): number {
-
-        if (
-            !this.cart?.items
-        ) {
-
-            return 0;
-
-        }
-
-
-        const item =
-            this.cart.items.find(
-
-                (
-                    cartItem: any
-                ) => {
-
-                    return (
-
-                        cartItem.productId ===
-                        productId
-
-                    ) ||
-
-                    (
-
-                        cartItem.product?.id ===
-                        productId
-
-                    );
-
-                }
-
-            );
-
-
-        return item?.quantity ?? 0;
-
     }
 
 
@@ -739,177 +567,51 @@ export class ProductsListComponent implements OnInit {
     // AJOUT AU PANIER
     // =========================================================
 
-    addToCart(
-        product: Product
-    ): void {
+    addToCart(product: Product): void {
 
-        // =====================================================
-        // VÉRIFICATION CONNEXION
-        // =====================================================
-
-        if (
-            !this.authService.isLoggedIn()
-        ) {
-
-            this.router.navigate(
-
-                ['/signin'],
-
-                {
-
-                    queryParams: {
-
-                        returnUrl:
-                            this.router.url
-
-                    }
-
-                }
-
-            );
+        if (!product.id) {
 
             return;
-
         }
 
-
-        // =====================================================
-        // VÉRIFICATION STOCK
-        // =====================================================
 
         if (
             product.stock === undefined ||
             product.stock <= 0
         ) {
 
-            this.cartError =
-                'Ce produit est actuellement en rupture de stock.';
-
-            this.cartMessage = '';
-
             return;
-
         }
 
-
-        // =====================================================
-        // ÉVITER LES DOUBLES CLICS
-        // =====================================================
-
-        if (
-            this.addingProductId ===
-            product.id
-        ) {
-
-            return;
-
-        }
-
-
-        this.addingProductId =
-            product.id;
-
-        this.cartMessage = '';
-
-        this.cartError = '';
-
-
-        // =====================================================
-        // AJOUT AU PANIER
-        // =====================================================
 
         this.cartService
-            .addItem(
+            .addToCart(
                 product.id,
                 1
             )
             .subscribe({
 
-                next: (
-                    cart: Cart
-                ) => {
+                next: () => {
 
-                    this.cart = cart;
-
-                    this.updateCartCount();
-
-                    this.addingProductId =
-                        null;
-
-                    this.cartMessage =
-                        'Produit ajouté au panier.';
-
-                    this.cartError = '';
-
+                    this.loadCart();
                 },
 
-                error: (
-                    error: any
-                ) => {
+                error: (error: any) => {
 
                     console.error(
-                        'Erreur ajout produit au panier :',
+                        'Erreur ajout panier :',
                         error
                     );
-
-                    this.addingProductId =
-                        null;
-
-
-                    // =========================================
-                    // SESSION EXPIRÉE
-                    // =========================================
-
-                    if (
-                        error?.status === 401
-                    ) {
-
-                        this.authService.logout();
-
-                        this.cart = null;
-
-                        this.cartCount = 0;
-
-                        this.router.navigate(
-
-                            ['/signin'],
-
-                            {
-
-                                queryParams: {
-
-                                    returnUrl:
-                                        this.router.url
-
-                                }
-
-                            }
-
-                        );
-
-                        return;
-
-                    }
-
-
-                    this.cartError =
-                        error?.error?.message ??
-                        'Impossible d’ajouter le produit au panier.';
-
-                    this.cartMessage = '';
-
                 }
-
             });
-
     }
 
 
     // =========================================================
-    // PRODUIT
+    // IMAGE PRINCIPALE
     // =========================================================
 
-    getMainImage(
+    getProductImage(
         product: Product
     ): string {
 
@@ -920,58 +622,54 @@ export class ProductsListComponent implements OnInit {
 
             const mainImage =
                 product.images.find(
-
-                    image =>
-                        image.main
-
+                    (image: any) =>
+                        image.main === true
                 );
 
 
-            return (
+            if (mainImage?.imageUrl) {
 
-                mainImage?.imageUrl ??
+                return mainImage.imageUrl;
+            }
 
-                product.images[0]?.imageUrl ??
 
-                '/images/products/default-product.png'
+            if (
+                product.images[0]?.imageUrl
+            ) {
 
-            );
-
+                return product.images[0].imageUrl;
+            }
         }
 
 
-        return '/images/products/default-product.png';
-
+        return '/images/products/default-product.jpg';
     }
 
 
-    isOutOfStock(
-        product: Product
-    ): boolean {
+    // =========================================================
+    // ERREUR IMAGE
+    // =========================================================
 
-        return (
+    onImageError(
+        event: Event
+    ): void {
 
-            product.stock === undefined ||
-
-            product.stock <= 0
-
-        );
-
-    }
+        const image =
+            event.target as HTMLImageElement;
 
 
-    isLowStock(
-        product: Product
-    ): boolean {
+        if (
+            image.src.includes(
+                'default-product.jpg'
+            )
+        ) {
 
-        return (
+            return;
+        }
 
-            product.stock > 0 &&
 
-            product.stock <= 5
-
-        );
-
+        image.src =
+            '/images/products/default-product.jpg';
     }
 
 
@@ -980,79 +678,66 @@ export class ProductsListComponent implements OnInit {
     // =========================================================
 
     formatPrice(
-        price: number | undefined | null
+        price: number | null | undefined
     ): string {
 
-        return (
+        if (
+            price === null ||
+            price === undefined
+        ) {
 
-            new Intl.NumberFormat(
-                'fr-FR'
-            ).format(
-                price ?? 0
-            )
+            return '0 FCFA';
+        }
 
-            +
 
-            ' FCFA'
-
-        );
-
+        return new Intl.NumberFormat(
+            'fr-FR'
+        ).format(price) + ' FCFA';
     }
 
 
     // =========================================================
-    // CATÉGORIES DU PRODUIT
+    // STOCK
     // =========================================================
 
-    getProductCategories(
+    isInStock(
         product: Product
-    ): string[] {
+    ): boolean {
 
         return (
-            product.categories ?? []
+            product.stock !== undefined &&
+            product.stock > 0
         );
-
     }
 
 
     // =========================================================
-    // DOMAINES THÉRAPEUTIQUES DU PRODUIT
+    // NOMBRE DE PRODUITS AFFICHÉS
     // =========================================================
 
-    getProductTherapeuticAreas(
-        product: Product
-    ): string[] {
+    get firstDisplayedProduct(): number {
+
+        if (this.totalElements === 0) {
+
+            return 0;
+        }
+
 
         return (
-            product.therapeuticAreas ??
-            []
+            this.currentPage *
+            this.pageSize
+        ) + 1;
+    }
+
+
+    get lastDisplayedProduct(): number {
+
+        return Math.min(
+            (
+                this.currentPage + 1
+            ) * this.pageSize,
+
+            this.totalElements
         );
-
     }
-
-
-    // =========================================================
-    // FOCUS RECHERCHE
-    // =========================================================
-
-    focusSearch(): void {
-
-        setTimeout(() => {
-
-            const input =
-                document.querySelector(
-                    'input[type="text"]'
-                ) as HTMLInputElement | null;
-
-
-            if (input) {
-
-                input.focus();
-
-            }
-
-        });
-
-    }
-
 }

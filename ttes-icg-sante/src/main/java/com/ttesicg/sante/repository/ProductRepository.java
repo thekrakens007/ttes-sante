@@ -1,7 +1,6 @@
 package com.ttesicg.sante.repository;
 
 import com.ttesicg.sante.entity.Product;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,143 +12,131 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    Optional<Product> findBySku(String sku);
+// =========================================================
+// SKU
+// =========================================================
 
-    boolean existsBySku(String sku);
+Optional<Product> findBySku(String sku);
 
+boolean existsBySku(String sku);
 
-    // =========================================================
-    // RECHERCHE ADMIN
-    // =========================================================
+// =========================================================
+// RECHERCHE SIMPLE
+// =========================================================
 
-    @Query("""
-        SELECT p
-        FROM Product p
-        LEFT JOIN p.company company
-        WHERE
+List<Product> findByNameContainingIgnoreCase(String keyword);
+
+// =========================================================
+// PRODUITS PAR ENTREPRISE
+// =========================================================
+
+List<Product> findByCompanyId(Long companyId);
+
+// =========================================================
+// PRODUITS DISPONIBLES
+// =========================================================
+
+@Query("""
+    SELECT DISTINCT p
+    FROM Product p
+    LEFT JOIN p.company c
+    LEFT JOIN p.categories cat
+    LEFT JOIN p.therapeuticAreas ta
+    LEFT JOIN p.inventory i
+    WHERE p.active = true
+      AND (
+            :keyword = ''
+            OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(p.brand) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+          )
+      AND (
+            :categoryId IS NULL
+            OR cat.id = :categoryId
+          )
+      AND (
+            :companyId IS NULL
+            OR c.id = :companyId
+          )
+      AND (
+            :therapeuticAreaId IS NULL
+            OR ta.id = :therapeuticAreaId
+          )
+      AND (
+            i IS NULL
+            OR i.quantity > 0
+          )
+    ORDER BY p.id DESC
+    """)
+Page<Product> findAvailableProductsWithFilters(
+        @Param("keyword") String keyword,
+        @Param("categoryId") Long categoryId,
+        @Param("companyId") Long companyId,
+        @Param("therapeuticAreaId") Long therapeuticAreaId,
+        Pageable pageable
+);
+
+// =========================================================
+// PRODUITS DISPONIBLES SANS FILTRE
+// =========================================================
+
+@Query("""
+    SELECT DISTINCT p
+    FROM Product p
+    LEFT JOIN p.inventory i
+    WHERE p.active = true
+      AND (
+            i IS NULL
+            OR i.quantity > 0
+          )
+    ORDER BY p.id DESC
+    """)
+Page<Product> findAvailableProducts(Pageable pageable);
+
+// =========================================================
+// RECHERCHE PRODUITS CLIENT
+// =========================================================
+
+@Query("""
+    SELECT DISTINCT p
+    FROM Product p
+    LEFT JOIN p.company c
+    WHERE p.active = true
+      AND (
             LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
             OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(COALESCE(p.brand, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(COALESCE(p.activeIngredient, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(COALESCE(company.name, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-        """)
-    Page<Product> searchProducts(
-            @Param("keyword") String keyword,
-            Pageable pageable
-    );
+            OR LOWER(p.brand) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+          )
+    ORDER BY p.id DESC
+    """)
+Page<Product> searchAvailableProducts(
+        @Param("keyword") String keyword,
+        Pageable pageable
+);
 
+// =========================================================
+// RECHERCHE ADMIN
+// =========================================================
 
-    // =========================================================
-    // PRODUITS DISPONIBLES
-    // =========================================================
+@Query("""
+    SELECT DISTINCT p
+    FROM Product p
+    LEFT JOIN p.company c
+    WHERE
+        LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR LOWER(p.brand) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    ORDER BY p.id DESC
+    """)
+Page<Product> searchProducts(
+        @Param("keyword") String keyword,
+        Pageable pageable
+);
 
-    @Query("""
-        SELECT p
-        FROM Product p
-        WHERE
-            p.active = true
-            AND p.inventory.quantity > 0
-        """)
-    Page<Product> findAvailableProducts(
-            Pageable pageable
-    );
-
-
-    // =========================================================
-    // PRODUITS DISPONIBLES + FILTRES
-    // =========================================================
-
-    @Query("""
-        SELECT DISTINCT p
-        FROM Product p
-        LEFT JOIN p.categories c
-        LEFT JOIN p.therapeuticAreas ta
-        LEFT JOIN p.company company
-        WHERE
-            p.active = true
-            AND p.inventory.quantity > 0
-
-            AND (
-                :keyword IS NULL
-                OR :keyword = ''
-                OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(COALESCE(p.brand, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(COALESCE(p.activeIngredient, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(COALESCE(company.name, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            )
-
-            AND (
-                :categoryId IS NULL
-                OR c.id = :categoryId
-            )
-
-            AND (
-                :companyId IS NULL
-                OR company.id = :companyId
-            )
-
-            AND (
-                :therapeuticAreaId IS NULL
-                OR ta.id = :therapeuticAreaId
-            )
-        """)
-    Page<Product> findAvailableProductsWithFilters(
-            @Param("keyword") String keyword,
-            @Param("categoryId") Long categoryId,
-            @Param("companyId") Long companyId,
-            @Param("therapeuticAreaId") Long therapeuticAreaId,
-            Pageable pageable
-    );
-
-
-    // =========================================================
-    // RECHERCHE PRODUITS DISPONIBLES
-    // =========================================================
-
-    @Query("""
-        SELECT p
-        FROM Product p
-        LEFT JOIN p.company company
-        WHERE
-            p.active = true
-            AND p.inventory.quantity > 0
-
-            AND (
-                :keyword IS NULL
-                OR :keyword = ''
-                OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(COALESCE(p.brand, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(COALESCE(p.activeIngredient, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(COALESCE(company.name, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            )
-        """)
-    Page<Product> searchAvailableProducts(
-            @Param("keyword") String keyword,
-            Pageable pageable
-    );
-
-
-    // =========================================================
-    // ENTREPRISE
-    // =========================================================
-
-    List<Product> findByCompanyId(Long companyId);
-
-
-    // =========================================================
-    // PRODUITS ACTIFS
-    // =========================================================
-
-    List<Product> findByActiveTrue();
-
-
-    // =========================================================
-    // RECHERCHE SIMPLE
-    // =========================================================
-
-    List<Product> findByNameContainingIgnoreCase(
-            String name
-    );
 }

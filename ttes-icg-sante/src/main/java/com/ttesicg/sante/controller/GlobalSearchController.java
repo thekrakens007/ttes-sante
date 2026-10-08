@@ -16,22 +16,49 @@ public class GlobalSearchController {
     private final GlobalSearchService globalSearchService;
 
 
-    // =========================================================
-    // RECHERCHE GLOBALE PRODUITS + PACKS
-    // =========================================================
-
     @GetMapping
     public ResponseEntity<GlobalSearchResponse> search(
-            @RequestParam String keyword,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size
+
+            @RequestParam(
+                    defaultValue = ""
+            )
+            String q,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "8"
+            )
+            int size,
+
+            @RequestParam(
+                    required = false
+            )
+            Long categoryId,
+
+            @RequestParam(
+                    required = false
+            )
+            Long companyId,
+
+            @RequestParam(
+                    required = false
+            )
+            Long therapeuticAreaId
+
     ) {
 
         return ResponseEntity.ok(
                 globalSearchService.search(
-                        keyword,
+                        q,
                         page,
-                        size
+                        size,
+                        categoryId,
+                        companyId,
+                        therapeuticAreaId
                 )
         );
     }

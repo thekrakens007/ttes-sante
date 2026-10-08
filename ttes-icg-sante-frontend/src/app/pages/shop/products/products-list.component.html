@@ -1,130 +1,411 @@
-<div class="min-h-screen bg-white">
+<div class="min-h-screen bg-gray-50">
 
-    <!-- ===================================================== -->
-    <!-- HEADER / INTRODUCTION -->
-    <!-- ===================================================== -->
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
+    <header
+        class="sticky top-0 z-50 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur"
+    >
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
-    <section class="bg-white">
+            <div class="flex h-16 items-center justify-between">
 
-        <div
-            class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"
-        >
+                <!-- LOGO -->
+                <a
+                    routerLink="/"
+                    (click)="closeMobileMenu()"
+                    class="flex items-center"
+                >
+                    <img
+                        src="/images/logo/logo.svg"
+                        alt="TTES-ICG Santé"
+                        class="h-10 w-auto"
+                    />
+                </a>
 
-            <div
-                class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
-            >
+                <!-- =================================================
+                     NAVIGATION DESKTOP
+                ================================================== -->
+                <nav class="hidden items-center gap-6 md:flex">
 
-                <div>
-
-                    <p
-                        class="mb-2 text-sm font-semibold uppercase tracking-wide text-green-600"
+                    <a
+                        routerLink="/"
+                        routerLinkActive="text-green-600"
+                        [routerLinkActiveOptions]="{ exact: true }"
+                        class="text-sm font-medium text-gray-700 transition hover:text-green-600"
                     >
-                        TTES-ICG Santé
-                    </p>
+                        Accueil
+                    </a>
 
-                    <h1
-                        class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
+                    <a
+                        routerLink="/products"
+                        routerLinkActive="text-green-600"
+                        class="text-sm font-medium text-gray-700 transition hover:text-green-600"
                     >
-                        Nos produits
-                    </h1>
+                        Produits
+                    </a>
 
-                    <p
-                        class="mt-2 max-w-2xl text-sm leading-6 text-gray-600 sm:text-base"
+                    <a
+                        routerLink="/bundles"
+                        routerLinkActive="text-green-600"
+                        class="text-sm font-medium text-gray-700 transition hover:text-green-600"
                     >
-                        Découvrez notre sélection de produits
-                        de santé et trouvez facilement ce dont
-                        vous avez besoin.
-                    </p>
+                        Packs
+                    </a>
+
+                    <a
+                        routerLink="/companies"
+                        routerLinkActive="text-green-600"
+                        class="text-sm font-medium text-gray-700 transition hover:text-green-600"
+                    >
+                        Entreprises
+                    </a>
+
+                </nav>
+
+                <!-- =================================================
+                     ACTIONS DESKTOP
+                ================================================== -->
+                <div class="hidden items-center gap-3 md:flex">
+
+                    <!-- PANIER -->
+                    <a
+                        routerLink="/cart"
+                        class="relative rounded-lg p-2 text-gray-600 transition hover:bg-gray-100 hover:text-green-600"
+                        title="Panier"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 5h13m-2-5v5m-7-5v5"
+                            />
+                        </svg>
+
+                        @if (cartCount > 0) {
+                            <span
+                                class="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-green-600 px-1 text-xs font-bold text-white"
+                            >
+                                {{ cartCount }}
+                            </span>
+                        }
+                    </a>
+
+                    <!-- =================================================
+                         NON CONNECTÉ
+                    ================================================== -->
+                    @if (!isLoggedIn()) {
+
+                        <a
+                            routerLink="/signin"
+                            class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-green-600 hover:text-green-600"
+                        >
+                            Connexion
+                        </a>
+
+                        <a
+                            routerLink="/signup"
+                            class="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700"
+                        >
+                            Inscription
+                        </a>
+
+                    }
+
+                    <!-- =================================================
+                         CONNECTÉ
+                    ================================================== -->
+                    @if (isLoggedIn()) {
+
+                        <a
+                            routerLink="/profile"
+                            class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-green-600 hover:text-green-600"
+                        >
+                            Mon profil
+                        </a>
+
+                        <button
+                            type="button"
+                            (click)="logout()"
+                            class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
+                        >
+                            Déconnexion
+                        </button>
+
+                    }
 
                 </div>
 
-
-                <!-- PANIER -->
-
-                <a
-                    routerLink="/cart"
-                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700"
+                <!-- =================================================
+                     BOUTON MENU MOBILE
+                ================================================== -->
+                <button
+                    type="button"
+                    class="rounded-lg p-2 text-gray-600 transition hover:bg-gray-100 md:hidden"
+                    (click)="toggleMobileMenu()"
+                    aria-label="Menu"
                 >
+
+                    @if (!mobileMenuOpen) {
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"
+                            />
+                        </svg>
+
+                    } @else {
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"
+                            />
+                        </svg>
+
+                    }
+
+                </button>
+
+            </div>
+
+            <!-- =====================================================
+                 MENU MOBILE
+            ====================================================== -->
+            @if (mobileMenuOpen) {
+
+                <div class="border-t border-gray-100 py-4 md:hidden">
+
+                    <!-- NAVIGATION -->
+                    <nav class="flex flex-col gap-1">
+
+                        <a
+                            routerLink="/"
+                            routerLinkActive="bg-green-50 text-green-600"
+                            [routerLinkActiveOptions]="{ exact: true }"
+                            (click)="closeMobileMenu()"
+                            class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-green-600"
+                        >
+                            Accueil
+                        </a>
+
+                        <a
+                            routerLink="/products"
+                            routerLinkActive="bg-green-50 text-green-600"
+                            (click)="closeMobileMenu()"
+                            class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-green-600"
+                        >
+                            Produits
+                        </a>
+
+                        <a
+                            routerLink="/bundles"
+                            routerLinkActive="bg-green-50 text-green-600"
+                            (click)="closeMobileMenu()"
+                            class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-green-600"
+                        >
+                            Packs
+                        </a>
+
+                        <a
+                            routerLink="/companies"
+                            routerLinkActive="bg-green-50 text-green-600"
+                            (click)="closeMobileMenu()"
+                            class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-green-600"
+                        >
+                            Entreprises
+                        </a>
+
+                        <!-- PANIER MOBILE -->
+                        <a
+                            routerLink="/cart"
+                            (click)="closeMobileMenu()"
+                            class="flex items-center justify-between rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-green-600"
+                        >
+                            <span>Panier</span>
+
+                            @if (cartCount > 0) {
+                                <span
+                                    class="flex h-6 min-w-6 items-center justify-center rounded-full bg-green-600 px-2 text-xs font-bold text-white"
+                                >
+                                    {{ cartCount }}
+                                </span>
+                            }
+                        </a>
+
+                    </nav>
+
+                    <!-- =================================================
+                         ACTIONS UTILISATEUR MOBILE
+                    ================================================== -->
+                    <div class="mt-3 border-t border-gray-100 pt-3">
+
+                        <!-- NON CONNECTÉ -->
+                        @if (!isLoggedIn()) {
+
+                            <div class="grid grid-cols-2 gap-2">
+
+                                <a
+                                    routerLink="/signin"
+                                    (click)="closeMobileMenu()"
+                                    class="rounded-lg border border-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-700 transition hover:border-green-600 hover:text-green-600"
+                                >
+                                    Connexion
+                                </a>
+
+                                <a
+                                    routerLink="/signup"
+                                    (click)="closeMobileMenu()"
+                                    class="rounded-lg bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-green-700"
+                                >
+                                    Inscription
+                                </a>
+
+                            </div>
+
+                        }
+
+                        <!-- CONNECTÉ -->
+                        @if (isLoggedIn()) {
+
+                            <div class="flex flex-col gap-2">
+
+                                <a
+                                    routerLink="/profile"
+                                    (click)="closeMobileMenu()"
+                                    class="rounded-lg border border-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-700 transition hover:border-green-600 hover:text-green-600"
+                                >
+                                    Mon profil
+                                </a>
+
+                                <button
+                                    type="button"
+                                    (click)="logout()"
+                                    class="rounded-lg bg-red-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-red-700"
+                                >
+                                    Déconnexion
+                                </button>
+
+                            </div>
+
+                        }
+
+                    </div>
+
+                </div>
+
+            }
+
+        </div>
+    </header>
+
+
+    <!-- =========================================================
+         CONTENU PRINCIPAL
+    ========================================================== -->
+    <main>
+
+        <!-- =====================================================
+             HERO / TITRE
+        ====================================================== -->
+        <section class="bg-white">
+
+            <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+
+                <!-- BREADCRUMB -->
+                <div class="mb-6 flex items-center gap-2 text-sm text-gray-500">
+
+                    <a
+                        routerLink="/"
+                        class="transition hover:text-green-600"
+                    >
+                        Accueil
+                    </a>
 
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        class="h-5 w-5"
+                        class="h-4 w-4"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
                     >
-
                         <path
                             stroke-linecap="round"
                             stroke-linejoin="round"
                             stroke-width="2"
-                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 2m2-2l2 2m8-2l2 2m-2-2l-2 2M9 21h.01M18 21h.01"
+                            d="M9 5l7 7-7 7"
                         />
-
                     </svg>
 
-                    Panier
+                    <span class="font-medium text-gray-900">
+                        Produits
+                    </span>
 
-                    @if (cartCount > 0) {
+                </div>
 
-                        <span
-                            class="inline-flex min-w-6 items-center justify-center rounded-full bg-white px-2 py-0.5 text-xs font-bold text-green-700"
-                        >
-                            {{ cartCount }}
-                        </span>
+                <!-- TITRE -->
+                <div class="max-w-3xl">
 
-                    }
+                    <h1
+                        class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
+                    >
+                        Nos produits de santé
+                    </h1>
 
-                </a>
+                    <p class="mt-3 text-base leading-7 text-gray-600">
+                        Découvrez notre sélection de produits de santé,
+                        médicaments et solutions adaptés à vos besoins.
+                    </p>
+
+                </div>
 
             </div>
 
-        </div>
-
-    </section>
+        </section>
 
 
-    <!-- ===================================================== -->
-    <!-- FILTRES -->
-    <!-- ===================================================== -->
+        <!-- =====================================================
+             RECHERCHE + FILTRES
+        ====================================================== -->
+        <section class="border-y border-gray-200 bg-gray-50">
 
-    <section
-        class="border-y border-gray-200 bg-gray-50"
-    >
+            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 
-        <div
-            class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8"
-        >
-
-            <!-- ================================================= -->
-            <!-- RECHERCHE -->
-            <!-- ================================================= -->
-
-            <form
-                (ngSubmit)="submitSearch()"
-                class="mb-5"
-            >
-
-                <label
-                    for="product-search"
-                    class="mb-2 block text-sm font-semibold text-gray-800"
-                >
-                    Rechercher un produit
-                </label>
-
-
-                <div
-                    class="flex flex-col gap-2 sm:flex-row"
+                <!-- RECHERCHE -->
+                <form
+                    (ngSubmit)="submitSearch()"
+                    class="mb-5"
                 >
 
-                    <div
-                        class="relative flex-1"
-                    >
+                    <div class="relative">
 
                         <div
-                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4"
                         >
-
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 class="h-5 w-5 text-gray-400"
@@ -132,461 +413,320 @@
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
                             >
-
                                 <path
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
                                     stroke-width="2"
-                                    d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
+                                    d="M21 21l-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0z"
                                 />
-
                             </svg>
-
                         </div>
-
 
                         <input
-                            id="product-search"
+                            type="text"
                             name="search"
-                            type="search"
                             [(ngModel)]="searchTerm"
-                            (keydown)="onSearchKeydown($event)"
-                            placeholder="Nom, SKU, marque, principe actif..."
-                            class="w-full rounded-xl border border-gray-300 bg-white py-3 pl-10 pr-4 text-sm text-gray-900 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100"
+                            placeholder="Rechercher un produit..."
+                            class="w-full rounded-xl border border-gray-300 bg-white py-3 pl-11 pr-32 text-sm text-gray-900 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100"
                         />
+
+                        <button
+                            type="submit"
+                            class="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg bg-green-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-green-700"
+                        >
+                            Rechercher
+                        </button>
+
+                    </div>
+
+                </form>
+
+
+                <!-- FILTRES -->
+                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+
+                    <!-- CATÉGORIE -->
+                    <div>
+
+                        <label
+                            class="mb-2 block text-sm font-medium text-gray-700"
+                        >
+                            Catégorie
+                        </label>
+
+                        <select
+                            name="category"
+                            [(ngModel)]="selectedCategory"
+                            (ngModelChange)="onFilterChange()"
+                            class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
+                        >
+
+                            <option [ngValue]="null">
+                                Toutes les catégories
+                            </option>
+
+                            @for (category of categories; track category.id) {
+
+                                <option [ngValue]="category.id">
+                                    {{ category.name }}
+                                </option>
+
+                            }
+
+                        </select>
 
                     </div>
 
 
-                    <button
-                        type="submit"
-                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-green-700"
-                    >
+                    <!-- ENTREPRISE -->
+                    <div>
 
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
+                        <label
+                            class="mb-2 block text-sm font-medium text-gray-700"
+                        >
+                            Entreprise
+                        </label>
+
+                        <select
+                            name="company"
+                            [(ngModel)]="selectedCompany"
+                            (ngModelChange)="onFilterChange()"
+                            class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
                         >
 
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
-                            />
-
-                        </svg>
-
-                        Rechercher
-
-                    </button>
-
-                </div>
-
-            </form>
-
-
-            <!-- ================================================= -->
-            <!-- FILTRES -->
-            <!-- ================================================= -->
-
-            <div
-                class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
-            >
-
-                <!-- ================================================= -->
-                <!-- CATÉGORIE -->
-                <!-- ================================================= -->
-
-                <div>
-
-                    <label
-                        for="category"
-                        class="mb-2 block text-sm font-semibold text-gray-700"
-                    >
-                        Catégorie
-                    </label>
-
-                    <select
-                        id="category"
-                        name="category"
-                        [(ngModel)]="selectedCategory"
-                        (ngModelChange)="onFilterChange()"
-                        class="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-700 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100"
-                    >
-
-                        <option
-                            [ngValue]="null"
-                        >
-                            Toutes les catégories
-                        </option>
-
-
-                        @for (
-                            category of categories;
-                            track category.id
-                        ) {
-
-                            <option
-                                [ngValue]="category.id"
-                            >
-                                {{ category.name }}
+                            <option [ngValue]="null">
+                                Toutes les entreprises
                             </option>
 
-                        }
+                            @for (company of companies; track company.id) {
 
-                    </select>
+                                <option [ngValue]="company.id">
+                                    {{ company.name }}
+                                </option>
 
-                </div>
+                            }
+
+                        </select>
+
+                    </div>
 
 
-                <!-- ================================================= -->
-                <!-- ENTREPRISE -->
-                <!-- ================================================= -->
+                    <!-- DOMAINE THÉRAPEUTIQUE -->
+                    <div>
 
-                <div>
-
-                    <label
-                        for="company"
-                        class="mb-2 block text-sm font-semibold text-gray-700"
-                    >
-                        Entreprise
-                    </label>
-
-                    <select
-                        id="company"
-                        name="company"
-                        [(ngModel)]="selectedCompany"
-                        (ngModelChange)="onFilterChange()"
-                        class="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-700 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100"
-                    >
-
-                        <option
-                            [ngValue]="null"
+                        <label
+                            class="mb-2 block text-sm font-medium text-gray-700"
                         >
-                            Toutes les entreprises
-                        </option>
+                            Domaine thérapeutique
+                        </label>
 
+                        <select
+                            name="therapeuticArea"
+                            [(ngModel)]="selectedTherapeuticArea"
+                            (ngModelChange)="onFilterChange()"
+                            class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
+                        >
 
-                        @for (
-                            company of companies;
-                            track company.id
-                        ) {
-
-                            <option
-                                [ngValue]="company.id"
-                            >
-                                {{ company.name }}
+                            <option [ngValue]="null">
+                                Tous les domaines
                             </option>
 
-                        }
+                            @for (
+                                area of therapeuticAreas;
+                                track area.id
+                            ) {
 
-                    </select>
+                                <option [ngValue]="area.id">
+                                    {{ area.name }}
+                                </option>
 
-                </div>
+                            }
+
+                        </select>
+
+                    </div>
 
 
-                <!-- ================================================= -->
-                <!-- DOMAINE THÉRAPEUTIQUE -->
-                <!-- ================================================= -->
+                    <!-- RÉINITIALISER -->
+                    <div class="flex items-end">
 
-                <div>
-
-                    <label
-                        for="therapeuticArea"
-                        class="mb-2 block text-sm font-semibold text-gray-700"
-                    >
-                        Domaine thérapeutique
-                    </label>
-
-                    <select
-                        id="therapeuticArea"
-                        name="therapeuticArea"
-                        [(ngModel)]="selectedTherapeuticArea"
-                        (ngModelChange)="onFilterChange()"
-                        class="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-700 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100"
-                    >
-
-                        <option
-                            [ngValue]="null"
+                        <button
+                            type="button"
+                            (click)="resetFilters()"
+                            class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:border-green-500 hover:text-green-600"
                         >
-                            Tous les domaines
-                        </option>
+                            Réinitialiser les filtres
+                        </button>
 
-
-                        @for (
-                            area of therapeuticAreas;
-                            track area.id
-                        ) {
-
-                            <option
-                                [ngValue]="area.id"
-                            >
-                                {{ area.name }}
-                            </option>
-
-                        }
-
-                    </select>
-
-                </div>
-
-
-                <!-- ================================================= -->
-                <!-- RESET -->
-                <!-- ================================================= -->
-
-                <div
-                    class="flex items-end"
-                >
-
-                    <button
-                        type="button"
-                        (click)="resetFilters()"
-                        class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-700 transition hover:border-gray-400 hover:bg-gray-100"
-                    >
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M4 4v5h5M20 20v-5h-5M5.64 9A7.99 7.99 0 0 1 19 6.36L20 9M4 15l1 2.64A7.99 7.99 0 0 0 18.36 15"
-                            />
-
-                        </svg>
-
-                        Réinitialiser
-
-                    </button>
+                    </div>
 
                 </div>
 
             </div>
 
-        </div>
-
-    </section>
+        </section>
 
 
-    <!-- ===================================================== -->
-    <!-- CONTENU -->
-    <!-- ===================================================== -->
+        <!-- =====================================================
+             LISTE PRODUITS
+        ====================================================== -->
+        <section class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
-    <main
-        class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"
-    >
+            <!-- MESSAGE PANIER -->
+            @if (cartMessage) {
 
-        <!-- ================================================= -->
-        <!-- LOADING -->
-        <!-- ================================================= -->
+                <div
+                    class="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700"
+                >
+                    {{ cartMessage }}
+                </div>
 
-        @if (loading) {
+            }
 
-            <div
-                class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
-            >
+            @if (cartError) {
 
-                @for (
-                    item of [1,2,3,4,5,6,7,8];
-                    track item
-                ) {
+                <div
+                    class="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                >
+                    {{ cartError }}
+                </div>
 
-                    <div
-                        class="overflow-hidden rounded-2xl border border-gray-200 bg-white"
-                    >
+            }
+
+
+            <!-- RÉSULTATS -->
+            @if (!loading && !error) {
+
+                <div class="mb-6 flex items-center justify-between">
+
+                    <div>
+
+                        <p class="text-sm text-gray-500">
+                            {{ totalElements }}
+                            produit{{ totalElements > 1 ? 's' : '' }}
+                            trouvé{{ totalElements > 1 ? 's' : '' }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+            }
+
+
+            <!-- =================================================
+                 LOADING
+            ================================================== -->
+            @if (loading) {
+
+                <div
+                    class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                >
+
+                    @for (
+                        item of [1,2,3,4,5,6,7,8];
+                        track item
+                    ) {
 
                         <div
-                            class="h-56 animate-pulse bg-gray-200"
-                        ></div>
-
-                        <div class="space-y-3 p-5">
+                            class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
+                        >
 
                             <div
-                                class="h-4 w-3/4 animate-pulse rounded bg-gray-200"
+                                class="h-56 animate-pulse bg-gray-200"
                             ></div>
 
-                            <div
-                                class="h-3 w-1/2 animate-pulse rounded bg-gray-200"
-                            ></div>
+                            <div class="space-y-3 p-5">
 
-                            <div
-                                class="h-5 w-1/3 animate-pulse rounded bg-gray-200"
-                            ></div>
+                                <div
+                                    class="h-4 animate-pulse rounded bg-gray-200"
+                                ></div>
+
+                                <div
+                                    class="h-6 w-3/4 animate-pulse rounded bg-gray-200"
+                                ></div>
+
+                                <div
+                                    class="h-4 w-1/2 animate-pulse rounded bg-gray-200"
+                                ></div>
+
+                                <div
+                                    class="h-8 animate-pulse rounded bg-gray-200"
+                                ></div>
+
+                            </div>
 
                         </div>
-
-                    </div>
-
-                }
-
-            </div>
-
-        }
-
-
-        <!-- ================================================= -->
-        <!-- ERREUR -->
-        <!-- ================================================= -->
-
-        @else if (error) {
-
-            <div
-                class="rounded-2xl border border-red-200 bg-red-50 p-6 text-center"
-            >
-
-                <div
-                    class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600"
-                >
-
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 9v3.75m0 3.75h.008M10.29 3.86 2.82 17.25A2 2 0 0 0 4.56 20h14.88a2 2 0 0 0 1.74-2.75L13.71 3.86a2 2 0 0 0-3.42 0Z"
-                        />
-
-                    </svg>
-
-                </div>
-
-
-                <h2
-                    class="text-lg font-bold text-red-800"
-                >
-                    Une erreur est survenue
-                </h2>
-
-
-                <p
-                    class="mt-2 text-sm text-red-700"
-                >
-                    {{ error }}
-                </p>
-
-
-                <button
-                    type="button"
-                    (click)="loadProducts()"
-                    class="mt-4 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
-                >
-                    Réessayer
-                </button>
-
-            </div>
-
-        }
-
-
-        <!-- ================================================= -->
-        <!-- PRODUITS -->
-        <!-- ================================================= -->
-
-        @else {
-
-            <!-- =============================================== -->
-            <!-- BARRE DE RÉSULTATS -->
-            <!-- =============================================== -->
-
-            <div
-                class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
-            >
-
-                <div>
-
-                    @if (totalElements > 0) {
-
-                        <p
-                            class="text-sm text-gray-600"
-                        >
-
-                            Affichage de
-
-                            <span
-                                class="font-semibold text-gray-900"
-                            >
-                                {{ firstDisplayedProduct }}
-                            </span>
-
-                            à
-
-                            <span
-                                class="font-semibold text-gray-900"
-                            >
-                                {{ lastDisplayedProduct }}
-                            </span>
-
-                            sur
-
-                            <span
-                                class="font-semibold text-gray-900"
-                            >
-                                {{ totalElements }}
-                            </span>
-
-                            produit(s)
-
-                        </p>
-
-                    } @else {
-
-                        <p
-                            class="text-sm text-gray-600"
-                        >
-                            Aucun produit trouvé.
-                        </p>
 
                     }
 
                 </div>
 
+            }
 
-                @if (
-                    searchTerm ||
-                    selectedCategory !== null ||
-                    selectedCompany !== null ||
-                    selectedTherapeuticArea !== null
-                ) {
+
+            <!-- =================================================
+                 ERREUR
+            ================================================== -->
+            @if (!loading && error) {
+
+                <div
+                    class="rounded-2xl border border-red-200 bg-red-50 p-8 text-center"
+                >
+
+                    <div
+                        class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100"
+                    >
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-6 w-6 text-red-600"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 9v3.75m0 3.75h.008v.008H12V16.5zM10.29 3.86l-8.82 15a1 1 0 00.87 1.5h19.32a1 1 0 00.87-1.5l-8.82-15a1 1 0 00-1.73 0z"
+                            />
+                        </svg>
+
+                    </div>
+
+                    <h2 class="text-lg font-semibold text-gray-900">
+                        Une erreur est survenue
+                    </h2>
+
+                    <p class="mt-2 text-sm text-red-700">
+                        {{ error }}
+                    </p>
 
                     <button
                         type="button"
-                        (click)="resetFilters()"
-                        class="text-sm font-semibold text-green-700 hover:text-green-800"
+                        (click)="loadProducts()"
+                        class="mt-5 rounded-lg bg-green-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700"
                     >
-                        Effacer les filtres
+                        Réessayer
                     </button>
 
-                }
+                </div>
 
-            </div>
+            }
 
 
-            <!-- =============================================== -->
-            <!-- AUCUN PRODUIT -->
-            <!-- =============================================== -->
-
-            @if (products.length === 0) {
+            <!-- =================================================
+                 AUCUN PRODUIT
+            ================================================== -->
+            @if (
+                !loading &&
+                !error &&
+                products.length === 0
+            ) {
 
                 <div
-                    class="rounded-2xl border border-gray-200 bg-white px-6 py-16 text-center"
+                    class="rounded-2xl border border-gray-200 bg-white p-10 text-center"
                 >
 
                     <div
@@ -600,38 +740,29 @@
                             viewBox="0 0 24 24"
                             stroke="currentColor"
                         >
-
                             <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                stroke-width="1.7"
-                                d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
+                                stroke-width="2"
+                                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                             />
-
                         </svg>
 
                     </div>
 
-
-                    <h2
-                        class="text-xl font-bold text-gray-900"
-                    >
+                    <h2 class="text-xl font-semibold text-gray-900">
                         Aucun produit trouvé
                     </h2>
 
-
-                    <p
-                        class="mx-auto mt-2 max-w-md text-sm leading-6 text-gray-500"
-                    >
-                        Aucun produit ne correspond aux
-                        critères sélectionnés.
+                    <p class="mt-2 text-sm text-gray-500">
+                        Aucun produit ne correspond à votre recherche
+                        ou à vos filtres.
                     </p>
-
 
                     <button
                         type="button"
                         (click)="resetFilters()"
-                        class="mt-5 rounded-xl bg-green-600 px-5 py-3 text-sm font-semibold text-white hover:bg-green-700"
+                        class="mt-5 rounded-lg bg-green-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700"
                     >
                         Réinitialiser les filtres
                     </button>
@@ -641,14 +772,17 @@
             }
 
 
-            <!-- =============================================== -->
-            <!-- GRILLE PRODUITS -->
-            <!-- =============================================== -->
-
-            @else {
+            <!-- =================================================
+                 PRODUITS
+            ================================================== -->
+            @if (
+                !loading &&
+                !error &&
+                products.length > 0
+            ) {
 
                 <div
-                    class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
+                    class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                 >
 
                     @for (
@@ -657,78 +791,72 @@
                     ) {
 
                         <article
-                            class="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg"
+                            class="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
                         >
 
-                            <!-- ================================= -->
                             <!-- IMAGE -->
-                            <!-- ================================= -->
-
-                            <a
-                                [routerLink]="[
-                                    '/products',
-                                    product.id
-                                ]"
-                                class="relative block overflow-hidden bg-gray-50"
+                            <div
+                                class="relative h-56 overflow-hidden bg-gray-100"
                             >
 
-                                <div
-                                    class="flex h-56 items-center justify-center p-4"
-                                >
+                                <img
+                                    [src]="getMainImage(product)"
+                                    [alt]="product.name"
+                                    class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                                    loading="lazy"
+                                />
 
-                                    <img
-                                        [src]="getProductImage(product)"
-                                        [alt]="product.name"
-                                        (error)="onImageError($event)"
-                                        class="h-full w-full object-contain transition duration-300 group-hover:scale-105"
-                                    />
 
-                                </div>
+                                <!-- PRESCRIPTION -->
+                                @if (product.requiresPrescription) {
+
+                                    <span
+                                        class="absolute left-3 top-3 rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold text-white shadow-sm"
+                                    >
+                                        Ordonnance
+                                    </span>
+
+                                }
 
 
                                 <!-- STOCK -->
+                                @if (isOutOfStock(product)) {
 
-                                <div
-                                    class="absolute left-3 top-3"
-                                >
+                                    <span
+                                        class="absolute right-3 top-3 rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow-sm"
+                                    >
+                                        Rupture
+                                    </span>
 
-                                    @if (isInStock(product)) {
+                                } @else if (isLowStock(product)) {
 
-                                        <span
-                                            class="inline-flex rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700"
-                                        >
-                                            En stock
-                                        </span>
+                                    <span
+                                        class="absolute right-3 top-3 rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold text-white shadow-sm"
+                                    >
+                                        Stock limité
+                                    </span>
 
-                                    } @else {
+                                } @else {
 
-                                        <span
-                                            class="inline-flex rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700"
-                                        >
-                                            Rupture
-                                        </span>
+                                    <span
+                                        class="absolute right-3 top-3 rounded-full bg-green-600 px-3 py-1 text-xs font-semibold text-white shadow-sm"
+                                    >
+                                        En stock
+                                    </span>
 
-                                    }
+                                }
 
-                                </div>
-
-                            </a>
+                            </div>
 
 
-                            <!-- ================================= -->
-                            <!-- INFORMATIONS -->
-                            <!-- ================================= -->
-
-                            <div
-                                class="flex flex-1 flex-col p-5"
-                            >
+                            <!-- CONTENU -->
+                            <div class="flex flex-1 flex-col p-5">
 
                                 <!-- ENTREPRISE -->
-
                                 @if (product.companyName) {
 
                                     <p
-                                        class="mb-1 text-xs font-semibold uppercase tracking-wide text-green-600"
+                                        class="mb-1 text-xs font-medium uppercase tracking-wide text-green-600"
                                     >
                                         {{ product.companyName }}
                                     </p>
@@ -737,42 +865,30 @@
 
 
                                 <!-- NOM -->
-
-                                <a
-                                    [routerLink]="[
-                                        '/products',
-                                        product.id
-                                    ]"
-                                    class="line-clamp-2 min-h-[3rem] text-base font-bold text-gray-900 transition hover:text-green-700"
+                                <h2
+                                    class="line-clamp-2 min-h-[3.5rem] text-lg font-bold text-gray-900"
                                 >
                                     {{ product.name }}
-                                </a>
+                                </h2>
 
 
                                 <!-- SKU -->
-
                                 @if (product.sku) {
 
-                                    <p
-                                        class="mt-2 text-xs text-gray-500"
-                                    >
-                                        SKU :
-                                        {{ product.sku }}
+                                    <p class="mt-1 text-xs text-gray-500">
+                                        SKU : {{ product.sku }}
                                     </p>
 
                                 }
 
 
                                 <!-- CATÉGORIES -->
-
                                 @if (
                                     product.categories &&
                                     product.categories.length > 0
                                 ) {
 
-                                    <div
-                                        class="mt-3 flex flex-wrap gap-1.5"
-                                    >
+                                    <div class="mt-3 flex flex-wrap gap-1">
 
                                         @for (
                                             category of product.categories;
@@ -780,7 +896,7 @@
                                         ) {
 
                                             <span
-                                                class="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600"
+                                                class="rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700"
                                             >
                                                 {{ category }}
                                             </span>
@@ -792,130 +908,147 @@
                                 }
 
 
-                                <!-- DOMAINE THÉRAPEUTIQUE -->
+                                <!-- DESCRIPTION -->
+                                @if (product.description) {
 
+                                    <p
+                                        class="mt-3 line-clamp-3 text-sm leading-6 text-gray-600"
+                                    >
+                                        {{ product.description }}
+                                    </p>
+
+                                }
+
+
+                                <!-- DOMAINES THÉRAPEUTIQUES -->
                                 @if (
                                     product.therapeuticAreas &&
                                     product.therapeuticAreas.length > 0
                                 ) {
 
-                                    <div
-                                        class="mt-2"
-                                    >
+                                    <div class="mt-3">
 
-                                        @for (
-                                            area of product.therapeuticAreas | slice:0:1;
-                                            track area
-                                        ) {
+                                        <p
+                                            class="mb-1 text-xs font-semibold text-gray-500"
+                                        >
+                                            Domaine thérapeutique
+                                        </p>
 
-                                            <p
-                                                class="line-clamp-1 text-xs text-gray-500"
-                                            >
-                                                {{ area }}
-                                            </p>
+                                        <div class="flex flex-wrap gap-1">
 
-                                        }
+                                            @for (
+                                                area of product.therapeuticAreas;
+                                                track area
+                                            ) {
+
+                                                <span
+                                                    class="rounded-full bg-blue-50 px-2 py-1 text-xs text-blue-700"
+                                                >
+                                                    {{ area }}
+                                                </span>
+
+                                            }
+
+                                        </div>
 
                                     </div>
 
                                 }
 
 
-                                <!-- PRIX -->
+                                <!-- ESPACE -->
+                                <div class="mt-auto pt-5">
 
-                                <div
-                                    class="mt-auto pt-5"
-                                >
-
+                                    <!-- PRIX / STOCK -->
                                     <div
-                                        class="flex items-end justify-between gap-3"
+                                        class="mb-4 flex items-end justify-between gap-3"
                                     >
 
                                         <div>
 
                                             <p
-                                                class="text-xl font-bold text-gray-900"
+                                                class="text-2xl font-bold text-gray-900"
                                             >
                                                 {{ formatPrice(product.price) }}
                                             </p>
 
-                                            @if (
-                                                product.purchasePrice &&
-                                                product.purchasePrice > product.price
-                                            ) {
-
-                                                <p
-                                                    class="text-xs text-gray-400"
-                                                >
-                                                    Prix public
-                                                </p>
-
-                                            }
-
                                         </div>
 
-
-                                        @if (
-                                            product.stock !== undefined
-                                        ) {
-
-                                            <p
-                                                class="text-xs text-gray-500"
-                                            >
-                                                Stock :
-                                                {{ product.stock }}
-                                            </p>
-
-                                        }
+                                        <p
+                                            class="text-xs text-gray-500"
+                                        >
+                                            Stock :
+                                            {{ product.stock }}
+                                        </p>
 
                                     </div>
 
 
-                                    <!-- ================================= -->
-                                    <!-- BOUTON PANIER -->
-                                    <!-- ================================= -->
+                                    <!-- ACTIONS -->
+                                    <div class="grid grid-cols-2 gap-2">
 
-                                    <button
-                                        type="button"
-                                        (click)="addToCart(product)"
-                                        [disabled]="!isInStock(product)"
-                                        class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition"
-                                        [ngClass]="
-                                            isInStock(product)
-                                                ? 'bg-green-600 text-white hover:bg-green-700'
-                                                : 'cursor-not-allowed bg-gray-100 text-gray-400'
-                                        "
-                                    >
-
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="h-5 w-5"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
+                                        <!-- AJOUT PANIER -->
+                                        <button
+                                            type="button"
+                                            [disabled]="
+                                                isOutOfStock(product) ||
+                                                addingProductId === product.id
+                                            "
+                                            (click)="addToCart(product)"
+                                            class="rounded-lg bg-green-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                                         >
 
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-2 2m2-2 2 2m8-2 2 2m-2-2-2 2M9 21h.01M18 21h.01"
-                                            />
+                                            @if (
+                                                addingProductId ===
+                                                product.id
+                                            ) {
 
-                                        </svg>
+                                                <span>
+                                                    Ajout...
+                                                </span>
+
+                                            } @else {
+
+                                                @if (
+                                                    getProductCartQuantity(
+                                                        product.id
+                                                    ) > 0
+                                                ) {
+
+                                                    <span>
+                                                        Panier
+                                                        ({{
+                                                            getProductCartQuantity(
+                                                                product.id
+                                                            )
+                                                        }})
+                                                    </span>
+
+                                                } @else {
+
+                                                    <span>
+                                                        Ajouter
+                                                    </span>
+
+                                                }
+
+                                            }
+
+                                        </button>
 
 
-                                        @if (isInStock(product)) {
+                                        <!-- DÉTAILS -->
+                                        <a
+                                            [routerLink]="[
+                                                '/products',
+                                                product.id
+                                            ]"
+                                            class="rounded-lg border border-gray-300 px-3 py-2.5 text-center text-sm font-semibold text-gray-700 transition hover:border-green-600 hover:text-green-600"
+                                        >
+                                            Voir le produit
+                                        </a>
 
-                                            Ajouter au panier
-
-                                        } @else {
-
-                                            Indisponible
-
-                                        }
-
-                                    </button>
+                                    </div>
 
                                 </div>
 
@@ -928,146 +1061,63 @@
                 </div>
 
 
-                <!-- ============================================= -->
-                <!-- PAGINATION -->
-                <!-- ============================================= -->
-
+                <!-- =================================================
+                     PAGINATION
+                ================================================== -->
                 @if (totalPages > 1) {
 
                     <div
-                        class="mt-10 flex flex-col items-center justify-between gap-4 border-t border-gray-200 pt-6 sm:flex-row"
+                        class="mt-10 flex flex-wrap items-center justify-center gap-2"
                     >
 
-                        <!-- INFOS -->
-
-                        <p
-                            class="text-sm text-gray-500"
+                        <!-- PRÉCÉDENT -->
+                        <button
+                            type="button"
+                            [disabled]="currentPage === 0"
+                            (click)="previousPage()"
+                            class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-green-500 hover:text-green-600 disabled:cursor-not-allowed disabled:opacity-40"
                         >
-                            Page
-                            <span
-                                class="font-semibold text-gray-900"
-                            >
-                                {{ currentPage + 1 }}
-                            </span>
-                            sur
-                            <span
-                                class="font-semibold text-gray-900"
-                            >
-                                {{ totalPages }}
-                            </span>
-                        </p>
+                            Précédent
+                        </button>
 
 
-                        <!-- NAVIGATION -->
-
-                        <div
-                            class="flex items-center gap-1"
-                        >
-
-                            <!-- PRÉCÉDENT -->
+                        <!-- PAGES -->
+                        @for (
+                            page of getPaginationPages();
+                            track page
+                        ) {
 
                             <button
                                 type="button"
-                                (click)="previousPage()"
-                                [disabled]="currentPage === 0"
-                                class="inline-flex h-10 items-center justify-center rounded-lg border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
-                            >
-
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    class="h-4 w-4"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="m15 19-7-7 7-7"
-                                    />
-
-                                </svg>
-
-                                <span
-                                    class="ml-1 hidden sm:inline"
-                                >
-                                    Précédent
-                                </span>
-
-                            </button>
-
-
-                            <!-- PAGES -->
-
-                            @for (
-                                page of pages;
-                                track page
-                            ) {
-
-                                <button
-                                    type="button"
-                                    (click)="goToPage(page)"
-                                    class="hidden h-10 min-w-10 items-center justify-center rounded-lg border px-3 text-sm font-semibold transition sm:inline-flex"
-                                    [ngClass]="
-                                        page === currentPage
-                                            ? 'border-green-600 bg-green-600 text-white'
-                                            : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
-                                    "
-                                >
-                                    {{ page + 1 }}
-                                </button>
-
-                            }
-
-
-                            <!-- PAGE COURANTE MOBILE -->
-
-                            <span
-                                class="inline-flex h-10 min-w-10 items-center justify-center rounded-lg border border-green-600 bg-green-600 px-3 text-sm font-semibold text-white sm:hidden"
-                            >
-                                {{ currentPage + 1 }}
-                            </span>
-
-
-                            <!-- SUIVANT -->
-
-                            <button
-                                type="button"
-                                (click)="nextPage()"
-                                [disabled]="
-                                    currentPage >= totalPages - 1
+                                (click)="goToPage(page)"
+                                [class.bg-green-600]="
+                                    page === currentPage
                                 "
-                                class="inline-flex h-10 items-center justify-center rounded-lg border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                                [class.text-white]="
+                                    page === currentPage
+                                "
+                                [class.text-gray-700]="
+                                    page !== currentPage
+                                "
+                                class="min-w-10 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium transition hover:border-green-500 hover:text-green-600"
                             >
-
-                                <span
-                                    class="mr-1 hidden sm:inline"
-                                >
-                                    Suivant
-                                </span>
-
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    class="h-4 w-4"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="m9 5 7 7-7 7"
-                                    />
-
-                                </svg>
-
+                                {{ page + 1 }}
                             </button>
 
-                        </div>
+                        }
+
+
+                        <!-- SUIVANT -->
+                        <button
+                            type="button"
+                            [disabled]="
+                                currentPage >= totalPages - 1
+                            "
+                            (click)="nextPage()"
+                            class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-green-500 hover:text-green-600 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                            Suivant
+                        </button>
 
                     </div>
 
@@ -1075,8 +1125,45 @@
 
             }
 
-        }
+        </section>
 
     </main>
+
+
+    <!-- =========================================================
+         FOOTER
+    ========================================================== -->
+    <footer class="border-t border-gray-200 bg-white">
+
+        <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+
+            <div
+                class="flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left"
+            >
+
+                <div>
+
+                    <img
+                        src="/images/logo/logo.svg"
+                        alt="TTES-ICG Santé"
+                        class="mx-auto h-9 w-auto sm:mx-0"
+                    />
+
+                    <p class="mt-2 text-sm text-gray-500">
+                        Votre partenaire santé.
+                    </p>
+
+                </div>
+
+                <p class="text-sm text-gray-500">
+                    © {{ currentYear }} TTES-ICG Santé.
+                    Tous droits réservés.
+                </p>
+
+            </div>
+
+        </div>
+
+    </footer>
 
 </div>

@@ -20,6 +20,7 @@ import {
     Bundle
 } from '../../core/models/global-search.model';
 
+
 @Component({
     selector: 'app-search',
     standalone: true,
@@ -31,23 +32,44 @@ import {
 })
 export class SearchComponent implements OnInit {
 
+    // =========================================================
+    // SERVICES
+    // =========================================================
+
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private searchService = inject(SearchService);
 
+    // =========================================================
+    // RECHERCHE
+    // =========================================================
+
     keyword = '';
+
+    // =========================================================
+    // RESULTATS
+    // =========================================================
 
     products: Product[] = [];
     bundles: Bundle[] = [];
 
+    // =========================================================
+    // ETAT
+    // =========================================================
+
     loading = false;
     error = '';
+
+    // =========================================================
+    // INIT
+    // =========================================================
 
     ngOnInit(): void {
 
         this.route.queryParams.subscribe(params => {
 
-            const keyword = (params['q'] || '').trim();
+            const keyword =
+                (params['q'] || '').trim();
 
             this.keyword = keyword;
 
@@ -61,15 +83,18 @@ export class SearchComponent implements OnInit {
         });
     }
 
-    /**
-     * Effectue la recherche globale
-     * produits + packs.
-     */
+    // =========================================================
+    // RECHERCHE GLOBALE
+    // =========================================================
+
     search(): void {
 
-        const keyword = this.keyword.trim();
+        const keyword =
+            this.keyword.trim();
 
         if (!keyword) {
+            this.products = [];
+            this.bundles = [];
             return;
         }
 
@@ -80,112 +105,141 @@ export class SearchComponent implements OnInit {
             .search(keyword, 0, 8)
             .subscribe({
 
-                next: (response: GlobalSearchResponse) => {
+                next: (
+                    response: GlobalSearchResponse
+                ) => {
 
-                    this.products = response.products || [];
+                    this.products =
+                        response.products ?? [];
 
-                    this.bundles = response.bundles || [];
+                    this.bundles =
+                        response.bundles ?? [];
 
                     this.loading = false;
                 },
 
-                error: (err) => {
+                error: (error) => {
 
                     console.error(
                         'Erreur recherche globale :',
-                        err
+                        error
                     );
-
-                    this.error =
-                        'Impossible de récupérer les résultats de recherche.';
 
                     this.products = [];
                     this.bundles = [];
+
+                    this.error =
+                        'Impossible de récupérer les résultats de recherche.';
 
                     this.loading = false;
                 }
             });
     }
 
-    /**
-     * Retourne l'image principale d'un produit.
-     */
+    // =========================================================
+    // RESULTATS
+    // =========================================================
+
+    get hasResults(): boolean {
+        return (
+            this.products.length > 0 ||
+            this.bundles.length > 0
+        );
+    }
+
+    // =========================================================
+    // IMAGE PRODUIT
+    // =========================================================
+
     getProductImage(product: Product): string {
 
         if (
             !product.images ||
             product.images.length === 0
         ) {
-            return '/images/products/default-product.jpg';
+            return '/images/products/default-product.png';
         }
 
-        const image = product.images[0];
+        const mainImage =
+            product.images.find(
+                image => image.main
+            );
 
-        if (typeof image === 'string') {
-            return image;
+        if (mainImage?.imageUrl) {
+            return mainImage.imageUrl;
         }
 
-        if (image?.imageUrl) {
-            return image.imageUrl;
+        const firstImage =
+            product.images[0];
+
+        if (firstImage?.imageUrl) {
+            return firstImage.imageUrl;
         }
 
-        if (image?.url) {
-            return image.url;
-        }
-
-        if (image?.path) {
-            return image.path;
-        }
-
-        return '/images/products/default-product.jpg';
+        return '/images/products/default-product.png';
     }
 
-    /**
-     * Retourne l'image principale d'un pack.
-     */
+    // =========================================================
+    // IMAGE PACK
+    // =========================================================
+
     getBundleImage(bundle: Bundle): string {
 
         if (
             !bundle.images ||
             bundle.images.length === 0
         ) {
-            return '/images/products/default-product.jpg';
+            return '/images/products/default-product.png';
         }
 
-        const mainImage = bundle.images.find(
-            image => image.main
-        );
+        const mainImage =
+            bundle.images.find(
+                image => image.main
+            );
 
         if (mainImage?.imageUrl) {
             return mainImage.imageUrl;
         }
 
-        if (bundle.images[0]?.imageUrl) {
-            return bundle.images[0].imageUrl;
+        const firstImage =
+            bundle.images[0];
+
+        if (firstImage?.imageUrl) {
+            return firstImage.imageUrl;
         }
 
-        return '/images/products/default-product.jpg';
+        return '/images/products/default-product.png';
     }
 
-    /**
-     * Ouvre la page d'un produit.
-     */
-    openProduct(productId: number): void {
+    // =========================================================
+    // NAVIGATION PRODUIT
+    // =========================================================
+
+    openProduct(product: Product): void {
+
+        if (!product?.id) {
+            return;
+        }
 
         this.router.navigate([
             '/products',
-            productId
+            product.id
         ]);
     }
 
-    /**
-     * Ouvre la page d'un pack.
-     */
-    openBundle(bundleId: number): void {
+    // =========================================================
+    // NAVIGATION PACK
+    // =========================================================
+
+    openBundle(bundle: Bundle): void {
+
+        if (!bundle?.id) {
+            return;
+        }
 
         this.router.navigate([
             '/bundles',
-            bundleId
+            bundle.id
         ]);
     }
 }

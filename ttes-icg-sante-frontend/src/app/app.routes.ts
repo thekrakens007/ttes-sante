@@ -64,6 +64,12 @@ export const routes: Routes = [
     title: 'TTES-ICG Santé - Boutique'
   },
   {
+    path: 'search',
+    loadComponent: () =>
+        import('./pages/shop/search.component')
+            .then(m => m.SearchComponent)
+}
+  {
     path: 'profile',
     component: ProfileComponent,
     canActivate: [authGuard]

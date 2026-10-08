@@ -1,6 +1,7 @@
 import {
     Component,
     OnInit,
+    OnDestroy,
     inject
 } from '@angular/core';
 
@@ -24,7 +25,7 @@ import { Cart } from '../../../core/interfaces/cart.interface';
     ],
     templateUrl: './products-list.component.html'
 })
-export class ProductsListComponent implements OnInit {
+export class ProductsListComponent implements OnInit, OnDestroy {
 
     private readonly productService = inject(ProductService);
     private readonly cartService = inject(CartService);
@@ -38,6 +39,31 @@ export class ProductsListComponent implements OnInit {
 
     loading = true;
     error = '';
+
+    /* ============================================================
+       CARROUSEL PRODUITS ALÉATOIRES
+       ============================================================ */
+
+    /**
+     * Produits affichés dans le carrousel supérieur.
+     */
+    featuredProducts: Product[] = [];
+
+    /**
+     * Index du produit actuellement affiché.
+     */
+    featuredCurrentIndex = 0;
+
+    /**
+     * Timer du défilement automatique.
+     */
+    private featuredInterval: ReturnType<typeof setInterval> | null = null;
+
+    /**
+     * Nombre de produits visibles simultanément
+     * selon la largeur de l'écran.
+     */
+    featuredVisibleCount = 4;
 
     /* ============================================================
        PAGINATION
@@ -110,6 +136,269 @@ export class ProductsListComponent implements OnInit {
         this.loadProducts();
 
         this.loadCart();
+
+        /*
+         * Défilement automatique du carrousel.
+         */
+        this.startFeaturedCarousel();
+    }
+
+    /* ============================================================
+       DESTRUCTION
+       ============================================================ */
+
+    ngOnDestroy(): void {
+
+        this.stopFeaturedCarousel();
+    }
+
+    /* ============================================================
+       CARROUSEL PRODUITS
+       ============================================================ */
+
+    /**
+     * Mélange un tableau de manière aléatoire.
+     */
+    private shuffleProducts(
+        products: Product[]
+    ): Product[] {
+
+        const shuffled = [...products];
+
+        for (
+            let i = shuffled.length - 1;
+            i > 0;
+            i--
+        ) {
+
+            const j =
+                Math.floor(
+                    Math.random() * (i + 1)
+                );
+
+            [
+                shuffled[i],
+                shuffled[j]
+            ] = [
+                shuffled[j],
+                shuffled[i]
+            ];
+        }
+
+        return shuffled;
+    }
+
+    /**
+     * Prépare les produits du carrousel.
+     */
+    private prepareFeaturedProducts(): void {
+
+        if (!this.products || this.products.length === 0) {
+
+            this.featuredProducts = [];
+
+            this.featuredCurrentIndex = 0;
+
+            return;
+        }
+
+        /*
+         * Mélange les produits actuellement chargés.
+         */
+        const shuffled =
+            this.shuffleProducts(this.products);
+
+        /*
+         * On affiche au maximum 8 produits
+         * dans le carrousel.
+         */
+        this.featuredProducts =
+            shuffled.slice(0, 8);
+
+        this.featuredCurrentIndex = 0;
+    }
+
+    /**
+     * Démarre le défilement automatique.
+     */
+    private startFeaturedCarousel(): void {
+
+        this.stopFeaturedCarousel();
+
+        this.featuredInterval =
+            setInterval(() => {
+
+                this.nextFeaturedProduct();
+
+            }, 3000);
+    }
+
+    /**
+     * Arrête le défilement automatique.
+     */
+    private stopFeaturedCarousel(): void {
+
+        if (this.featuredInterval !== null) {
+
+            clearInterval(
+                this.featuredInterval
+            );
+
+            this.featuredInterval = null;
+        }
+    }
+
+    /**
+     * Produit suivant.
+     */
+    nextFeaturedProduct(): void {
+
+        if (
+            !this.featuredProducts ||
+            this.featuredProducts.length === 0
+        ) {
+            return;
+        }
+
+        this.featuredCurrentIndex++;
+
+        /*
+         * Retour au début.
+         */
+        if (
+            this.featuredCurrentIndex >=
+            this.featuredProducts.length
+        ) {
+
+            this.featuredCurrentIndex = 0;
+        }
+    }
+
+    /**
+     * Produit précédent.
+     */
+    previousFeaturedProduct(): void {
+
+        if (
+            !this.featuredProducts ||
+            this.featuredProducts.length === 0
+        ) {
+            return;
+        }
+
+        this.featuredCurrentIndex--;
+
+        if (
+            this.featuredCurrentIndex < 0
+        ) {
+
+            this.featuredCurrentIndex =
+                this.featuredProducts.length - 1;
+        }
+    }
+
+    /**
+     * Produit actuellement affiché.
+     */
+    getCurrentFeaturedProduct(): Product | null {
+
+        if (
+            !this.featuredProducts ||
+            this.featuredProducts.length === 0
+        ) {
+            return null;
+        }
+
+        return this.featuredProducts[
+            this.featuredCurrentIndex
+        ];
+    }
+
+    /**
+     * Produits affichés dans le carrousel.
+     *
+     * Cette méthode permet d'afficher plusieurs cartes
+     * selon la taille de l'écran.
+     */
+    getVisibleFeaturedProducts(): Product[] {
+
+        if (
+            !this.featuredProducts ||
+            this.featuredProducts.length === 0
+        ) {
+            return [];
+        }
+
+        const result: Product[] = [];
+
+        const count =
+            Math.min(
+                this.featuredVisibleCount,
+                this.featuredProducts.length
+            );
+
+        for (
+            let i = 0;
+            i < count;
+            i++
+        ) {
+
+            const index =
+                (
+                    this.featuredCurrentIndex +
+                    i
+                ) %
+                this.featuredProducts.length;
+
+            result.push(
+                this.featuredProducts[index]
+            );
+        }
+
+        return result;
+    }
+
+    /**
+     * Change le produit affiché par le carrousel.
+     */
+    selectFeaturedProduct(
+        index: number
+    ): void {
+
+        if (
+            index < 0 ||
+            index >= this.featuredProducts.length
+        ) {
+            return;
+        }
+
+        this.featuredCurrentIndex = index;
+    }
+
+    /**
+     * Navigation vers un produit depuis le carrousel.
+     */
+    viewFeaturedProduct(
+        product: Product
+    ): void {
+
+        this.viewProduct(product);
+    }
+
+    /**
+     * Pause temporaire lors du survol.
+     */
+    pauseFeaturedCarousel(): void {
+
+        this.stopFeaturedCarousel();
+    }
+
+    /**
+     * Reprise après le survol.
+     */
+    resumeFeaturedCarousel(): void {
+
+        this.startFeaturedCarousel();
     }
 
     /* ============================================================
@@ -161,10 +450,9 @@ export class ProductsListComponent implements OnInit {
 
         this.loadingFilters = true;
 
-        /* ========================================================
-           CATÉGORIES
-        ======================================================== */
-
+        /*
+         * Catégories
+         */
         this.productService
             .getCategories()
             .subscribe({
@@ -186,10 +474,9 @@ export class ProductsListComponent implements OnInit {
                 }
             });
 
-        /* ========================================================
-           ENTREPRISES
-        ======================================================== */
-
+        /*
+         * Entreprises
+         */
         this.productService
             .getCompanies()
             .subscribe({
@@ -211,10 +498,9 @@ export class ProductsListComponent implements OnInit {
                 }
             });
 
-        /* ========================================================
-           DOMAINES THÉRAPEUTIQUES
-        ======================================================== */
-
+        /*
+         * Domaines thérapeutiques
+         */
         this.productService
             .getTherapeuticAreas()
             .subscribe({
@@ -254,7 +540,8 @@ export class ProductsListComponent implements OnInit {
         this.error = '';
 
         const keyword =
-            this.searchTerm?.trim() || undefined;
+            this.searchTerm?.trim() ||
+            undefined;
 
         this.productService
             .getProductsPaginated(
@@ -269,16 +556,8 @@ export class ProductsListComponent implements OnInit {
 
                 next: (response) => {
 
-                    /* =================================================
-                       RÉCUPÉRATION DES PRODUITS
-                    ================================================= */
-
-                    const receivedProducts =
+                    this.products =
                         response?.content ?? [];
-
-                    /* =================================================
-                       MÉTADONNÉES PAGINATION
-                    ================================================= */
 
                     this.totalElements =
                         response?.totalElements ?? 0;
@@ -286,10 +565,10 @@ export class ProductsListComponent implements OnInit {
                     this.totalPages =
                         response?.totalPages ?? 0;
 
-                    /* =================================================
-                       VÉRIFICATION DE LA PAGE
-                    ================================================= */
-
+                    /*
+                     * Si la page demandée n'existe plus,
+                     * revenir sur la dernière page.
+                     */
                     if (
                         this.totalPages > 0 &&
                         this.currentPage >=
@@ -304,18 +583,10 @@ export class ProductsListComponent implements OnInit {
                         return;
                     }
 
-                    /* =================================================
-                       MÉLANGE ALÉATOIRE
-                       
-                       IMPORTANT :
-                       On crée une copie avant le mélange afin de
-                       ne pas modifier directement response.content.
-                    ================================================= */
-
-                    this.products =
-                        this.shuffleProducts(
-                            receivedProducts
-                        );
+                    /*
+                     * Préparation du carrousel.
+                     */
+                    this.prepareFeaturedProducts();
 
                     this.loading = false;
                 },
@@ -329,6 +600,8 @@ export class ProductsListComponent implements OnInit {
 
                     this.products = [];
 
+                    this.featuredProducts = [];
+
                     this.totalElements = 0;
 
                     this.totalPages = 0;
@@ -339,46 +612,6 @@ export class ProductsListComponent implements OnInit {
                     this.loading = false;
                 }
             });
-    }
-
-    /* ============================================================
-       MÉLANGE ALÉATOIRE DES PRODUITS
-       ============================================================ */
-
-    /**
-     * Mélange les produits de manière aléatoire.
-     *
-     * Fisher-Yates est utilisé pour obtenir un mélange
-     * correctement réparti.
-     */
-    private shuffleProducts(
-        products: Product[]
-    ): Product[] {
-
-        const shuffled =
-            [...products];
-
-        for (
-            let i = shuffled.length - 1;
-            i > 0;
-            i--
-        ) {
-
-            const j =
-                Math.floor(
-                    Math.random() * (i + 1)
-                );
-
-            [
-                shuffled[i],
-                shuffled[j]
-            ] = [
-                shuffled[j],
-                shuffled[i]
-            ];
-        }
-
-        return shuffled;
     }
 
     /* ============================================================
@@ -427,7 +660,8 @@ export class ProductsListComponent implements OnInit {
 
         this.selectedCompany = null;
 
-        this.selectedTherapeuticArea = null;
+        this.selectedTherapeuticArea =
+            null;
 
         this.currentPage = 0;
 
@@ -438,9 +672,7 @@ export class ProductsListComponent implements OnInit {
        PAGINATION
        ============================================================ */
 
-    goToPage(
-        page: number
-    ): void {
+    goToPage(page: number): void {
 
         if (
             page < 0 ||
@@ -495,10 +727,6 @@ export class ProductsListComponent implements OnInit {
         });
     }
 
-    /* ============================================================
-       PAGES DE PAGINATION
-       ============================================================ */
-
     getPaginationPages(): number[] {
 
         if (this.totalPages <= 0) {
@@ -524,9 +752,7 @@ export class ProductsListComponent implements OnInit {
 
     get firstDisplayedProduct(): number {
 
-        if (
-            this.totalElements === 0
-        ) {
+        if (this.totalElements === 0) {
             return 0;
         }
 
@@ -538,9 +764,7 @@ export class ProductsListComponent implements OnInit {
 
     get lastDisplayedProduct(): number {
 
-        if (
-            this.totalElements === 0
-        ) {
+        if (this.totalElements === 0) {
             return 0;
         }
 
@@ -575,8 +799,7 @@ export class ProductsListComponent implements OnInit {
 
                     this.cart = cart;
 
-                    this.cartLoading =
-                        false;
+                    this.cartLoading = false;
                 },
 
                 error: (err) => {
@@ -588,15 +811,10 @@ export class ProductsListComponent implements OnInit {
 
                     this.cart = null;
 
-                    this.cartLoading =
-                        false;
+                    this.cartLoading = false;
                 }
             });
     }
-
-    /* ============================================================
-       AJOUT AU PANIER
-       ============================================================ */
 
     addToCart(
         product: Product
@@ -681,10 +899,6 @@ export class ProductsListComponent implements OnInit {
             });
     }
 
-    /* ============================================================
-       NOMBRE D'ARTICLES DU PANIER
-       ============================================================ */
-
     get cartCount(): number {
 
         if (
@@ -713,10 +927,6 @@ export class ProductsListComponent implements OnInit {
         );
     }
 
-    /* ============================================================
-       QUANTITÉ PRODUIT DANS LE PANIER
-       ============================================================ */
-
     getProductCartQuantity(
         productId: number
     ): number {
@@ -732,8 +942,6 @@ export class ProductsListComponent implements OnInit {
             this.cart.items.find(
                 (cartItem: any) => {
 
-                    /* productId direct */
-
                     if (
                         Number(
                             cartItem?.productId
@@ -743,8 +951,6 @@ export class ProductsListComponent implements OnInit {
                         return true;
                     }
 
-                    /* product.id */
-
                     if (
                         Number(
                             cartItem?.product?.id
@@ -753,8 +959,6 @@ export class ProductsListComponent implements OnInit {
                     ) {
                         return true;
                     }
-
-                    /* product.productId */
 
                     if (
                         Number(
@@ -867,46 +1071,30 @@ export class ProductsListComponent implements OnInit {
             const firstImage: any =
                 product.images[0];
 
-            /* Image = string */
-
             if (
-                typeof firstImage ===
-                'string'
+                typeof firstImage === 'string'
             ) {
-
                 return firstImage;
             }
 
-            /* { url: "..." } */
-
             if (
                 firstImage?.url &&
-                typeof firstImage.url ===
-                'string'
+                typeof firstImage.url === 'string'
             ) {
-
                 return firstImage.url;
             }
 
-            /* { imageUrl: "..." } */
-
             if (
                 firstImage?.imageUrl &&
-                typeof firstImage.imageUrl ===
-                'string'
+                typeof firstImage.imageUrl === 'string'
             ) {
-
                 return firstImage.imageUrl;
             }
 
-            /* { path: "..." } */
-
             if (
                 firstImage?.path &&
-                typeof firstImage.path ===
-                'string'
+                typeof firstImage.path === 'string'
             ) {
-
                 return firstImage.path;
             }
         }
@@ -918,22 +1106,15 @@ export class ProductsListComponent implements OnInit {
         product: Product
     ): string {
 
-        return this.getMainImage(
-            product
-        );
+        return this.getMainImage(product);
     }
-
-    /* ============================================================
-       ERREUR IMAGE
-       ============================================================ */
 
     onImageError(
         event: Event
     ): void {
 
         const image =
-            event.target as
-            HTMLImageElement;
+            event.target as HTMLImageElement;
 
         if (!image) {
             return;
@@ -955,7 +1136,6 @@ export class ProductsListComponent implements OnInit {
             !product.categories ||
             product.categories.length === 0
         ) {
-
             return 'Non catégorisé';
         }
 
@@ -963,10 +1143,8 @@ export class ProductsListComponent implements OnInit {
             .map((category: any) => {
 
                 if (
-                    typeof category ===
-                    'string'
+                    typeof category === 'string'
                 ) {
-
                     return category;
                 }
 
@@ -988,7 +1166,6 @@ export class ProductsListComponent implements OnInit {
             !product.therapeuticAreas ||
             product.therapeuticAreas.length === 0
         ) {
-
             return 'Non défini';
         }
 
@@ -996,10 +1173,8 @@ export class ProductsListComponent implements OnInit {
             .map((area: any) => {
 
                 if (
-                    typeof area ===
-                    'string'
+                    typeof area === 'string'
                 ) {
-
                     return area;
                 }
 

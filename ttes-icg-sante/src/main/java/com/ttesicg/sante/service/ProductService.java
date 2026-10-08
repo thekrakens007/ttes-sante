@@ -19,67 +19,97 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
 public class ProductService {
 
-
     private final ProductRepository productRepository;
-
     private final CompanyRepository companyRepository;
-
     private final CategoryRepository categoryRepository;
-
     private final TherapeuticAreaRepository therapeuticAreaRepository;
-
     private final InventoryRepository inventoryRepository;
 
 
-    // =====================================================
+    // =========================================================
     // FIND BY ID
-    // =====================================================
+    // =========================================================
 
     public ProductResponse findById(Long id) {
 
-        Product product =
-                productRepository
-                        .findById(id)
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Produit introuvable"
-                                )
-                        );
+        Product product = productRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Produit introuvable")
+                );
 
         return map(product);
     }
 
+
+    // =========================================================
+    // PRODUITS DISPONIBLES PAGINÉS
+    // =========================================================
+
     public Page<ProductResponse> getAvailableProductsPaginated(
-        Pageable pageable
-) {
+            Pageable pageable
+    ) {
 
-    return productRepository
-            .findAvailableProducts(pageable)
-            .map(this::map);
-}
+        return productRepository
+                .findAvailableProducts(pageable)
+                .map(this::map);
+    }
 
-    public Page<ProductResponse> getProductsPaginated(Pageable pageable) {
+
+    // =========================================================
+    // PRODUITS PAGINÉS
+    // =========================================================
+
+    public Page<ProductResponse> getProductsPaginated(
+            Pageable pageable
+    ) {
+
         return productRepository
                 .findAll(pageable)
                 .map(this::map);
     }
 
 
-    // =====================================================
+    // =========================================================
+    // PRODUITS DISPONIBLES
+    // RECHERCHE + FILTRES + PAGINATION
+    // =========================================================
+
+    public Page<ProductResponse> getAvailableProductsPaginated(
+            String keyword,
+            Long categoryId,
+            Long companyId,
+            Long therapeuticAreaId,
+            Pageable pageable
+    ) {
+
+        String normalizedKeyword =
+                keyword != null
+                        ? keyword.trim()
+                        : "";
+
+        return productRepository
+                .findAvailableProductsWithFilters(
+                        normalizedKeyword,
+                        categoryId,
+                        companyId,
+                        therapeuticAreaId,
+                        pageable
+                )
+                .map(this::map);
+    }
+
+
+    // =========================================================
     // CREATE
-    // =====================================================
+    // =========================================================
 
     @Transactional
     public ProductResponse create(ProductRequest request) {
-
-        // ================================================
-        // ENTREPRISE
-        // ================================================
 
         Company company =
                 companyRepository
@@ -90,74 +120,52 @@ public class ProductService {
                                 )
                         );
 
-
-        // ================================================
-        // PRODUIT
-        // ================================================
-
         Product product =
                 Product.builder()
-
                         .company(company)
-
                         .name(request.getName())
-
                         .sku(request.getSku())
-
                         .description(request.getDescription())
-
                         .brand(request.getBrand())
-
-                        .activeIngredient(
-                                request.getActiveIngredient()
-                        )
-
+                        .activeIngredient(request.getActiveIngredient())
                         .dosage(request.getDosage())
-
                         .form(request.getForm())
-
                         .price(request.getPrice())
-
                         .purchasePrice(request.getPurchasePrice())
                         .ingredients(request.getIngredients())
-
                         .requiresPrescription(
                                 request.getRequiresPrescription()
                         )
-
                         .build();
 
 
-        // ================================================
-        // CATEGORIES
-        // ================================================
+        // =====================================================
+        // CATÉGORIES
+        // =====================================================
 
         if (
                 request.getCategoryIds() != null
                         &&
-                        !request.getCategoryIds().isEmpty()
+                !request.getCategoryIds().isEmpty()
         ) {
 
             product.setCategories(
                     categoryRepository
-                            .findAllById(
-                                    request.getCategoryIds()
-                            )
+                            .findAllById(request.getCategoryIds())
                             .stream()
                             .collect(Collectors.toSet())
             );
-
         }
 
 
-        // ================================================
-        // DOMAINES THERAPEUTIQUES
-        // ================================================
+        // =====================================================
+        // DOMAINES THÉRAPEUTIQUES
+        // =====================================================
 
         if (
                 request.getTherapeuticAreaIds() != null
                         &&
-                        !request.getTherapeuticAreaIds().isEmpty()
+                !request.getTherapeuticAreaIds().isEmpty()
         ) {
 
             product.setTherapeuticAreas(
@@ -168,58 +176,47 @@ public class ProductService {
                             .stream()
                             .collect(Collectors.toSet())
             );
-
         }
 
 
-        // ================================================
-        // SAUVEGARDE PRODUIT
-        // ================================================
+        // =====================================================
+        // SAUVEGARDE
+        // =====================================================
 
         productRepository.save(product);
 
 
-        // ================================================
+        // =====================================================
         // STOCK
-        // ================================================
+        // =====================================================
 
-        int stock = request.getStock() != null
-                ? request.getStock()
-                : 0;
-
+        int stock =
+                request.getStock() != null
+                        ? request.getStock()
+                        : 0;
 
         Inventory inventory =
                 Inventory.builder()
-
                         .product(product)
-
                         .quantity(stock)
-
                         .minimumQuantity(0)
-
                         .build();
 
-
         inventoryRepository.save(inventory);
-
 
         return map(product);
     }
 
 
-    // =====================================================
+    // =========================================================
     // UPDATE
-    // =====================================================
+    // =========================================================
 
     @Transactional
     public ProductResponse update(
             Long id,
             ProductRequest request
     ) {
-
-        // ================================================
-        // PRODUIT
-        // ================================================
 
         Product product =
                 productRepository
@@ -231,9 +228,9 @@ public class ProductService {
                         );
 
 
-        // ================================================
+        // =====================================================
         // ENTREPRISE
-        // ================================================
+        // =====================================================
 
         if (request.getCompanyId() != null) {
 
@@ -252,58 +249,34 @@ public class ProductService {
         }
 
 
-        // ================================================
-        // INFORMATIONS GENERALES
-        // ================================================
+        // =====================================================
+        // INFORMATIONS
+        // =====================================================
 
-        product.setName(
-                request.getName()
-        );
-
-        product.setSku(
-                request.getSku()
-        );
-
-        product.setDescription(
-                request.getDescription()
-        );
-
-        product.setBrand(
-                request.getBrand()
-        );
-
+        product.setName(request.getName());
+        product.setSku(request.getSku());
+        product.setDescription(request.getDescription());
+        product.setBrand(request.getBrand());
         product.setActiveIngredient(
                 request.getActiveIngredient()
         );
-
-        product.setDosage(
-                request.getDosage()
-        );
-
-        product.setForm(
-                request.getForm()
-        );
-
-        product.setPrice(
-                request.getPrice()
-        );
-
+        product.setDosage(request.getDosage());
+        product.setForm(request.getForm());
+        product.setPrice(request.getPrice());
         product.setPurchasePrice(
                 request.getPurchasePrice()
         );
-
         product.setIngredients(
                 request.getIngredients()
         );
-
         product.setRequiresPrescription(
                 request.getRequiresPrescription()
         );
 
 
-        // ================================================
-        // CATEGORIES
-        // ================================================
+        // =====================================================
+        // CATÉGORIES
+        // =====================================================
 
         if (request.getCategoryIds() != null) {
 
@@ -312,28 +285,21 @@ public class ProductService {
             if (!request.getCategoryIds().isEmpty()) {
 
                 product.getCategories().addAll(
-                        categoryRepository
-                                .findAllById(
-                                        request.getCategoryIds()
-                                )
+                        categoryRepository.findAllById(
+                                request.getCategoryIds()
+                        )
                 );
-
             }
-
         }
 
 
-        // ================================================
-        // DOMAINES THERAPEUTIQUES
-        // ================================================
+        // =====================================================
+        // DOMAINES THÉRAPEUTIQUES
+        // =====================================================
 
-        if (
-                request.getTherapeuticAreaIds() != null
-        ) {
+        if (request.getTherapeuticAreaIds() != null) {
 
-            product
-                    .getTherapeuticAreas()
-                    .clear();
+            product.getTherapeuticAreas().clear();
 
             if (
                     !request
@@ -341,32 +307,22 @@ public class ProductService {
                             .isEmpty()
             ) {
 
-                product
-                        .getTherapeuticAreas()
-                        .addAll(
-                                therapeuticAreaRepository
-                                        .findAllById(
-                                                request
-                                                        .getTherapeuticAreaIds()
-                                        )
-                        );
-
+                product.getTherapeuticAreas().addAll(
+                        therapeuticAreaRepository.findAllById(
+                                request.getTherapeuticAreaIds()
+                        )
+                );
             }
-
         }
 
-
-        // ================================================
-        // SAUVEGARDE PRODUIT
-        // ================================================
 
         Product saved =
                 productRepository.save(product);
 
 
-        // ================================================
+        // =====================================================
         // STOCK
-        // ================================================
+        // =====================================================
 
         if (request.getStock() != null) {
 
@@ -375,60 +331,39 @@ public class ProductService {
                             .findByProductId(id)
                             .orElseGet(() ->
                                     Inventory.builder()
-
                                             .product(saved)
-
                                             .quantity(0)
-
                                             .minimumQuantity(0)
-
                                             .build()
                             );
-
 
             inventory.setQuantity(
                     request.getStock()
             );
 
-
-            inventoryRepository.save(
-                    inventory
-            );
-
+            inventoryRepository.save(inventory);
         }
-
 
         return map(saved);
     }
 
 
-    // =====================================================
+    // =========================================================
     // MAP PRODUCT -> RESPONSE
-    // =====================================================
+    // =========================================================
 
     private ProductResponse map(Product product) {
 
-        // ================================================
-        // STOCK
-        // ================================================
-
         Inventory inventory =
                 inventoryRepository
-                        .findByProductId(
-                                product.getId()
-                        )
+                        .findByProductId(product.getId())
                         .orElse(null);
-
 
         Integer stock =
                 inventory != null
                         ? inventory.getQuantity()
                         : 0;
 
-
-        // ================================================
-        // COMPANY ID
-        // ================================================
 
         Long companyId =
                 product.getCompany() != null
@@ -442,20 +377,12 @@ public class ProductService {
                         : null;
 
 
-        // ================================================
-        // CATEGORY IDS
-        // ================================================
-
         Set<Long> categoryIds =
                 product.getCategories()
                         .stream()
                         .map(Category::getId)
                         .collect(Collectors.toSet());
 
-
-        // ================================================
-        // CATEGORY NAMES
-        // ================================================
 
         Set<String> categories =
                 product.getCategories()
@@ -464,10 +391,6 @@ public class ProductService {
                         .collect(Collectors.toSet());
 
 
-        // ================================================
-        // THERAPEUTIC AREA IDS
-        // ================================================
-
         Set<Long> therapeuticAreaIds =
                 product.getTherapeuticAreas()
                         .stream()
@@ -475,21 +398,12 @@ public class ProductService {
                         .collect(Collectors.toSet());
 
 
-        // ================================================
-        // THERAPEUTIC AREA NAMES
-        // ================================================
-
         Set<String> therapeuticAreas =
                 product.getTherapeuticAreas()
                         .stream()
                         .map(TherapeuticArea::getName)
                         .collect(Collectors.toSet());
 
-
-
-        // ================================================
-        // RESPONSE
-        // ================================================
 
         return ProductResponse.builder()
 
@@ -507,21 +421,19 @@ public class ProductService {
                         product.getActiveIngredient()
                 )
 
-                .dosage(
-                        product.getDosage()
+                .dosage(product.getDosage())
+
+                .form(product.getForm())
+
+                .price(product.getPrice())
+
+                .purchasePrice(
+                        product.getPurchasePrice()
                 )
 
-                .form(
-                        product.getForm()
+                .ingredients(
+                        product.getIngredients()
                 )
-
-                .price(
-                        product.getPrice()
-                )
-
-                .purchasePrice(product.getPurchasePrice())
-
-                .ingredients(product.getIngredients())
 
                 .requiresPrescription(
                         product.getRequiresPrescription()
@@ -529,17 +441,14 @@ public class ProductService {
 
                 .stock(stock)
 
-                // COMPANY
                 .companyId(companyId)
 
                 .companyName(companyName)
 
-                // CATEGORIES
                 .categoryIds(categoryIds)
 
                 .categories(categories)
 
-                // THERAPEUTIC AREAS
                 .therapeuticAreaIds(
                         therapeuticAreaIds
                 )
@@ -548,13 +457,11 @@ public class ProductService {
                         therapeuticAreas
                 )
 
-                // IMAGES
                 .images(
                         product.getImages()
                                 .stream()
                                 .map(image ->
-                                        ProductImageResponse
-                                                .builder()
+                                        ProductImageResponse.builder()
                                                 .id(image.getId())
                                                 .imageUrl(
                                                         image.getImageUrl()
@@ -574,9 +481,9 @@ public class ProductService {
     }
 
 
-    // =====================================================
+    // =========================================================
     // FIND ALL
-    // =====================================================
+    // =========================================================
 
     public List<ProductResponse> findAll() {
 
@@ -588,10 +495,6 @@ public class ProductService {
     }
 
 
-    // =====================================================
-    // GET ALL PRODUCTS
-    // =====================================================
-
     public List<ProductResponse> getAllProducts() {
 
         return productRepository
@@ -602,9 +505,9 @@ public class ProductService {
     }
 
 
-    // =====================================================
-    // GET PRODUCT BY ID
-    // =====================================================
+    // =========================================================
+    // GET BY ID
+    // =========================================================
 
     public ProductResponse getProductById(Long id) {
 
@@ -621,27 +524,25 @@ public class ProductService {
     }
 
 
-    // =====================================================
-    // SEARCH
-    // =====================================================
+    // =========================================================
+    // SEARCH SIMPLE
+    // =========================================================
 
     public List<ProductResponse> searchProducts(
             String keyword
     ) {
 
         return productRepository
-                .findByNameContainingIgnoreCase(
-                        keyword
-                )
+                .findByNameContainingIgnoreCase(keyword)
                 .stream()
                 .map(this::map)
                 .toList();
     }
 
 
-    // =====================================================
-    // PRODUCTS BY COMPANY
-    // =====================================================
+    // =========================================================
+    // PRODUITS PAR ENTREPRISE
+    // =========================================================
 
     public List<ProductResponse> getProductsByCompany(
             Long companyId
@@ -655,9 +556,45 @@ public class ProductService {
     }
 
 
-    // =====================================================
+    // =========================================================
+    // SEARCH CLIENT PAGINATED
+    // =========================================================
+
+    public Page<ProductResponse> searchAvailableProductsPaginated(
+            String keyword,
+            Pageable pageable
+    ) {
+
+        return productRepository
+                .searchAvailableProducts(
+                        keyword.trim(),
+                        pageable
+                )
+                .map(this::map);
+    }
+
+
+    // =========================================================
+    // SEARCH ADMIN PAGINATED
+    // =========================================================
+
+    public Page<ProductResponse> searchProductsPaginated(
+            String keyword,
+            Pageable pageable
+    ) {
+
+        return productRepository
+                .searchProducts(
+                        keyword.trim(),
+                        pageable
+                )
+                .map(this::map);
+    }
+
+
+    // =========================================================
     // DELETE
-    // =====================================================
+    // =========================================================
 
     @Transactional
     public void delete(Long id) {
@@ -673,44 +610,7 @@ public class ProductService {
 
         productRepository.delete(product);
     }
-// =====================================================
-// SEARCH CLIENT - PAGINATED
-// =====================================================
 
-public Page<ProductResponse> searchAvailableProductsPaginated(
-        String keyword,
-        Pageable pageable
-) {
-
-    return productRepository
-            .searchAvailableProducts(
-                    keyword.trim(),
-                    pageable
-            )
-            .map(this::map);
-}
-
-
-// =====================================================
-// SEARCH ADMIN - PAGINATED
-// =====================================================
-
-public Page<ProductResponse> searchProductsPaginated(
-        String keyword,
-        Pageable pageable
-) {
-
-    return productRepository
-            .searchProducts(
-                    keyword.trim(),
-                    pageable
-            )
-            .map(this::map);
-}
-
-    // =====================================================
-    // DELETE PRODUCT
-    // =====================================================
 
     @Transactional
     public void deleteProduct(Long productId) {
@@ -727,5 +627,4 @@ public Page<ProductResponse> searchProductsPaginated(
 
         productRepository.delete(product);
     }
-
 }

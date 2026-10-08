@@ -55,13 +55,6 @@ export class ProductsListComponent implements OnInit {
 
     searchTerm = '';
 
-    /*
-     * La recherche n'est exécutée que lorsque submitSearch()
-     * est appelée :
-     * - touche Entrée
-     * - bouton Rechercher
-     */
-
     /* ============================================================
        FILTRES
        ============================================================ */
@@ -101,7 +94,7 @@ export class ProductsListComponent implements OnInit {
     }
 
     /* ============================================================
-       CHARGEMENT DES FILTRES
+       FILTRES
        ============================================================ */
 
     loadFilterData(): void {
@@ -148,7 +141,6 @@ export class ProductsListComponent implements OnInit {
         this.productService.getTherapeuticAreas().subscribe({
             next: (areas) => {
                 this.therapeuticAreas = areas ?? [];
-
                 this.loadingFilters = false;
             },
             error: (err) => {
@@ -158,14 +150,13 @@ export class ProductsListComponent implements OnInit {
                 );
 
                 this.therapeuticAreas = [];
-
                 this.loadingFilters = false;
             }
         });
     }
 
     /* ============================================================
-       CHARGEMENT DES PRODUITS
+       PRODUITS
        ============================================================ */
 
     loadProducts(): void {
@@ -188,22 +179,20 @@ export class ProductsListComponent implements OnInit {
             .subscribe({
                 next: (response) => {
 
-                    this.products = response.content ?? [];
+                    this.products =
+                        response?.content ?? [];
 
                     this.totalElements =
-                        response.totalElements ?? 0;
+                        response?.totalElements ?? 0;
 
                     this.totalPages =
-                        response.totalPages ?? 0;
+                        response?.totalPages ?? 0;
 
                     /*
-                     * Sécurité :
-                     * si le backend renvoie une page vide alors
-                     * qu'une page précédente existe, on revient
-                     * à la dernière page disponible.
+                     * Si la page demandée n'existe plus,
+                     * revenir sur la dernière page.
                      */
                     if (
-                        this.products.length === 0 &&
                         this.totalPages > 0 &&
                         this.currentPage >= this.totalPages
                     ) {
@@ -244,18 +233,11 @@ export class ProductsListComponent implements OnInit {
 
     submitSearch(): void {
 
-        /*
-         * La recherche repart toujours de la première page.
-         */
         this.currentPage = 0;
 
         this.loadProducts();
     }
 
-    /*
-     * Permet également de déclencher la recherche avec Entrée
-     * si l'input appelle directement cette méthode.
-     */
     onSearchKeydown(event: KeyboardEvent): void {
 
         if (event.key === 'Enter') {
@@ -272,16 +254,13 @@ export class ProductsListComponent implements OnInit {
 
     onFilterChange(): void {
 
-        /*
-         * Lorsqu'un filtre change, on repart de la page 1.
-         */
         this.currentPage = 0;
 
         this.loadProducts();
     }
 
     /* ============================================================
-       RÉINITIALISER LES FILTRES
+       RESET
        ============================================================ */
 
     resetFilters(): void {
@@ -317,9 +296,6 @@ export class ProductsListComponent implements OnInit {
 
         this.loadProducts();
 
-        /*
-         * Retour en haut de la liste.
-         */
         window.scrollTo({
             top: 0,
             behavior: 'smooth'
@@ -328,47 +304,93 @@ export class ProductsListComponent implements OnInit {
 
     previousPage(): void {
 
-        if (this.currentPage > 0) {
-
-            this.currentPage--;
-
-            this.loadProducts();
-
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
+        if (this.currentPage <= 0) {
+            return;
         }
+
+        this.currentPage--;
+
+        this.loadProducts();
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     }
 
     nextPage(): void {
 
-        if (this.currentPage < this.totalPages - 1) {
-
-            this.currentPage++;
-
-            this.loadProducts();
-
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
+        if (
+            this.currentPage >=
+            this.totalPages - 1
+        ) {
+            return;
         }
+
+        this.currentPage++;
+
+        this.loadProducts();
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     }
 
-    get pageNumbers(): number[] {
+    /*
+     * Ton HTML utilise "pages".
+     *
+     * On retourne ici les numéros de pages en base 0.
+     */
+    get pages(): number[] {
 
-        const pages: number[] = [];
-
-        for (
-            let i = 0;
-            i < this.totalPages;
-            i++
-        ) {
-            pages.push(i);
+        if (this.totalPages <= 0) {
+            return [];
         }
 
-        return pages;
+        return Array.from(
+            { length: this.totalPages },
+            (_, index) => index
+        );
+    }
+
+    /* ============================================================
+       INFORMATIONS PAGINATION
+       ============================================================ */
+
+    /*
+     * Ton HTML utilise firstDisplayedProduct.
+     *
+     * Exemple :
+     * page 0 / 8 produits => 1
+     * page 1 / 8 produits => 9
+     */
+    get firstDisplayedProduct(): number {
+
+        if (this.totalElements === 0) {
+            return 0;
+        }
+
+        return (
+            this.currentPage * this.pageSize
+        ) + 1;
+    }
+
+    /*
+     * Ton HTML utilise lastDisplayedProduct.
+     */
+    get lastDisplayedProduct(): number {
+
+        if (this.totalElements === 0) {
+            return 0;
+        }
+
+        return Math.min(
+            (
+                this.currentPage + 1
+            ) * this.pageSize,
+            this.totalElements
+        );
     }
 
     /* ============================================================
@@ -380,6 +402,7 @@ export class ProductsListComponent implements OnInit {
         this.cartLoading = true;
 
         this.cartService.getCart().subscribe({
+
             next: (cart) => {
 
                 this.cart = cart;
@@ -401,25 +424,27 @@ export class ProductsListComponent implements OnInit {
         });
     }
 
-    /* ============================================================
-       AJOUTER UN PRODUIT AU PANIER
-       ============================================================ */
-
+    /*
+     * Ajouter un produit au panier.
+     *
+     * IMPORTANT :
+     * CartService possède addItem(), pas addToCart().
+     */
     addToCart(product: Product): void {
 
         if (!product?.id) {
+
             console.error(
-                'Impossible d’ajouter ce produit au panier:',
+                'Produit invalide:',
                 product
             );
 
             return;
         }
 
-        /*
-         * Évite plusieurs clics simultanés sur le même produit.
-         */
-        if (this.addingToCartId === product.id) {
+        if (
+            this.addingToCartId === product.id
+        ) {
             return;
         }
 
@@ -432,8 +457,8 @@ export class ProductsListComponent implements OnInit {
                 next: (cart) => {
 
                     /*
-                     * addItem() retourne directement le panier
-                     * mis à jour.
+                     * addItem() retourne directement
+                     * le panier mis à jour.
                      */
                     this.cart = cart;
 
@@ -452,31 +477,55 @@ export class ProductsListComponent implements OnInit {
             });
     }
 
+    /*
+     * Ton HTML utilise cartCount.
+     */
+    get cartCount(): number {
+
+        if (
+            !this.cart ||
+            !this.cart.items
+        ) {
+            return 0;
+        }
+
+        return this.cart.items.reduce(
+            (
+                total: number,
+                item: any
+            ) => {
+
+                return (
+                    total +
+                    (Number(item.quantity) || 0)
+                );
+            },
+            0
+        );
+    }
+
     /* ============================================================
-       VÉRIFIER SI LE PRODUIT EST EN STOCK
+       STOCK
        ============================================================ */
 
     isInStock(product: Product): boolean {
 
-        return (product.stock ?? 0) > 0;
+        return (
+            (product.stock ?? 0) > 0
+        );
     }
-
-    /* ============================================================
-       VÉRIFIER SI LE PRODUIT EST EN RUPTURE
-       ============================================================ */
 
     isOutOfStock(product: Product): boolean {
 
-        return (product.stock ?? 0) <= 0;
+        return (
+            (product.stock ?? 0) <= 0
+        );
     }
-
-    /* ============================================================
-       FORMATAGE DU STOCK
-       ============================================================ */
 
     getStockLabel(product: Product): string {
 
-        const stock = product.stock ?? 0;
+        const stock =
+            product.stock ?? 0;
 
         if (stock <= 0) {
             return 'Rupture de stock';
@@ -490,10 +539,12 @@ export class ProductsListComponent implements OnInit {
     }
 
     /* ============================================================
-       FORMATAGE DU PRIX
+       PRIX
        ============================================================ */
 
-    formatPrice(price: number | null | undefined): string {
+    formatPrice(
+        price: number | null | undefined
+    ): string {
 
         if (
             price === null ||
@@ -508,24 +559,31 @@ export class ProductsListComponent implements OnInit {
     }
 
     /* ============================================================
-       IMAGE DU PRODUIT
+       IMAGE PRODUIT
        ============================================================ */
 
-    getProductImage(product: Product): string {
+    getProductImage(
+        product: Product
+    ): string {
 
-        /*
-         * Si le produit possède des images.
-         */
         if (
             product.images &&
             product.images.length > 0
         ) {
 
-            const firstImage = product.images[0];
+            /*
+             * On utilise "any" ici parce que ton modèle
+             * ProductImage semble exposer une structure dont
+             * TypeScript déduit actuellement url comme {}.
+             *
+             * Cela évite l'erreur :
+             * Type '{}' is not assignable to type 'string'.
+             */
+            const firstImage: any =
+                product.images[0];
 
             /*
-             * Selon le modèle ProductImage,
-             * l'URL peut être directement "url".
+             * Image stockée directement comme string.
              */
             if (
                 typeof firstImage === 'string'
@@ -533,26 +591,40 @@ export class ProductsListComponent implements OnInit {
                 return firstImage;
             }
 
+            /*
+             * Structure :
+             * { url: "..." }
+             */
             if (
-                firstImage &&
-                'url' in firstImage &&
-                firstImage.url
+                firstImage?.url &&
+                typeof firstImage.url === 'string'
             ) {
                 return firstImage.url;
             }
 
+            /*
+             * Structure :
+             * { imageUrl: "..." }
+             */
             if (
-                firstImage &&
-                'imageUrl' in firstImage &&
-                firstImage.imageUrl
+                firstImage?.imageUrl &&
+                typeof firstImage.imageUrl === 'string'
             ) {
                 return firstImage.imageUrl;
             }
+
+            /*
+             * Structure éventuelle :
+             * { path: "..." }
+             */
+            if (
+                firstImage?.path &&
+                typeof firstImage.path === 'string'
+            ) {
+                return firstImage.path;
+            }
         }
 
-        /*
-         * Image par défaut.
-         */
         return '/images/products/default-product.jpg';
     }
 
@@ -574,10 +646,12 @@ export class ProductsListComponent implements OnInit {
     }
 
     /* ============================================================
-       CATÉGORIES DU PRODUIT
+       CATÉGORIES
        ============================================================ */
 
-    getCategoryNames(product: Product): string {
+    getCategoryNames(
+        product: Product
+    ): string {
 
         if (
             !product.categories ||
@@ -595,7 +669,7 @@ export class ProductsListComponent implements OnInit {
                     return category;
                 }
 
-                return category.name ?? '';
+                return category?.name ?? '';
             })
             .filter(Boolean)
             .join(', ');
@@ -625,7 +699,7 @@ export class ProductsListComponent implements OnInit {
                     return area;
                 }
 
-                return area.name ?? '';
+                return area?.name ?? '';
             })
             .filter(Boolean)
             .join(', ');
@@ -635,7 +709,9 @@ export class ProductsListComponent implements OnInit {
        ENTREPRISE
        ============================================================ */
 
-    getCompanyName(product: Product): string {
+    getCompanyName(
+        product: Product
+    ): string {
 
         return (
             product.companyName ||
@@ -644,10 +720,12 @@ export class ProductsListComponent implements OnInit {
     }
 
     /* ============================================================
-       NAVIGATION DÉTAIL PRODUIT
+       NAVIGATION
        ============================================================ */
 
-    viewProduct(product: Product): void {
+    viewProduct(
+        product: Product
+    ): void {
 
         if (!product?.id) {
             return;
@@ -657,24 +735,5 @@ export class ProductsListComponent implements OnInit {
             '/products',
             product.id
         ]);
-    }
-
-    /* ============================================================
-       NOMBRE D'ÉLÉMENTS DU PANIER
-       ============================================================ */
-
-    getCartItemCount(): number {
-
-        if (!this.cart?.items) {
-            return 0;
-        }
-
-        return this.cart.items.reduce(
-            (
-                total: number,
-                item: any
-            ) => total + (item.quantity ?? 0),
-            0
-        );
     }
 }

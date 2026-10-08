@@ -1,6 +1,7 @@
 package com.ttesicg.sante.repository;
 
 import com.ttesicg.sante.entity.Product;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +16,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findBySku(String sku);
 
     boolean existsBySku(String sku);
+
 
     // =========================================================
     // RECHERCHE ADMIN
@@ -54,7 +56,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
     // =========================================================
-    // PRODUITS DISPONIBLES + RECHERCHE + FILTRES
+    // PRODUITS DISPONIBLES + FILTRES
     // =========================================================
 
     @Query("""
@@ -102,7 +104,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
     // =========================================================
-    // PRODUITS DISPONIBLES + RECHERCHE
+    // RECHERCHE PRODUITS DISPONIBLES
     // =========================================================
 
     @Query("""
@@ -112,8 +114,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         WHERE
             p.active = true
             AND p.inventory.quantity > 0
+
             AND (
-                LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                :keyword IS NULL
+                OR :keyword = ''
+                OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
                 OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))
                 OR LOWER(COALESCE(p.brand, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
                 OR LOWER(COALESCE(p.activeIngredient, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
@@ -127,7 +132,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
     // =========================================================
-    // PAR ENTREPRISE
+    // ENTREPRISE
     // =========================================================
 
     List<Product> findByCompanyId(Long companyId);
@@ -141,8 +146,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
     // =========================================================
-    // RECHERCHE SIMPLE PAR NOM
+    // RECHERCHE SIMPLE
     // =========================================================
 
-    List<Product> findByNameContainingIgnoreCase(String name);
+    List<Product> findByNameContainingIgnoreCase(
+            String name
+    );
 }

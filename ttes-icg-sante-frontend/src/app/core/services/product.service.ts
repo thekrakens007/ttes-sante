@@ -34,6 +34,8 @@ export class ProductService {
         );
     }
 
+    
+
 
     // =========================================================
     // PRODUITS PAGINÉS
@@ -240,12 +242,11 @@ export class ProductService {
     // CATÉGORIES
     // =========================================================
 
-    getCategories(): Observable<any[]> {
-
-        return this.http.get<any[]>(
-            '/api/categories'
-        );
-    }
+      getCategories(): Observable<any[]> {
+    return this.http.get<any[]>(
+        `${this.API_URL}/categories`
+    );
+}
 
 
     // =========================================================
@@ -264,10 +265,10 @@ export class ProductService {
     // DOMAINES THÉRAPEUTIQUES
     // =========================================================
 
-    getTherapeuticAreas(): Observable<any[]> {
 
-        return this.http.get<any[]>(
-            '/api/therapeutic-areas'
-        );
-    }
+getTherapeuticAreas(): Observable<any[]> {
+    return this.http.get<any[]>(
+        `${this.API_URL}/therapeutic-areas`
+    );
+}
 }

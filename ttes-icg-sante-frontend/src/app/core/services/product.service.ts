@@ -1,8 +1,15 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import {
+    HttpClient,
+    HttpParams
+} from '@angular/common/http';
+
 import { Observable } from 'rxjs';
 
-import { Product, ProductPage } from '../models/product.model';
+import {
+    Product,
+    ProductPage
+} from '../models/product.model';
 
 @Injectable({
     providedIn: 'root'
@@ -13,55 +20,25 @@ export class ProductService {
 
     private readonly API_URL = '/api/products';
 
-    /**
-     * Récupérer tous les produits
-     */
+
+    // =========================================================
+    // TOUS LES PRODUITS
+    // =========================================================
+
     getProducts(): Observable<Product[]> {
-        return this.http.get<Product[]>(this.API_URL);
+
+        return this.http.get<Product[]>(
+            this.API_URL
+        );
+
     }
 
-    /**
-     * Récupérer les produits avec pagination
-     */
+
+    // =========================================================
+    // PRODUITS AVEC PAGINATION + FILTRES
+    // =========================================================
+
     getProductsPaginated(
-        page: number = 0,
-        size: number = 12
-    ): Observable<ProductPage> {
-
-        const params = new HttpParams()
-            .set('page', page)
-            .set('size', size);
-
-        return this.http.get<ProductPage>(
-            `${this.API_URL}/paginated`,
-            { params }
-        );
-    }
-
-    /**
-     * Rechercher des produits avec pagination
-     */
-    searchProductsPaginated(
-        keyword: string,
-        page: number = 0,
-        size: number = 12
-    ): Observable<ProductPage> {
-
-        const params = new HttpParams()
-            .set('keyword', keyword.trim())
-            .set('page', page)
-            .set('size', size);
-
-        return this.http.get<ProductPage>(
-            `${this.API_URL}/search`,
-            { params }
-        );
-    }
-
-    /**
-     * Récupérer les produits avec recherche + filtres + pagination
-     */
-    getProductsFiltered(
         page: number = 0,
         size: number = 12,
         keyword?: string,
@@ -74,57 +51,200 @@ export class ProductService {
             .set('page', page)
             .set('size', size);
 
-        if (keyword?.trim()) {
-            params = params.set('keyword', keyword.trim());
+
+        // -----------------------------------------------------
+        // RECHERCHE
+        // -----------------------------------------------------
+
+        if (keyword && keyword.trim().length > 0) {
+
+            params = params.set(
+                'keyword',
+                keyword.trim()
+            );
+
         }
 
-        if (categoryId != null) {
-            params = params.set('categoryId', categoryId);
+
+        // -----------------------------------------------------
+        // CATÉGORIE
+        // -----------------------------------------------------
+
+        if (categoryId !== null && categoryId !== undefined) {
+
+            params = params.set(
+                'categoryId',
+                categoryId
+            );
+
         }
 
-        if (companyId != null) {
-            params = params.set('companyId', companyId);
+
+        // -----------------------------------------------------
+        // ENTREPRISE
+        // -----------------------------------------------------
+
+        if (companyId !== null && companyId !== undefined) {
+
+            params = params.set(
+                'companyId',
+                companyId
+            );
+
         }
 
-        if (therapeuticAreaId != null) {
-            params = params.set('therapeuticAreaId', therapeuticAreaId);
+
+        // -----------------------------------------------------
+        // DOMAINE THÉRAPEUTIQUE
+        // -----------------------------------------------------
+
+        if (
+            therapeuticAreaId !== null &&
+            therapeuticAreaId !== undefined
+        ) {
+
+            params = params.set(
+                'therapeuticAreaId',
+                therapeuticAreaId
+            );
+
         }
+
 
         return this.http.get<ProductPage>(
             `${this.API_URL}/paginated`,
-            { params }
+            {
+                params
+            }
         );
+
     }
 
-    /**
-     * Récupérer un produit par son ID
-     */
-    getProduct(productId: number): Observable<Product> {
+
+    // =========================================================
+    // RECHERCHE AVEC PAGINATION
+    // =========================================================
+
+    searchProductsPaginated(
+        keyword: string,
+        page: number = 0,
+        size: number = 12
+    ): Observable<ProductPage> {
+
+        const params = new HttpParams()
+            .set(
+                'keyword',
+                keyword.trim()
+            )
+            .set(
+                'page',
+                page
+            )
+            .set(
+                'size',
+                size
+            );
+
+        return this.http.get<ProductPage>(
+            `${this.API_URL}/search`,
+            {
+                params
+            }
+        );
+
+    }
+
+
+    // =========================================================
+    // PRODUIT PAR ID
+    // =========================================================
+
+    getProduct(
+        productId: number
+    ): Observable<Product> {
+
         return this.http.get<Product>(
             `${this.API_URL}/${productId}`
         );
+
     }
 
-    /**
-     * Recherche simple
-     */
-    searchProducts(name: string): Observable<Product[]> {
+
+    // =========================================================
+    // RECHERCHE SIMPLE
+    // =========================================================
+
+    searchProducts(
+        name: string
+    ): Observable<Product[]> {
 
         const params = new HttpParams()
-            .set('name', name.trim());
+            .set(
+                'name',
+                name.trim()
+            );
 
         return this.http.get<Product[]>(
             `${this.API_URL}/search`,
-            { params }
+            {
+                params
+            }
         );
+
     }
 
-    /**
-     * Récupérer les produits d'une entreprise
-     */
-    getProductsByCompany(companyId: number): Observable<Product[]> {
+
+    // =========================================================
+    // PRODUITS D'UNE ENTREPRISE
+    // =========================================================
+
+    getProductsByCompany(
+        companyId: number
+    ): Observable<Product[]> {
+
         return this.http.get<Product[]>(
             `${this.API_URL}/company/${companyId}`
         );
+
     }
+
+
+    // =========================================================
+    // CATÉGORIES
+    // =========================================================
+
+    getCategories(): Observable<any[]> {
+
+        return this.http.get<any[]>(
+            '/api/categories'
+        );
+
+    }
+
+
+    // =========================================================
+    // ENTREPRISES
+    // =========================================================
+
+    getCompanies(): Observable<any[]> {
+
+        return this.http.get<any[]>(
+            '/api/companies'
+        );
+
+    }
+
+
+    // =========================================================
+    // DOMAINES THÉRAPEUTIQUES
+    // =========================================================
+
+    getTherapeuticAreas(): Observable<any[]> {
+
+        return this.http.get<any[]>(
+            '/api/therapeutic-areas'
+        );
+
+    }
+
 }

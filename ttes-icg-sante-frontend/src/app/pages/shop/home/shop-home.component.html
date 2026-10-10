@@ -1,9 +1,9 @@
-<div class="min-h-screen bg-gray-50 text-gray-900 transition-colors duration-300 dark:bg-gray-950 dark:text-white">
+<div class="min-h-screen bg-gray-50 text-gray-900 transition-colors duration-300 dark:bg-gray-950 dark:text-white overflow-x-hidden">
 
 <!-- TOP BAR -->
 <div class="hidden bg-green-950 text-xs text-green-50 md:block">
     <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2.5 sm:px-6 lg:px-8">
-        <div class="flex items-center gap-5">
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-1">
             <span>📍 Douala • Yaoundé • Bafoussam • Garoua • Maroua • Ngaoundéré</span>
             <span>🕒 Lun - Sam : 8h - 18h</span>
             <span>✉️ contact&#64;tes-icg.com</span>
@@ -12,7 +12,7 @@
         <a href="https://wa.me/237690980866?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20une%20consultation."
            target="_blank"
            rel="noopener noreferrer"
-           class="rounded-lg bg-orange-400 px-3 py-1.5 font-bold text-green-950 transition hover:bg-orange-300">
+           class="shrink-0 rounded-lg bg-orange-400 px-3 py-1.5 font-bold text-green-950 transition hover:bg-orange-300">
             Consultation WhatsApp (+237 690 98 08 66)
         </a>
     </div>
@@ -31,11 +31,11 @@
 
             <img src="/images/logo/logo.svg"
                  alt="TES-ICG Santé"
-                 class="h-11 w-auto sm:h-12 dark:hidden">
+                 class="h-10 w-auto sm:h-12 dark:hidden">
 
             <img src="/images/logo/logo-dark.svg"
                  alt="TES-ICG Santé"
-                 class="hidden h-11 w-auto sm:h-12 dark:block">
+                 class="hidden h-10 w-auto sm:h-12 dark:block">
         </a>
 
 
@@ -66,7 +66,7 @@
 
 
         <!-- ACTIONS DESKTOP -->
-        <div class="hidden items-center gap-2 md:flex">
+        <div class="hidden items-center gap-2 lg:flex">
 
             <a href="https://wa.me/237690980866?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20une%20consultation."
                target="_blank"
@@ -150,7 +150,7 @@
                     name="search"
                     [(ngModel)]="searchTerm"
                     [ngModelOptions]="{standalone: true}"
-                    placeholder="Rechercher un produit (Double Stemcell, Crystal Cell...) ou une pathologie..."
+                    placeholder="Rechercher un produit ou une pathologie..."
                     autocomplete="off"
                     class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 pr-14 text-sm text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-600/10 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500">
 
@@ -163,7 +163,7 @@
 
             </form>
 
-            <p class="mt-1.5 px-1 text-xs text-gray-400 dark:text-gray-500">
+            <p class="mt-1.5 px-1 text-xs text-gray-400 dark:text-gray-500 truncate">
                 Recherchez les solutions à base de cellules souches végétales
             </p>
 
@@ -171,21 +171,52 @@
 
     </div>
 
+
+    <!-- MOBILE MENU DROPDOWN -->
+    @if (mobileMenuOpen) {
+        <div class="border-t border-gray-200 bg-white px-4 py-4 shadow-xl dark:border-gray-800 dark:bg-gray-900 md:hidden">
+            <div class="flex flex-col gap-2">
+                <a routerLink="/" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">🏠 Accueil</a>
+                <a routerLink="/products" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">🛍️ Produits</a>
+                <a routerLink="/bundles" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">📦 Packs</a>
+                <a routerLink="/companies" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">🏢 Entreprises</a>
+                
+                <a href="https://wa.me/237690980866?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20une%20consultation." target="_blank" rel="noopener noreferrer" class="rounded-xl bg-orange-400 px-4 py-3 text-center text-sm font-bold text-green-950">
+                    💬 Consultation WhatsApp
+                </a>
+
+                @if (!isLoggedIn()) {
+                    <a routerLink="/signin" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">🔐 Se connecter</a>
+                    <a routerLink="/signup" (click)="closeMobileMenu()" class="rounded-xl bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white">📝 Créer un compte</a>
+                }
+                @if (isLoggedIn() && isAdmin()) {
+                    <a routerLink="/admin" (click)="closeMobileMenu()" class="rounded-xl bg-green-700 px-4 py-3 text-center text-sm font-semibold text-white">⚙️ Dashboard Admin</a>
+                }
+                @if (isLoggedIn() && !isAdmin()) {
+                    <a routerLink="/profile" (click)="closeMobileMenu()" class="rounded-xl bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white">👤 Mon profil</a>
+                }
+                @if (isLoggedIn()) {
+                    <a routerLink="/cart" (click)="closeMobileMenu()" class="rounded-xl bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white">🛒 Mon panier</a>
+                }
+            </div>
+        </div>
+    }
+
 </header>
 
 
 <!-- HERO SECTION -->
-<section class="relative min-h-[580px] bg-gradient-to-br from-green-950 via-green-900 to-green-950 overflow-hidden text-white py-20">
+<section class="relative min-h-[520px] bg-gradient-to-br from-green-950 via-green-900 to-green-950 overflow-hidden text-white py-16 sm:py-24">
 
-    <div class="relative mx-auto flex min-h-[480px] max-w-7xl items-center px-4 sm:px-6 lg:px-8">
+    <div class="relative mx-auto flex max-w-7xl items-center px-4 sm:px-6 lg:px-8">
 
         <div class="max-w-3xl">
 
-            <div class="mb-6 inline-flex rounded-full border border-green-300/30 bg-green-900/50 px-4 py-2 text-sm font-semibold text-green-100 backdrop-blur-sm">
-                🌱 La Biothérapie Cellulaire Végétale • PhytoScience • We Are The Trend Maker
+            <div class="mb-4 sm:mb-6 inline-flex flex-wrap rounded-full border border-green-300/30 bg-green-900/50 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-green-100 backdrop-blur-sm">
+                🌱 La Biothérapie Cellulaire Végétale • PhytoScience
             </div>
 
-            <h1 class="text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
+            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-white">
 
                 La Biothérapie Cellulaire,
 
@@ -195,24 +226,24 @@
 
             </h1>
 
-            <p class="mt-6 max-w-2xl text-base leading-8 text-green-50 sm:text-lg">
+            <p class="mt-4 sm:mt-6 max-w-2xl text-sm sm:text-lg leading-7 sm:leading-8 text-green-50">
 
                 Pionnier de l'activité des cellules souches végétales depuis 2012 en partenariat avec le laboratoire suisse Mibelle Biochemistry. Restaurez, régénérez et remplacez vos cellules endommagées.
 
             </p>
 
-            <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3">
 
                 <a routerLink="/products"
-                   class="inline-flex justify-center rounded-xl bg-orange-400 px-6 py-4 text-sm font-extrabold uppercase tracking-wide text-green-950 shadow-xl transition hover:bg-orange-300">
-                    🛍️ Découvrir la gamme PhytoScience
+                   class="inline-flex justify-center items-center rounded-xl bg-orange-400 px-6 py-3.5 sm:py-4 text-xs sm:text-sm font-extrabold uppercase tracking-wide text-green-950 shadow-xl transition hover:bg-orange-300 text-center">
+                    🛍️ Découvrir la gamme
                 </a>
 
                 <a href="https://wa.me/237690980866?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20un%20accompagnement."
                    target="_blank"
                    rel="noopener noreferrer"
-                   class="inline-flex justify-center rounded-xl border border-white/40 bg-white/10 px-6 py-4 text-sm font-bold uppercase tracking-wide text-white backdrop-blur-sm transition hover:bg-white/20">
-                    💬 Consultation Directe (+237 690 98 08 66)
+                   class="inline-flex justify-center items-center rounded-xl border border-white/40 bg-white/10 px-6 py-3.5 sm:py-4 text-xs sm:text-sm font-bold uppercase tracking-wide text-white backdrop-blur-sm transition hover:bg-white/20 text-center">
+                    💬 Consultation Directe
                 </a>
 
             </div>
@@ -227,37 +258,37 @@
 <!-- AVANTAGES DE LA THÉRAPIES CELLULAIRE -->
 <section class="border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
 
-    <div class="mx-auto grid max-w-7xl gap-4 px-4 py-8 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
+    <div class="mx-auto grid max-w-7xl gap-4 px-4 py-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:px-6 lg:px-8">
 
         <div class="flex items-center gap-4 rounded-2xl bg-green-50 p-4 dark:bg-green-950/30">
-            <span class="text-3xl">🚫🩺</span>
+            <span class="text-3xl shrink-0">🚫🩺</span>
             <div>
-                <p class="font-extrabold text-green-900 dark:text-green-300">Pas d'Opération ni Injection</p>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Prise sublinguale simple, sans douleur ni examen lourd.</p>
+                <p class="font-extrabold text-green-900 dark:text-green-300 text-sm sm:text-base">Pas d'Opération ni Injection</p>
+                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Prise sublinguale simple, sans douleur.</p>
             </div>
         </div>
 
         <div class="flex items-center gap-4 rounded-2xl bg-green-50 p-4 dark:bg-green-950/30">
-            <span class="text-3xl">🌱✨</span>
+            <span class="text-3xl shrink-0">🌱✨</span>
             <div>
-                <p class="font-extrabold text-green-900 dark:text-green-300">Pas d'Effets Secondaires</p>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Origine végétalienne 100% naturelle (PhytoCellTec™).</p>
+                <p class="font-extrabold text-green-900 dark:text-green-300 text-sm sm:text-base">Pas d'Effets Secondaires</p>
+                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Origine végétalienne 100% naturelle.</p>
             </div>
         </div>
 
         <div class="flex items-center gap-4 rounded-2xl bg-green-50 p-4 dark:bg-green-950/30">
-            <span class="text-3xl">🔄🧬</span>
+            <span class="text-3xl shrink-0">🔄🧬</span>
             <div>
-                <p class="font-extrabold text-green-900 dark:text-green-300">Régénération Profonde</p>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Répare et remplace n'importe quel organe endommagé.</p>
+                <p class="font-extrabold text-green-900 dark:text-green-300 text-sm sm:text-base">Régénération Profonde</p>
+                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Répare et remplace l'organe usé.</p>
             </div>
         </div>
 
         <div class="flex items-center gap-4 rounded-2xl bg-green-50 p-4 dark:bg-green-950/30">
-            <span class="text-3xl">⏳❤️</span>
+            <span class="text-3xl shrink-0">⏳❤️</span>
             <div>
-                <p class="font-extrabold text-green-900 dark:text-green-300">Longévité Humaine</p>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Accroît la longévité de la vie et renforce le système immunitaire.</p>
+                <p class="font-extrabold text-green-900 dark:text-green-300 text-sm sm:text-base">Longévité Humaine</p>
+                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Renforce le système immunitaire.</p>
             </div>
         </div>
 
@@ -267,35 +298,35 @@
 
 
 <!-- DÉFINITION ET SCHÉMA ANATOMIQUE -->
-<section class="bg-white py-20 dark:bg-gray-950">
+<section class="bg-white py-12 sm:py-20 dark:bg-gray-950">
 
-    <div class="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
+    <div class="mx-auto grid max-w-7xl items-center gap-8 lg:gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
 
         <div>
 
-            <span class="text-sm font-bold uppercase tracking-[0.2em] text-green-600 dark:text-green-400">
+            <span class="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-green-600 dark:text-green-400">
                 Les Cellules Souches : Définition
             </span>
 
-            <h2 class="mt-3 text-3xl font-extrabold sm:text-4xl">
+            <h2 class="mt-2 sm:mt-3 text-2xl sm:text-4xl font-extrabold">
                 Des "Cellules Mères" capables de tout régénérer dans le corps
             </h2>
 
-            <p class="mt-6 leading-8 text-gray-600 dark:text-gray-400">
+            <p class="mt-4 sm:mt-6 text-sm sm:text-base leading-7 sm:leading-8 text-gray-600 dark:text-gray-400">
 
                 Les cellules souches sont des éléments constituants du corps humain ayant le pouvoir étonnant de produire de nouvelles cellules qui peuvent se transformer en n'importe quel tissu ou organe : <strong>cellules musculaires, sanguines, nerveuses, cardiaques, intestinales, rénales ou hépatiques</strong>.
 
             </p>
 
-            <p class="mt-4 leading-8 text-gray-600 dark:text-gray-400">
+            <p class="mt-3 sm:mt-4 text-sm sm:text-base leading-7 sm:leading-8 text-gray-600 dark:text-gray-400">
 
                 Elles guérissent le corps lorsqu'il est malade ou blessé en produisant de nouvelles cellules saines pour remplacer les cellules usées ou détruites par la maladie.
 
             </p>
 
-            <div class="mt-7 rounded-2xl border-l-4 border-green-600 bg-green-50 p-5 dark:bg-green-950/30">
+            <div class="mt-6 sm:mt-7 rounded-2xl border-l-4 border-green-600 bg-green-50 p-4 sm:p-5 dark:bg-green-950/30">
 
-                <p class="text-sm font-semibold leading-7 text-green-900 dark:text-green-200">
+                <p class="text-xs sm:text-sm font-semibold leading-6 sm:leading-7 text-green-900 dark:text-green-200">
 
                     💡 <strong>La thérapie cellulaire est une solution pour tous les problèmes liés à la santé du corps humain et de la femme</strong> (Cerveau, Tyroïde, Cœur, Poumons, Foie, Rate, Estomac, Reins, Intestins, Système reproducteur).
 
@@ -307,9 +338,9 @@
 
 
         <!-- Bloc schématique organes -->
-        <div class="rounded-3xl border border-gray-200 bg-green-950 p-8 text-white shadow-xl dark:border-gray-800">
-            <h3 class="text-xl font-bold text-orange-300 mb-4">🧬 Biothérapie & Action multi-organes</h3>
-            <div class="grid grid-cols-2 gap-4 text-sm">
+        <div class="rounded-3xl border border-gray-200 bg-green-950 p-6 sm:p-8 text-white shadow-xl dark:border-gray-800">
+            <h3 class="text-lg sm:text-xl font-bold text-orange-300 mb-4">🧬 Biothérapie & Action multi-organes</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
                 <div class="p-3 bg-white/10 rounded-xl">🧠 Cerveau / Système nerveux</div>
                 <div class="p-3 bg-white/10 rounded-xl">❤️ Cœur & Vaisseaux</div>
                 <div class="p-3 bg-white/10 rounded-xl">🫁 Poumons & Voies respiratoires</div>
@@ -324,22 +355,22 @@
 </section>
 
 
-<!-- PATHOLOGIES ET MALADIES TRAITÉES (PLUS DE 200 MALADIES) -->
-<section class="bg-gray-100 py-20 dark:bg-gray-900">
+<!-- PATHOLOGIES ET MALADIES TRAITÉES -->
+<section class="bg-gray-100 py-12 sm:py-20 dark:bg-gray-900">
 
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         <div class="mx-auto max-w-3xl text-center">
 
-            <span class="text-sm font-bold uppercase tracking-[0.2em] text-orange-500">
+            <span class="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-orange-500">
                 Action Internationale de Lutte contre les Maladies Graves
             </span>
 
-            <h2 class="mt-3 text-3xl font-extrabold sm:text-4xl">
+            <h2 class="mt-2 sm:mt-3 text-2xl sm:text-4xl font-extrabold">
                 Traite plus de 200 maladies graves, compliquées et génétiques
             </h2>
 
-            <p class="mt-5 leading-8 text-gray-600 dark:text-gray-400">
+            <p class="mt-4 sm:mt-5 text-sm sm:text-base leading-7 sm:leading-8 text-gray-600 dark:text-gray-400">
 
                 Des résultats cliniques prouvés dans le traitement des affections réputées incurables :
 
@@ -348,36 +379,36 @@
         </div>
 
 
-        <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="mt-8 sm:mt-12 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
 
             <div class="rounded-3xl bg-white p-6 shadow-md dark:bg-gray-950">
                 <div class="text-3xl mb-3">🎗️</div>
                 <h3 class="text-lg font-bold text-green-800 dark:text-green-400">Tous les types de Cancer</h3>
-                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Prostate, Sein, Col de l'utérus, Lymphome de Burkitt, Neuroblastome, Cancer de la moelle osseuse, Cancer du sein/gorge...</p>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Prostate, Sein, Col de l'utérus, Lymphome de Burkitt, Neuroblastome, Cancer de la moelle osseuse...</p>
             </div>
 
             <div class="rounded-3xl bg-white p-6 shadow-md dark:bg-gray-950">
                 <div class="text-3xl mb-3">🩸</div>
                 <h3 class="text-lg font-bold text-green-800 dark:text-green-400">Diabète & Gangrène</h3>
-                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Diabète de type 1 et 2, cicatrisation des gangrènes diabétiques, arrêt de la dégénérescence des membres.</p>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Diabète de type 1 et 2, cicatrisation des gangrènes diabétiques, arrêt de la dégénérescence.</p>
             </div>
 
             <div class="rounded-3xl bg-white p-6 shadow-md dark:bg-gray-950">
                 <div class="text-3xl mb-3">👶</div>
                 <h3 class="text-lg font-bold text-green-800 dark:text-green-400">Infertilité Homme & Femme</h3>
-                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Azoospermie, Oligospermie, Nécrozoospermie, Teratozoospermie, Trompes bouchées, Fibromes, Kystes, Myomes, Salpingite.</p>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Azoospermie, Oligospermie, Nécrozoospermie, Trompes bouchées, Fibromes, Kystes, Myomes.</p>
             </div>
 
             <div class="rounded-3xl bg-white p-6 shadow-md dark:bg-gray-950">
                 <div class="text-3xl mb-3">🫀</div>
                 <h3 class="text-lg font-bold text-green-800 dark:text-green-400">Hypertension & AVC</h3>
-                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Hypertension artérielle, Insuffisance rénale, Séquelles d'AVC, Parkinson, Alzheimer, Drépanocytose.</p>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Hypertension artérielle, Insuffisance rénale, Séquelles d'AVC, Parkinson, Alzheimer.</p>
             </div>
 
             <div class="rounded-3xl bg-white p-6 shadow-md dark:bg-gray-950">
                 <div class="text-3xl mb-3">👁️</div>
                 <h3 class="text-lg font-bold text-green-800 dark:text-green-400">Vision & Dermatologie</h3>
-                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Glaucome, Cataracte, Perte totale de la vue, Vitiligo, Eczéma, Brûlures sévères, Calvitie, Arthrose.</p>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Glaucome, Cataracte, Vitiligo, Eczéma, Brûlures sévères, Calvitie, Arthrose.</p>
             </div>
 
             <div class="rounded-3xl bg-white p-6 shadow-md dark:bg-gray-950">
@@ -394,21 +425,21 @@
 
 
 <!-- PRODUITS PHYTOSCIENCE -->
-<section class="bg-white py-20 dark:bg-gray-950">
+<section class="bg-white py-12 sm:py-20 dark:bg-gray-950">
 
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         <div class="mx-auto max-w-3xl text-center">
 
-            <span class="text-sm font-bold uppercase tracking-[0.2em] text-orange-500">
+            <span class="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-orange-500">
                 GAMME OFFICIELLE PHYTOSCIENCE
             </span>
 
-            <h2 class="mt-3 text-3xl font-extrabold sm:text-4xl">
+            <h2 class="mt-2 sm:mt-3 text-2xl sm:text-4xl font-extrabold">
                 Les Produits à base de Cellules Souches Végétales
             </h2>
 
-            <p class="mt-5 leading-8 text-gray-600 dark:text-gray-400">
+            <p class="mt-4 sm:mt-5 text-sm sm:text-base leading-7 sm:leading-8 text-gray-600 dark:text-gray-400">
 
                 Les formules originales de la biothérapie cellulaire PhytoScience :
 
@@ -417,56 +448,64 @@
         </div>
 
 
-        <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="mt-8 sm:mt-12 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
 
             <!-- DOUBLE STEMCELL -->
-            <article class="group overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 p-6 shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900">
-                <div class="text-4xl mb-3">🍏🍇</div>
-                <span class="text-xs font-bold uppercase tracking-wider text-green-600">The Origin of Stem Cells™</span>
-                <h3 class="mt-2 text-lg font-extrabold">DOUBLE STEMCELL™</h3>
-                <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">
-                    Combinaison de PhytoCellTec™ Malus Domestica (Pomme Suisse) et Solar Vitis (Raisin). Régénère les cellules mères et rajeunit tout l'organisme.
-                </p>
-                <a routerLink="/products" class="mt-5 inline-flex rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-800">
+            <article class="group overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 p-6 shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900 flex flex-col justify-between">
+                <div>
+                    <div class="text-4xl mb-3">🍏🍇</div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-green-600">The Origin of Stem Cells™</span>
+                    <h3 class="mt-2 text-lg font-extrabold">DOUBLE STEMCELL™</h3>
+                    <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">
+                        Combinaison de PhytoCellTec™ Malus Domestica (Pomme Suisse) et Solar Vitis (Raisin). Régénère les cellules mères et rajeunit tout l'organisme.
+                    </p>
+                </div>
+                <a routerLink="/products" class="mt-5 inline-flex justify-center rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-800">
                     Commander →
                 </a>
             </article>
 
             <!-- CRYSTAL CELL -->
-            <article class="group overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 p-6 shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900">
-                <div class="text-4xl mb-3">💎🍅</div>
-                <span class="text-xs font-bold uppercase tracking-wider text-green-600">Cellule Cristalline Anti-Cancer</span>
-                <h3 class="mt-2 text-lg font-extrabold">CRYSTAL CELL™</h3>
-                <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">
-                    Formule avancée aux caroténoïdes incolores (Phytoène & Phytofluène de Tomates Blanches) et Acai Berry. Traitement oncologique et cicatrisation rapide.
-                </p>
-                <a routerLink="/products" class="mt-5 inline-flex rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-800">
+            <article class="group overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 p-6 shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900 flex flex-col justify-between">
+                <div>
+                    <div class="text-4xl mb-3">💎🍅</div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-green-600">Cellule Cristalline Anti-Cancer</span>
+                    <h3 class="mt-2 text-lg font-extrabold">CRYSTAL CELL™</h3>
+                    <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">
+                        Formule avancée aux caroténoïdes incolores (Phytoène & Phytofluène de Tomates Blanches) et Acai Berry. Traitement oncologique et cicatrisation rapide.
+                    </p>
+                </div>
+                <a routerLink="/products" class="mt-5 inline-flex justify-center rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-800">
                     Commander →
                 </a>
             </article>
 
             <!-- SNOWPHYLLFORTE -->
-            <article class="group overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 p-6 shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900">
-                <div class="text-4xl mb-3">🌿❄️</div>
-                <span class="text-xs font-bold uppercase tracking-wider text-green-600">Snow Algae Chlorophyll</span>
-                <h3 class="mt-2 text-lg font-extrabold">SNOWPHYLLFORTE™</h3>
-                <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">
-                    Nourrit et détoxifie le sang. Élimine les toxines, contrôle la glycémie et régule le pH contre l'acidité interne.
-                </p>
-                <a routerLink="/products" class="mt-5 inline-flex rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-800">
+            <article class="group overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 p-6 shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900 flex flex-col justify-between">
+                <div>
+                    <div class="text-4xl mb-3">🌿❄️</div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-green-600">Snow Algae Chlorophyll</span>
+                    <h3 class="mt-2 text-lg font-extrabold">SNOWPHYLLFORTE™</h3>
+                    <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">
+                        Nourrit et détoxifie le sang. Élimine les toxines, contrôle la glycémie et régule le pH contre l'acidité interne.
+                    </p>
+                </div>
+                <a routerLink="/products" class="mt-5 inline-flex justify-center rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-800">
                     Commander →
                 </a>
             </article>
 
             <!-- ACTUALPLUS & TRIPLE STEMCELL -->
-            <article class="group overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 p-6 shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900">
-                <div class="text-4xl mb-3">✨🧪</div>
-                <span class="text-xs font-bold uppercase tracking-wider text-green-600">Immuno-Booster & Soins Cutanés</span>
-                <h3 class="mt-2 text-lg font-extrabold">ACTUALPLUS™ & TRIPLE STEM</h3>
-                <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">
-                    Extrait concentré pour renforcer le système immunitaire déficient et spray dermique sublingual pour les plaies chroniques et affections de la peau.
-                </p>
-                <a routerLink="/products" class="mt-5 inline-flex rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-800">
+            <article class="group overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 p-6 shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900 flex flex-col justify-between">
+                <div>
+                    <div class="text-4xl mb-3">✨🧪</div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-green-600">Immuno-Booster & Soins Cutanés</span>
+                    <h3 class="mt-2 text-lg font-extrabold">ACTUALPLUS™ & TRIPLE STEM</h3>
+                    <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">
+                        Extrait concentré pour renforcer le système immunitaire déficient et spray dermique sublingual pour les plaies chroniques et affections de la peau.
+                    </p>
+                </div>
+                <a routerLink="/products" class="mt-5 inline-flex justify-center rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-800">
                     Commander →
                 </a>
             </article>
@@ -478,22 +517,22 @@
 </section>
 
 
-<!-- TÉMOIGNAGES CLINIQUES REPRIS DES DOCUMENTS D'ORIGINE -->
-<section class="bg-gray-100 py-20 dark:bg-gray-900">
+<!-- TÉMOIGNAGES CLINIQUES -->
+<section class="bg-gray-100 py-12 sm:py-20 dark:bg-gray-900">
 
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         <div class="mx-auto max-w-3xl text-center">
 
-            <span class="text-sm font-bold uppercase tracking-[0.2em] text-orange-500">
+            <span class="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-orange-500">
                 RÉSULTATS DE TRAITEMENT
             </span>
 
-            <h2 class="mt-3 text-3xl font-extrabold sm:text-4xl">
+            <h2 class="mt-2 sm:mt-3 text-2xl sm:text-4xl font-extrabold">
                 Témoignages & Preuves de Guérison
             </h2>
 
-            <p class="mt-5 text-gray-600 dark:text-gray-400">
+            <p class="mt-4 sm:mt-5 text-sm sm:text-base text-gray-600 dark:text-gray-400">
 
                 Extrait des cas suivis dans nos cliniques au Cameroun :
 
@@ -502,9 +541,8 @@
         </div>
 
 
-        <div class="mt-10 grid gap-8 md:grid-cols-3">
+        <div class="mt-8 sm:mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 
-            <!-- Cas 1 : Gangrène Diabétique -->
             <div class="overflow-hidden rounded-3xl bg-white p-6 shadow-md dark:bg-gray-950">
                 <div class="mb-4 text-center">
                     <span class="inline-block rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700">Cas 1 : Gangrène Diabétique</span>
@@ -515,7 +553,6 @@
                 </p>
             </div>
 
-            <!-- Cas 2 : Plaie Cancéreuse Burkitt -->
             <div class="overflow-hidden rounded-3xl bg-white p-6 shadow-md dark:bg-gray-950">
                 <div class="mb-4 text-center">
                     <span class="inline-block rounded-full bg-purple-100 px-3 py-1 text-xs font-bold text-purple-700">Cas 2 : Plaie Lymphomatique</span>
@@ -526,8 +563,7 @@
                 </p>
             </div>
 
-            <!-- Cas 3 : Infertilité FIV -->
-            <div class="overflow-hidden rounded-3xl bg-white p-6 shadow-md dark:bg-gray-950">
+            <div class="overflow-hidden rounded-3xl bg-white p-6 shadow-md dark:bg-gray-950 sm:col-span-2 lg:col-span-1">
                 <div class="mb-4 text-center">
                     <span class="inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700">Cas 3 : Infertilité & Naissance</span>
                 </div>
@@ -544,48 +580,48 @@
 </section>
 
 
-<!-- CAMPAGNE DE SANTÉ ET CLINIQUES AU CAMEROUN -->
-<section class="bg-green-950 py-20 text-white">
+<!-- CAMPAGNE DE SANTÉ ET CLINIQUES -->
+<section class="bg-green-950 py-12 sm:py-20 text-white">
 
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         <div class="max-w-3xl">
 
-            <span class="text-sm font-bold uppercase tracking-[0.2em] text-orange-300">
+            <span class="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-orange-300">
                 Campagnes Santé & Centres de Traitement
             </span>
 
-            <h2 class="mt-3 text-3xl font-extrabold sm:text-4xl">
+            <h2 class="mt-2 sm:mt-3 text-2xl sm:text-4xl font-extrabold">
                 Consultez nos Docteurs Spécialisés
             </h2>
 
-            <p class="mt-6 leading-8 text-green-100">
+            <p class="mt-4 sm:mt-6 text-sm sm:text-base leading-7 sm:leading-8 text-green-100">
 
                 Si vous souffrez d'une maladie grave, génétique ou rare et que vous ne savez plus à quel saint vous vouer, bénéficiez d'un bilan de santé en thérapie cellulaire à nos centres ou en ligne :
 
             </p>
 
-            <div class="mt-6 space-y-3 text-sm">
+            <div class="mt-6 space-y-3 text-xs sm:text-sm">
 
-                <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3">
-                    🏢 <strong>DOUALA :</strong> Clinique située à NGODI Sapeurs Pompiers (Bâtiment en forme de château)
+                <div class="flex items-start sm:items-center gap-3 rounded-xl bg-white/10 p-3">
+                    <span class="shrink-0">🏢</span> <div><strong>DOUALA :</strong> Clinique située à NGODI Sapeurs Pompiers (Bâtiment château)</div>
                 </div>
 
-                <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3">
-                    🏢 <strong>NGAOUNDÉRÉ :</strong> Adamaoua Hotel
+                <div class="flex items-start sm:items-center gap-3 rounded-xl bg-white/10 p-3">
+                    <span class="shrink-0">🏢</span> <div><strong>NGAOUNDÉRÉ :</strong> Adamaoua Hotel</div>
                 </div>
 
-                <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3">
-                    🏢 <strong>GAROUA :</strong> Hotel Benoue
+                <div class="flex items-start sm:items-center gap-3 rounded-xl bg-white/10 p-3">
+                    <span class="shrink-0">🏢</span> <div><strong>GAROUA :</strong> Hotel Benoue</div>
                 </div>
 
-                <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3">
-                    🏢 <strong>MAROUA :</strong> Hôtel Maroua Palace
+                <div class="flex items-start sm:items-center gap-3 rounded-xl bg-white/10 p-3">
+                    <span class="shrink-0">🏢</span> <div><strong>MAROUA :</strong> Hôtel Maroua Palace</div>
                 </div>
 
             </div>
 
-            <div class="mt-8 rounded-2xl border border-orange-300/40 bg-white/5 p-5 text-sm leading-7 text-green-50">
+            <div class="mt-6 sm:mt-8 rounded-2xl border border-orange-300/40 bg-white/5 p-4 sm:p-5 text-xs sm:text-sm leading-6 sm:leading-7 text-green-50">
 
                 📞 <strong>Contacts Orientation & Rendez-vous :</strong><br>
                 +237 690 98 08 66 / +237 658 69 19 89 (Dr. Matho)
@@ -600,17 +636,17 @@
 
 
 <!-- FOOTER -->
-<footer class="bg-green-950 py-12 text-green-100 border-t border-green-900">
+<footer class="bg-green-950 py-10 sm:py-12 text-green-100 border-t border-green-900">
 
-    <div class="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 md:grid-cols-4 lg:px-8">
+    <div class="mx-auto grid max-w-7xl gap-8 sm:gap-10 px-4 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
 
         <div>
 
             <img src="/images/logo/logo-dark.svg"
                  alt="TES-ICG Santé"
-                 class="h-12 w-auto">
+                 class="h-10 sm:h-12 w-auto">
 
-            <p class="mt-4 text-sm leading-6 text-green-200">
+            <p class="mt-3 sm:mt-4 text-xs sm:text-sm leading-6 text-green-200">
 
                 PhytoScience - We Are The Trend Maker.<br>
                 Distributeur officiel de la biothérapie cellulaire végétale au Cameroun.
@@ -622,27 +658,16 @@
 
         <div>
 
-            <h3 class="font-bold text-white">
+            <h3 class="font-bold text-white text-sm sm:text-base">
                 Navigation
             </h3>
 
-            <div class="mt-4 space-y-3 text-sm">
+            <div class="mt-3 sm:mt-4 space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
 
-                <a routerLink="/" class="block hover:text-orange-300">
-                    Accueil
-                </a>
-
-                <a routerLink="/products" class="block hover:text-orange-300">
-                    Produits PhytoScience
-                </a>
-
-                <a routerLink="/bundles" class="block hover:text-orange-300">
-                    Packs
-                </a>
-
-                <a routerLink="/companies" class="block hover:text-orange-300">
-                    Entreprises
-                </a>
+                <a routerLink="/" class="block hover:text-orange-300">Accueil</a>
+                <a routerLink="/products" class="block hover:text-orange-300">Produits PhytoScience</a>
+                <a routerLink="/bundles" class="block hover:text-orange-300">Packs</a>
+                <a routerLink="/companies" class="block hover:text-orange-300">Entreprises</a>
 
             </div>
 
@@ -651,11 +676,11 @@
 
         <div>
 
-            <h3 class="font-bold text-white">
+            <h3 class="font-bold text-white text-sm sm:text-base">
                 Nos Spécialités
             </h3>
 
-            <div class="mt-4 space-y-3 text-sm">
+            <div class="mt-3 sm:mt-4 space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
 
                 <p>🧬 Double Stemcell / Crystal Cell</p>
                 <p>🧪 Chlorophylle SnowphyllForte</p>
@@ -669,11 +694,11 @@
 
         <div>
 
-            <h3 class="font-bold text-white">
+            <h3 class="font-bold text-white text-sm sm:text-base">
                 Contact Direct
             </h3>
 
-            <div class="mt-4 space-y-3 text-sm">
+            <div class="mt-3 sm:mt-4 space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
 
                 <p>📍 Douala, Yaoundé, Bafoussam, Garoua, Maroua, Ngaoundéré</p>
                 <p>📞 +237 690 98 08 66</p>
@@ -693,7 +718,7 @@
     </div>
 
 
-    <div class="mx-auto mt-10 max-w-7xl border-t border-green-800 px-4 pt-6 text-center text-xs text-green-300 sm:px-6 lg:px-8">
+    <div class="mx-auto mt-8 sm:mt-10 max-w-7xl border-t border-green-800 px-4 pt-6 text-center text-xs text-green-300 sm:px-6 lg:px-8">
 
         PhytoScience™ - The Origin of Plant Stem Cell. Tous droits réservés.
 

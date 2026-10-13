@@ -1,3 +1,4 @@
+
 package com.ttesicg.sante.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -46,6 +47,13 @@ public class Company {
     @Column(nullable = false)
     private Boolean active = true;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "category_id",
+            foreignKey = @ForeignKey(name = "fk_company_category")
+    )
+    private CompanyCategory category;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -64,10 +72,7 @@ public class Company {
         updatedAt = LocalDateTime.now();
     }
 
-    @OneToMany(
-            mappedBy = "company",
-            fetch = FetchType.LAZY
-    )
+    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
     @JsonIgnore
     @Builder.Default
     private Set<Product> products = new HashSet<>();

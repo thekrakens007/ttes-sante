@@ -14,6 +14,8 @@ import {InventoryRequest} from "../interfaces/inventory-request.interface";
 import {ProductImageResponse} from "../interfaces/product-image-response.interface";
 import {ProductPage} from "../models/product.model";
 import {RoleResponse} from "../interfaces/role-response.interface";
+import { CompanyCategoryRequest } from '../interfaces/company-category-request.interface';
+import { CompanyCategoryResponse } from '../interfaces/company-category-response.interface';
 
 @Injectable({
     providedIn: 'root'
@@ -409,4 +411,47 @@ searchProductsPaginated(
         );
 
     }
+
+
+    // =========================
+    // CATÉGORIES D'ENTREPRISES
+    // =========================
+
+    getCompanyCategories(): Observable<CompanyCategoryResponse[]> {
+        return this.http.get<CompanyCategoryResponse[]>(
+            `${this.API_URL}/company-categories`
+        );
+    }
+
+    getCompanyCategory(id: number): Observable<CompanyCategoryResponse> {
+        return this.http.get<CompanyCategoryResponse>(
+            `${this.API_URL}/company-categories/${id}`
+        );
+    }
+
+    createCompanyCategory(
+        request: CompanyCategoryRequest
+    ): Observable<CompanyCategoryResponse> {
+        return this.http.post<CompanyCategoryResponse>(
+            `${this.API_URL}/company-categories`,
+            request
+        );
+    }
+
+    updateCompanyCategory(
+        id: number,
+        request: CompanyCategoryRequest
+    ): Observable<CompanyCategoryResponse> {
+        return this.http.put<CompanyCategoryResponse>(
+            `${this.API_URL}/company-categories/${id}`,
+            request
+        );
+    }
+
+    deleteCompanyCategory(id: number): Observable<void> {
+        return this.http.delete<void>(
+            `${this.API_URL}/company-categories/${id}`
+        );
+    }
+
 }

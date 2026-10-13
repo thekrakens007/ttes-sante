@@ -18,9 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-
-
-
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http
@@ -62,7 +59,12 @@ public class SecurityConfig {
                 .requestMatchers("/api/orders/**")
                 .authenticated()
 
-                .anyRequest()
+
+                 .requestMatchers("/api/company-categories/**")
+                        .permitAll()
+
+
+                        .anyRequest()
                 .authenticated()
         )
                 .addFilterBefore(

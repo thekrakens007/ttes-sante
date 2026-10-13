@@ -10,4 +10,5 @@ public interface ProductBundleRepository extends JpaRepository<ProductBundle, Lo
     List<ProductBundle> findByActiveTrueOrderByCreatedAtDesc();
 
     List<ProductBundle> findAllByOrderByCreatedAtDesc();
+
 }

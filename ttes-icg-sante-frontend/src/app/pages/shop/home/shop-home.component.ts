@@ -20,7 +20,8 @@ import { AuthService } from '../../../core/services/auth.service';
 
 import { BundleService } from '../../../core/services/bundle.service';
 import { BundleResponse } from '../../../core/interfaces/bundle-response.interface';
-
+import { CompanyCategoryService } from '../../../core/services/company-category.service';
+import { CompanyCategoryResponse } from '../../../core/interfaces/company-category-response.interface';
 
 @Component({
     selector: 'app-shop-home',
@@ -55,6 +56,7 @@ export class ShopHomeComponent implements OnInit {
     private authService = inject(AuthService);
     private bundleService = inject(BundleService);
     private router = inject(Router);
+    private companyCategoryService = inject(CompanyCategoryService);
 
     // ===================== CART =====================
 
@@ -256,6 +258,7 @@ export class ShopHomeComponent implements OnInit {
     ngOnInit(): void {
         this.loadProducts();
         this.loadBundles();
+        this.loadCompanyCategories();
 
         if (this.isLoggedIn()) {
             this.loadCart();
@@ -552,6 +555,34 @@ export class ShopHomeComponent implements OnInit {
         this.therapeuticAreas = [
             ...new Set(therapeuticAreas)
         ].sort();
+    }
+    // ===================== COMPANY CATEGORIES =====================
+
+    companyCategories: CompanyCategoryResponse[] = [];
+    companyCategoriesLoading = false;
+    companyCategoriesError = '';
+
+    loadCompanyCategories(): void {
+        this.companyCategoriesLoading = true;
+        this.companyCategoriesError = '';
+
+        this.companyCategoryService.getCategories().subscribe({
+            next: (categories) => {
+                this.companyCategories = categories ?? [];
+                this.companyCategoriesLoading = false;
+            },
+            error: (error) => {
+                console.error(
+                    'Erreur lors du chargement des catégories d’entreprises',
+                    error
+                );
+
+                this.companyCategories = [];
+                this.companyCategoriesError =
+                    'Impossible de charger les catégories pour le moment.';
+                this.companyCategoriesLoading = false;
+            }
+        });
     }
 
     /**

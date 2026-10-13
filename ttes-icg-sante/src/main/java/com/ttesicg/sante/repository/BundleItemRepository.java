@@ -10,4 +10,6 @@ public interface BundleItemRepository extends JpaRepository<BundleItem, Long> {
     List<BundleItem> findByBundleId(Long bundleId);
 
     void deleteByBundleId(Long bundleId);
+
+    boolean existsByProduct_Id(Long productId);
 }

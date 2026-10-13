@@ -52,7 +52,7 @@ import {BundleListComponent} from "./pages/shop/bundles/bundle-list/bundle-list.
 import {BundleDetailComponent} from "./pages/shop/bundles/bundle-detail/bundle-detail.component";
 import {BundleFormComponent} from "./pages/admin/ bundles/bundle-form/bundle-form.component";
 import {BundlesComponent} from "./pages/admin/ bundles/bundles.component";
-
+import { CompanyCategoriesComponent } from './pages/admin/company-categories/company-categories.component';
 export const routes: Routes = [
   // =====================================================
   // ESPACE CLIENT PUBLIC
@@ -236,6 +236,11 @@ export const routes: Routes = [
         path: 'users',
         component: UsersComponent,
         title: 'Gestion des utilisateurs'
+      },
+      {
+        path: 'company-categories',
+        component: CompanyCategoriesComponent,
+        title: 'Catégories d’entreprises'
       },
       {
         path: 'bundles',

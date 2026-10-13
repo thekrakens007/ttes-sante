@@ -99,6 +99,7 @@ public class AdminProductController {
         return ResponseEntity.noContent().build();
     }
 
+
     /**
  * Recherche paginée des produits pour l'administration
  */

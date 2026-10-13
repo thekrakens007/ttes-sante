@@ -13,6 +13,7 @@ import com.ttesicg.sante.repository.CompanyRepository;
 import com.ttesicg.sante.repository.InventoryRepository;
 import com.ttesicg.sante.repository.ProductRepository;
 import com.ttesicg.sante.repository.TherapeuticAreaRepository;
+import com.ttesicg.sante.repository.BundleItemRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+
+
+
 @Service
 @RequiredArgsConstructor
 public class ProductService {
@@ -36,7 +40,7 @@ private final CompanyRepository companyRepository;
 private final CategoryRepository categoryRepository;
 private final TherapeuticAreaRepository therapeuticAreaRepository;
 private final InventoryRepository inventoryRepository;
-
+    private final BundleItemRepository bundleItemRepository;
 
 // =========================================================
 // FIND BY ID
@@ -729,22 +733,26 @@ public void delete(
 // DELETE PRODUCT
 // =========================================================
 
-@Transactional
-public void deleteProduct(
-        Long productId
-) {
 
-    Product product =
-            productRepository
-                    .findById(productId)
-                    .orElseThrow(() ->
-                            new ResponseStatusException(
-                                    HttpStatus.NOT_FOUND,
-                                    "Produit introuvable"
-                            )
-                    );
+    @Transactional
+    public void deleteProduct(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Produit introuvable."
+                        )
+                );
 
-    productRepository.delete(product);
-}
+        if (bundleItemRepository.existsByProduct_Id(productId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Impossible de supprimer ce produit : il est utilisé dans un ou plusieurs packs. Retirez-le d'abord des packs concernés."
+            );
+        }
+
+        productRepository.delete(product);
+    }
+
 
 }

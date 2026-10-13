@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import com.ttesicg.sante.entity.CompanyCategory;
+import com.ttesicg.sante.repository.CompanyCategoryRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +22,7 @@ public class CompanyService {
 
     private final ProductRepository productRepository;
 
+    private final CompanyCategoryRepository companyCategoryRepository;
 
     // =========================================================
     // CREER
@@ -34,6 +37,10 @@ public class CompanyService {
                 .description(request.getDescription())
                 .country(request.getCountry())
                 .website(request.getWebsite())
+
+                .logoUrl(request.getLogoUrl())
+                .category(getCategory(request.getCategoryId()))
+
                 .build();
 
         Company saved =
@@ -76,6 +83,10 @@ public class CompanyService {
                 request.getWebsite()
         );
 
+        company.setLogoUrl(request.getLogoUrl());
+        company.setCategory(getCategory(request.getCategoryId()));
+
+
         companyRepository.save(company);
 
         return map(company);
@@ -94,6 +105,17 @@ public class CompanyService {
                 .toList();
     }
 
+
+    private CompanyCategory getCategory(Long categoryId) {
+        if (categoryId == null) {
+            return null;
+        }
+
+        return companyCategoryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Catégorie d'entreprise introuvable : " + categoryId
+                ));
+    }
 
     // =========================================================
     // DETAIL ENTREPRISE
@@ -154,9 +176,9 @@ public class CompanyService {
     // MAPPING COMPANY
     // =========================================================
 
-    private CompanyResponse map(
-            Company company
-    ) {
+
+    private CompanyResponse map(Company company) {
+        CompanyCategory category = company.getCategory();
 
         return CompanyResponse.builder()
                 .id(company.getId())
@@ -164,8 +186,12 @@ public class CompanyService {
                 .description(company.getDescription())
                 .country(company.getCountry())
                 .website(company.getWebsite())
+                .logoUrl(company.getLogoUrl())
+                .categoryId(category != null ? category.getId() : null)
+                .categoryName(category != null ? category.getName() : null)
                 .build();
     }
+
 
 
     // =========================================================

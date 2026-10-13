@@ -49,6 +49,7 @@ export class AppSidebarComponent {
         { name: "Packs", path: "/admin/bundles" },
         { name: "Catégories", path: "/admin/categories" },
         { name: "Entreprises", path: "/admin/companies" },
+        { name: "Categories d'entreprise", path: "/admin/company-categories" },
         { name: "Domaines thérapeutiques", path: "/admin/therapeutic-areas" }
       ]
     },

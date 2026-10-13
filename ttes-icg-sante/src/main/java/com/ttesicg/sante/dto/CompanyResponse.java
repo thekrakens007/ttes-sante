@@ -1,3 +1,4 @@
+
 package com.ttesicg.sante.dto;
 
 import lombok.Builder;
@@ -8,12 +9,12 @@ import lombok.Data;
 public class CompanyResponse {
 
     private Long id;
-
     private String name;
-
     private String description;
-
     private String country;
-
     private String website;
+    private String logoUrl;
+
+    private Long categoryId;
+    private String categoryName;
 }

@@ -271,4 +271,12 @@ getTherapeuticAreas(): Observable<any[]> {
         `${this.API_URL}/therapeutic-areas`
     );
 }
+
+
+    deleteProduct(productId: number) {
+        return this.http.delete<void>(
+            `/api/admin/products/${productId}`
+        );
+    }
+
 }

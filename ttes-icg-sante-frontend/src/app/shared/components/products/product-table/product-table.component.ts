@@ -746,29 +746,56 @@ export class ProductTableComponent implements OnInit {
     // SUPPRESSION
     // ============================================================
 
-    deleteProduct(
-        productId: number
-    ): void {
 
-        /*
-         * Dans la liste normale, cette méthode est conservée
-         * pour compatibilité avec ton ancien HTML.
-         *
-         * La suppression réelle du produit du catalogue
-         * doit continuer à passer par ton AdminService/backend.
-         */
+    // ============================================================
+    // SUPPRESSION D'UN PRODUIT
+    // ============================================================
 
-        if (
-            this.isBundleSelectionMode
-        ) {
-
-            this.selectedProductIds.delete(
-                productId
-            );
-
+    deleteProduct(productId: number): void {
+        if (this.isBundleSelectionMode) {
+            return;
         }
 
+        const product = this.products.find(
+            p => p.id === productId
+        );
+
+        const confirmed = window.confirm(
+            `Voulez-vous vraiment supprimer le produit "${product?.name ?? productId}" ? Cette action est irréversible.`
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        this.errorMessage = '';
+
+        this.productService.deleteProduct(productId).subscribe({
+            next: () => {
+                // Retirer le produit de la sélection locale.
+                this.selectedProductIds.delete(productId);
+
+                // Si le dernier produit de la page vient d'être supprimé,
+                // revenir à la page précédente lorsqu'elle existe.
+                if (this.products.length === 1 && this.currentPage > 0) {
+                    this.currentPage--;
+                }
+
+                // Recharger la liste depuis le backend.
+                this.loadProducts();
+            },
+            error: (err) => {
+                console.error('Erreur lors de la suppression :', err);
+
+                this.errorMessage =
+                    err?.error?.message ??
+                    'Impossible de supprimer ce produit.';
+
+                window.alert(this.errorMessage);
+            }
+        });
     }
+
 
 
     // ============================================================
@@ -890,5 +917,12 @@ export class ProductTableComponent implements OnInit {
             );
 
     }
+
+
+    // ============================================================
+    // SUPPRESSION D'UN PRODUIT
+    // ============================================================
+
+
 
 }

@@ -1,0 +1,1234 @@
+
+
+==================================================
+FICHIER : ttes-icg-sante\src\main\resources\db\migration\V2__create_core_tables.sql
+==================================================
+-- ============================================================
+-- USERS
+-- ============================================================
+
+CREATE TABLE users (
+                       id BIGSERIAL PRIMARY KEY,
+                       first_name VARCHAR(100) NOT NULL,
+                       last_name VARCHAR(100) NOT NULL,
+                       email VARCHAR(255) NOT NULL UNIQUE,
+                       password VARCHAR(255) NOT NULL,
+                       phone VARCHAR(30),
+                       enabled BOOLEAN NOT NULL DEFAULT TRUE,
+                       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                       updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================================
+-- ROLES
+-- ============================================================
+
+CREATE TABLE roles (
+                       id BIGSERIAL PRIMARY KEY,
+                       name VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE user_roles (
+                            user_id BIGINT NOT NULL,
+                            role_id BIGINT NOT NULL,
+
+                            PRIMARY KEY (user_id, role_id),
+
+                            CONSTRAINT fk_user_roles_user
+                                FOREIGN KEY (user_id)
+                                    REFERENCES users(id)
+                                    ON DELETE CASCADE,
+
+                            CONSTRAINT fk_user_roles_role
+                                FOREIGN KEY (role_id)
+                                    REFERENCES roles(id)
+                                    ON DELETE CASCADE
+);
+
+-- ============================================================
+-- COMPANIES
+-- Entreprises qui fournissent / fabriquent les produits
+-- ============================================================
+
+CREATE TABLE companies (
+                           id BIGSERIAL PRIMARY KEY,
+                           name VARCHAR(255) NOT NULL UNIQUE,
+                           description TEXT,
+                           logo_url VARCHAR(500),
+                           website VARCHAR(500),
+                           email VARCHAR(255),
+                           phone VARCHAR(30),
+                           active BOOLEAN NOT NULL DEFAULT TRUE,
+                           created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                           updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================================
+-- CATEGORIES
+-- Catégories hiérarchiques
+-- Exemple :
+-- Médicaments
+--   └── Antalgiques
+--       └── Paracétamol
+-- ============================================================
+
+CREATE TABLE categories (
+                            id BIGSERIAL PRIMARY KEY,
+                            name VARCHAR(255) NOT NULL,
+                            description TEXT,
+                            image_url VARCHAR(500),
+                            parent_id BIGINT,
+                            active BOOLEAN NOT NULL DEFAULT TRUE,
+                            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                            updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+                            CONSTRAINT fk_category_parent
+                                FOREIGN KEY (parent_id)
+                                    REFERENCES categories(id)
+                                    ON DELETE SET NULL
+);
+
+-- ============================================================
+-- DOMAINES / TRAITEMENTS THERAPEUTIQUES
+-- ============================================================
+
+CREATE TABLE therapeutic_areas (
+                                   id BIGSERIAL PRIMARY KEY,
+                                   name VARCHAR(255) NOT NULL UNIQUE,
+                                   description TEXT,
+                                   active BOOLEAN NOT NULL DEFAULT TRUE,
+                                   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================================
+-- PRODUCTS
+-- ============================================================
+
+CREATE TABLE products (
+                          id BIGSERIAL PRIMARY KEY,
+
+                          company_id BIGINT NOT NULL,
+
+                          name VARCHAR(255) NOT NULL,
+                          sku VARCHAR(100) NOT NULL UNIQUE,
+
+                          description TEXT,
+
+                          brand VARCHAR(255),
+
+                          active_ingredient VARCHAR(500),
+
+                          dosage VARCHAR(100),
+
+                          form VARCHAR(100),
+
+                          price NUMERIC(12, 2) NOT NULL,
+
+                          requires_prescription BOOLEAN NOT NULL DEFAULT FALSE,
+
+                          active BOOLEAN NOT NULL DEFAULT TRUE,
+
+                          created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                          updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+                          CONSTRAINT fk_product_company
+                              FOREIGN KEY (company_id)
+                                  REFERENCES companies(id)
+                                  ON DELETE RESTRICT,
+
+                          CONSTRAINT chk_product_price
+                              CHECK (price >= 0)
+);
+
+-- ============================================================
+-- PRODUCT <-> CATEGORY
+-- Un produit peut appartenir à plusieurs catégories
+-- ============================================================
+
+CREATE TABLE product_categories (
+                                    product_id BIGINT NOT NULL,
+                                    category_id BIGINT NOT NULL,
+
+                                    PRIMARY KEY (product_id, category_id),
+
+                                    CONSTRAINT fk_product_categories_product
+                                        FOREIGN KEY (product_id)
+                                            REFERENCES products(id)
+                                            ON DELETE CASCADE,
+
+                                    CONSTRAINT fk_product_categories_category
+                                        FOREIGN KEY (category_id)
+                                            REFERENCES categories(id)
+                                            ON DELETE CASCADE
+);
+
+-- ============================================================
+-- PRODUCT <-> THERAPEUTIC AREA
+-- ============================================================
+
+CREATE TABLE product_therapeutic_areas (
+                                           product_id BIGINT NOT NULL,
+                                           therapeutic_area_id BIGINT NOT NULL,
+
+                                           PRIMARY KEY (product_id, therapeutic_area_id),
+
+                                           CONSTRAINT fk_product_therapeutic_product
+                                               FOREIGN KEY (product_id)
+                                                   REFERENCES products(id)
+                                                   ON DELETE CASCADE,
+
+                                           CONSTRAINT fk_product_therapeutic_area
+                                               FOREIGN KEY (therapeutic_area_id)
+                                                   REFERENCES therapeutic_areas(id)
+                                                   ON DELETE CASCADE
+);
+
+-- ============================================================
+-- PRODUCT IMAGES
+-- ============================================================
+
+CREATE TABLE product_images (
+                                id BIGSERIAL PRIMARY KEY,
+
+                                product_id BIGINT NOT NULL,
+
+                                image_url VARCHAR(500) NOT NULL,
+
+                                is_main BOOLEAN NOT NULL DEFAULT FALSE,
+
+                                display_order INTEGER NOT NULL DEFAULT 0,
+
+                                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+                                CONSTRAINT fk_product_images_product
+                                    FOREIGN KEY (product_id)
+                                        REFERENCES products(id)
+                                        ON DELETE CASCADE
+);
+
+-- ============================================================
+-- INVENTORY
+-- ============================================================
+
+CREATE TABLE inventory (
+                           id BIGSERIAL PRIMARY KEY,
+
+                           product_id BIGINT NOT NULL UNIQUE,
+
+                           quantity INTEGER NOT NULL DEFAULT 0,
+
+                           minimum_quantity INTEGER NOT NULL DEFAULT 0,
+
+                           updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+                           CONSTRAINT fk_inventory_product
+                               FOREIGN KEY (product_id)
+                                   REFERENCES products(id)
+                                   ON DELETE CASCADE,
+
+                           CONSTRAINT chk_inventory_quantity
+                               CHECK (quantity >= 0),
+
+                           CONSTRAINT chk_inventory_minimum_quantity
+                               CHECK (minimum_quantity >= 0)
+);
+
+-- ============================================================
+-- INDEXES
+-- ============================================================
+
+CREATE INDEX idx_products_company
+    ON products(company_id);
+
+CREATE INDEX idx_products_name
+    ON products(name);
+
+CREATE INDEX idx_products_active
+    ON products(active);
+
+CREATE INDEX idx_categories_parent
+    ON categories(parent_id);
+
+CREATE INDEX idx_product_categories_category
+    ON product_categories(category_id);
+
+CREATE INDEX idx_product_therapeutic_area
+    ON product_therapeutic_areas(therapeutic_area_id);
+
+CREATE INDEX idx_product_images_product
+    ON product_images(product_id);
+
+
+==================================================
+FICHIER : ttes-icg-sante\src\main\resources\db\migration\V5__add_country_to_company.sql
+==================================================
+ALTER TABLE companies
+    ADD COLUMN country VARCHAR(100);
+
+
+==================================================
+FICHIER : ttes-icg-sante\src\main\java\com\ttesicg\sante\entity\Company.java
+==================================================
+package com.ttesicg.sante.entity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "companies")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Company {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true, length = 255)
+    private String name;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(length = 100)
+    private String country;
+
+    @Column(name = "logo_url", length = 500)
+    private String logoUrl;
+
+    @Column(length = 500)
+    private String website;
+
+    @Column(length = 255)
+    private String email;
+
+    @Column(length = 30)
+    private String phone;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean active = true;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        createdAt = now;
+        updatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    @OneToMany(
+            mappedBy = "company",
+            fetch = FetchType.LAZY
+    )
+    @JsonIgnore
+    @Builder.Default
+    private Set<Product> products = new HashSet<>();
+}
+
+
+==================================================
+FICHIER : ttes-icg-sante\src\main\java\com\ttesicg\sante\dto\CompanyRequest.java
+==================================================
+package com.ttesicg.sante.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+
+@Data
+public class CompanyRequest {
+
+    @NotBlank(message = "Le nom est obligatoire")
+    private String name;
+
+    private String description;
+
+    private String country;
+
+    private String website;
+}
+
+
+==================================================
+FICHIER : ttes-icg-sante\src\main\java\com\ttesicg\sante\dto\CompanyResponse.java
+==================================================
+package com.ttesicg.sante.dto;
+
+import lombok.Builder;
+import lombok.Data;
+
+@Data
+@Builder
+public class CompanyResponse {
+
+    private Long id;
+
+    private String name;
+
+    private String description;
+
+    private String country;
+
+    private String website;
+}
+
+
+==================================================
+FICHIER : ttes-icg-sante\src\main\java\com\ttesicg\sante\repository\CompanyRepository.java
+==================================================
+package com.ttesicg.sante.repository;
+
+import com.ttesicg.sante.entity.Company;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface CompanyRepository extends JpaRepository<Company, Long> {
+
+    Optional<Company> findByName(String name);
+
+    boolean existsByName(String name);
+}
+
+
+==================================================
+FICHIER : ttes-icg-sante\src\main\java\com\ttesicg\sante\service\CompanyService.java
+==================================================
+package com.ttesicg.sante.service;
+
+import com.ttesicg.sante.dto.CompanyRequest;
+import com.ttesicg.sante.dto.CompanyResponse;
+import com.ttesicg.sante.dto.ProductResponse;
+import com.ttesicg.sante.entity.Company;
+import com.ttesicg.sante.entity.Product;
+import com.ttesicg.sante.repository.CompanyRepository;
+import com.ttesicg.sante.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class CompanyService {
+
+    private final CompanyRepository companyRepository;
+
+    private final ProductRepository productRepository;
+
+
+    // =========================================================
+    // CREER
+    // =========================================================
+
+    public CompanyResponse create(
+            CompanyRequest request
+    ) {
+
+        Company company = Company.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .country(request.getCountry())
+                .website(request.getWebsite())
+                .build();
+
+        Company saved =
+                companyRepository.save(company);
+
+        return map(saved);
+    }
+
+
+    // =========================================================
+    // MODIFIER
+    // =========================================================
+
+    public CompanyResponse update(
+            Long id,
+            CompanyRequest request
+    ) {
+
+        Company company =
+                companyRepository.findById(id)
+                        .orElseThrow(
+                                () -> new RuntimeException(
+                                        "Entreprise introuvable"
+                                )
+                        );
+
+        company.setName(
+                request.getName()
+        );
+
+        company.setDescription(
+                request.getDescription()
+        );
+
+        company.setCountry(
+                request.getCountry()
+        );
+
+        company.setWebsite(
+                request.getWebsite()
+        );
+
+        companyRepository.save(company);
+
+        return map(company);
+    }
+
+
+    // =========================================================
+    // LISTE DES ENTREPRISES
+    // =========================================================
+
+    public List<CompanyResponse> findAll() {
+
+        return companyRepository.findAll()
+                .stream()
+                .map(this::map)
+                .toList();
+    }
+
+
+    // =========================================================
+    // DETAIL ENTREPRISE
+    // =========================================================
+
+    public CompanyResponse findById(
+            Long id
+    ) {
+
+        Company company =
+                companyRepository.findById(id)
+                        .orElseThrow(
+                                () -> new RuntimeException(
+                                        "Entreprise introuvable"
+                                )
+                        );
+
+        return map(company);
+    }
+
+
+    // =========================================================
+    // PRODUITS D'UNE ENTREPRISE
+    // =========================================================
+
+    public List<ProductResponse> findProducts(
+            Long companyId
+    ) {
+
+        companyRepository.findById(companyId)
+                .orElseThrow(
+                        () -> new RuntimeException(
+                                "Entreprise introuvable"
+                        )
+                );
+
+        return productRepository
+                .findByCompanyId(companyId)
+                .stream()
+                .map(this::mapProduct)
+                .toList();
+    }
+
+
+    // =========================================================
+    // SUPPRIMER
+    // =========================================================
+
+    public void delete(
+            Long id
+    ) {
+
+        companyRepository.deleteById(id);
+    }
+
+
+    // =========================================================
+    // MAPPING COMPANY
+    // =========================================================
+
+    private CompanyResponse map(
+            Company company
+    ) {
+
+        return CompanyResponse.builder()
+                .id(company.getId())
+                .name(company.getName())
+                .description(company.getDescription())
+                .country(company.getCountry())
+                .website(company.getWebsite())
+                .build();
+    }
+
+
+    // =========================================================
+    // MAPPING PRODUCT
+    // =========================================================
+
+    private ProductResponse mapProduct(
+            Product product
+    ) {
+
+        return ProductResponse.builder()
+
+                .id(product.getId())
+
+                .name(product.getName())
+
+                .sku(product.getSku())
+
+                .description(product.getDescription())
+
+                .brand(product.getBrand())
+
+                .activeIngredient(
+                        product.getActiveIngredient()
+                )
+
+                .dosage(
+                        product.getDosage()
+                )
+
+                .form(
+                        product.getForm()
+                )
+
+                .price(
+                        product.getPrice()
+                )
+
+                .requiresPrescription(
+                        product.getRequiresPrescription()
+                )
+
+                .stock(
+                        product.getInventory() != null
+                                ? product.getInventory().getQuantity()
+                                : 0
+                )
+
+                .companyId(
+                        product.getCompany().getId()
+                )
+
+                .companyName(
+                        product.getCompany().getName()
+                )
+
+                .categoryIds(
+                        product.getCategories()
+                                .stream()
+                                .map(category -> category.getId())
+                                .collect(
+                                        java.util.stream.Collectors.toSet()
+                                )
+                )
+
+                .categories(
+                        product.getCategories()
+                                .stream()
+                                .map(category -> category.getName())
+                                .collect(
+                                        java.util.stream.Collectors.toSet()
+                                )
+                )
+
+                .therapeuticAreaIds(
+                        product.getTherapeuticAreas()
+                                .stream()
+                                .map(area -> area.getId())
+                                .collect(
+                                        java.util.stream.Collectors.toSet()
+                                )
+                )
+
+                .therapeuticAreas(
+                        product.getTherapeuticAreas()
+                                .stream()
+                                .map(area -> area.getName())
+                                .collect(
+                                        java.util.stream.Collectors.toSet()
+                                )
+                )
+
+                .images(
+                        product.getImages()
+                                .stream()
+                                .map(image ->
+                                        com.ttesicg.sante.dto.ProductImageResponse
+                                                .builder()
+                                                .id(image.getId())
+                                                .imageUrl(image.getImageUrl())
+                                                .build()
+                                )
+                                .toList()
+                )
+
+                .build();
+    }
+}
+
+
+==================================================
+FICHIER : ttes-icg-sante\src\main\java\com\ttesicg\sante\controller\AdminCompanyController.java
+==================================================
+package com.ttesicg.sante.controller;
+
+import com.ttesicg.sante.dto.CompanyRequest;
+import com.ttesicg.sante.dto.CompanyResponse;
+import com.ttesicg.sante.service.CompanyService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+
+@RestController
+@RequestMapping("/api/admin/companies")
+@RequiredArgsConstructor
+public class AdminCompanyController {
+
+
+    private final CompanyService companyService;
+
+
+
+    @PostMapping
+    public CompanyResponse create(
+            @Valid @RequestBody CompanyRequest request
+    ){
+        System.out.println("yoooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+        return companyService.create(request);
+    }
+
+
+    @PutMapping("/{id}")
+    public CompanyResponse update(
+            @PathVariable Long id,
+            @Valid @RequestBody CompanyRequest request
+    ){
+        return companyService.update(id, request);
+    }
+
+    @GetMapping
+    public List<CompanyResponse> findAll(){
+
+        return companyService.findAll();
+    }
+
+
+
+    @GetMapping("/{id}")
+    public CompanyResponse findById(
+            @PathVariable Long id
+    ){
+
+        return companyService.findById(id);
+    }
+
+
+
+    @DeleteMapping("/{id}")
+    public void delete(
+            @PathVariable Long id
+    ){
+
+        companyService.delete(id);
+    }
+}
+
+
+==================================================
+FICHIER : ttes-icg-sante\src\main\java\com\ttesicg\sante\controller\CompanyController.java
+==================================================
+package com.ttesicg.sante.controller;
+
+import com.ttesicg.sante.dto.CompanyResponse;
+import com.ttesicg.sante.dto.ProductResponse;
+import com.ttesicg.sante.service.CompanyService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/companies")
+@RequiredArgsConstructor
+public class CompanyController {
+
+    private final CompanyService companyService;
+
+
+    // =========================================================
+    // LISTE DES ENTREPRISES
+    // =========================================================
+
+    @GetMapping
+    public List<CompanyResponse> findAll() {
+
+        return companyService.findAll();
+    }
+
+
+    // =========================================================
+    // DETAIL D'UNE ENTREPRISE
+    // =========================================================
+
+    @GetMapping("/{id}")
+    public CompanyResponse findById(
+            @PathVariable Long id
+    ) {
+
+        return companyService.findById(id);
+    }
+
+
+    // =========================================================
+    // PRODUITS D'UNE ENTREPRISE
+    // =========================================================
+
+    @GetMapping("/{id}/products")
+    public List<ProductResponse> findProducts(
+            @PathVariable Long id
+    ) {
+
+        return companyService.findProducts(id);
+    }
+}
+
+
+==================================================
+FICHIER : ttes-icg-sante-frontend\src\app\core\interfaces\company-request.interface.ts
+==================================================
+export interface CompanyRequest {
+
+    name: string;
+
+    description?: string;
+
+    country?: string;
+
+    website?: string;
+
+}
+
+
+==================================================
+FICHIER : ttes-icg-sante-frontend\src\app\core\interfaces\company-response.interface.ts
+==================================================
+export interface CompanyResponse {
+    id: number;
+    name: string;
+    description: string;
+    country: string;
+    website: string;
+}
+
+
+==================================================
+FICHIER : ttes-icg-sante-frontend\src\app\core\services\company.service.ts
+==================================================
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+import { CompanyResponse } from '../interfaces/company-response.interface';
+import { ProductResponse } from '../interfaces/product-response.interface';
+
+@Injectable({
+    providedIn: 'root'
+})
+export class CompanyService {
+
+    private http = inject(HttpClient);
+
+    private readonly API_URL =
+        '/api/companies';
+
+
+    // =====================================================
+    // LISTE DES ENTREPRISES
+    // =====================================================
+
+    getCompanies(): Observable<CompanyResponse[]> {
+
+        return this.http.get<CompanyResponse[]>(
+            this.API_URL
+        );
+
+    }
+
+
+    // =====================================================
+    // DETAIL ENTREPRISE
+    // =====================================================
+
+    getCompany(
+        companyId: number
+    ): Observable<CompanyResponse> {
+
+        return this.http.get<CompanyResponse>(
+            `${this.API_URL}/${companyId}`
+        );
+
+    }
+
+
+    // =====================================================
+    // PRODUITS DE L'ENTREPRISE
+    // =====================================================
+
+    getCompanyProducts(
+        companyId: number
+    ): Observable<ProductResponse[]> {
+
+        return this.http.get<ProductResponse[]>(
+            `${this.API_URL}/${companyId}/products`
+        );
+
+    }
+
+}
+
+
+==================================================
+FICHIER : ttes-icg-sante-frontend\src\app\pages\admin\companies\company-form\company-form.component.ts
+==================================================
+import {
+    Component,
+    OnInit,
+    inject
+} from '@angular/core';
+
+import { CommonModule } from '@angular/common';
+
+import {
+    FormBuilder,
+    ReactiveFormsModule,
+    Validators
+} from '@angular/forms';
+
+import {
+    ActivatedRoute,
+    Router
+} from '@angular/router';
+
+import { AdminService } from '../../../../core/services/admin.service';
+
+import { CompanyRequest } from '../../../../core/interfaces/company-request.interface';
+
+@Component({
+    selector: 'app-company-form',
+    standalone: true,
+    imports: [
+        CommonModule,
+        ReactiveFormsModule
+    ],
+    templateUrl: './company-form.component.html'
+})
+export class CompanyFormComponent implements OnInit {
+
+    private fb = inject(FormBuilder);
+
+    private adminService = inject(AdminService);
+
+    private route = inject(ActivatedRoute);
+
+    private router = inject(Router);
+
+    companyId?: number;
+
+    editMode = false;
+
+    loading = false;
+
+    successMessage = '';
+
+    errorMessage = '';
+
+    companyForm = this.fb.group({
+
+        name: ['', Validators.required],
+
+        description: [''],
+
+        country: [''],
+
+        website: ['']
+
+    });
+
+    ngOnInit(): void {
+
+        const id =
+            this.route.snapshot.paramMap.get('id');
+
+        if (id) {
+
+            this.companyId = Number(id);
+
+            this.editMode = true;
+
+            this.loadCompany();
+
+        }
+
+    }
+
+    loadCompany(): void {
+
+        if (!this.companyId) {
+            return;
+        }
+
+        this.loading = true;
+
+        this.adminService
+            .getCompany(this.companyId)
+            .subscribe({
+
+                next: company => {
+
+                    this.companyForm.patchValue({
+
+                        name: company.name,
+
+                        description: company.description,
+
+                        country: company.country,
+
+                        website: company.website
+
+                    });
+
+                    this.loading = false;
+
+                },
+
+                error: err => {
+
+                    console.error(err);
+
+                    this.errorMessage =
+                        'Impossible de charger l’entreprise.';
+
+                    this.loading = false;
+
+                }
+
+            });
+
+    }
+
+    submit(): void {
+
+        if (this.companyForm.invalid) {
+
+            this.companyForm.markAllAsTouched();
+
+            return;
+
+        }
+
+        this.loading = true;
+
+        const request =
+            this.companyForm.getRawValue() as CompanyRequest;
+
+        if (this.editMode && this.companyId) {
+
+            this.adminService
+                .updateCompany(
+                    this.companyId,
+                    request
+                )
+                .subscribe({
+
+                    next: () => {
+
+                        this.router.navigate([
+                            '/admin/companies'
+                        ]);
+
+                    },
+
+                    error: err => {
+
+                        console.error(err);
+
+                        this.loading = false;
+
+                    }
+
+                });
+
+        } else {
+
+            this.adminService
+                .createCompany(request)
+                .subscribe({
+
+                    next: () => {
+
+                        this.router.navigate([
+                            '/admin/companies'
+                        ]);
+
+                    },
+
+                    error: err => {
+
+                        console.error(err);
+
+                        this.loading = false;
+
+                    }
+
+                });
+
+        }
+
+    }
+
+}
+
+
+==================================================
+FICHIER : ttes-icg-sante-frontend\src\app\pages\admin\companies\company-form\company-form.component.html
+==================================================
+<div
+        class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+
+    <div class="mb-6">
+
+        <h3
+                class="text-lg font-semibold text-gray-800 dark:text-white/90">
+
+            @if(editMode){
+                Modifier une entreprise
+            } @else {
+                Nouvelle entreprise
+            }
+
+        </h3>
+
+    </div>
+
+    <form
+            [formGroup]="companyForm"
+            (ngSubmit)="submit()"
+            class="space-y-6">
+
+        <div>
+
+            <label class="mb-2 block text-sm font-medium">
+
+                Nom
+
+            </label>
+
+            <input
+                    type="text"
+                    formControlName="name"
+                    class="h-11 w-full rounded-lg border border-gray-300 px-4">
+
+        </div>
+
+        <div>
+
+            <label class="mb-2 block text-sm font-medium">
+
+                Pays
+
+            </label>
+
+            <input
+                    type="text"
+                    formControlName="country"
+                    class="h-11 w-full rounded-lg border border-gray-300 px-4">
+
+        </div>
+
+        <div>
+
+            <label class="mb-2 block text-sm font-medium">
+
+                Site Web
+
+            </label>
+
+            <input
+                    type="text"
+                    formControlName="website"
+                    class="h-11 w-full rounded-lg border border-gray-300 px-4">
+
+        </div>
+
+        <div>
+
+            <label class="mb-2 block text-sm font-medium">
+
+                Description
+
+            </label>
+
+            <textarea
+                    rows="5"
+                    formControlName="description"
+                    class="w-full rounded-lg border border-gray-300 px-4 py-3">
+            </textarea>
+
+        </div>
+
+        <div
+                class="flex justify-end gap-3 border-t border-gray-200 pt-5">
+
+            <button
+                    type="submit"
+                    [disabled]="loading"
+                    class="rounded-lg bg-brand-500 px-5 py-2.5 text-white">
+
+                @if(loading){
+
+                    Enregistrement...
+
+                } @else {
+
+                    @if(editMode){
+                        Mettre à jour
+                    } @else {
+                        Créer
+                    }
+
+                }
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>

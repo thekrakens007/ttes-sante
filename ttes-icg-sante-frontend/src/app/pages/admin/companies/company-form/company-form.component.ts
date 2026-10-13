@@ -1,3 +1,4 @@
+
 import {
     Component,
     OnInit,
@@ -18,8 +19,8 @@ import {
 } from '@angular/router';
 
 import { AdminService } from '../../../../core/services/admin.service';
-
 import { CompanyRequest } from '../../../../core/interfaces/company-request.interface';
+import { CompanyCategoryResponse } from '../../../../core/interfaces/company-category-response.interface';
 
 @Component({
     selector: 'app-company-form',
@@ -33,105 +34,94 @@ import { CompanyRequest } from '../../../../core/interfaces/company-request.inte
 export class CompanyFormComponent implements OnInit {
 
     private fb = inject(FormBuilder);
-
     private adminService = inject(AdminService);
-
     private route = inject(ActivatedRoute);
-
-    private router = inject(Router);
+    readonly router = inject(Router);
 
     companyId?: number;
-
     editMode = false;
-
     loading = false;
+    loadingCategories = false;
 
     successMessage = '';
-
     errorMessage = '';
 
+    categories: CompanyCategoryResponse[] = [];
+
     companyForm = this.fb.group({
-
-        name: ['', Validators.required],
-
+        name: ['', [Validators.required, Validators.maxLength(255)]],
         description: [''],
-
         country: [''],
-
-        website: ['']
-
+        website: [''],
+        logoUrl: [''],
+        categoryId: this.fb.control<number | null>(null)
     });
 
     ngOnInit(): void {
+        this.loadCategories();
 
-        const id =
-            this.route.snapshot.paramMap.get('id');
+        const id = this.route.snapshot.paramMap.get('id');
 
         if (id) {
-
             this.companyId = Number(id);
-
             this.editMode = true;
-
             this.loadCompany();
-
         }
+    }
 
+    loadCategories(): void {
+        this.loadingCategories = true;
+
+        this.adminService.getCompanyCategories().subscribe({
+            next: categories => {
+                this.categories = categories;
+                this.loadingCategories = false;
+            },
+            error: err => {
+                console.error('Erreur de chargement des catégories :', err);
+                this.errorMessage =
+                    'Impossible de charger les catégories d’entreprises.';
+                this.loadingCategories = false;
+            }
+        });
     }
 
     loadCompany(): void {
-
         if (!this.companyId) {
             return;
         }
 
         this.loading = true;
 
-        this.adminService
-            .getCompany(this.companyId)
-            .subscribe({
+        this.adminService.getCompany(this.companyId).subscribe({
+            next: company => {
+                this.companyForm.patchValue({
+                    name: company.name ?? '',
+                    description: company.description ?? '',
+                    country: company.country ?? '',
+                    website: company.website ?? '',
+                    logoUrl: company.logoUrl ?? '',
+                    categoryId: company.categoryId ?? null
+                });
 
-                next: company => {
-
-                    this.companyForm.patchValue({
-
-                        name: company.name,
-
-                        description: company.description,
-
-                        country: company.country,
-
-                        website: company.website
-
-                    });
-
-                    this.loading = false;
-
-                },
-
-                error: err => {
-
-                    console.error(err);
-
-                    this.errorMessage =
-                        'Impossible de charger l’entreprise.';
-
-                    this.loading = false;
-
-                }
-
-            });
-
+                this.loading = false;
+            },
+            error: err => {
+                console.error(err);
+                this.errorMessage =
+                    'Impossible de charger l’entreprise.';
+                this.loading = false;
+            }
+        });
     }
 
     submit(): void {
+        this.errorMessage = '';
+        this.successMessage = '';
 
         if (this.companyForm.invalid) {
-
             this.companyForm.markAllAsTouched();
-
             return;
-
         }
 
         this.loading = true;
@@ -139,59 +129,23 @@ export class CompanyFormComponent implements OnInit {
         const request =
             this.companyForm.getRawValue() as CompanyRequest;
 
-        if (this.editMode && this.companyId) {
+        const operation = this.editMode && this.companyId
+            ? this.adminService.updateCompany(this.companyId, request)
+            : this.adminService.createCompany(request);
 
-            this.adminService
-                .updateCompany(
-                    this.companyId,
-                    request
-                )
-                .subscribe({
+        operation.subscribe({
+            next: () => {
+                this.router.navigate(['/admin/companies']);
+            },
+            error: err => {
+                console.error('Erreur d’enregistrement :', err);
 
-                    next: () => {
+                this.errorMessage =
+                    err?.error?.message ||
+                    'Impossible d’enregistrer cette entreprise.';
 
-                        this.router.navigate([
-                            '/admin/companies'
-                        ]);
-
-                    },
-
-                    error: err => {
-
-                        console.error(err);
-
-                        this.loading = false;
-
-                    }
-
-                });
-
-        } else {
-
-            this.adminService
-                .createCompany(request)
-                .subscribe({
-
-                    next: () => {
-
-                        this.router.navigate([
-                            '/admin/companies'
-                        ]);
-
-                    },
-
-                    error: err => {
-
-                        console.error(err);
-
-                        this.loading = false;
-
-                    }
-
-                });
-
-        }
-
+                this.loading = false;
+            }
+        });
     }
-
 }

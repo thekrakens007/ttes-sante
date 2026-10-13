@@ -1,0 +1,2 @@
+ALTER TABLE products
+    ALTER COLUMN dosage TYPE VARCHAR(1000);

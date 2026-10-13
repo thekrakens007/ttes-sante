@@ -74,7 +74,7 @@ public class Product {
 
 
 
-    @Column(length = 100)
+    @Column(length = 1000)
     private String dosage;
 
     @Column(

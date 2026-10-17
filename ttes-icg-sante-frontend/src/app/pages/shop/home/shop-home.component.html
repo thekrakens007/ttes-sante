@@ -642,170 +642,98 @@
 
     </section>
 
-    <!-- PRODUITS PHYTOSCIENCE -->
-    <section class="bg-white py-12 sm:py-20 dark:bg-gray-950">
+   
+<!-- PRODUITS PHYTOSCIENCE -->
+<section class="bg-white py-12 sm:py-20 dark:bg-gray-950">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-3xl text-center">
+            <span class="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-orange-500">
+                GAMME PHYTOSCIENCE
+            </span>
 
-            <div class="mx-auto max-w-3xl text-center">
+            <h2 class="mt-2 sm:mt-3 text-2xl sm:text-4xl font-extrabold">
+                Les produits à base d'extraits végétaux
+            </h2>
 
-                <span class="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-orange-500">
-                    GAMME PHYTOSCIENCE
-                </span>
+            <p class="mt-4 sm:mt-5 text-sm sm:text-base leading-7 sm:leading-8 text-gray-600 dark:text-gray-400">
+                Découvrez les produits disponibles dans notre catalogue.
+            </p>
+        </div>
 
-                <h2 class="mt-2 sm:mt-3 text-2xl sm:text-4xl font-extrabold">
-                    Les produits à base d'extraits végétaux
-                </h2>
+        <!-- Produits chargés depuis l'API -->
+        <div class="mt-8 sm:mt-12 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
 
-                <p class="mt-4 sm:mt-5 text-sm sm:text-base leading-7 sm:leading-8 text-gray-600 dark:text-gray-400">
-                    Découvrez les produits présentés dans la gamme PhytoScience.
-                </p>
-
-            </div>
-
-            <div class="mt-8 sm:mt-12 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-
-                <!-- DOUBLE STEMCELL -->
-                <article class="group overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900 flex flex-col justify-between">
+            @for (product of filteredProducts.slice(0, 8); track product.id) {
+                <article
+                    class="group flex flex-col justify-between overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900">
 
                     <div>
-                        <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=600&q=80"
-                             alt="Pomme et raisin - Double Stemcell"
-                             class="h-48 w-full object-cover">
+                        <!-- Image réelle provenant du produit en base -->
+                        <div class="flex h-56 items-center justify-center overflow-hidden bg-white p-4 dark:bg-gray-800">
+                            <img
+                                [src]="getMainImage(product)"
+                                [alt]="product.name"
+                                (error)="onProductImageError($event)"
+                                loading="lazy"
+                                class="h-full w-full object-contain transition duration-300 group-hover:scale-105">
+                        </div>
 
                         <div class="p-6">
-                            <div class="text-4xl mb-3">🍏🍇</div>
-
-                            <span class="text-xs font-bold uppercase tracking-wider text-green-600">
-                                The Origin of Stem Cells™
+                            <span class="text-xs font-bold uppercase tracking-wider text-green-600 dark:text-green-400">
+                                {{ product.companyName || 'Gamme PhytoScience' }}
                             </span>
 
                             <h3 class="mt-2 text-lg font-extrabold">
-                                DOUBLE STEMCELL™
+                                {{ product.name }}
                             </h3>
 
-                            <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">
-                                Produit présenté avec des extraits de pomme et de raisin. Consultez la fiche détaillée pour connaître sa composition exacte et ses conditions d'utilisation.
+                            <p class="mt-2 line-clamp-3 text-sm leading-6 text-gray-600 dark:text-gray-400">
+                                {{ product.description || 'Consultez la fiche du produit pour découvrir ses caractéristiques.' }}
                             </p>
+
+                            @if (product.price != null) {
+                                <p class="mt-4 text-lg font-extrabold text-green-700 dark:text-green-400">
+                                    {{ product.price | number:'1.0-0' }} FCFA
+                                </p>
+                            }
                         </div>
                     </div>
 
                     <div class="px-6 pb-6">
-                        <a routerLink="/products"
-                           class="mt-5 inline-flex justify-center w-full rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-800">
-                            Commander →
+                        <a
+                            routerLink="/products"
+                            class="inline-flex w-full items-center justify-center rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-800">
+                            Découvrir le produit →
                         </a>
                     </div>
 
                 </article>
-
-                <!-- CRYSTAL CELL -->
-                <article class="group overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900 flex flex-col justify-between">
-
-                    <div>
-                        <img src="https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&q=80"
-                             alt="Tomates - Crystal Cell"
-                             class="h-48 w-full object-cover">
-
-                        <div class="p-6">
-                            <div class="text-4xl mb-3">💎🍅</div>
-
-                            <span class="text-xs font-bold uppercase tracking-wider text-green-600">
-                                Formule à base d'extraits végétaux
-                            </span>
-
-                            <h3 class="mt-2 text-lg font-extrabold">
-                                CRYSTAL CELL™
-                            </h3>
-
-                            <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">
-                                Produit présenté dans la gamme PhytoScience. Consultez sa fiche pour découvrir sa composition, son usage prévu et les précautions éventuelles.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="px-6 pb-6">
-                        <a routerLink="/products"
-                           class="mt-5 inline-flex justify-center w-full rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-800">
-                            Commander →
-                        </a>
-                    </div>
-
-                </article>
-
-                <!-- SNOWPHYLLFORTE -->
-                <article class="group overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900 flex flex-col justify-between">
-
-                    <div>
-                        <img src="https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=600&q=80"
-                             alt="Végétation - SnowphyllForte"
-                             class="h-48 w-full object-cover">
-
-                        <div class="p-6">
-                            <div class="text-4xl mb-3">🌿❄️</div>
-
-                            <span class="text-xs font-bold uppercase tracking-wider text-green-600">
-                                Snow Algae Chlorophyll
-                            </span>
-
-                            <h3 class="mt-2 text-lg font-extrabold">
-                                SNOWPHYLLFORTE™
-                            </h3>
-
-                            <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">
-                                Produit de la gamme PhytoScience. Retrouvez sur sa fiche les informations relatives à sa composition et à son utilisation.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="px-6 pb-6">
-                        <a routerLink="/products"
-                           class="mt-5 inline-flex justify-center w-full rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-800">
-                            Commander →
-                        </a>
-                    </div>
-
-                </article>
-
-                <!-- ACTUALPLUS & TRIPLE STEMCELL -->
-                <article class="group overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900 flex flex-col justify-between">
-
-                    <div>
-                        <img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&q=80"
-                             alt="Produits de soin - ActualPlus"
-                             class="h-48 w-full object-cover">
-
-                        <div class="p-6">
-                            <div class="text-4xl mb-3">✨🧪</div>
-
-                            <span class="text-xs font-bold uppercase tracking-wider text-green-600">
-                                Gamme de produits
-                            </span>
-
-                            <h3 class="mt-2 text-lg font-extrabold">
-                                ACTUALPLUS™ & TRIPLE STEM
-                            </h3>
-
-                            <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">
-                                Découvrez les caractéristiques, la composition et les recommandations d'utilisation de ces produits sur leurs fiches détaillées.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="px-6 pb-6">
-                        <a routerLink="/products"
-                           class="mt-5 inline-flex justify-center w-full rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-800">
-                            Commander →
-                        </a>
-                    </div>
-
-                </article>
-
-            </div>
+            } @empty {
+                <div class="col-span-full rounded-2xl border border-dashed border-gray-300 p-8 text-center dark:border-gray-700">
+                    <p class="font-semibold text-gray-700 dark:text-gray-200">
+                        Aucun produit disponible pour le moment.
+                    </p>
+                    <a
+                        routerLink="/products"
+                        class="mt-4 inline-flex rounded-xl bg-green-700 px-5 py-3 text-sm font-bold text-white hover:bg-green-800">
+                        Voir tous les produits
+                    </a>
+                </div>
+            }
 
         </div>
 
-    </section>
+        <div class="mt-8 text-center">
+            <a
+                routerLink="/products"
+                class="inline-flex items-center justify-center rounded-xl border border-green-700 px-6 py-3 text-sm font-bold text-green-700 transition hover:bg-green-700 hover:text-white dark:border-green-500 dark:text-green-400">
+                Voir tous les produits →
+            </a>
+        </div>
+
+    </div>
+</section>
 
     <!-- TÉMOIGNAGES -->
     <section class="bg-gray-100 py-12 sm:py-20 dark:bg-gray-900">

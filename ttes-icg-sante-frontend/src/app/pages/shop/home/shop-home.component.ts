@@ -265,6 +265,15 @@ export class ShopHomeComponent implements OnInit {
         }
     }
 
+onProductImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    const fallback = '/images/products/default-product.png';
+
+    if (!img.src.endsWith(fallback)) {
+        img.src = fallback;
+    }
+}
+
     // ===================== GLOBAL SEARCH =====================
 
     /**

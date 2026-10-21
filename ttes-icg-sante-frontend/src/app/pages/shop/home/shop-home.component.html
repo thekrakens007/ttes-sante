@@ -651,68 +651,76 @@
                 </p>
             </div>
 
-            <!-- Produits chargés depuis l'API -->
-            <div class="mt-8 sm:mt-12 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+           <!-- Produits des trois entreprises -->
+<div class="mt-8 sm:mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
 
-                @for (product of filteredProducts.slice(0, 8); track product.id) {
-                <article
-                        class="group flex flex-col justify-between overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900">
+    @for (
+        product of filteredProducts.filter(product => {
+            const company = (product.companyName || '').trim().toLowerCase();
 
-                    <div>
-                        <!-- Image réelle provenant du produit en base -->
-                        <div class="flex h-56 items-center justify-center overflow-hidden bg-white p-4 dark:bg-gray-800">
-                            <img
-                                    [src]="getMainImage(product)"
-                                    [alt]="product.name"
-                                    (error)="onProductImageError($event)"
-                                    loading="lazy"
-                                    class="h-full w-full object-contain transition duration-300 group-hover:scale-105">
-                        </div>
+            return company === 'das group cameroun'
+                || company === 'tiens cameroun'
+                || company === 'dynace global cameroun';
+        }).slice(0, 8);
+        track product.id
+    ) {
+        <!-- Conserve ici ton article complet actuel -->
+        <article
+            class="group flex flex-col justify-between overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900">
 
-                        <div class="p-6">
-                            <span class="text-xs font-bold uppercase tracking-wider text-green-600 dark:text-green-400">
-                                {{ product.companyName || 'Gamme PhytoScience' }}
-                            </span>
-
-                            <h3 class="mt-2 text-lg font-extrabold">
-                                {{ product.name }}
-                            </h3>
-
-                            <p class="mt-2 line-clamp-3 text-sm leading-6 text-gray-600 dark:text-gray-400">
-                                {{ product.description || 'Consultez la fiche du produit pour découvrir ses caractéristiques.' }}
-                            </p>
-
-                            @if (product.price != null) {
-                            <p class="mt-4 text-lg font-extrabold text-green-700 dark:text-green-400">
-                                {{ product.price | number:'1.0-0' }} FCFA
-                            </p>
-                            }
-                        </div>
-                    </div>
-
-                    <div class="px-6 pb-6">
-                        <a
-                                routerLink="/products"
-                                class="inline-flex w-full items-center justify-center rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-800">
-                            Découvrir le produit →
-                        </a>
-                    </div>
-
-                </article>
-                } @empty {
-                <div class="col-span-full rounded-2xl border border-dashed border-gray-300 p-8 text-center dark:border-gray-700">
-                    <p class="font-semibold text-gray-700 dark:text-gray-200">
-                        Aucun produit disponible pour le moment.
-                    </p>
-                    <a
-                            routerLink="/products"
-                            class="mt-4 inline-flex rounded-xl bg-green-700 px-5 py-3 text-sm font-bold text-white hover:bg-green-800">
-                        Voir tous les produits
-                    </a>
+            <div>
+                <div class="flex h-56 items-center justify-center overflow-hidden bg-white p-4 dark:bg-gray-800">
+                    <img
+                        [src]="getMainImage(product)"
+                        [alt]="product.name"
+                        (error)="onProductImageError($event)"
+                        loading="lazy"
+                        class="h-full w-full object-contain transition duration-300 group-hover:scale-105">
                 </div>
-                }
 
+                <div class="p-6">
+                    <span class="text-xs font-bold uppercase tracking-wider text-green-600 dark:text-green-400">
+                        {{ product.companyName }}
+                    </span>
+
+                    <h3 class="mt-2 text-lg font-extrabold">
+                        {{ product.name }}
+                    </h3>
+
+                    <p class="mt-2 line-clamp-3 text-sm leading-6 text-gray-600 dark:text-gray-400">
+                        {{ product.description || 'Consultez la fiche du produit pour découvrir ses caractéristiques.' }}
+                    </p>
+
+                    @if (product.price != null) {
+                        <p class="mt-4 text-lg font-extrabold text-green-700 dark:text-green-400">
+                            {{ product.price | number:'1.0-0' }} FCFA
+                        </p>
+                    }
+                </div>
             </div>
+
+            <div class="px-6 pb-6">
+                <a
+                    routerLink="/products"
+                    class="inline-flex w-full items-center justify-center rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-800">
+                    Découvrir le produit →
+                </a>
+            </div>
+        </article>
+    } @empty {
+        <div class="col-span-full rounded-2xl border border-dashed border-gray-300 p-8 text-center dark:border-gray-700">
+            <p class="font-semibold text-gray-700 dark:text-gray-200">
+                Aucun produit de ces trois entreprises n'est disponible sur cette page.
+            </p>
+            <a
+                routerLink="/products"
+                class="mt-4 inline-flex rounded-xl bg-green-700 px-5 py-3 text-sm font-bold text-white hover:bg-green-800">
+                Voir tous les produits
+            </a>
+        </div>
+    }
+
+</div>
 
             <div class="mt-8 text-center">
                 <a

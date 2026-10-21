@@ -343,44 +343,48 @@
                        [queryParams]="{ categoryId: category.id }"
                        class="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-green-500 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-green-500 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-green-600">
 
-                        <!-- Image de la catégorie -->
-                        <div class="relative h-52 overflow-hidden bg-green-50 dark:bg-gray-800">
+                        
+<!-- IMAGE DE LA CATÉGORIE -->
+<div class="relative h-52 overflow-hidden bg-green-50 dark:bg-gray-800">
 
-                            @if (
-                                category.name.toLowerCase().includes('cellul') ||
-                                category.name.toLowerCase().includes('thérap') ||
-                                category.name.toLowerCase().includes('therap')
-                            ) {
-                                <img
-                                    src="https://www.simplyscience.ch/fileadmin/_processed_/d/0/csm_5_Stammzelle_canstockphoto_17796871_angepasst-FR_aa81df3c27.jpg"
-                                    alt="Thérapie cellulaire et cellules souches"
-                                    loading="lazy"
-                                    class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                                />
-                            }
+    @if (
+        category.name.toLowerCase().includes('cellul') ||
+        category.name.toLowerCase().includes('thérap') ||
+        category.name.toLowerCase().includes('therap')
+    ) {
+        <img
+            src="https://www.simplyscience.ch/fileadmin/_processed_/d/0/csm_5_Stammzelle_canstockphoto_17796871_angepasst-FR_aa81df3c27.jpg"
+            alt="Thérapie cellulaire et cellules souches"
+            loading="lazy"
+            class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        />
+    } @else if (
+        category.name.toLowerCase().includes('complément') ||
+        category.name.toLowerCase().includes('complement') ||
+        category.name.toLowerCase().includes('alimentaire') ||
+        category.name.toLowerCase().includes('nutrition')
+    ) {
+        <img
+            src="https://www.federationdesdiabetiques.org/public/content/1/img/complements_alimentaires.png"
+            alt="Compléments alimentaires"
+            loading="lazy"
+            class="h-full w-full object-contain p-3 transition duration-500 group-hover:scale-105"
+        />
+    } @else {
+        <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-green-100 to-green-50 dark:from-green-950 dark:to-gray-800">
+            <span class="text-6xl transition-transform duration-300 group-hover:scale-110" aria-hidden="true">
+                🏢
+            </span>
+        </div>
+    }
 
-                            @else if (
-                                category.name.toLowerCase().includes('complément') ||
-                                category.name.toLowerCase().includes('complement') ||
-                                category.name.toLowerCase().includes('alimentaire') ||
-                                category.name.toLowerCase().includes('nutrition')
-                            ) {
-                                <img
-                                    src="https://www.federationdesdiabetiques.org/public/content/1/img/complements_alimentaires.png"
-                                    alt="Compléments alimentaires"
-                                    loading="lazy"
-                                    class="h-full w-full object-contain p-3 transition duration-500 group-hover:scale-105"
-                                />
-                            }
+    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 pt-12">
+        <span class="inline-flex rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-green-900 shadow">
+            Découvrir la catégorie
+        </span>
+    </div>
 
-                            @else {
-                                <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-green-100 to-green-50 dark:from-green-950 dark:to-gray-800">
-                                    <span class="text-6xl transition-transform duration-300 group-hover:scale-110"
-                                          aria-hidden="true">
-                                        🏢
-                                    </span>
-                                </div>
-                            }
+</div>
 
                             <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 pt-12">
                                 <span class="inline-flex rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-green-900 shadow">

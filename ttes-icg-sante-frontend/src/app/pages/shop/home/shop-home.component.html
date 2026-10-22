@@ -651,20 +651,10 @@
                 </p>
             </div>
 
-           <!-- Produits des trois entreprises -->
+          <!-- Produits des trois entreprises -->
 <div class="mt-8 sm:mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
 
-    @for (
-        product of filteredProducts.filter(product => {
-            const company = (product.companyName || '').trim().toLowerCase();
-
-            return company === 'das group cameroun'
-                || company === 'tiens cameroun'
-                || company === 'dynace global cameroun';
-        }).slice(0, 8);
-        track product.id
-    ) {
-        <!-- Conserve ici ton article complet actuel -->
+    @for (product of getFeaturedCompanyProducts(); track product.id) {
         <article
             class="group flex flex-col justify-between overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900">
 
@@ -712,6 +702,7 @@
             <p class="font-semibold text-gray-700 dark:text-gray-200">
                 Aucun produit de ces trois entreprises n'est disponible sur cette page.
             </p>
+
             <a
                 routerLink="/products"
                 class="mt-4 inline-flex rounded-xl bg-green-700 px-5 py-3 text-sm font-bold text-white hover:bg-green-800">
@@ -722,16 +713,13 @@
 
 </div>
 
-            <div class="mt-8 text-center">
-                <a
-                        routerLink="/products"
-                        class="inline-flex items-center justify-center rounded-xl border border-green-700 px-6 py-3 text-sm font-bold text-green-700 transition hover:bg-green-700 hover:text-white dark:border-green-500 dark:text-green-400">
-                    Voir tous les produits →
-                </a>
-            </div>
-
-        </div>
-    </section>
+<div class="mt-8 text-center">
+    <a
+        routerLink="/products"
+        class="inline-flex items-center justify-center rounded-xl border border-green-700 px-6 py-3 text-sm font-bold text-green-700 transition hover:bg-green-700 hover:text-white dark:border-green-500 dark:text-green-400">
+        Voir tous les produits →
+    </a>
+</div>
 
 
 

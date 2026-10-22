@@ -654,7 +654,7 @@
           <!-- Produits des trois entreprises -->
 <div class="mt-8 sm:mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
 
-    @for (product of getFeaturedCompanyProducts(); track product.id) {
+    @for (product of featuredCompanyProducts; track product.id) {
         <article
             class="group flex flex-col justify-between overflow-hidden rounded-3xl border border-gray-200 bg-gray-50 shadow-md transition hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900">
 

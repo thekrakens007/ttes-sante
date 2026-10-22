@@ -473,83 +473,121 @@ export class ShopHomeComponent implements OnInit {
      * de page de 100. Si le backend impose une limite plus faible,
      * utiliser cette limite ou adapter le backend.
      */
-    loadFeaturedCompanyProducts(): void {
-        this.featuredCompanyProductsLoading = true;
-        this.featuredCompanyProductsError = '';
+   
+loadFeaturedCompanyProducts(): void {
+    this.featuredCompanyProductsLoading = true;
+    this.featuredCompanyProductsError = '';
 
-        const size = 100;
+    const pageSize = 100;
 
-        this.productService.getProductsPaginated(0, size).subscribe({
+    this.productService
+        .getProductsPaginated(0, pageSize)
+        .subscribe({
             next: (firstResponse) => {
-                const totalPages = firstResponse.totalPages ?? 0;
+                const totalPages = firstResponse.totalPages ?? 1;
+                const allProducts: Product[] = [
+                    ...(firstResponse.content ?? [])
+                ];
 
-                const otherPageRequests = Array.from(
-                    { length: Math.max(0, totalPages - 1) },
-                    (_, index) =>
-                        this.productService.getProductsPaginated(
-                            index + 1,
-                            size
-                        )
-                );
-
-                const requests = otherPageRequests.length > 0
-                    ? forkJoin(otherPageRequests)
-                    : [];
-
-                if (Array.isArray(requests)) {
-                    const allProducts = [
-                        ...(firstResponse.content ?? [])
-                    ];
-
-                    this.featuredCompanyProducts = this.filterFeaturedCompanyProducts(
-                        allProducts
-                    );
-
-                    this.featuredCompanyProductsLoading = false;
+                if (totalPages <= 1) {
+                    this.finishFeaturedCompanyProducts(allProducts);
                     return;
                 }
 
-                requests.subscribe({
+                const requests = Array.from(
+                    { length: totalPages - 1 },
+                    (_, index) =>
+                        this.productService.getProductsPaginated(
+                            index + 1,
+                            pageSize
+                        )
+                );
+
+                forkJoin(requests).subscribe({
                     next: (responses) => {
-                        const allProducts = [
-                            ...(firstResponse.content ?? []),
-                            ...responses.flatMap(
-                                response => response.content ?? []
-                            )
-                        ];
+                        for (const response of responses) {
+                            allProducts.push(
+                                ...(response.content ?? [])
+                            );
+                        }
 
-                        this.featuredCompanyProducts =
-                            this.filterFeaturedCompanyProducts(allProducts);
-
-                        this.featuredCompanyProductsLoading = false;
+                        this.finishFeaturedCompanyProducts(allProducts);
                     },
                     error: (error) => {
                         console.error(
-                            'Erreur lors du chargement des pages de produits',
+                            'Erreur de chargement des pages supplémentaires :',
                             error
                         );
 
-                        this.featuredCompanyProducts = [];
-                        this.featuredCompanyProductsError =
-                            'Impossible de charger les produits de ces entreprises.';
-                        this.featuredCompanyProductsLoading = false;
+                        // Au moins, afficher les produits de la première page.
+                        this.finishFeaturedCompanyProducts(allProducts);
                     }
                 });
             },
             error: (error) => {
                 console.error(
-                    'Erreur lors du chargement des produits des entreprises',
+                    'Erreur de chargement des produits :',
                     error
                 );
 
                 this.featuredCompanyProducts = [];
                 this.featuredCompanyProductsError =
-                    'Impossible de charger les produits de ces entreprises.';
+                    'Impossible de charger les produits.';
                 this.featuredCompanyProductsLoading = false;
             }
         });
+}
+
+private finishFeaturedCompanyProducts(products: Product[]): void {
+    const normalize = (value: string | null | undefined): string =>
+        (value ?? '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, ' ')
+            .trim();
+
+    const allowedCompanies = [
+        'das group cameroun',
+        'tiens cameroun',
+        'dynace global cameroun'
+    ];
+
+    const matchesCompany = (companyName: string | null | undefined): boolean => {
+        const company = normalize(companyName);
+
+        return allowedCompanies.some(name =>
+            company.includes(name) || name.includes(company)
+        ) && company.length > 0;
+    };
+
+    const uniqueProducts = new Map<number, Product>();
+
+    for (const product of products) {
+        if (
+            product.stock > 0 &&
+            matchesCompany(product.companyName)
+        ) {
+            uniqueProducts.set(product.id, product);
+        }
     }
 
+    this.featuredCompanyProducts = Array
+        .from(uniqueProducts.values())
+        .slice(0, 8);
+
+    this.featuredCompanyProductsLoading = false;
+
+    console.log(
+        'Produits des trois entreprises :',
+        this.featuredCompanyProducts
+    );
+
+    console.log(
+        'Noms des entreprises retournés par l’API :',
+        [...new Set(products.map(p => p.companyName))]
+    );
+}
     /**
      * Filtre les produits disponibles des trois entreprises,
      * en normalisant la casse et les espaces du nom d'entreprise.

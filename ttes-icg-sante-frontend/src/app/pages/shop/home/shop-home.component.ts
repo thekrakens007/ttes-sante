@@ -7,6 +7,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 
 import { ProductService } from '../../../core/services/product.service';
 import { Product } from '../../../core/models/product.model';
@@ -20,6 +21,7 @@ import { AuthService } from '../../../core/services/auth.service';
 
 import { BundleService } from '../../../core/services/bundle.service';
 import { BundleResponse } from '../../../core/interfaces/bundle-response.interface';
+
 import { CompanyCategoryService } from '../../../core/services/company-category.service';
 import { CompanyCategoryResponse } from '../../../core/interfaces/company-category-response.interface';
 
@@ -36,7 +38,7 @@ import { CompanyCategoryResponse } from '../../../core/interfaces/company-catego
 })
 export class ShopHomeComponent implements OnInit {
 
-    // ===================== PAGINATION =====================
+    // ===================== PAGINATION PRINCIPALE =====================
 
     currentPage = 0;
     pageSize = 8;
@@ -62,10 +64,21 @@ export class ShopHomeComponent implements OnInit {
 
     cart: CartResponse | null = null;
 
-    // ===================== PRODUCTS (API) =====================
+    // ===================== PRODUCTS =====================
 
     products: Product[] = [];
     filteredProducts: Product[] = [];
+
+    // Produits dédiés à la section des trois entreprises
+    featuredCompanyProducts: Product[] = [];
+    featuredCompanyProductsLoading = false;
+    featuredCompanyProductsError = '';
+
+    private readonly featuredCompanyNames = [
+        'das group cameroun',
+        'tiens cameroun',
+        'dynace global cameroun'
+    ];
 
     // ===================== BUNDLES =====================
 
@@ -90,7 +103,7 @@ export class ShopHomeComponent implements OnInit {
     loading = true;
     error = '';
 
-    // ===================== CONTENU STATIQUE DE LA PAGE D'ACCUEIL =====================
+    // ===================== PARTNERS =====================
 
     partners = [
         {
@@ -140,8 +153,10 @@ export class ShopHomeComponent implements OnInit {
             name: 'Dynace Global Cameroun',
             category: 'Bien-être',
             active: false
-        },
+        }
     ];
+
+    // ===================== REASSURANCE =====================
 
     reassurance = [
         {
@@ -163,8 +178,10 @@ export class ShopHomeComponent implements OnInit {
             i: '🔒',
             t: 'Paiement sécurisé',
             d: 'Commande simple depuis votre compte'
-        },
+        }
     ];
+
+    // ===================== STEPS =====================
 
     steps = [
         {
@@ -181,8 +198,10 @@ export class ShopHomeComponent implements OnInit {
             n: 3,
             t: 'Restez accompagné',
             d: 'Nous restons disponibles pour répondre à vos questions.'
-        },
+        }
     ];
+
+    // ===================== PACKS STATIQUES =====================
 
     packs = [
         {
@@ -199,8 +218,10 @@ export class ShopHomeComponent implements OnInit {
             t: 'Pack Famille',
             d: 'Plusieurs produits à partager, avec un meilleur prix.',
             img: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=85'
-        },
+        }
     ];
+
+    // ===================== PRODUITS STATIQUES =====================
 
     featuredProducts = [
         {
@@ -250,13 +271,20 @@ export class ShopHomeComponent implements OnInit {
             tag: 'Complément alimentaire',
             desc: 'Complément alimentaire. Voir la fiche pour la composition et le mode d\'emploi.',
             image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=900&q=85'
-        },
+        }
     ];
 
-    // ===================== INIT =====================
+    // ===================== COMPANY CATEGORIES =====================
+
+    companyCategories: CompanyCategoryResponse[] = [];
+    companyCategoriesLoading = false;
+    companyCategoriesError = '';
+
+    // ===================== INITIALISATION =====================
 
     ngOnInit(): void {
         this.loadProducts();
+        this.loadFeaturedCompanyProducts();
         this.loadBundles();
         this.loadCompanyCategories();
 
@@ -264,6 +292,8 @@ export class ShopHomeComponent implements OnInit {
             this.loadCart();
         }
     }
+
+    // ===================== IMAGE ERROR =====================
 
     onProductImageError(event: Event): void {
         const img = event.target as HTMLImageElement;
@@ -274,16 +304,8 @@ export class ShopHomeComponent implements OnInit {
         }
     }
 
-    // ===================== GLOBAL SEARCH =====================
+    // ===================== RECHERCHE GLOBALE =====================
 
-    /**
-     * Lance la recherche globale des produits et des packs.
-     *
-     * La recherche est déclenchée uniquement lorsque
-     * l'utilisateur valide le formulaire :
-     * - bouton 🔍
-     * - touche Entrée
-     */
     submitSearch(): void {
         const keyword = this.searchTerm?.trim();
 
@@ -298,7 +320,7 @@ export class ShopHomeComponent implements OnInit {
         });
     }
 
-    // ===================== MOBILE MENU =====================
+    // ===================== MENU MOBILE =====================
 
     toggleMobileMenu(): void {
         this.mobileMenuOpen = !this.mobileMenuOpen;
@@ -308,7 +330,7 @@ export class ShopHomeComponent implements OnInit {
         this.mobileMenuOpen = false;
     }
 
-    // ===================== BUNDLES =====================
+    // ===================== CHARGEMENT DES PACKS =====================
 
     loadBundles(): void {
         this.bundlesLoading = true;
@@ -319,7 +341,6 @@ export class ShopHomeComponent implements OnInit {
                 this.bundles = (bundles ?? []).slice(0, 4);
                 this.bundlesLoading = false;
             },
-
             error: (error) => {
                 console.error(
                     'Erreur lors du chargement des packs',
@@ -327,24 +348,18 @@ export class ShopHomeComponent implements OnInit {
                 );
 
                 this.bundles = [];
-                this.bundlesError =
-                    'Impossible de charger les packs.';
+                this.bundlesError = 'Impossible de charger les packs.';
                 this.bundlesLoading = false;
             }
         });
     }
 
     getBundleImage(bundle: BundleResponse): string {
-        if (
-            !bundle.images ||
-            bundle.images.length === 0
-        ) {
+        if (!bundle.images || bundle.images.length === 0) {
             return '/images/products/default-product.png';
         }
 
-        const mainImage = bundle.images.find(
-            image => image.main
-        );
+        const mainImage = bundle.images.find(image => image.main);
 
         return (
             mainImage?.imageUrl ||
@@ -358,13 +373,10 @@ export class ShopHomeComponent implements OnInit {
     }
 
     isBundleAvailable(bundle: BundleResponse): boolean {
-        return (
-            bundle.stock !== undefined &&
-            bundle.stock > 0
-        );
+        return bundle.stock !== undefined && bundle.stock > 0;
     }
 
-    // ===================== CART =====================
+    // ===================== PANIER =====================
 
     loadCart(): void {
         if (!this.isLoggedIn()) {
@@ -376,13 +388,8 @@ export class ShopHomeComponent implements OnInit {
             next: (cart) => {
                 this.cart = cart;
             },
-
             error: (error) => {
-                console.error(
-                    'Erreur chargement panier',
-                    error
-                );
-
+                console.error('Erreur chargement panier', error);
                 this.cart = null;
             }
         });
@@ -410,52 +417,35 @@ export class ShopHomeComponent implements OnInit {
         return item?.quantity ?? 0;
     }
 
-    // ===================== PRODUCTS =====================
+    // ===================== PRODUITS : PAGINATION PRINCIPALE =====================
 
     loadProducts(): void {
         this.loading = true;
         this.error = '';
 
         this.productService
-            .getProductsPaginated(
-                this.currentPage,
-                this.pageSize
-            )
+            .getProductsPaginated(this.currentPage, this.pageSize)
             .subscribe({
-
                 next: (response) => {
+                    this.products = (response.content ?? [])
+                        .filter(product => product.stock > 0);
 
-                    this.products =
-                        (response.content ?? [])
-                            .filter(
-                                product => product.stock > 0
-                            );
-
-                    this.totalPages =
-                        response.totalPages ?? 0;
-
-                    this.totalElements =
-                        response.totalElements ?? 0;
+                    this.totalPages = response.totalPages ?? 0;
+                    this.totalElements = response.totalElements ?? 0;
 
                     this.pages = Array.from(
-                        {
-                            length: this.totalPages
-                        },
+                        { length: this.totalPages },
                         (_, index) => index
                     );
 
                     this.buildFilters();
 
-                    this.filteredProducts =
-                        [...this.products];
-
+                    this.filteredProducts = [...this.products];
                     this.search();
 
                     this.loading = false;
                 },
-
                 error: (error) => {
-
                     console.error(
                         'Erreur lors du chargement des produits',
                         error
@@ -463,23 +453,135 @@ export class ShopHomeComponent implements OnInit {
 
                     this.products = [];
                     this.filteredProducts = [];
-
                     this.totalPages = 0;
                     this.totalElements = 0;
                     this.pages = [];
 
-                    this.error =
-                        'Impossible de charger les produits.';
-
+                    this.error = 'Impossible de charger les produits.';
                     this.loading = false;
                 }
             });
     }
 
+    // ===================== PRODUITS DES TROIS ENTREPRISES =====================
+
+    /**
+     * Charge les produits de toutes les pages de l'API indépendamment
+     * de la pagination principale de la page d'accueil.
+     *
+     * IMPORTANT : cette méthode suppose que l'API accepte une taille
+     * de page de 100. Si le backend impose une limite plus faible,
+     * utiliser cette limite ou adapter le backend.
+     */
+    loadFeaturedCompanyProducts(): void {
+        this.featuredCompanyProductsLoading = true;
+        this.featuredCompanyProductsError = '';
+
+        const size = 100;
+
+        this.productService.getProductsPaginated(0, size).subscribe({
+            next: (firstResponse) => {
+                const totalPages = firstResponse.totalPages ?? 0;
+
+                const otherPageRequests = Array.from(
+                    { length: Math.max(0, totalPages - 1) },
+                    (_, index) =>
+                        this.productService.getProductsPaginated(
+                            index + 1,
+                            size
+                        )
+                );
+
+                const requests = otherPageRequests.length > 0
+                    ? forkJoin(otherPageRequests)
+                    : [];
+
+                if (Array.isArray(requests)) {
+                    const allProducts = [
+                        ...(firstResponse.content ?? [])
+                    ];
+
+                    this.featuredCompanyProducts = this.filterFeaturedCompanyProducts(
+                        allProducts
+                    );
+
+                    this.featuredCompanyProductsLoading = false;
+                    return;
+                }
+
+                requests.subscribe({
+                    next: (responses) => {
+                        const allProducts = [
+                            ...(firstResponse.content ?? []),
+                            ...responses.flatMap(
+                                response => response.content ?? []
+                            )
+                        ];
+
+                        this.featuredCompanyProducts =
+                            this.filterFeaturedCompanyProducts(allProducts);
+
+                        this.featuredCompanyProductsLoading = false;
+                    },
+                    error: (error) => {
+                        console.error(
+                            'Erreur lors du chargement des pages de produits',
+                            error
+                        );
+
+                        this.featuredCompanyProducts = [];
+                        this.featuredCompanyProductsError =
+                            'Impossible de charger les produits de ces entreprises.';
+                        this.featuredCompanyProductsLoading = false;
+                    }
+                });
+            },
+            error: (error) => {
+                console.error(
+                    'Erreur lors du chargement des produits des entreprises',
+                    error
+                );
+
+                this.featuredCompanyProducts = [];
+                this.featuredCompanyProductsError =
+                    'Impossible de charger les produits de ces entreprises.';
+                this.featuredCompanyProductsLoading = false;
+            }
+        });
+    }
+
+    /**
+     * Filtre les produits disponibles des trois entreprises,
+     * en normalisant la casse et les espaces du nom d'entreprise.
+     */
+    private filterFeaturedCompanyProducts(products: Product[]): Product[] {
+        const seen = new Set<number>();
+
+        return products
+            .filter(product => {
+                const company = (product.companyName ?? '')
+                    .trim()
+                    .toLowerCase();
+
+                return (
+                    product.stock > 0 &&
+                    this.featuredCompanyNames.includes(company)
+                );
+            })
+            .filter(product => {
+                if (seen.has(product.id)) {
+                    return false;
+                }
+
+                seen.add(product.id);
+                return true;
+            })
+            .slice(0, 8);
+    }
+
     // ===================== PAGINATION =====================
 
     goToPage(page: number): void {
-
         if (
             page < 0 ||
             page >= this.totalPages ||
@@ -489,7 +591,6 @@ export class ShopHomeComponent implements OnInit {
         }
 
         this.currentPage = page;
-
         this.loadProducts();
 
         window.scrollTo({
@@ -499,13 +600,8 @@ export class ShopHomeComponent implements OnInit {
     }
 
     nextPage(): void {
-
-        if (
-            this.currentPage <
-            this.totalPages - 1
-        ) {
+        if (this.currentPage < this.totalPages - 1) {
             this.currentPage++;
-
             this.loadProducts();
 
             window.scrollTo({
@@ -516,11 +612,8 @@ export class ShopHomeComponent implements OnInit {
     }
 
     previousPage(): void {
-
         if (this.currentPage > 0) {
-
             this.currentPage--;
-
             this.loadProducts();
 
             window.scrollTo({
@@ -530,46 +623,27 @@ export class ShopHomeComponent implements OnInit {
         }
     }
 
-    // ===================== FILTERS =====================
+    // ===================== FILTRES =====================
 
     buildFilters(): void {
+        const categories = this.products.flatMap(
+            p => p.categories ?? []
+        );
 
-        const categories =
-            this.products.flatMap(
-                p => p.categories ?? []
-            );
+        const companies: string[] = this.products
+            .map(p => p.companyName)
+            .filter((value): value is string => !!value);
 
-        const companies: string[] =
-            this.products
-                .map(p => p.companyName)
-                .filter(
-                    (
-                        value
-                    ): value is string => !!value
-                );
+        const therapeuticAreas = this.products.flatMap(
+            p => p.therapeuticAreas ?? []
+        );
 
-        const therapeuticAreas =
-            this.products.flatMap(
-                p => p.therapeuticAreas ?? []
-            );
-
-        this.categories = [
-            ...new Set(categories)
-        ].sort();
-
-        this.companies = [
-            ...new Set(companies)
-        ].sort();
-
-        this.therapeuticAreas = [
-            ...new Set(therapeuticAreas)
-        ].sort();
+        this.categories = [...new Set(categories)].sort();
+        this.companies = [...new Set(companies)].sort();
+        this.therapeuticAreas = [...new Set(therapeuticAreas)].sort();
     }
-    // ===================== COMPANY CATEGORIES =====================
 
-    companyCategories: CompanyCategoryResponse[] = [];
-    companyCategoriesLoading = false;
-    companyCategoriesError = '';
+    // ===================== CATÉGORIES D'ENTREPRISES =====================
 
     loadCompanyCategories(): void {
         this.companyCategoriesLoading = true;
@@ -594,105 +668,65 @@ export class ShopHomeComponent implements OnInit {
         });
     }
 
-    /**
-     * Filtrage local des produits affichés
-     * sur la page d'accueil.
-     *
-     * Cette méthode est différente de submitSearch().
-     * - search() = filtrage local de la liste de l'accueil
-     * - submitSearch() = recherche globale produits + packs
-     */
+    // ===================== RECHERCHE ET FILTRAGE LOCAL =====================
+
     search(): void {
+        const term = this.searchTerm.trim().toLowerCase();
 
-        const term =
-            this.searchTerm
-                .trim()
-                .toLowerCase();
-
-        this.filteredProducts =
-            this.products.filter(product => {
-
-                const matchesSearch =
-                    !term ||
-                    product.name
-                        ?.toLowerCase()
-                        .includes(term) ||
-                    product.brand
-                        ?.toLowerCase()
-                        .includes(term) ||
-                    product.description
-                        ?.toLowerCase()
-                        .includes(term) ||
-                    product.categories
-                        ?.some(
-                            c =>
-                                c
-                                    .toLowerCase()
-                                    .includes(term)
-                        ) ||
-                    product.companyName
-                        ?.toLowerCase()
-                        .includes(term) ||
-                    product.therapeuticAreas
-                        ?.some(
-                            a =>
-                                a
-                                    .toLowerCase()
-                                    .includes(term)
-                        );
-
-                const matchesCategory =
-                    !this.selectedCategory ||
-                    product.categories?.includes(
-                        this.selectedCategory
-                    );
-
-                const matchesCompany =
-                    !this.selectedCompany ||
-                    product.companyName ===
-                    this.selectedCompany;
-
-                const matchesTherapeuticArea =
-                    !this.selectedTherapeuticArea ||
-                    product.therapeuticAreas?.includes(
-                        this.selectedTherapeuticArea
-                    );
-
-                return (
-                    matchesSearch &&
-                    matchesCategory &&
-                    matchesCompany &&
-                    matchesTherapeuticArea
+        this.filteredProducts = this.products.filter(product => {
+            const matchesSearch =
+                !term ||
+                product.name?.toLowerCase().includes(term) ||
+                product.brand?.toLowerCase().includes(term) ||
+                product.description?.toLowerCase().includes(term) ||
+                product.categories?.some(
+                    category => category.toLowerCase().includes(term)
+                ) ||
+                product.companyName?.toLowerCase().includes(term) ||
+                product.therapeuticAreas?.some(
+                    area => area.toLowerCase().includes(term)
                 );
-            });
+
+            const matchesCategory =
+                !this.selectedCategory ||
+                product.categories?.includes(this.selectedCategory);
+
+            const matchesCompany =
+                !this.selectedCompany ||
+                product.companyName === this.selectedCompany;
+
+            const matchesTherapeuticArea =
+                !this.selectedTherapeuticArea ||
+                product.therapeuticAreas?.includes(
+                    this.selectedTherapeuticArea
+                );
+
+            return (
+                matchesSearch &&
+                matchesCategory &&
+                matchesCompany &&
+                matchesTherapeuticArea
+            );
+        });
     }
 
     resetFilters(): void {
-
         this.searchTerm = '';
         this.selectedCategory = '';
         this.selectedCompany = '';
         this.selectedTherapeuticArea = '';
 
-        this.filteredProducts =
-            [...this.products];
+        this.filteredProducts = [...this.products];
     }
 
-    // ===================== PRODUCT IMAGE / PRICE =====================
+    // ===================== IMAGES ET PRIX =====================
 
     getMainImage(product: Product): string {
-
-        if (
-            !product.images ||
-            product.images.length === 0
-        ) {
+        if (!product.images || product.images.length === 0) {
             return '/images/products/default-product.png';
         }
 
-        const mainImage =
-            product.images.find(
-                image => image.main
-            );
+        const mainImage = product.images.find(image => image.main);
 
         return (
             mainImage?.imageUrl ||
@@ -701,35 +735,14 @@ export class ShopHomeComponent implements OnInit {
         );
     }
 
-    formatPrice(
-        price: number | undefined
-    ): string {
-
+    formatPrice(price: number | undefined): string {
         return (
-            new Intl.NumberFormat('fr-FR')
-                .format(price ?? 0) +
+            new Intl.NumberFormat('fr-FR').format(price ?? 0) +
             ' FCFA'
         );
     }
-    getFeaturedCompanyProducts(): Product[] {
-  const allowedCompanies = [
-    'das group cameroun',
-    'tiens cameroun',
-    'dynace global cameroun'
-  ];
 
-  return this.filteredProducts
-    .filter(product => {
-      const company = (product.companyName ?? '')
-        .trim()
-        .toLowerCase();
-
-      return allowedCompanies.includes(company);
-    })
-    .slice(0, 8);
-}
-
-    // ===================== AUTH =====================
+    // ===================== AUTHENTIFICATION =====================
 
     isLoggedIn(): boolean {
         return this.authService.isLoggedIn();

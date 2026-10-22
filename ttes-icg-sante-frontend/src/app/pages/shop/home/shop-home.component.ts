@@ -711,6 +711,23 @@ export class ShopHomeComponent implements OnInit {
             ' FCFA'
         );
     }
+    getFeaturedCompanyProducts(): Product[] {
+  const allowedCompanies = [
+    'das group cameroun',
+    'tiens cameroun',
+    'dynace global cameroun'
+  ];
+
+  return this.filteredProducts
+    .filter(product => {
+      const company = (product.companyName ?? '')
+        .trim()
+        .toLowerCase();
+
+      return allowedCompanies.includes(company);
+    })
+    .slice(0, 8);
+}
 
     // ===================== AUTH =====================
 

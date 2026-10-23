@@ -1,2 +1,2 @@
 ALTER TABLE products
-    ALTER COLUMN dosage TYPE TEXT;
+ALTER COLUMN dosage TYPE TEXT;

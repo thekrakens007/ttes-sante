@@ -130,7 +130,8 @@ export class ProductFormComponent implements OnInit {
         ],
 
         dosage: [
-            ''
+            '',
+            Validators.maxLength(1000)
         ],
 
         form: [

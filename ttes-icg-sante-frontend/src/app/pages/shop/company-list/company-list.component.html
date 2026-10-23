@@ -172,12 +172,15 @@
                         class="flex h-44 items-center justify-center
                                    bg-gray-50 dark:bg-gray-800">
 
-                    @if (company.logoUrl) {
+                    @if (company.logoUrl && !failedLogoIds.has(company.id)) {
 
                     <img
                             [src]="company.logoUrl"
                             [alt]="company.name"
-                            class="h-full w-full object-contain p-6">
+                            class="h-full w-full object-contain p-6"
+                            loading="lazy"
+                            referrerpolicy="no-referrer"
+                            (error)="onLogoError(company.id)">
 
                     } @else {
 

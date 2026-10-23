@@ -69,6 +69,8 @@ export class SearchComponent implements OnInit {
 
     private productService = inject(ProductService);
 
+// État du menu mobile
+    mobileMenuOpen = false;
 
     // =========================================================
     // RECHERCHE

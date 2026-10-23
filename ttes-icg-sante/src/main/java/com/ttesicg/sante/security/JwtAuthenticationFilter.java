@@ -29,13 +29,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        System.out.println("===== JWT FILTER EXECUTE =====");
-        System.out.println("METHOD : " + request.getMethod());
-        System.out.println("URI : " + request.getRequestURI());
-
         String authHeader = request.getHeader("Authorization");
 
-        System.out.println("Authorization : " + authHeader);
 
         // Aucun token JWT
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -57,10 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             var userDetails =
                     userDetailsService.loadUserByUsername(email);
 
-            System.out.println("===== USER AUTHENTICATED =====");
-            System.out.println("Email : " + email);
-            System.out.println("Enabled : " + userDetails.isEnabled());
-            System.out.println("Authorities : " + userDetails.getAuthorities());
+
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(

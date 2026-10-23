@@ -1,0 +1,612 @@
+<div class="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white">
+
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
+
+    <header class="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur dark:border-gray-800 dark:bg-gray-950/95">
+
+        <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+
+            <!-- LOGO -->
+
+            <a routerLink="/" class="flex items-center gap-3">
+                <img src="/images/logo/logo.svg" alt="TTES-ICG Santé" class="h-10 w-auto dark:hidden">
+                <img src="/images/logo/logo-dark.svg" alt="TTES-ICG Santé" class="hidden h-10 w-auto dark:block">
+            </a>
+
+            <!-- DESKTOP NAV -->
+
+            <nav class="hidden items-center gap-6 md:flex">
+
+                <a routerLink="/"
+                   class="text-sm font-medium text-gray-700 transition hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400">
+                    Accueil
+                </a>
+
+                <a routerLink="/products"
+                   class="text-sm font-medium text-gray-700 transition hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400">
+                    Produits
+                </a>
+
+                <a routerLink="/bundles"
+                   class="text-sm font-medium text-gray-700 transition hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400">
+                    Packs
+                </a>
+
+                <a routerLink="/cures"
+                   class="text-sm font-semibold text-green-600 dark:text-green-400">
+                    Cures preventives
+                </a>
+
+                <a routerLink="/companies"
+                   class="text-sm font-medium text-gray-700 transition hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400">
+                    Entreprises
+                </a>
+
+                @if (isAdmin()) {
+                <a routerLink="/admin"
+                   class="text-sm font-medium text-gray-700 transition hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400">
+                    Administration
+                </a>
+                }
+
+            </nav>
+
+            <!-- ACTIONS -->
+
+            <div class="hidden items-center gap-3 md:flex">
+
+                @if (isLoggedIn()) {
+                <a routerLink="/profile"
+                   class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+                    Mon profil
+                </a>
+                } @else {
+                <a routerLink="/signin"
+                   class="rounded-lg border border-green-600 px-4 py-2 text-sm font-semibold text-green-600 transition hover:bg-green-50 dark:border-green-500 dark:text-green-400 dark:hover:bg-green-900/20">
+                    Connexion
+                </a>
+                }
+
+                <a routerLink="/cart"
+                   class="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400">
+                    🛒
+                    <span>Panier</span>
+
+                    @if (cartCount > 0) {
+                    <span class="flex h-6 min-w-6 items-center justify-center rounded-full bg-white px-1.5 text-xs font-bold text-green-700">
+                        {{ cartCount }}
+                    </span>
+                    }
+                </a>
+
+            </div>
+
+            <!-- MOBILE MENU BUTTON -->
+
+            <button type="button"
+                    class="rounded-lg p-2 text-gray-700 hover:bg-gray-100 md:hidden dark:text-gray-300 dark:hover:bg-gray-800"
+                    (click)="toggleMobileMenu()">
+                @if (mobileMenuOpen) {
+                ✕
+                } @else {
+                ☰
+                }
+            </button>
+
+        </div>
+
+        <!-- MOBILE MENU -->
+
+        @if (mobileMenuOpen) {
+        <div class="border-t border-gray-200 bg-white px-4 py-4 md:hidden dark:border-gray-800 dark:bg-gray-950">
+
+            <nav class="flex flex-col gap-2">
+
+                <a routerLink="/" (click)="closeMobileMenu()"
+                   class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
+                    Accueil
+                </a>
+
+                <a routerLink="/products" (click)="closeMobileMenu()"
+                   class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
+                    Produits
+                </a>
+
+                <a routerLink="/bundles" (click)="closeMobileMenu()"
+                   class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
+                    Packs
+                </a>
+
+                <a routerLink="/cures" (click)="closeMobileMenu()"
+                   class="rounded-lg bg-green-50 px-4 py-3 text-sm font-semibold text-green-700 dark:bg-green-900/20 dark:text-green-400">
+                    Cures preventives
+                </a>
+
+                <a routerLink="/companies" (click)="closeMobileMenu()"
+                   class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
+                    Entreprises
+                </a>
+
+                @if (isAdmin()) {
+                <a routerLink="/admin" (click)="closeMobileMenu()"
+                   class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
+                    Administration
+                </a>
+                }
+
+                <div class="mt-2 border-t border-gray-200 pt-3 dark:border-gray-800">
+
+                    @if (isLoggedIn()) {
+                    <a routerLink="/profile" (click)="closeMobileMenu()"
+                       class="mb-2 block rounded-lg border border-gray-200 px-4 py-3 text-center text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300">
+                        Mon profil
+                    </a>
+                    } @else {
+                    <a routerLink="/signin" (click)="closeMobileMenu()"
+                       class="mb-2 block rounded-lg border border-green-600 px-4 py-3 text-center text-sm font-semibold text-green-600 dark:border-green-500 dark:text-green-400">
+                        Connexion
+                    </a>
+                    }
+
+                    <a routerLink="/cart" (click)="closeMobileMenu()"
+                       class="flex items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white dark:bg-green-500">
+                        🛒
+                        <span>Panier</span>
+
+                        @if (cartCount > 0) {
+                        <span class="flex h-6 min-w-6 items-center justify-center rounded-full bg-white px-1.5 text-xs font-bold text-green-700">
+                            {{ cartCount }}
+                        </span>
+                        }
+                    </a>
+
+                </div>
+
+            </nav>
+
+        </div>
+        }
+
+    </header>
+
+
+    <!-- ===================================================== -->
+    <!-- MAIN -->
+    <!-- ===================================================== -->
+
+    <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+
+        <!-- TITLE -->
+
+        <div class="mb-8">
+
+            <div class="mb-2 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                <a routerLink="/" class="hover:text-green-600 dark:hover:text-green-400">
+                    Accueil
+                </a>
+                <span>/</span>
+                <span class="font-medium text-gray-700 dark:text-gray-300">
+                    Cures
+                </span>
+            </div>
+
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+
+                <div>
+                    <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
+                        Nos cures santé
+                    </h1>
+
+                    <p class="mt-2 max-w-2xl text-gray-600 dark:text-gray-400">
+                        Découvrez nos cures : des associations de produits
+                        sélectionnés pour accompagner votre bien-être.
+                    </p>
+                </div>
+
+                <a routerLink="/cart"
+                   class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400">
+                    🛒
+                    <span>Voir le panier</span>
+
+                    @if (cartCount > 0) {
+                    <span class="flex h-6 min-w-6 items-center justify-center rounded-full bg-white px-1.5 text-xs font-bold text-green-700">
+                        {{ cartCount }}
+                    </span>
+                    }
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- RECHERCHE + TRI -->
+        <!-- ================================================= -->
+
+        <section class="mb-8 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6 dark:border-gray-800 dark:bg-gray-900">
+
+            <div class="grid gap-4 md:grid-cols-[1fr_auto]">
+
+                <!-- SEARCH -->
+
+                <div>
+                    <label class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        Rechercher une cure
+                    </label>
+
+                    <div class="relative">
+
+                        <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-gray-400">
+                            🔍
+                        </span>
+
+                        <input type="text"
+                               [(ngModel)]="searchTerm"
+                               (ngModelChange)="search()"
+                               placeholder="Nom, description, produit..."
+                               class="w-full rounded-xl border border-gray-300 bg-white py-3 pl-11 pr-4 text-sm text-gray-900 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-500/20 dark:border-gray-700 dark:bg-gray-950 dark:text-white dark:placeholder-gray-500">
+
+                        @if (searchTerm) {
+                        <button type="button"
+                                (click)="clearSearch()"
+                                class="absolute inset-y-0 right-3 flex items-center px-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                            ✕
+                        </button>
+                        }
+
+                    </div>
+                </div>
+
+                <!-- SORT -->
+
+                <div class="min-w-[200px]">
+                    <label class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        Trier par
+                    </label>
+
+                    <select [(ngModel)]="sortOption"
+                            (ngModelChange)="search()"
+                            class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-500/20 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
+                        <option value="">Par défaut</option>
+                        <option value="price-asc">Prix croissant</option>
+                        <option value="price-desc">Prix décroissant</option>
+                        <option value="name">Nom (A-Z)</option>
+                    </select>
+                </div>
+
+            </div>
+
+            @if (searchTerm || sortOption) {
+            <div class="mt-4 flex justify-end">
+                <button type="button"
+                        (click)="resetFilters()"
+                        class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+                    Réinitialiser les filtres
+                </button>
+            </div>
+            }
+
+        </section>
+
+
+        <!-- ================================================= -->
+        <!-- EN-TETE RESULTATS -->
+        <!-- ================================================= -->
+
+        @if (!loading && !error) {
+        <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+                <span class="font-semibold text-gray-900 dark:text-white">
+                    {{ filteredCures.length }}
+                </span>
+                cure{{ filteredCures.length > 1 ? 's' : '' }}
+                disponible{{ filteredCures.length > 1 ? 's' : '' }}
+            </p>
+
+            @if (cartCount > 0) {
+            <a routerLink="/cart"
+               class="inline-flex items-center gap-2 text-sm font-semibold text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300">
+                🛒
+                <span>
+                    {{ cartCount }}
+                    article{{ cartCount > 1 ? 's' : '' }}
+                    dans le panier
+                </span>
+            </a>
+            }
+
+        </div>
+        }
+
+
+        <!-- ================================================= -->
+        <!-- CHARGEMENT -->
+        <!-- ================================================= -->
+
+        @if (loading) {
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+
+            @for (skeleton of [1,2,3,4,5,6,7,8]; track skeleton) {
+            <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+
+                <div class="h-52 animate-pulse bg-gray-200 dark:bg-gray-800"></div>
+
+                <div class="space-y-4 p-5">
+                    <div class="h-5 w-3/4 animate-pulse rounded bg-gray-200 dark:bg-gray-800"></div>
+                    <div class="h-4 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-800"></div>
+                    <div class="h-4 w-2/3 animate-pulse rounded bg-gray-200 dark:bg-gray-800"></div>
+                    <div class="h-11 w-full animate-pulse rounded-xl bg-gray-200 dark:bg-gray-800"></div>
+                </div>
+
+            </div>
+            }
+
+        </div>
+        }
+
+
+        <!-- ================================================= -->
+        <!-- ERREUR -->
+        <!-- ================================================= -->
+
+        @if (!loading && error) {
+        <div class="rounded-2xl border border-red-200 bg-red-50 p-8 text-center dark:border-red-800 dark:bg-red-900/20">
+
+            <div class="mb-4 text-4xl">⚠️</div>
+
+            <h2 class="text-lg font-bold text-red-800 dark:text-red-300">
+                Impossible de charger les cures
+            </h2>
+
+            <p class="mt-2 text-sm text-red-700 dark:text-red-400">
+                {{ error }}
+            </p>
+
+            <button type="button"
+                    (click)="loadCures()"
+                    class="mt-5 rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700">
+                Réessayer
+            </button>
+
+        </div>
+        }
+
+
+        <!-- ================================================= -->
+        <!-- AUCUN RESULTAT -->
+        <!-- ================================================= -->
+
+        @if (!loading && !error && filteredCures.length === 0) {
+        <div class="rounded-2xl border border-gray-200 bg-white p-10 text-center shadow-sm dark:border-gray-800 dark:bg-gray-900">
+
+            <div class="mb-4 text-5xl">🌿</div>
+
+            @if (cures.length === 0) {
+
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                Aucune cure disponible
+            </h2>
+
+            <p class="mx-auto mt-2 max-w-md text-sm text-gray-600 dark:text-gray-400">
+                Nos cures arrivent bientôt. Revenez nous voir très vite.
+            </p>
+
+            } @else {
+
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                Aucune cure trouvée
+            </h2>
+
+            <p class="mx-auto mt-2 max-w-md text-sm text-gray-600 dark:text-gray-400">
+                Aucune cure ne correspond aux critères de recherche.
+            </p>
+
+            @if (searchTerm || sortOption) {
+            <button type="button"
+                    (click)="resetFilters()"
+                    class="mt-5 rounded-xl bg-green-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400">
+                Réinitialiser les filtres
+            </button>
+            }
+
+            }
+
+        </div>
+        }
+
+
+        <!-- ================================================= -->
+        <!-- GRILLE DES CURES -->
+        <!-- ================================================= -->
+
+        @if (!loading && !error && paginatedCures.length > 0) {
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+
+            @for (cure of paginatedCures; track cure.id) {
+            <article class="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900">
+
+                <!-- IMAGE -->
+
+                <div class="relative overflow-hidden bg-gray-100 dark:bg-gray-800">
+
+                    <img [src]="getMainImage(cure)"
+                         [alt]="cure.name"
+                         class="h-52 w-full object-cover transition duration-500 group-hover:scale-105">
+
+                    <!-- BADGE CURE -->
+
+                    <div class="absolute right-3 top-3">
+                        <span class="inline-flex items-center rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-green-700 shadow-sm dark:bg-gray-950/95 dark:text-green-400">
+                            CURE
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <!-- CONTENU -->
+
+                <div class="flex flex-1 flex-col p-5">
+
+                    <h2 class="line-clamp-2 text-lg font-bold text-gray-900 dark:text-white">
+                        <a [routerLink]="['/cures', cure.id]"
+                           class="transition hover:text-green-600 dark:hover:text-green-400">
+                            {{ cure.name }}
+                        </a>
+                    </h2>
+
+                    @if (cure.description) {
+                    <p class="mt-2 line-clamp-3 text-sm leading-6 text-gray-600 dark:text-gray-400">
+                        {{ cure.description }}
+                    </p>
+                    }
+
+                    <!-- NOMBRE DE PRODUITS -->
+
+                    <div class="mt-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                        <span>📦</span>
+                        <span>
+                            {{ getProductCount(cure) }}
+                            produit{{ getProductCount(cure) > 1 ? 's' : '' }}
+                            dans cette cure
+                        </span>
+                    </div>
+
+                    <!-- PRIX -->
+
+                    <div class="mt-5">
+                        <p class="text-2xl font-extrabold text-green-600 dark:text-green-400">
+                            {{ formatPrice(cure.totalPrice) }}
+                        </p>
+                    </div>
+
+                    <!-- VOIR LES DETAILS -->
+
+                    <a [routerLink]="['/cures', cure.id]"
+                       class="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400">
+                        <span>👁️</span>
+                        <span>Voir les détails</span>
+                    </a>
+
+                    <!-- VOIR LE CONTENU -->
+
+                    <button type="button"
+                            (click)="toggleContent(cure)"
+                            class="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-green-600 bg-white px-4 py-3 text-sm font-semibold text-green-700 transition hover:bg-green-50 dark:border-green-500 dark:bg-gray-900 dark:text-green-400 dark:hover:bg-green-900/30">
+                        @if (isExpanded(cure)) {
+                        <span>▲</span>
+                        <span>Masquer le contenu</span>
+                        } @else {
+                        <span>▼</span>
+                        <span>Voir le contenu</span>
+                        }
+                    </button>
+
+                    @if (isExpanded(cure)) {
+                    <ul class="mt-4 space-y-3 rounded-xl bg-gray-50 p-3 dark:bg-gray-800/50">
+
+                        @for (item of getItems(cure); track item.productId) {
+                        <li class="flex items-center gap-3">
+
+                            @if (item.productImageUrl) {
+                            <img [src]="item.productImageUrl"
+                                 [alt]="item.productName"
+                                 class="h-10 w-10 shrink-0 rounded-lg object-cover">
+                            } @else {
+                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-200 text-lg dark:bg-gray-700">
+                                📦
+                            </div>
+                            }
+
+                            <span class="min-w-0 flex-1 truncate text-sm font-medium text-gray-800 dark:text-gray-200">
+                                {{ item.productName }}
+                            </span>
+
+                            <span class="shrink-0 rounded-full bg-green-100 px-2.5 py-1 text-xs font-bold text-green-700 dark:bg-green-900/40 dark:text-green-400">
+                                × {{ item.quantity }}
+                            </span>
+
+                        </li>
+                        }
+
+                    </ul>
+                    }
+
+                </div>
+
+            </article>
+            }
+
+        </div>
+        }
+
+
+        <!-- ================================================= -->
+        <!-- PAGINATION -->
+        <!-- ================================================= -->
+
+        @if (!loading && !error && totalPages > 1) {
+        <div class="mt-10 flex flex-wrap items-center justify-center gap-2">
+
+            <!-- PRECEDENT -->
+
+            <button type="button"
+                    (click)="previousPage()"
+                    [disabled]="currentPage === 0"
+                    class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
+                ←
+                <span>Précédent</span>
+            </button>
+
+            <!-- NUMEROS -->
+
+            @for (page of pages; track page) {
+            <button type="button"
+                    (click)="goToPage(page)"
+                    [class.bg-green-600]="currentPage === page"
+                    [class.text-white]="currentPage === page"
+                    [class.border-green-600]="currentPage === page"
+                    class="flex h-10 min-w-10 items-center justify-center rounded-lg border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
+                {{ page + 1 }}
+            </button>
+            }
+
+            <!-- SUIVANT -->
+
+            <button type="button"
+                    (click)="nextPage()"
+                    [disabled]="currentPage === totalPages - 1"
+                    class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
+                <span>Suivant</span>
+                →
+            </button>
+
+        </div>
+        }
+
+    </main>
+
+
+    <!-- ===================================================== -->
+    <!-- FOOTER -->
+    <!-- ===================================================== -->
+
+    <footer class="mt-16 border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
+
+        <div class="mx-auto max-w-7xl px-4 py-8 text-center sm:px-6 lg:px-8">
+
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                © {{ currentYear }}
+                TTES-ICG Santé.
+                Tous droits réservés.
+            </p>
+
+        </div>
+
+    </footer>
+
+</div>

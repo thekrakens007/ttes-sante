@@ -1,0 +1,714 @@
+<div class="p-6">
+
+    <!-- ========================================================= -->
+    <!-- HEADER -->
+    <!-- ========================================================= -->
+
+    <div
+            class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+    >
+
+        <div>
+
+            <h1
+                    class="text-2xl font-semibold text-gray-900 dark:text-white"
+            >
+                Gestion des cures
+            </h1>
+
+            <p
+                    class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+            >
+                Crée et gère les cures composées de plusieurs produits.
+            </p>
+
+        </div>
+
+
+        <a
+                routerLink="/admin/cures/new"
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-green-700 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-green-800"
+        >
+
+            <span class="text-lg leading-none">
+                +
+            </span>
+
+            Nouvelle cure
+
+        </a>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- MESSAGE DE SUCCES -->
+    <!-- ========================================================= -->
+
+    @if (successMessage) {
+    <div
+            class="mb-6 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-400"
+    >
+        {{ successMessage }}
+    </div>
+    }
+
+
+    <!-- ========================================================= -->
+    <!-- CHARGEMENT -->
+    <!-- ========================================================= -->
+
+    @if (loading) {
+    <div
+            class="rounded-xl border border-gray-200 bg-white px-6 py-16 text-center dark:border-gray-800 dark:bg-white/[0.03]"
+    >
+
+        <div
+                class="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-green-700"
+        ></div>
+
+        <p
+                class="text-sm text-gray-500 dark:text-gray-400"
+        >
+            Chargement des cures...
+        </p>
+
+    </div>
+    }
+
+
+    <!-- ========================================================= -->
+    <!-- ERREUR -->
+    <!-- ========================================================= -->
+
+    @if (!loading && errorMessage) {
+    <div
+            class="mb-6 rounded-xl border border-red-200 bg-red-50 p-5 dark:border-red-800 dark:bg-red-900/20"
+    >
+
+        <div class="flex items-start gap-3">
+
+            <div
+                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-100 font-bold text-red-600 dark:bg-red-900/40 dark:text-red-400"
+            >
+                !
+            </div>
+
+            <div>
+
+                <p
+                        class="font-medium text-red-700 dark:text-red-400"
+                >
+                    Une erreur est survenue
+                </p>
+
+                <p
+                        class="mt-1 text-sm text-red-600 dark:text-red-400"
+                >
+                    {{ errorMessage }}
+                </p>
+
+                <button
+                        type="button"
+                        (click)="loadCures()"
+                        class="mt-3 text-sm font-medium text-red-700 underline hover:no-underline dark:text-red-400"
+                >
+                    Réessayer
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+    }
+
+
+    <!-- ========================================================= -->
+    <!-- CONTENU -->
+    <!-- ========================================================= -->
+
+    @if (!loading) {
+    <div>
+
+        <!-- ===================================================== -->
+        <!-- BARRE DE RECHERCHE / FILTRES -->
+        <!-- ===================================================== -->
+
+        <div
+                class="mb-6 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]"
+        >
+
+            <div
+                    class="flex flex-col gap-4 xl:flex-row xl:items-center"
+            >
+
+                <!-- Recherche -->
+
+                <div class="relative flex-1">
+
+                    <span
+                            class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    >
+                        🔎
+                    </span>
+
+                    <input
+                            type="text"
+                            [(ngModel)]="searchTerm"
+                            (input)="onSearch()"
+                            placeholder="Rechercher une cure, un produit..."
+                            class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-10 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-green-600 focus:ring-2 focus:ring-green-600/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                    />
+
+                    @if (searchTerm) {
+                    <button
+                            type="button"
+                            (click)="clearSearch()"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 dark:hover:text-white"
+                    >
+                        ✕
+                    </button>
+                    }
+
+                </div>
+
+
+                <!-- Statut -->
+
+                <div
+                        class="flex items-center gap-2"
+                >
+
+                    <label
+                            class="whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
+                    >
+                        Statut
+                    </label>
+
+                    <select
+                            [(ngModel)]="statusFilter"
+                            (change)="onStatusFilterChange()"
+                            class="rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/20 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                    >
+
+                        <option value="all">
+                            Tous
+                        </option>
+
+                        <option value="active">
+                            Actives
+                        </option>
+
+                        <option value="inactive">
+                            Inactives
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Actualiser -->
+
+                <button
+                        type="button"
+                        (click)="loadCures()"
+                        class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                >
+
+                    ↻
+
+                    Actualiser
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ===================================================== -->
+        <!-- BARRE RESULTATS -->
+        <!-- ===================================================== -->
+
+        <div
+                class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+        >
+
+            <div>
+
+                <p
+                        class="text-sm text-gray-500 dark:text-gray-400"
+                >
+
+                    @if (totalItems > 0) {
+
+                    Affichage de
+
+                    <span
+                            class="font-medium text-gray-900 dark:text-white"
+                    >
+                            {{ paginationStart }}
+                        </span>
+
+                    à
+
+                    <span
+                            class="font-medium text-gray-900 dark:text-white"
+                    >
+                            {{ paginationEnd }}
+                        </span>
+
+                    sur
+
+                    <span
+                            class="font-medium text-gray-900 dark:text-white"
+                    >
+                            {{ totalItems }}
+                        </span>
+
+                    cure{{ totalItems > 1 ? 's' : '' }}
+
+                    } @else {
+
+                    Aucun résultat
+
+                    }
+
+                </p>
+
+            </div>
+
+
+            <!-- Nombre par page -->
+
+            <div
+                    class="flex items-center gap-2"
+            >
+
+                <label
+                        class="text-sm text-gray-500 dark:text-gray-400"
+                >
+                    Afficher
+                </label>
+
+                <select
+                        [(ngModel)]="pageSize"
+                        (change)="onPageSizeChange()"
+                        class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none focus:border-green-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                >
+
+                    @for (size of pageSizeOptions; track size) {
+                    <option [ngValue]="size">
+                        {{ size }}
+                    </option>
+                    }
+
+                </select>
+
+                <span
+                        class="text-sm text-gray-500 dark:text-gray-400"
+                >
+                    par page
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- ===================================================== -->
+        <!-- CARTES -->
+        <!-- ===================================================== -->
+
+        @if (paginatedCures.length > 0) {
+        <div
+                class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
+        >
+
+            @for (cure of paginatedCures; track cure.id) {
+            <div
+                    class="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-white/[0.03]"
+            >
+
+                <!-- IMAGE -->
+
+                <div
+                        class="relative h-56 overflow-hidden bg-gray-100 dark:bg-gray-800"
+                >
+
+                    @if (getMainImage(cure)) {
+                    <img
+                            [src]="getMainImage(cure)"
+                            [alt]="cure.name"
+                            class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                    />
+                    } @else {
+                    <div
+                            class="flex h-full w-full items-center justify-center"
+                    >
+
+                        <div class="text-center">
+
+                            <div
+                                    class="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-gray-200 text-2xl dark:bg-gray-700"
+                            >
+                                🌿
+                            </div>
+
+                            <p
+                                    class="text-sm text-gray-400"
+                            >
+                                Aucune image
+                            </p>
+
+                        </div>
+
+                    </div>
+                    }
+
+
+                    <!-- Statut -->
+
+                    <div
+                            class="absolute left-3 top-3"
+                    >
+
+                        @if (cure.active) {
+                        <span
+                                class="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1.5 text-xs font-semibold text-green-700 shadow-sm dark:bg-green-900/40 dark:text-green-400"
+                        >
+
+                            <span
+                                    class="h-1.5 w-1.5 rounded-full bg-green-500"
+                            ></span>
+
+                            Active
+
+                        </span>
+                        } @else {
+                        <span
+                                class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-600 shadow-sm dark:bg-gray-800 dark:text-gray-400"
+                        >
+
+                            <span
+                                    class="h-1.5 w-1.5 rounded-full bg-gray-400"
+                            ></span>
+
+                            Inactive
+
+                        </span>
+                        }
+
+                    </div>
+
+
+                    <!-- Nombre produits -->
+
+                    <div
+                            class="absolute right-3 top-3"
+                    >
+
+                        <span
+                                class="rounded-full bg-black/60 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm"
+                        >
+
+                            {{ getProductCount(cure) }}
+
+                            produit{{
+                                getProductCount(cure) > 1
+                                    ? 's'
+                                    : ''
+                            }}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CONTENU -->
+
+                <div class="p-5">
+
+                    <!-- Nom -->
+
+                    <div class="mb-4">
+
+                        <h2
+                                class="truncate text-lg font-semibold text-gray-900 dark:text-white"
+                                [title]="cure.name"
+                        >
+                            {{ cure.name }}
+                        </h2>
+
+                        <p
+                                class="mt-1 text-xs text-gray-400"
+                        >
+                            ID : {{ cure.id }}
+                        </p>
+
+                    </div>
+
+
+                    <!-- Description -->
+
+                    <p
+                            class="mb-4 line-clamp-2 text-sm text-gray-500 dark:text-gray-400"
+                    >
+                        {{ cure.description || 'Aucune description' }}
+                    </p>
+
+
+                    <!-- PRIX -->
+
+                    <p
+                            class="mb-4 text-xl font-bold text-green-700 dark:text-green-400"
+                    >
+                        {{ formatPrice(cure.totalPrice) }}
+                    </p>
+
+
+                    <!-- INFORMATIONS -->
+
+                    <div
+                            class="grid grid-cols-2 gap-3"
+                    >
+
+                        <!-- Produits -->
+
+                        <div
+                                class="rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50"
+                        >
+
+                            <p
+                                    class="text-xs text-gray-500 dark:text-gray-400"
+                            >
+                                Produits
+                            </p>
+
+                            <p
+                                    class="mt-1 font-semibold text-gray-900 dark:text-white"
+                            >
+                                {{ getProductCount(cure) }}
+                            </p>
+
+                        </div>
+
+
+                        <!-- Quantité totale -->
+
+                        <div
+                                class="rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50"
+                        >
+
+                            <p
+                                    class="text-xs text-gray-500 dark:text-gray-400"
+                            >
+                                Quantité totale
+                            </p>
+
+                            <p
+                                    class="mt-1 font-semibold text-gray-900 dark:text-white"
+                            >
+                                {{ getTotalQuantity(cure) }}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ACTIONS -->
+
+                    <div
+                            class="mt-5 flex gap-2 border-t border-gray-100 pt-4 dark:border-gray-800"
+                    >
+
+                        <a
+                                [routerLink]="[
+                                '/admin/cures/edit',
+                                cure.id
+                            ]"
+                                class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-center text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                        >
+                            Modifier
+                        </a>
+
+
+                        <button
+                                type="button"
+                                [disabled]="deletingCureId === cure.id"
+                                (click)="deleteCure(cure)"
+                                class="flex-1 rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-900/50 dark:hover:bg-red-900/20"
+                        >
+
+                            @if (deletingCureId === cure.id) {
+                            Suppression...
+                            } @else {
+                            Supprimer
+                            }
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+            }
+
+        </div>
+        }
+
+
+        <!-- ===================================================== -->
+        <!-- AUCUN RESULTAT -->
+        <!-- ===================================================== -->
+
+        @if (paginatedCures.length === 0) {
+        <div
+                class="rounded-xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center dark:border-gray-700 dark:bg-white/[0.03]"
+        >
+
+            <div
+                    class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 text-2xl dark:bg-gray-800"
+            >
+                🔎
+            </div>
+
+            @if (cures.length === 0) {
+
+            <h2
+                    class="text-lg font-semibold text-gray-900 dark:text-white"
+            >
+                Aucune cure disponible
+            </h2>
+
+            <p
+                    class="mx-auto mt-2 max-w-md text-sm text-gray-500 dark:text-gray-400"
+            >
+                Commence par créer ta première cure.
+            </p>
+
+            } @else {
+
+            <h2
+                    class="text-lg font-semibold text-gray-900 dark:text-white"
+            >
+                Aucune cure trouvée
+            </h2>
+
+            <p
+                    class="mx-auto mt-2 max-w-md text-sm text-gray-500 dark:text-gray-400"
+            >
+                Aucune cure ne correspond aux critères de recherche
+                ou de filtrage actuels.
+            </p>
+
+            @if (searchTerm || statusFilter !== 'all') {
+            <button
+                    type="button"
+                    (click)="resetFilters()"
+                    class="mt-5 rounded-lg bg-green-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-800"
+            >
+                Réinitialiser les filtres
+            </button>
+            }
+
+            }
+
+        </div>
+        }
+
+
+        <!-- ===================================================== -->
+        <!-- PAGINATION -->
+        <!-- ===================================================== -->
+
+        @if (totalPages > 1) {
+        <div
+                class="mt-8 flex flex-col gap-4 border-t border-gray-200 pt-5 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between"
+        >
+
+            <!-- Informations -->
+
+            <p
+                    class="text-sm text-gray-500 dark:text-gray-400"
+            >
+                Page
+
+                <span
+                        class="font-medium text-gray-900 dark:text-white"
+                >
+                    {{ currentPage }}
+                </span>
+
+                sur
+
+                <span
+                        class="font-medium text-gray-900 dark:text-white"
+                >
+                    {{ totalPages }}
+                </span>
+
+            </p>
+
+
+            <!-- Navigation -->
+
+            <div
+                    class="flex items-center gap-1"
+            >
+
+                <!-- Précédent -->
+
+                <button
+                        type="button"
+                        (click)="previousPage()"
+                        [disabled]="currentPage === 1"
+                        class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                >
+                    ←
+                </button>
+
+
+                <!-- Pages -->
+
+                @for (page of pages; track page) {
+                <button
+                        type="button"
+                        (click)="goToPage(page)"
+                        [ngClass]="{
+                        'bg-green-700 text-white border-green-700': currentPage === page,
+                        'border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800': currentPage !== page
+                    }"
+                        class="min-w-10 rounded-lg border px-3 py-2 text-sm font-medium transition"
+                >
+                    {{ page }}
+                </button>
+                }
+
+
+                <!-- Suivant -->
+
+                <button
+                        type="button"
+                        (click)="nextPage()"
+                        [disabled]="currentPage === totalPages"
+                        class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                >
+                    →
+                </button>
+
+            </div>
+
+        </div>
+        }
+
+    </div>
+    }
+
+</div>

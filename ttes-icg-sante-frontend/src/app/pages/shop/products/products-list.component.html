@@ -52,6 +52,12 @@
                     >
                         Packs
                     </a>
+                    <!-- desktop -->
+                    <a routerLink="/cures"
+                       class="text-sm font-medium text-gray-700 transition hover:text-green-600"
+                        Cures preventives
+                    </a>
+
 
                     <a
                         routerLink="/companies"
@@ -238,6 +244,13 @@
                             class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-green-600"
                         >
                             Entreprises
+                        </a>
+
+                        <!-- mobile -->
+                        <a routerLink="/cures" (click)="closeMobileMenu()"
+                           class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-green-600"
+                        >
+                            Cures preventives
                         </a>
 
                         <!-- PANIER MOBILE -->

@@ -74,23 +74,28 @@ export class ProductTableComponent implements OnInit {
      * Contient toujours les produits actuellement sélectionnés.
      *
      * En mode normal :
-     * -> produits sélectionnés pour créer un nouveau pack.
+     * -> produits sélectionnés pour créer un nouveau pack ou une cure.
      *
-     * En mode pack :
-     * -> produits actuellement sélectionnés dans le pack.
+     * En mode sélection (depuis un pack ou une cure) :
+     * -> produits actuellement sélectionnés dans le pack / la cure.
      */
     selectedProductIds = new Set<number>();
 
 
     // ============================================================
-    // MODE SELECTION DEPUIS UN PACK
+    // MODE SELECTION DEPUIS UN PACK OU UNE CURE
     // ============================================================
 
     isBundleSelectionMode = false;
 
     /**
+     * Formulaire d'origine : pack ou cure.
+     */
+    returnTarget: 'bundle' | 'cure' = 'bundle';
+
+    /**
      * Sélection présente AVANT d'ouvrir le sélecteur
-     * depuis le formulaire du pack.
+     * depuis le formulaire du pack / de la cure.
      *
      * Utilisée uniquement pour "Annuler".
      */
@@ -99,7 +104,41 @@ export class ProductTableComponent implements OnInit {
     bundleReturnMode:
         'new' | 'edit' | null = null;
 
+    /**
+     * Id du pack ou de la cure en modification.
+     */
     bundleReturnId: number | null = null;
+
+
+    // ============================================================
+    // LIBELLES DYNAMIQUES
+    // ============================================================
+
+    get targetOfLabel(): string {
+
+        return this.returnTarget === 'cure'
+            ? 'de la cure'
+            : 'du pack';
+
+    }
+
+
+    get targetToLabel(): string {
+
+        return this.returnTarget === 'cure'
+            ? 'à la cure'
+            : 'au pack';
+
+    }
+
+
+    get targetInLabel(): string {
+
+        return this.returnTarget === 'cure'
+            ? 'dans la cure'
+            : 'dans le pack';
+
+    }
 
 
     // ============================================================
@@ -112,7 +151,7 @@ export class ProductTableComponent implements OnInit {
 
             /*
              * ====================================================
-             * Vérification du mode sélection depuis un pack
+             * Vérification du mode sélection depuis un pack / cure
              * ====================================================
              */
 
@@ -138,12 +177,16 @@ export class ProductTableComponent implements OnInit {
              *
              * Ici les cases restent visibles.
              *
-             * La sélection sert à créer un nouveau pack.
+             * La sélection sert à créer un nouveau pack
+             * ou une nouvelle cure.
              * ====================================================
              */
 
             this.isBundleSelectionMode =
                 false;
+
+            this.returnTarget =
+                'bundle';
 
             this.bundleReturnMode =
                 null;
@@ -162,9 +205,6 @@ export class ProductTableComponent implements OnInit {
              *
              * Cela permet à la sélection de rester disponible
              * pendant les recherches et les changements de page.
-             *
-             * Mais lorsqu'on arrive réellement sur la page
-             * normalement, on démarre avec une sélection vide.
              */
 
             this.loadProducts();
@@ -175,7 +215,7 @@ export class ProductTableComponent implements OnInit {
 
 
     // ============================================================
-    // ENTREE EN MODE SELECTION PACK
+    // ENTREE EN MODE SELECTION (PACK OU CURE)
     // ============================================================
 
     private enterBundleSelectionMode(
@@ -184,6 +224,16 @@ export class ProductTableComponent implements OnInit {
 
         this.isBundleSelectionMode =
             true;
+
+
+        /*
+         * Formulaire d'origine : pack (défaut) ou cure.
+         */
+
+        this.returnTarget =
+            params.get('target') === 'cure'
+                ? 'cure'
+                : 'bundle';
 
 
         /*
@@ -201,7 +251,7 @@ export class ProductTableComponent implements OnInit {
 
 
         /*
-         * ID du pack en modification.
+         * ID du pack / de la cure en modification.
          */
 
         const bundleIdParam =
@@ -215,7 +265,7 @@ export class ProductTableComponent implements OnInit {
 
 
         /*
-         * Produits déjà présents dans le pack.
+         * Produits déjà présents dans le pack / la cure.
          */
 
         const productIdsParam =
@@ -370,7 +420,7 @@ export class ProductTableComponent implements OnInit {
             Array.from(
                 {
                     length:
-                        this.totalPages
+                    this.totalPages
                 },
                 (_, index) =>
                     index
@@ -545,6 +595,42 @@ export class ProductTableComponent implements OnInit {
 
 
     // ============================================================
+    // NAVIGATION VERS LE FORMULAIRE D'ORIGINE (PACK OU CURE)
+    // ============================================================
+
+    private navigateToForm(
+        productIds: number[]
+    ): void {
+
+        const base =
+            this.returnTarget === 'cure'
+                ? '/admin/cures'
+                : '/admin/bundles';
+
+
+        const commands =
+            this.bundleReturnMode === 'edit' &&
+            this.bundleReturnId !== null
+                ? [base, 'edit', this.bundleReturnId]
+                : [base, 'new'];
+
+
+        this.router.navigate(
+            commands,
+            {
+                queryParams: {
+
+                    productIds:
+                        productIds.join(',')
+
+                }
+            }
+        );
+
+    }
+
+
+    // ============================================================
     // CREATION DU PACK
     // ============================================================
 
@@ -571,57 +657,16 @@ export class ProductTableComponent implements OnInit {
 
 
         /*
-         * Si nous sommes dans le mode sélection
-         * depuis un pack existant, on revient à CE pack.
-         */
-
-        if (
-            this.isBundleSelectionMode &&
-            this.bundleReturnMode === 'edit' &&
-            this.bundleReturnId !== null
-        ) {
-
-            this.router.navigate(
-                [
-                    '/admin/bundles/edit',
-                    this.bundleReturnId
-                ],
-                {
-                    queryParams: {
-
-                        productIds:
-                            productIds.join(',')
-
-                    }
-                }
-            );
-
-            return;
-
-        }
-
-
-        /*
-         * Si nous sommes dans le mode sélection
-         * depuis un nouveau pack.
+         * Mode sélection depuis un pack OU une cure :
+         * on revient au bon formulaire (création ou édition).
          */
 
         if (
             this.isBundleSelectionMode
         ) {
 
-            this.router.navigate(
-                [
-                    '/admin/bundles/new'
-                ],
-                {
-                    queryParams: {
-
-                        productIds:
-                            productIds.join(',')
-
-                    }
-                }
+            this.navigateToForm(
+                productIds
             );
 
             return;
@@ -633,8 +678,7 @@ export class ProductTableComponent implements OnInit {
          * ========================================================
          * MODE NORMAL
          *
-         * C'est ici que nous créons un nouveau pack
-         * depuis la liste normale des produits.
+         * Création d'un nouveau pack depuis la liste normale.
          * ========================================================
          */
 
@@ -663,7 +707,45 @@ export class ProductTableComponent implements OnInit {
 
 
     // ============================================================
-    // CONFIRMATION SELECTION PACK
+    // CREATION DE LA CURE (MODE NORMAL)
+    // ============================================================
+
+    createCure(): void {
+
+        const productIds =
+            Array.from(
+                this.selectedProductIds
+            );
+
+
+        if (
+            productIds.length === 0
+        ) {
+
+            return;
+
+        }
+
+
+        this.router.navigate(
+            [
+                '/admin/cures/new'
+            ],
+            {
+                queryParams: {
+
+                    productIds:
+                        productIds.join(',')
+
+                }
+            }
+        );
+
+    }
+
+
+    // ============================================================
+    // CONFIRMATION SELECTION
     // ============================================================
 
     confirmBundleSelection(): void {
@@ -674,21 +756,32 @@ export class ProductTableComponent implements OnInit {
 
 
     // ============================================================
-    // ANNULATION SELECTION PACK
+    // ANNULATION SELECTION
     // ============================================================
 
     cancelBundleSelection(): void {
 
         /*
-         * Cette méthode n'est utilisée que lorsque
-         * nous sommes revenus du formulaire d'un pack.
+         * CURE :
+         * on renvoie toujours la sélection initiale pour que
+         * le formulaire retrouve son brouillon (création et édition).
          */
+
+        if (
+            this.returnTarget === 'cure'
+        ) {
+
+            this.navigateToForm(
+                this.initialBundleProductIds
+            );
+
+            return;
+
+        }
 
 
         /*
-         * --------------------------------------------------------
-         * EDITION
-         * --------------------------------------------------------
+         * PACK - EDITION
          */
 
         if (
@@ -709,9 +802,7 @@ export class ProductTableComponent implements OnInit {
 
 
         /*
-         * --------------------------------------------------------
-         * CREATION
-         * --------------------------------------------------------
+         * PACK - CREATION
          */
 
         this.router.navigate(
@@ -732,7 +823,7 @@ export class ProductTableComponent implements OnInit {
 
 
     // ============================================================
-    // RETOUR AU PACK
+    // RETOUR AU FORMULAIRE
     // ============================================================
 
     navigateBackToBundle(): void {
@@ -743,15 +834,11 @@ export class ProductTableComponent implements OnInit {
 
 
     // ============================================================
-    // SUPPRESSION
-    // ============================================================
-
-
-    // ============================================================
     // SUPPRESSION D'UN PRODUIT
     // ============================================================
 
     deleteProduct(productId: number): void {
+
         if (this.isBundleSelectionMode) {
             return;
         }
@@ -794,8 +881,8 @@ export class ProductTableComponent implements OnInit {
                 window.alert(this.errorMessage);
             }
         });
-    }
 
+    }
 
 
     // ============================================================
@@ -917,12 +1004,5 @@ export class ProductTableComponent implements OnInit {
             );
 
     }
-
-
-    // ============================================================
-    // SUPPRESSION D'UN PRODUIT
-    // ============================================================
-
-
 
 }

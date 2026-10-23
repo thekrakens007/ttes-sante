@@ -93,6 +93,20 @@ export const routes: Routes = [
     title: 'Liste des produits'
   },
   {
+    path: 'cures/:id',
+    loadComponent: () =>
+        import('./pages/shop/cures/cure-detail/cure-detail.component')
+            .then(m => m.CureDetailComponent),
+    title: 'Détail de la cure'
+  },
+  {
+    path: 'cures',
+    loadComponent: () =>
+        import('./pages/shop/cures/cure-list/cure-list.component')
+            .then(m => m.CureListComponent),
+    title: 'Nos cures'
+  },
+  {
     path: 'checkout',
     component: CheckoutComponent,
     canActivate: [authGuard],
@@ -259,6 +273,29 @@ export const routes: Routes = [
         component: BundleFormComponent,
         title: 'Modifier le pack'
       },
+
+      {
+        path: 'cures',
+        loadComponent: () =>
+            import('./pages/admin/cures/cures.component')
+                .then(m => m.CuresComponent),
+        title: 'Gestion des cures'
+      },
+      {
+        path: 'cures/new',
+        loadComponent: () =>
+            import('./pages/admin/cures/cure-form/cure-form.component')
+                .then(m => m.CureFormComponent),
+        title: 'Nouvelle cure'
+      },
+      {
+        path: 'cures/edit/:id',
+        loadComponent: () =>
+            import('./pages/admin/cures/cure-form/cure-form.component')
+                .then(m => m.CureFormComponent),
+        title: 'Modifier la cure'
+      },
+
       {
         path:'calendar',
         component:CalenderComponent,

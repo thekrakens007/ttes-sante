@@ -1,42 +1,42 @@
 <div class="w-full">
 
     <!-- ========================================================= -->
-    <!-- MODE SELECTION DEPUIS UN PACK -->
+    <!-- MODE SELECTION DEPUIS UN PACK OU UNE CURE -->
     <!-- ========================================================= -->
 
     <div
-        *ngIf="isBundleSelectionMode"
-        class="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-5"
+            *ngIf="isBundleSelectionMode"
+            class="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-5"
     >
 
         <div
-            class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+                class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
         >
 
             <div>
 
                 <h2
-                    class="text-lg font-semibold text-blue-900"
+                        class="text-lg font-semibold text-blue-900"
                 >
-                    Sélection des produits du pack
+                    Sélection des produits {{ targetOfLabel }}
                 </h2>
 
                 <p
-                    class="mt-1 text-sm text-blue-700"
+                        class="mt-1 text-sm text-blue-700"
                 >
                     Sélectionnez les produits que vous souhaitez
-                    ajouter ou conserver dans le pack.
+                    ajouter ou conserver {{ targetInLabel }}.
                 </p>
 
             </div>
 
 
             <div
-                class="flex flex-wrap items-center gap-2"
+                    class="flex flex-wrap items-center gap-2"
             >
 
                 <span
-                    class="rounded-full bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white"
+                        class="rounded-full bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white"
                 >
                     {{ selectedProductCount }}
                     produit{{ selectedProductCount > 1 ? 's' : '' }}
@@ -45,37 +45,37 @@
 
 
                 <button
-                    type="button"
-                    (click)="selectAllVisible()"
-                    class="rounded-lg border border-blue-300 bg-white px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100"
+                        type="button"
+                        (click)="selectAllVisible()"
+                        class="rounded-lg border border-blue-300 bg-white px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100"
                 >
                     Tout sélectionner
                 </button>
 
 
                 <button
-                    type="button"
-                    (click)="deselectAllVisible()"
-                    class="rounded-lg border border-blue-300 bg-white px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100"
+                        type="button"
+                        (click)="deselectAllVisible()"
+                        class="rounded-lg border border-blue-300 bg-white px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100"
                 >
                     Tout désélectionner
                 </button>
 
 
                 <button
-                    type="button"
-                    (click)="cancelBundleSelection()"
-                    class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        type="button"
+                        (click)="cancelBundleSelection()"
+                        class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
                     Annuler
                 </button>
 
 
                 <button
-                    type="button"
-                    (click)="confirmBundleSelection()"
-                    [disabled]="selectedProductCount === 0"
-                    class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        type="button"
+                        (click)="confirmBundleSelection()"
+                        [disabled]="selectedProductCount === 0"
+                        class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     Confirmer la sélection
                 </button>
@@ -92,19 +92,19 @@
     <!-- ========================================================= -->
 
     <div
-        class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+            class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
     >
 
         <div>
 
             <h1
-                class="text-xl font-semibold text-gray-900 dark:text-white"
+                    class="text-xl font-semibold text-gray-900 dark:text-white"
             >
                 Produits
             </h1>
 
             <p
-                class="mt-1 text-sm text-gray-500"
+                    class="mt-1 text-sm text-gray-500"
             >
                 {{ totalElements }}
                 produit{{ totalElements > 1 ? 's' : '' }}
@@ -114,17 +114,17 @@
 
 
         <!-- ===================================================== -->
-        <!-- CREER UN PACK -->
+        <!-- CREER UN PACK / UNE CURE -->
         <!-- ===================================================== -->
 
         <div
-            *ngIf="!isBundleSelectionMode"
-            class="flex items-center gap-2"
+                *ngIf="!isBundleSelectionMode"
+                class="flex flex-wrap items-center gap-2"
         >
 
             <span
-                *ngIf="selectedProductCount > 0"
-                class="rounded-full bg-blue-100 px-3 py-2 text-sm font-semibold text-blue-700"
+                    *ngIf="selectedProductCount > 0"
+                    class="rounded-full bg-blue-100 px-3 py-2 text-sm font-semibold text-blue-700"
             >
                 {{ selectedProductCount }}
                 sélectionné{{ selectedProductCount > 1 ? 's' : '' }}
@@ -132,15 +132,32 @@
 
 
             <button
-                type="button"
-                (click)="continueToBundleCreation()"
-                [disabled]="selectedProductCount === 0"
-                class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    type="button"
+                    (click)="continueToBundleCreation()"
+                    [disabled]="selectedProductCount === 0"
+                    class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
                 Créer un pack
 
                 <span
-                    *ngIf="selectedProductCount > 0"
+                        *ngIf="selectedProductCount > 0"
+                >
+                    ({{ selectedProductCount }})
+                </span>
+
+            </button>
+
+
+            <button
+                    type="button"
+                    (click)="createCure()"
+                    [disabled]="selectedProductCount === 0"
+                    class="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+                Créer une cure
+
+                <span
+                        *ngIf="selectedProductCount > 0"
                 >
                     ({{ selectedProductCount }})
                 </span>
@@ -157,32 +174,32 @@
     <!-- ========================================================= -->
 
     <div
-        class="mb-6 rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+            class="mb-6 rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
     >
 
         <form
-            (ngSubmit)="submitSearch()"
-            class="flex flex-col gap-3 sm:flex-row"
+                (ngSubmit)="submitSearch()"
+                class="flex flex-col gap-3 sm:flex-row"
         >
 
             <div
-                class="flex-1"
+                    class="flex-1"
             >
 
                 <input
-                    type="text"
-                    name="searchTerm"
-                    [(ngModel)]="searchTerm"
-                    placeholder="Rechercher un produit..."
-                    class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                        type="text"
+                        name="searchTerm"
+                        [(ngModel)]="searchTerm"
+                        placeholder="Rechercher un produit..."
+                        class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 >
 
             </div>
 
 
             <button
-                type="submit"
-                class="rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
+                    type="submit"
+                    class="rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
             >
                 Rechercher
             </button>
@@ -197,8 +214,8 @@
     <!-- ========================================================= -->
 
     <div
-        *ngIf="errorMessage"
-        class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+            *ngIf="errorMessage"
+            class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700"
     >
         {{ errorMessage }}
     </div>
@@ -209,21 +226,21 @@
     <!-- ========================================================= -->
 
     <div
-        *ngIf="loading"
-        class="flex min-h-[250px] items-center justify-center rounded-xl border border-gray-200 bg-white"
+            *ngIf="loading"
+            class="flex min-h-[250px] items-center justify-center rounded-xl border border-gray-200 bg-white"
     >
 
         <div
-            class="text-center"
+                class="text-center"
         >
 
             <div
-                class="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"
+                    class="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"
             ></div>
 
 
             <p
-                class="mt-3 text-sm text-gray-500"
+                    class="mt-3 text-sm text-gray-500"
             >
                 Chargement des produits...
             </p>
@@ -238,26 +255,26 @@
     <!-- ========================================================= -->
 
     <div
-        *ngIf="!loading && products.length === 0"
-        class="rounded-xl border border-gray-200 bg-white p-10 text-center"
+            *ngIf="!loading && products.length === 0"
+            class="rounded-xl border border-gray-200 bg-white p-10 text-center"
     >
 
         <div
-            class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 text-2xl"
+                class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 text-2xl"
         >
             📦
         </div>
 
 
         <h3
-            class="text-lg font-semibold text-gray-900"
+                class="text-lg font-semibold text-gray-900"
         >
             Aucun produit trouvé
         </h3>
 
 
         <p
-            class="mt-1 text-sm text-gray-500"
+                class="mt-1 text-sm text-gray-500"
         >
             Aucun produit ne correspond à votre recherche.
         </p>
@@ -270,17 +287,17 @@
     <!-- ========================================================= -->
 
     <div
-        *ngIf="!loading && products.length > 0"
-        class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
+            *ngIf="!loading && products.length > 0"
+            class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
     >
 
         <div
-            *ngFor="let product of products"
-            class="group relative overflow-hidden rounded-xl border bg-white shadow-sm transition hover:shadow-md"
-            [class.border-blue-500]="isProductSelected(product.id)"
-            [class.ring-2]="isProductSelected(product.id)"
-            [class.ring-blue-100]="isProductSelected(product.id)"
-            [class.border-gray-200]="!isProductSelected(product.id)"
+                *ngFor="let product of products"
+                class="group relative overflow-hidden rounded-xl border bg-white shadow-sm transition hover:shadow-md"
+                [class.border-blue-500]="isProductSelected(product.id)"
+                [class.ring-2]="isProductSelected(product.id)"
+                [class.ring-blue-100]="isProductSelected(product.id)"
+                [class.border-gray-200]="!isProductSelected(product.id)"
         >
 
             <!-- ================================================= -->
@@ -288,12 +305,12 @@
             <!-- ================================================= -->
 
             <div
-                class="absolute left-3 top-3 z-30"
+                    class="absolute left-3 top-3 z-30"
             >
 
                 <label
-                    class="flex cursor-pointer items-center rounded-lg bg-white p-2 shadow-md"
-                    [title]="
+                        class="flex cursor-pointer items-center rounded-lg bg-white p-2 shadow-md"
+                        [title]="
                         isProductSelected(product.id)
                             ? 'Désélectionner'
                             : 'Sélectionner'
@@ -301,10 +318,10 @@
                 >
 
                     <input
-                        type="checkbox"
-                        [checked]="isProductSelected(product.id)"
-                        (change)="toggleProductSelection(product.id)"
-                        class="h-6 w-6 cursor-pointer rounded border-gray-400 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                            type="checkbox"
+                            [checked]="isProductSelected(product.id)"
+                            (change)="toggleProductSelection(product.id)"
+                            class="h-6 w-6 cursor-pointer rounded border-gray-400 text-blue-600 focus:ring-2 focus:ring-blue-500"
                     >
 
                 </label>
@@ -317,24 +334,24 @@
             <!-- ================================================= -->
 
             <div
-                class="relative h-48 bg-gray-50"
+                    class="relative h-48 bg-gray-50"
             >
 
                 <img
-                    *ngIf="getMainImage(product)"
-                    [src]="getMainImage(product)"
-                    [alt]="product.name"
-                    class="h-full w-full object-contain p-5"
+                        *ngIf="getMainImage(product)"
+                        [src]="getMainImage(product)"
+                        [alt]="product.name"
+                        class="h-full w-full object-contain p-5"
                 >
 
 
                 <div
-                    *ngIf="!getMainImage(product)"
-                    class="flex h-full items-center justify-center text-gray-400"
+                        *ngIf="!getMainImage(product)"
+                        class="flex h-full items-center justify-center text-gray-400"
                 >
 
                     <span
-                        class="text-4xl"
+                            class="text-4xl"
                     >
                         📦
                     </span>
@@ -345,17 +362,17 @@
                 <!-- STOCK -->
 
                 <div
-                    class="absolute right-3 top-3"
+                        class="absolute right-3 top-3"
                 >
 
                     <span
-                        class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium"
-                        [class.bg-green-100]="product.stock >= 10"
-                        [class.text-green-700]="product.stock >= 10"
-                        [class.bg-yellow-100]="product.stock > 0 && product.stock < 10"
-                        [class.text-yellow-700]="product.stock > 0 && product.stock < 10"
-                        [class.bg-red-100]="product.stock <= 0"
-                        [class.text-red-700]="product.stock <= 0"
+                            class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium"
+                            [class.bg-green-100]="product.stock >= 10"
+                            [class.text-green-700]="product.stock >= 10"
+                            [class.bg-yellow-100]="product.stock > 0 && product.stock < 10"
+                            [class.text-yellow-700]="product.stock > 0 && product.stock < 10"
+                            [class.bg-red-100]="product.stock <= 0"
+                            [class.text-red-700]="product.stock <= 0"
                     >
                         {{ getStockLabel(product.stock) }}
                     </span>
@@ -370,23 +387,23 @@
             <!-- ================================================= -->
 
             <div
-                class="p-4"
+                    class="p-4"
             >
 
                 <div
-                    class="mb-3"
+                        class="mb-3"
                 >
 
                     <h3
-                        class="line-clamp-2 text-base font-semibold text-gray-900"
+                            class="line-clamp-2 text-base font-semibold text-gray-900"
                     >
                         {{ product.name }}
                     </h3>
 
 
                     <p
-                        *ngIf="product.sku"
-                        class="mt-1 text-xs text-gray-500"
+                            *ngIf="product.sku"
+                            class="mt-1 text-xs text-gray-500"
                     >
                         SKU : {{ product.sku }}
                     </p>
@@ -397,19 +414,19 @@
                 <!-- ENTREPRISE -->
 
                 <div
-                    *ngIf="product.companyName"
-                    class="mb-3"
+                        *ngIf="product.companyName"
+                        class="mb-3"
                 >
 
                     <p
-                        class="text-xs text-gray-500"
+                            class="text-xs text-gray-500"
                     >
                         Entreprise
                     </p>
 
 
                     <p
-                        class="text-sm font-medium text-gray-700"
+                            class="text-sm font-medium text-gray-700"
                     >
                         {{ product.companyName }}
                     </p>
@@ -420,18 +437,18 @@
                 <!-- PRIX -->
 
                 <div
-                    class="mb-4 flex items-center justify-between"
+                        class="mb-4 flex items-center justify-between"
                 >
 
                     <span
-                        class="text-sm text-gray-500"
+                            class="text-sm text-gray-500"
                     >
                         Prix
                     </span>
 
 
                     <span
-                        class="text-base font-bold text-gray-900"
+                            class="text-base font-bold text-gray-900"
                     >
                         {{ product.price | number:'1.0-0' }} FCFA
                     </span>
@@ -444,26 +461,26 @@
                 <!-- ================================================= -->
 
                 <div
-                    *ngIf="!isBundleSelectionMode"
-                    class="flex items-center gap-2"
+                        *ngIf="!isBundleSelectionMode"
+                        class="flex items-center gap-2"
                 >
 
                     <button
-                        type="button"
-                        [routerLink]="[
+                            type="button"
+                            [routerLink]="[
                             '/admin/products/edit',
                             product.id
                         ]"
-                        class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
                         Modifier
                     </button>
 
 
                     <button
-                        type="button"
-                        (click)="deleteProduct(product.id)"
-                        class="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                            type="button"
+                            (click)="deleteProduct(product.id)"
+                            class="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
                     >
                         Supprimer
                     </button>
@@ -472,31 +489,31 @@
 
 
                 <!-- ================================================= -->
-                <!-- ACTIONS MODE PACK -->
+                <!-- ACTIONS MODE SELECTION (PACK OU CURE) -->
                 <!-- ================================================= -->
 
                 <div
-                    *ngIf="isBundleSelectionMode"
-                    class="mt-2"
+                        *ngIf="isBundleSelectionMode"
+                        class="mt-2"
                 >
 
                     <button
-                        type="button"
-                        (click)="toggleProductSelection(product.id)"
-                        class="w-full rounded-lg px-4 py-2.5 text-sm font-semibold transition"
-                        [class.bg-blue-600]="isProductSelected(product.id)"
-                        [class.text-white]="isProductSelected(product.id)"
-                        [class.hover:bg-blue-700]="isProductSelected(product.id)"
-                        [class.border]="!isProductSelected(product.id)"
-                        [class.border-gray-300]="!isProductSelected(product.id)"
-                        [class.text-gray-700]="!isProductSelected(product.id)"
-                        [class.hover:bg-gray-50]="!isProductSelected(product.id)"
+                            type="button"
+                            (click)="toggleProductSelection(product.id)"
+                            class="w-full rounded-lg px-4 py-2.5 text-sm font-semibold transition"
+                            [class.bg-blue-600]="isProductSelected(product.id)"
+                            [class.text-white]="isProductSelected(product.id)"
+                            [class.hover:bg-blue-700]="isProductSelected(product.id)"
+                            [class.border]="!isProductSelected(product.id)"
+                            [class.border-gray-300]="!isProductSelected(product.id)"
+                            [class.text-gray-700]="!isProductSelected(product.id)"
+                            [class.hover:bg-gray-50]="!isProductSelected(product.id)"
                     >
 
                         {{
-                            isProductSelected(product.id)
-                                ? '✓ Produit sélectionné'
-                                : '+ Ajouter au pack'
+                        isProductSelected(product.id)
+                        ? '✓ Produit sélectionné'
+                        : '+ Ajouter ' + targetToLabel
                         }}
 
                     </button>
@@ -515,18 +532,18 @@
     <!-- ========================================================= -->
 
     <div
-        *ngIf="!loading && totalPages > 1"
-        class="mt-6 flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
+            *ngIf="!loading && totalPages > 1"
+            class="mt-6 flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
     >
 
         <p
-            class="text-sm text-gray-500"
+                class="text-sm text-gray-500"
         >
 
             Page
 
             <span
-                class="font-semibold text-gray-900"
+                    class="font-semibold text-gray-900"
             >
                 {{ currentPage + 1 }}
             </span>
@@ -534,7 +551,7 @@
             sur
 
             <span
-                class="font-semibold text-gray-900"
+                    class="font-semibold text-gray-900"
             >
                 {{ totalPages }}
             </span>
@@ -543,38 +560,38 @@
 
 
         <div
-            class="flex flex-wrap items-center gap-1"
+                class="flex flex-wrap items-center gap-1"
         >
 
             <button
-                type="button"
-                (click)="previousPage()"
-                [disabled]="currentPage === 0"
-                class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    type="button"
+                    (click)="previousPage()"
+                    [disabled]="currentPage === 0"
+                    class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
             >
                 ←
             </button>
 
 
             <button
-                *ngFor="let page of pages"
-                type="button"
-                (click)="goToPage(page)"
-                class="min-w-9 rounded-lg px-3 py-2 text-sm font-medium"
-                [class.bg-blue-600]="page === currentPage"
-                [class.text-white]="page === currentPage"
-                [class.text-gray-700]="page !== currentPage"
-                [class.hover:bg-gray-100]="page !== currentPage"
+                    *ngFor="let page of pages"
+                    type="button"
+                    (click)="goToPage(page)"
+                    class="min-w-9 rounded-lg px-3 py-2 text-sm font-medium"
+                    [class.bg-blue-600]="page === currentPage"
+                    [class.text-white]="page === currentPage"
+                    [class.text-gray-700]="page !== currentPage"
+                    [class.hover:bg-gray-100]="page !== currentPage"
             >
                 {{ page + 1 }}
             </button>
 
 
             <button
-                type="button"
-                (click)="nextPage()"
-                [disabled]="currentPage >= totalPages - 1"
-                class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    type="button"
+                    (click)="nextPage()"
+                    [disabled]="currentPage >= totalPages - 1"
+                    class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
             >
                 →
             </button>
@@ -585,22 +602,22 @@
 
 
     <!-- ========================================================= -->
-    <!-- BARRE BASSE MODE PACK -->
+    <!-- BARRE BASSE MODE SELECTION -->
     <!-- ========================================================= -->
 
     <div
-        *ngIf="isBundleSelectionMode"
-        class="sticky bottom-4 z-40 mt-6 rounded-xl border border-gray-200 bg-white p-4 shadow-lg"
+            *ngIf="isBundleSelectionMode"
+            class="sticky bottom-4 z-40 mt-6 rounded-xl border border-gray-200 bg-white p-4 shadow-lg"
     >
 
         <div
-            class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
         >
 
             <div>
 
                 <p
-                    class="text-sm font-semibold text-gray-900"
+                        class="text-sm font-semibold text-gray-900"
                 >
                     {{ selectedProductCount }}
                     produit{{ selectedProductCount > 1 ? 's' : '' }}
@@ -609,7 +626,7 @@
 
 
                 <p
-                    class="text-xs text-gray-500"
+                        class="text-xs text-gray-500"
                 >
                     La sélection est conservée entre les pages.
                 </p>
@@ -618,23 +635,23 @@
 
 
             <div
-                class="flex flex-wrap gap-2"
+                    class="flex flex-wrap gap-2"
             >
 
                 <button
-                    type="button"
-                    (click)="cancelBundleSelection()"
-                    class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        type="button"
+                        (click)="cancelBundleSelection()"
+                        class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
                     Annuler
                 </button>
 
 
                 <button
-                    type="button"
-                    (click)="confirmBundleSelection()"
-                    [disabled]="selectedProductCount === 0"
-                    class="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        type="button"
+                        (click)="confirmBundleSelection()"
+                        [disabled]="selectedProductCount === 0"
+                        class="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     Confirmer la sélection
                 </button>

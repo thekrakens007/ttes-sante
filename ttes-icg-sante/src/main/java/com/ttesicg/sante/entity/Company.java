@@ -31,7 +31,7 @@ public class Company {
     @Column(length = 100)
     private String country;
 
-    @Column(name = "logo_url", length = 500)
+    @Column(name = "logo_url", columnDefinition = "TEXT")
     private String logoUrl;
 
     @Column(length = 500)

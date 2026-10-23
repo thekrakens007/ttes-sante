@@ -8,6 +8,7 @@ import { OrderResponse } from '../interfaces/order-response.interface';
 import {TherapeuticAreaResponse} from "../interfaces/therapeutic-area-response.interface";
 import {CategoryResponse} from "../interfaces/category-response.interface";
 import {CompanyResponse} from "../interfaces/company-response.interface";
+import {CompanyRequest} from "../interfaces/company-request.interface";
 import {TherapeuticAreaRequest} from "../interfaces/therapeutic-area-request.interface";
 import {InventoryResponse} from "../interfaces/inventory-response.interface";
 import {InventoryRequest} from "../interfaces/inventory-request.interface";
@@ -301,7 +302,7 @@ searchProductsPaginated(
     }
 
 
-    createCompany(request: any): Observable<CompanyResponse> {
+    createCompany(request: CompanyRequest): Observable<CompanyResponse> {
 
         return this.http.post<CompanyResponse>(
             `${this.API_URL}/companies`,
@@ -321,7 +322,7 @@ searchProductsPaginated(
 
     updateCompany(
         id: number,
-        request: any
+        request: CompanyRequest
     ): Observable<CompanyResponse> {
 
         return this.http.put<CompanyResponse>(

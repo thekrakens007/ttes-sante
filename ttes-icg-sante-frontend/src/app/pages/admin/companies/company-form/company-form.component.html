@@ -114,24 +114,63 @@
 
         <!-- URL du logo -->
         <div>
-            <label for="logoUrl" class="mb-2 block text-sm font-medium">
-                URL du logo
+            <label class="mb-2 block text-sm font-medium">
+                Image ou logo de l’entreprise
             </label>
 
             <input
-                    id="logoUrl"
-                    type="url"
-                    formControlName="logoUrl"
-                    placeholder="https://exemple.com/logo.png"
-                    class="h-11 w-full rounded-lg border border-gray-300 px-4"
+                    id="logoFile"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    (change)="selectLogoFile($event)"
+                    class="block w-full text-sm text-gray-700 file:mr-4 file:rounded-lg file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:font-medium file:text-brand-700"
             />
 
             <p class="mt-1 text-xs text-gray-500">
-                Colle une URL publique pointant vers l’image du logo.
+                Choisis un PNG, JPEG ou WebP (5 Mo maximum). L’image est réduite et enregistrée avec l’entreprise.
             </p>
 
+            <p *ngIf="logoFileError" class="mt-1 text-sm text-red-600">
+                {{ logoFileError }}
+            </p>
+
+            <div *ngIf="isUploadedLogo()" class="mt-4 flex items-center gap-3">
+                <span class="text-sm text-gray-600">Image importée.</span>
+                <button
+                        type="button"
+                        (click)="clearLogo()"
+                        class="text-sm font-medium text-red-600 hover:underline"
+                >
+                    Supprimer
+                </button>
+            </div>
+
+            <div class="mt-4">
+                <label for="logoUrl" class="mb-2 block text-sm font-medium">
+                    Ou colle l’URL publique d’un logo
+                </label>
+
+                <input
+                        *ngIf="!isUploadedLogo()"
+                        id="logoUrl"
+                        type="url"
+                        formControlName="logoUrl"
+                        maxlength="500"
+                        placeholder="https://exemple.com/logo.png"
+                        (input)="onLogoUrlInput()"
+                        class="h-11 w-full rounded-lg border border-gray-300 px-4"
+                />
+
+                <p
+                        *ngIf="companyForm.controls.logoUrl.touched && companyForm.controls.logoUrl.invalid"
+                        class="mt-1 text-sm text-red-600"
+                >
+                    L’URL du logo doit commencer par http:// ou https:// et ne pas dépasser 500 caractères.
+                </p>
+            </div>
+
             <div
-                    *ngIf="companyForm.controls.logoUrl.value"
+                    *ngIf="companyForm.controls.logoUrl.value && !logoPreviewError"
                     class="mt-3"
             >
                 <p class="mb-2 text-sm font-medium">Aperçu du logo</p>
@@ -140,10 +179,16 @@
                         [src]="companyForm.controls.logoUrl.value"
                         alt="Aperçu du logo de l’entreprise"
                         class="h-20 w-20 rounded-lg border border-gray-200 bg-white object-contain p-2"
-                        (error)="$any($event.target).style.display = 'none'"
-                        (load)="$any($event.target).style.display = 'block'"
+                        (error)="logoPreviewError = true"
                 />
             </div>
+
+            <p
+                    *ngIf="companyForm.controls.logoUrl.value && logoPreviewError"
+                    class="mt-2 text-sm text-red-600"
+            >
+                Cette image ne peut pas être chargée. Vérifie l’URL ou sélectionne un fichier.
+            </p>
         </div>
 
         <!-- Description -->

@@ -30,6 +30,7 @@ export class CompanyListComponent implements OnInit {
 
     loading = true;
     error = '';
+    failedLogoIds = new Set<number>();
 
     ngOnInit(): void {
         this.route.queryParamMap.subscribe(params => {
@@ -48,6 +49,7 @@ export class CompanyListComponent implements OnInit {
         this.companyService.getCompanies().subscribe({
             next: (companies) => {
                 this.companies = companies;
+                this.failedLogoIds.clear();
 
                 if (this.categoryId !== null) {
                     this.filteredCompanies = companies.filter(
@@ -76,5 +78,19 @@ export class CompanyListComponent implements OnInit {
                 this.loading = false;
             }
         });
+    }
+
+    onLogoError(companyId: number): void {
+        this.failedLogoIds.add(companyId);
+    }
+
+    getCompanyInitials(name: string): string {
+        return name
+            .trim()
+            .split(/\s+/)
+            .slice(0, 2)
+            .map(part => part.charAt(0))
+            .join('')
+            .toUpperCase();
     }
 }

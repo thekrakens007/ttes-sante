@@ -25,6 +25,8 @@ export class CompanyTableComponent implements OnInit {
 
     errorMessage = '';
 
+    failedLogoIds = new Set<number>();
+
     ngOnInit(): void {
         this.loadCompanies();
     }
@@ -39,6 +41,7 @@ export class CompanyTableComponent implements OnInit {
             next: data => {
 
                 this.companies = data;
+                this.failedLogoIds.clear();
 
                 this.loading = false;
 
@@ -60,6 +63,10 @@ export class CompanyTableComponent implements OnInit {
 
         });
 
+    }
+
+    onLogoError(companyId: number): void {
+        this.failedLogoIds.add(companyId);
     }
 
     refresh(): void {

@@ -2,6 +2,7 @@
 package com.ttesicg.sante.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -20,7 +21,11 @@ public class CompanyRequest {
     @Size(max = 500)
     private String website;
 
-    @Size(max = 500)
+    @Size(max = 400_000)
+    @Pattern(
+            regexp = "(?i)^(?:https?://\\S{1,492}|data:image/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2})?$",
+            message = "Le logo doit être une URL HTTP(S) ou une image PNG, JPEG ou WebP."
+    )
     private String logoUrl;
 
     // Facultatif : null signifie qu'aucune catégorie n'est sélectionnée.

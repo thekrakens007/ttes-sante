@@ -53,10 +53,6 @@ public class Cart {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cure_id")
-    private Cure cure;
-
     @PrePersist
     protected void onCreate(){
 

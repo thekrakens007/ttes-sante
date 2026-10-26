@@ -26,4 +26,7 @@ public class CartItemResponse {
     private String imageUrl;
 
     private BigDecimal subtotal;
+
+    private Long cureId;
+    private String cureName;
 }

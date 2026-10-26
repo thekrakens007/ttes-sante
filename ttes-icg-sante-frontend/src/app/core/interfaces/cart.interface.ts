@@ -7,6 +7,7 @@ export interface Cart {
 export interface CartItemRequest {
     productId?: number;
     bundleId?: number;
+    cureId?: number;
     quantity: number;
 }
 
@@ -18,6 +19,9 @@ export interface CartItem {
 
     bundleId?: number;
     bundleName?: string;
+
+    cureId?: number | null;
+    cureName?: string | null;
 
     quantity: number;
 
@@ -37,5 +41,6 @@ export interface CartResponse {
 export interface AddCartItemRequest {
     productId?: number;
     bundleId?: number;
+    cureId?: number;
     quantity: number;
 }

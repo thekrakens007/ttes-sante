@@ -1,4 +1,3 @@
-
 package com.ttesicg.sante.dto;
 
 import java.math.BigDecimal;
@@ -11,7 +10,13 @@ public record CureResponse(
         String imageUrl,
         boolean active,
         BigDecimal totalPrice,
-        List<CureProductResponse> items
+        List<CureProductResponse> items,
+
+        /*
+         * Nombre de cures réalisables avec le stock actuel
+         * des produits qui la composent.
+         */
+        Integer availableStock
 ) {
     public record CureProductResponse(
             Long productId,

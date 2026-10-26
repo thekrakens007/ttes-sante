@@ -1,4 +1,3 @@
-
 package com.ttesicg.sante.service;
 
 import com.ttesicg.sante.dto.CureRequest;
@@ -81,6 +80,81 @@ public class CureService {
                 .orElseThrow(() ->
                         new EntityNotFoundException("Cure introuvable")
                 );
+    }
+
+
+    // ============================================================
+    // PRIX ET STOCK (utilisés par le panier et les commandes)
+    // ============================================================
+
+    /**
+     * Prix total d'une cure :
+     * somme de (prix du produit × quantité) pour chaque produit.
+     */
+    @Transactional(readOnly = true)
+    public BigDecimal calculateTotalPrice(Cure cure) {
+        return cure.getItems().stream()
+                .map(item -> {
+                    BigDecimal unitPrice = Objects.requireNonNull(
+                            item.getProduct().getPrice(),
+                            "Le prix du produit ne peut pas être nul"
+                    );
+
+                    return unitPrice.multiply(
+                            BigDecimal.valueOf(item.getQuantity())
+                    );
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    /**
+     * Nombre de cures réalisables avec le stock actuel.
+     *
+     * Exemple :
+     *
+     * Produit A : 10 en stock, 2 par cure -> 5
+     * Produit B : 7  en stock, 1 par cure -> 7
+     *
+     * Stock de la cure = 5
+     */
+    @Transactional(readOnly = true)
+    public int calculateAvailableStock(Cure cure) {
+
+        if (cure.getItems() == null || cure.getItems().isEmpty()) {
+            return 0;
+        }
+
+        int stock = Integer.MAX_VALUE;
+
+        for (CureItem item : cure.getItems()) {
+
+            Product product = item.getProduct();
+
+            int productStock = 0;
+
+            if (product.getInventory() != null
+                    && product.getInventory().getQuantity() != null) {
+                productStock = product.getInventory().getQuantity();
+            }
+
+            int required = item.getQuantity();
+
+            if (required <= 0) {
+                continue;
+            }
+
+            stock = Math.min(stock, productStock / required);
+        }
+        int availableStock = stock == Integer.MAX_VALUE ? 0 : stock;
+
+        System.out.println(
+                "Stock calculé pour la cure "
+                        + cure.getId()
+                        + " : "
+                        + availableStock
+        );
+
+        return availableStock;
     }
 
 
@@ -193,7 +267,8 @@ public class CureService {
                 cure.getImageUrl(),
                 cure.isActive(),
                 total,
-                items
+                items,
+                calculateAvailableStock(cure)
         );
     }
 }

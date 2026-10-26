@@ -668,34 +668,20 @@ export class CheckoutComponent implements OnInit {
         ]);
 
     }
-    isBundle(item: any): boolean {
-
-        return item.bundleId != null;
-
-    }
-
+    isBundle(item: any): boolean { return item.bundleId != null; }
+    isCure(item: any): boolean { return item.cureId != null; }
 
     getItemName(item: any): string {
-
-        if (this.isBundle(item)) {
-
-            return item.bundleName
-                ?? 'Pack';
-
-        }
-
-        return item.productName
-            ?? 'Produit';
-
+        if (this.isBundle(item)) return item.bundleName ?? 'Pack';
+        if (this.isCure(item)) return item.cureName ?? 'Cure';
+        return item.productName ?? 'Produit';
     }
-
 
     getItemType(item: any): string {
-
-        return this.isBundle(item)
-            ? 'Pack'
-            : 'Produit';
-
+        if (this.isBundle(item)) return 'Pack';
+        if (this.isCure(item)) return 'Cure';
+        return 'Produit';
     }
+
 
 }

@@ -2,6 +2,8 @@ package com.ttesicg.sante.repository;
 
 
 import com.ttesicg.sante.entity.Cart;
+import com.ttesicg.sante.entity.CartItem;
+import com.ttesicg.sante.entity.Cure;
 import com.ttesicg.sante.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,6 +15,5 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
 
 
     Optional<Cart> findByUser(User user);
-
 
 }

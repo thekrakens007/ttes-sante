@@ -38,6 +38,7 @@ export class CartComponent implements OnInit {
 
     private router = inject(Router);
 
+     stockDialogOpen = false;
 
     // ==========================================
     // ÉTAT
@@ -162,31 +163,26 @@ export class CartComponent implements OnInit {
     // NOM ARTICLE
     // ==========================================
 
-    getItemName(item: CartItem): string {
-
-        if (this.isBundle(item)) {
-
-            return item.bundleName
-                ?? 'Pack';
-
-        }
-
-        return item.productName
-            ?? 'Produit';
-
+    isCure(item: CartItem): boolean {
+        return item.cureId != null;
     }
 
+    getItemName(item: CartItem): string {
+        if (this.isBundle(item)) {
+            return item.bundleName ?? 'Pack';
+        }
 
-    // ==========================================
-    // TYPE ARTICLE
-    // ==========================================
+        if (this.isCure(item)) {
+            return item.cureName ?? 'Cure';
+        }
+
+        return item.productName ?? 'Produit';
+    }
 
     getItemType(item: CartItem): string {
-
-        return this.isBundle(item)
-            ? 'Pack'
-            : 'Produit';
-
+        if (this.isBundle(item)) return 'Pack';
+        if (this.isCure(item)) return 'Cure';
+        return 'Produit';
     }
 
 
@@ -306,47 +302,28 @@ export class CartComponent implements OnInit {
                 // ERREUR
                 // ==================================
 
+
                 error: (error) => {
-
-                    console.error(
-                        'Erreur modification quantité',
-                        error
-                    );
-
+                    console.error('Erreur modification quantité', error);
+                    this.stockDialogOpen = true;
                     this.updatingItemId = null;
 
-                    /*
-                     * Le backend peut renvoyer :
-                     *
-                     * {
-                     *     "message":
-                     *     "Stock insuffisant pour le pack pack1"
-                     * }
-                     *
-                     * ou :
-                     *
-                     * {
-                     *     "error":
-                     *     "Stock insuffisant pour le pack pack1"
-                     * }
-                     */
+                    const backendMessage =
+                        error?.error?.message ??
+                        error?.error?.error ??
+                        '';
 
                     this.actionError =
-                        error?.error?.message
-                        ?? error?.error?.error
-                        ?? 'Stock insuffisant pour cet article.';
+                        typeof backendMessage === 'string' &&
+                        backendMessage.trim() !== ''
+                            ? backendMessage
+                            : 'Stock insuffisant ou impossible de modifier la quantité.';
 
-
-                    /*
-                     * On recharge le panier pour conserver
-                     * la quantité réellement enregistrée.
-                     *
-                     * IMPORTANT :
-                     * loadCart() ne supprime plus actionError.
-                     */
+                    // Recharge le panier sans effacer le message.
                     this.loadCart();
 
                 }
+
 
             });
 

@@ -11,6 +11,11 @@ public class CartItemRequest {
 
     private Long bundleId;
 
+    /**
+     * Identifiant de la cure à ajouter au panier.
+     */
+    private Long cureId;
+
     @NotNull
     @Positive
     private Integer quantity;

@@ -66,4 +66,8 @@ public class CartItem {
      */
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cure_id")
+    private Cure cure;
 }

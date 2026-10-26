@@ -88,6 +88,7 @@ public class OrderService {
          *
          * - un produit
          * - un pack
+         * - une cure
          */
         for (CartItem cartItem : cart.getItems()) {
 
@@ -104,6 +105,7 @@ public class OrderService {
                             .order(order)
                             .product(cartItem.getProduct())
                             .bundle(cartItem.getBundle())
+                            .cure(cartItem.getCure())
                             .quantity(cartItem.getQuantity())
                             .price(cartItem.getPrice())
                             .build();
@@ -176,6 +178,12 @@ public class OrderService {
      *   pour chaque produit du pack :
      *   stock produit -=
      *       quantité du pack × quantité commandée
+     *
+     * Cure :
+     *
+     *   pour chaque produit de la cure :
+     *   stock produit -=
+     *       quantité dans la cure × quantité commandée
      */
     private void checkAndUpdateStock(
             CartItem cartItem
@@ -323,6 +331,116 @@ public class OrderService {
 
         /*
          * ==========================
+         * CURE
+         * ==========================
+         */
+        if (cartItem.getCure() != null) {
+
+            Cure cure =
+                    cartItem.getCure();
+
+            /*
+             * Une cure désactivée depuis son ajout
+             * au panier ne peut plus être commandée.
+             */
+            if (!cure.isActive()) {
+
+                throw new RuntimeException(
+                        "La cure "
+                                + cure.getName()
+                                + " n'est plus disponible"
+                );
+            }
+
+            List<CureItem> cureItems =
+                    cure.getItems();
+
+            if (cureItems == null
+                    || cureItems.isEmpty()) {
+
+                throw new RuntimeException(
+                        "La cure "
+                                + cure.getName()
+                                + " ne contient aucun produit"
+                );
+            }
+
+            /*
+             * Première étape :
+             * vérifier TOUT le stock avant
+             * de modifier quoi que ce soit.
+             */
+            for (CureItem cureItem : cureItems) {
+
+                Product product =
+                        cureItem.getProduct();
+
+                Inventory inventory =
+                        inventoryRepository
+                                .findByProductId(
+                                        product.getId()
+                                )
+                                .orElseThrow(
+                                        () -> new RuntimeException(
+                                                "Stock introuvable pour "
+                                                        + product.getName()
+                                        )
+                                );
+
+                int requiredQuantity =
+                        cureItem.getQuantity()
+                                * cartItem.getQuantity();
+
+                if (inventory.getQuantity()
+                        < requiredQuantity) {
+
+                    throw new RuntimeException(
+                            "Stock insuffisant pour "
+                                    + product.getName()
+                                    + " dans la cure "
+                                    + cure.getName()
+                    );
+                }
+            }
+
+            /*
+             * Deuxième étape :
+             * décrémenter les stocks.
+             */
+            for (CureItem cureItem : cureItems) {
+
+                Product product =
+                        cureItem.getProduct();
+
+                Inventory inventory =
+                        inventoryRepository
+                                .findByProductId(
+                                        product.getId()
+                                )
+                                .orElseThrow(
+                                        () -> new RuntimeException(
+                                                "Stock introuvable pour "
+                                                        + product.getName()
+                                        )
+                                );
+
+                int requiredQuantity =
+                        cureItem.getQuantity()
+                                * cartItem.getQuantity();
+
+                inventory.setQuantity(
+                        inventory.getQuantity()
+                                - requiredQuantity
+                );
+
+                inventoryRepository.save(inventory);
+            }
+
+            return;
+        }
+
+        /*
+         * ==========================
          * ARTICLE INVALIDE
          * ==========================
          */
@@ -414,6 +532,10 @@ public class OrderService {
 
                     .bundleName(null)
 
+                    .cureId(null)
+
+                    .cureName(null)
+
                     .quantity(
                             item.getQuantity()
                     )
@@ -447,6 +569,49 @@ public class OrderService {
 
                     .bundleName(
                             bundle.getName()
+                    )
+
+                    .cureId(null)
+
+                    .cureName(null)
+
+                    .quantity(
+                            item.getQuantity()
+                    )
+
+                    .price(
+                            item.getPrice()
+                    )
+
+                    .build();
+        }
+
+        /*
+         * Ligne = CURE
+         */
+        if (item.getCure() != null) {
+
+            Cure cure =
+                    item.getCure();
+
+            return OrderItemResponse.builder()
+
+                    .id(item.getId())
+
+                    .productId(null)
+
+                    .productName(null)
+
+                    .bundleId(null)
+
+                    .bundleName(null)
+
+                    .cureId(
+                            cure.getId()
+                    )
+
+                    .cureName(
+                            cure.getName()
                     )
 
                     .quantity(

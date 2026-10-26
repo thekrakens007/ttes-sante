@@ -36,7 +36,7 @@
 
                 <a routerLink="/cures"
                    class="text-sm font-semibold text-green-600 dark:text-green-400">
-                    Cures preventives
+                    Cures
                 </a>
 
                 <a routerLink="/companies"
@@ -121,7 +121,7 @@
 
                 <a routerLink="/cures" (click)="closeMobileMenu()"
                    class="rounded-lg bg-green-50 px-4 py-3 text-sm font-semibold text-green-700 dark:bg-green-900/20 dark:text-green-400">
-                    Cures preventives
+                    Cures
                 </a>
 
                 <a routerLink="/companies" (click)="closeMobileMenu()"
@@ -293,6 +293,25 @@
 
 
         <!-- ================================================= -->
+        <!-- ================================================= -->
+        <!-- MESSAGES PANIER -->
+        <!-- ================================================= -->
+
+        @if (cartMessage) {
+        <div class="mb-6 flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700 dark:border-green-800 dark:bg-green-900/20 dark:text-green-400">
+            <span>✓</span>
+            <span>{{ cartMessage }}</span>
+        </div>
+        }
+
+        @if (cartError) {
+        <div class="mb-6 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+            <span>⚠️</span>
+            <span>{{ cartError }}</span>
+        </div>
+        }
+
+
         <!-- EN-TETE RESULTATS -->
         <!-- ================================================= -->
 
@@ -437,6 +456,16 @@
                          [alt]="cure.name"
                          class="h-52 w-full object-cover transition duration-500 group-hover:scale-105">
 
+                    <!-- BADGE RUPTURE -->
+
+                    @if (isOutOfStock(cure)) {
+                    <div class="absolute left-3 top-3">
+                        <span class="inline-flex items-center rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white shadow-sm">
+                            Rupture
+                        </span>
+                    </div>
+                    }
+
                     <!-- BADGE CURE -->
 
                     <div class="absolute right-3 top-3">
@@ -484,10 +513,38 @@
                         </p>
                     </div>
 
+                    <!-- QUANTITE DANS LE PANIER -->
+
+                    @if (getCureCartQuantity(cure.id) > 0) {
+                    <div class="mt-4 flex items-center justify-center gap-2 rounded-xl bg-green-50 px-3 py-2.5 text-sm font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                        <span class="text-base">🛒</span>
+                        <span>
+                            <span class="font-bold">{{ getCureCartQuantity(cure.id) }}</span>
+                            {{ getCureCartQuantity(cure.id) > 1 ? 'cures' : 'cure' }}
+                            dans le panier
+                        </span>
+                    </div>
+                    }
+
+                    <!-- AJOUTER AU PANIER -->
+
+                    <button type="button"
+                            (click)="addToCart(cure)"
+                            [disabled]="isOutOfStock(cure) || addingCureId === cure.id"
+                            class="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-green-500 dark:hover:bg-green-400">
+                        @if (addingCureId === cure.id) {
+                        <span class="animate-spin">⏳</span>
+                        <span>Ajout...</span>
+                        } @else {
+                        <span>🛒</span>
+                        <span>{{ isOutOfStock(cure) ? 'Rupture de stock' : 'Ajouter au panier' }}</span>
+                        }
+                    </button>
+
                     <!-- VOIR LES DETAILS -->
 
                     <a [routerLink]="['/cures', cure.id]"
-                       class="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400">
+                       class="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-green-600 bg-white px-4 py-3 text-sm font-semibold text-green-700 transition hover:bg-green-50 dark:border-green-500 dark:bg-gray-900 dark:text-green-400 dark:hover:bg-green-900/30">
                         <span>👁️</span>
                         <span>Voir les détails</span>
                     </a>
@@ -609,4 +666,49 @@
 
     </footer>
 
+    <!-- BOÎTE DE DIALOGUE : STOCK INSUFFISANT -->
+    @if (stockDialogOpen) {
+    <div
+            class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-4 py-6"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="stock-dialog-title">
+
+        <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-900">
+
+            <div class="flex items-start gap-4">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-100 text-2xl dark:bg-amber-900/40">
+                    ⚠️
+                </div>
+
+                <div class="flex-1">
+                    <h2
+                            id="stock-dialog-title"
+                            class="text-xl font-bold text-gray-900 dark:text-white">
+                        Stock insuffisant
+                    </h2>
+
+                    <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                        {{ stockDialogMessage }}
+                    </p>
+
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        La quantité demandée n'est pas disponible. Réessayez plus tard ou choisissez une autre cure.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button
+                        type="button"
+                        (click)="closeStockDialog()"
+                        class="rounded-xl bg-green-600 px-5 py-2.5 font-semibold text-white transition hover:bg-green-700">
+                    Compris
+                </button>
+            </div>
+
+        </div>
+    </div>
+    }
 </div>
+

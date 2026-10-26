@@ -144,6 +144,50 @@
 
                 <!-- ============================================= -->
                 <!-- CONTENU DE LA CURE -->
+
+                <!-- ============================================= -->
+                <!-- STOCK + PANIER -->
+                <!-- ============================================= -->
+
+                <div class="mt-6">
+
+                    @if (isOutOfStock()) {
+                    <p class="mb-3 font-medium text-red-600">
+                        Rupture de stock
+                    </p>
+                    }
+
+                    @if (cartMessage) {
+                    <div class="mb-3 flex items-center justify-between gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700 dark:border-green-800 dark:bg-green-900/20 dark:text-green-400">
+                        <span>✓ {{ cartMessage }}</span>
+                        <a routerLink="/cart" class="font-semibold underline">
+                            Voir le panier
+                        </a>
+                    </div>
+                    }
+
+                    @if (cartError) {
+                    <div class="mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+                        ⚠️ {{ cartError }}
+                    </div>
+                    }
+
+                    <button type="button"
+                            (click)="addToCart()"
+                            [disabled]="addingToCart || isOutOfStock()"
+                            class="w-full rounded-lg bg-green-700 px-6 py-3 font-medium text-white transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50">
+
+                        @if (addingToCart) {
+                        <span>Ajout en cours...</span>
+                        } @else {
+                        <span>🛒 Ajouter au panier</span>
+                        }
+
+                    </button>
+
+                </div>
+
+
                 <!-- ============================================= -->
 
                 <div class="mt-8">

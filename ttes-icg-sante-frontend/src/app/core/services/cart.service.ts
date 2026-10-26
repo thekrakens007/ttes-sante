@@ -23,6 +23,24 @@ export class CartService {
     }
 
     /**
+     * Ajouter une cure au panier.
+     */
+    addCure(
+        cureId: number,
+        quantity: number = 1
+    ): Observable<Cart> {
+
+        const request: CartItemRequest = {
+            cureId,
+            quantity
+        };
+
+        return this.http.post<Cart>(
+            `${this.API_URL}/me/items`,
+            request
+        );
+    }
+    /**
      * Ajouter un produit au panier.
      */
     addItem(

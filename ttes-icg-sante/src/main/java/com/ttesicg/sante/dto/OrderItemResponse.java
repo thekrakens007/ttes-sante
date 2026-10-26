@@ -22,4 +22,7 @@ public class OrderItemResponse {
     private Integer quantity;
 
     private BigDecimal price;
+
+    private Long cureId;
+    private String cureName;
 }

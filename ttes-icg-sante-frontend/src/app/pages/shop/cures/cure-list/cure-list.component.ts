@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 import { CureService } from '../../../../core/services/cure.service';
 import { Cure, CureProduct } from '../../../../core/models/cure.model';
@@ -26,6 +26,7 @@ export class CureListComponent implements OnInit {
     private cureService = inject(CureService);
     private authService = inject(AuthService);
     private cartService = inject(CartService);
+    private router = inject(Router);
 
 
     // ============================================================
@@ -42,6 +43,15 @@ export class CureListComponent implements OnInit {
 
     cart: Cart | null = null;
     cartCount = 0;
+
+    /** Cure en cours d'ajout au panier. */
+    addingCureId: number | null = null;
+
+    cartMessage = '';
+    cartError = '';
+
+    stockDialogOpen = false;
+    stockDialogMessage = '';
 
 
     // ============================================================
@@ -122,6 +132,16 @@ export class CureListComponent implements OnInit {
         return this.authService.hasRole('ROLE_ADMIN');
     }
 
+    private showStockDialog(message: string): void {
+        this.stockDialogMessage = message;
+        this.stockDialogOpen = true;
+        this.cartError = '';
+        this.cartMessage = '';
+    }
+
+    closeStockDialog(): void {
+        this.stockDialogOpen = false;
+    }
 
     // ============================================================
     // PANIER
@@ -360,6 +380,124 @@ export class CureListComponent implements OnInit {
                 ?.productImageUrl ??
             '/images/products/default-product.png'
         );
+    }
+
+
+    // ============================================================
+    // AJOUT AU PANIER
+    // ============================================================
+
+    private applyCart(cart: Cart): void {
+        this.cart = cart;
+        this.cartCount = (cart.items ?? []).reduce(
+            (total, item) => total + (item.quantity ?? 0),
+            0
+        );
+    }
+
+    getCureCartQuantity(cureId?: number): number {
+        if (cureId === undefined || !this.cart?.items) {
+            return 0;
+        }
+
+        return this.cart.items.find(item => item.cureId === cureId)
+            ?.quantity ?? 0;
+    }
+
+    /**
+     * Une cure n'a pas de stock propre : le backend peut fournir
+     * availableStock (nombre de cures réalisables avec le stock des
+     * produits). S'il est absent, on ne bloque pas côté client.
+     */
+    isOutOfStock(cure: Cure): boolean {
+        return (
+            cure.availableStock !== undefined &&
+            cure.availableStock !== null &&
+            cure.availableStock <= 0
+        );
+    }
+
+    addToCart(cure: Cure): void {
+        if (cure.id === undefined) {
+            return;
+        }
+
+        // Non connecté : redirection vers la connexion
+        if (!this.authService.isLoggedIn()) {
+            this.router.navigate(['/signin'], {
+                queryParams: { returnUrl: this.router.url }
+            });
+            return;
+        }
+
+        if (this.isOutOfStock(cure)) {
+            this.showCartError('Cette cure est actuellement en rupture de stock.');
+            return;
+        }
+
+        // Éviter le double clic
+        if (this.addingCureId !== null) {
+            return;
+        }
+
+        this.addingCureId = cure.id;
+        this.cartMessage = '';
+        this.cartError = '';
+
+        this.cartService.addCure(cure.id, 1).subscribe({
+            next: (cart: Cart) => {
+                this.applyCart(cart);
+                this.addingCureId = null;
+                this.cartMessage = `${cure.name} a été ajoutée au panier.`;
+
+                setTimeout(() => {
+                    this.cartMessage = '';
+                }, 3000);
+            },
+            error: (error: any) => {
+                console.error('Erreur ajout cure au panier :', error);
+                this.addingCureId = null;
+
+                // Session expirée
+                if (error?.status === 401) {
+                    this.authService.logout();
+                    this.router.navigate(['/signin'], {
+                        queryParams: { returnUrl: this.router.url }
+                    });
+                    return;
+                }
+
+                const message =
+                    error?.error?.message ??
+                    error?.error?.error ??
+                    'Impossible d’ajouter la cure au panier.';
+
+                const messageLower = String(message).toLowerCase();
+
+                // Afficher une boîte de dialogue si le problème concerne le stock.
+                if (
+                    messageLower.includes('stock') ||
+                    messageLower.includes('quantité disponible') ||
+                    messageLower.includes('quantite disponible') ||
+                    messageLower.includes('insuffisant')
+                ) {
+                    this.showStockDialog(message);
+                    return;
+                }
+
+                // Les autres erreurs restent affichées comme auparavant.
+                this.showCartError(message);
+            }
+        });
+    }
+
+    private showCartError(message: string): void {
+        this.cartError = message;
+        this.cartMessage = '';
+
+        setTimeout(() => {
+            this.cartError = '';
+        }, 4000);
     }
 
 

@@ -1,9 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { CureService } from '../../../../core/services/cure.service';
 import { Cure, CureProduct } from '../../../../core/models/cure.model';
+import { AuthService } from '../../../../core/services/auth.service';
+import { CartService } from '../../../../core/services/cart.service';
 
 @Component({
     selector: 'app-cure-detail',
@@ -14,7 +16,10 @@ import { Cure, CureProduct } from '../../../../core/models/cure.model';
 export class CureDetailComponent implements OnInit {
 
     private route = inject(ActivatedRoute);
+    private router = inject(Router);
     private cureService = inject(CureService);
+    private authService = inject(AuthService);
+    private cartService = inject(CartService);
 
     cure: Cure | null = null;
 
@@ -31,6 +36,14 @@ export class CureDetailComponent implements OnInit {
      * de ses produits (sans doublons).
      */
     images: string[] = [];
+
+    // ============================================================
+    // PANIER
+    // ============================================================
+
+    addingToCart = false;
+    cartMessage = '';
+    cartError = '';
 
 
     // ============================================================
@@ -110,6 +123,81 @@ export class CureDetailComponent implements OnInit {
 
     getSubtotal(item: CureProduct): number {
         return item.subtotal ?? (item.unitPrice ?? 0) * item.quantity;
+    }
+
+
+    // ============================================================
+    // STOCK
+    // ============================================================
+
+    /**
+     * Une cure n'a pas de stock propre : le backend peut fournir
+     * availableStock (nombre de cures réalisables). S'il est absent,
+     * on ne bloque pas côté client.
+     */
+    isOutOfStock(): boolean {
+        const stock = this.cure?.availableStock;
+
+        return stock !== undefined && stock !== null && stock <= 0;
+    }
+
+
+    // ============================================================
+    // AJOUT AU PANIER
+    // ============================================================
+
+    addToCart(): void {
+        if (!this.cure || this.cure.id === undefined) {
+            return;
+        }
+
+        // Non connecté : redirection vers la connexion
+        if (!this.authService.isLoggedIn()) {
+            this.router.navigate(['/signin'], {
+                queryParams: { returnUrl: this.router.url }
+            });
+            return;
+        }
+
+        if (this.isOutOfStock()) {
+            this.cartError = 'Cette cure est actuellement en rupture de stock.';
+            this.cartMessage = '';
+            return;
+        }
+
+        // Éviter le double clic
+        if (this.addingToCart) {
+            return;
+        }
+
+        this.addingToCart = true;
+        this.cartMessage = '';
+        this.cartError = '';
+
+        this.cartService.addCure(this.cure.id, 1).subscribe({
+            next: () => {
+                this.addingToCart = false;
+                this.cartMessage = 'Cure ajoutée au panier.';
+            },
+            error: (error: any) => {
+                console.error('Erreur ajout cure au panier :', error);
+                this.addingToCart = false;
+
+                // Session expirée
+                if (error?.status === 401) {
+                    this.authService.logout();
+                    this.router.navigate(['/signin'], {
+                        queryParams: { returnUrl: this.router.url }
+                    });
+                    return;
+                }
+
+                this.cartError =
+                    error?.error?.message ??
+                    error?.error?.error ??
+                    'Impossible d’ajouter la cure au panier.';
+            }
+        });
     }
 
 

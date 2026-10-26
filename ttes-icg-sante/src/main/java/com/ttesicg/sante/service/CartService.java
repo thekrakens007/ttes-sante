@@ -5,6 +5,7 @@ import com.ttesicg.sante.dto.CartItemResponse;
 import com.ttesicg.sante.dto.CartResponse;
 import com.ttesicg.sante.entity.Cart;
 import com.ttesicg.sante.entity.CartItem;
+import com.ttesicg.sante.entity.Cure;
 import com.ttesicg.sante.entity.Product;
 import com.ttesicg.sante.entity.ProductBundle;
 import com.ttesicg.sante.entity.BundleItem;
@@ -12,6 +13,7 @@ import com.ttesicg.sante.entity.User;
 import com.ttesicg.sante.repository.BundleItemRepository;
 import com.ttesicg.sante.repository.CartItemRepository;
 import com.ttesicg.sante.repository.CartRepository;
+import com.ttesicg.sante.repository.CureRepository;
 import com.ttesicg.sante.repository.ProductBundleRepository;
 import com.ttesicg.sante.repository.ProductRepository;
 import com.ttesicg.sante.repository.UserRepository;
@@ -33,6 +35,8 @@ public class CartService {
     private final ProductRepository productRepository;
     private final ProductBundleRepository bundleRepository;
     private final BundleItemRepository bundleItemRepository;
+    private final CureRepository cureRepository;
+    private final CureService cureService;
     private final UserRepository userRepository;
 
     private User getUserByEmail(String email) {
@@ -133,25 +137,34 @@ public class CartService {
         }
 
         /*
-         * Il faut obligatoirement choisir
-         * soit un produit, soit un pack.
+         * Il faut choisir EXACTEMENT un type d'article :
+         * un produit, un pack ou une cure.
          */
-        if (request.getProductId() == null
-                && request.getBundleId() == null) {
+        int selectedTypes = 0;
+
+        if (request.getProductId() != null) {
+            selectedTypes++;
+        }
+
+        if (request.getBundleId() != null) {
+            selectedTypes++;
+        }
+
+        if (request.getCureId() != null) {
+            selectedTypes++;
+        }
+
+        if (selectedTypes == 0) {
 
             throw new RuntimeException(
-                    "Vous devez sélectionner un produit ou un pack"
+                    "Vous devez sélectionner un produit, un pack ou une cure"
             );
         }
 
-        /*
-         * Impossible d'envoyer les deux.
-         */
-        if (request.getProductId() != null
-                && request.getBundleId() != null) {
+        if (selectedTypes > 1) {
 
             throw new RuntimeException(
-                    "Un article ne peut pas être à la fois un produit et un pack"
+                    "Un article ne peut être qu'un produit, un pack ou une cure"
             );
         }
 
@@ -191,7 +204,20 @@ public class CartService {
          * AJOUT D'UN PACK
          * ============================
          */
-        return addBundleToCart(
+        if (request.getBundleId() != null) {
+
+            return addBundleToCart(
+                    cart,
+                    request
+            );
+        }
+
+        /*
+         * ============================
+         * AJOUT D'UNE CURE
+         * ============================
+         */
+        return addCureToCart(
                 cart,
                 request
         );
@@ -260,6 +286,7 @@ public class CartService {
                             .cart(cart)
                             .product(product)
                             .bundle(null)
+                            .cure(null)
                             .quantity(request.getQuantity())
                             .price(product.getPrice())
                             .build();
@@ -344,8 +371,106 @@ public class CartService {
                             .cart(cart)
                             .product(null)
                             .bundle(bundle)
+                            .cure(null)
                             .quantity(request.getQuantity())
                             .price(bundle.getPrice())
+                            .build();
+        }
+
+        cartItemRepository.save(item);
+
+        return map(cart);
+    }
+
+    private CartResponse addCureToCart(
+            Cart cart,
+            CartItemRequest request
+    ) {
+
+        /*
+         * On charge la cure avec ses produits
+         * pour calculer son prix et son stock.
+         */
+        Cure cure =
+                cureRepository.findWithItemsById(
+                                request.getCureId()
+                        )
+                        .orElseThrow(
+                                () -> new RuntimeException(
+                                        "Cure introuvable"
+                                )
+                        );
+
+        /*
+         * Une cure inactive ne peut pas être
+         * ajoutée au panier.
+         */
+        if (!cure.isActive()) {
+
+            throw new RuntimeException(
+                    "Cette cure n'est plus disponible"
+            );
+        }
+
+        /*
+         * Vérifier le stock calculé de la cure.
+         */
+        int availableStock =
+                cureService.calculateAvailableStock(cure);
+
+        if (availableStock < request.getQuantity()) {
+
+            throw new RuntimeException(
+                    "Stock insuffisant pour la cure "
+                            + cure.getName()
+            );
+        }
+
+        /*
+         * Chercher si la cure existe déjà
+         * dans le panier.
+         */
+        CartItem item =
+                cartItemRepository
+                        .findByCartAndCure(
+                                cart,
+                                cure
+                        )
+                        .orElse(null);
+        System.out.println(
+                "Cure ID : " + cure.getId()
+                        + " | Stock disponible : " + availableStock
+                        + " | Quantité demandée : " + request.getQuantity()
+                        + " | Quantité déjà au panier : "
+                        + (item != null ? item.getQuantity() : 0)
+        );
+        if (item != null) {
+
+            int newQuantity =
+                    item.getQuantity()
+                            + request.getQuantity();
+
+            if (availableStock < newQuantity) {
+
+                throw new RuntimeException(
+                        "Quantité demandée supérieure au stock disponible pour la cure"
+                );
+            }
+
+            item.setQuantity(newQuantity);
+
+        } else {
+
+            item =
+                    CartItem.builder()
+                            .cart(cart)
+                            .product(null)
+                            .bundle(null)
+                            .cure(cure)
+                            .quantity(request.getQuantity())
+                            .price(
+                                    cureService.calculateTotalPrice(cure)
+                            )
                             .build();
         }
 
@@ -459,6 +584,8 @@ public class CartService {
                     .productName(product.getName())
                     .bundleId(null)
                     .bundleName(null)
+                    .cureId(null)
+                    .cureName(null)
                     .quantity(item.getQuantity())
                     .price(item.getPrice())
                     .subtotal(subtotal)
@@ -479,6 +606,30 @@ public class CartService {
                     .productName(null)
                     .bundleId(bundle.getId())
                     .bundleName(bundle.getName())
+                    .cureId(null)
+                    .cureName(null)
+                    .quantity(item.getQuantity())
+                    .price(item.getPrice())
+                    .subtotal(subtotal)
+                    .build();
+        }
+
+        /*
+         * Article = CURE
+         */
+        if (item.getCure() != null) {
+
+            Cure cure =
+                    item.getCure();
+
+            return CartItemResponse.builder()
+                    .id(item.getId())
+                    .productId(null)
+                    .productName(null)
+                    .bundleId(null)
+                    .bundleName(null)
+                    .cureId(cure.getId())
+                    .cureName(cure.getName())
                     .quantity(item.getQuantity())
                     .price(item.getPrice())
                     .subtotal(subtotal)
@@ -568,6 +719,25 @@ public class CartService {
                 throw new RuntimeException(
                         "Stock insuffisant pour le pack "
                                 + item.getBundle().getName()
+                );
+            }
+        }
+
+        /*
+         * Cure
+         */
+        if (item.getCure() != null) {
+
+            int availableStock =
+                    cureService.calculateAvailableStock(
+                            item.getCure()
+                    );
+
+            if (availableStock < quantity) {
+
+                throw new RuntimeException(
+                        "Stock insuffisant pour la cure "
+                                + item.getCure().getName()
                 );
             }
         }

@@ -15,6 +15,7 @@ export interface CureProduct {
 
 export interface Cure {
     id?: number;
+    availableStock?: number | null;   // nombre de cures réalisables avec le stock des produits
     name: string;
     description?: string | null;
     imageUrl?: string | null;

@@ -85,7 +85,7 @@ public class WhatsAppService {
 
 
         // ======================================================
-        // PRODUITS / PACKS
+        // PRODUITS / PACKS / CURES
         // ======================================================
 
         message.append("\n")
@@ -140,6 +140,18 @@ public class WhatsAppService {
             }
 
             /*
+             * ARTICLE = CURE
+             */
+            else if (item.getCure() != null) {
+
+                itemName =
+                        item.getCure().getName();
+
+                itemType = "Cure";
+
+            }
+
+            /*
              * CAS ANORMAL
              */
             else {
@@ -156,13 +168,16 @@ public class WhatsAppService {
 
             message.append("• ");
 
-            if ("Pack".equals(itemType)) {
+            switch (itemType) {
 
-                message.append("📦 *Pack* : ");
+                case "Pack" ->
+                        message.append("📦 *Pack* : ");
 
-            } else {
+                case "Cure" ->
+                        message.append("🌿 *Cure* : ");
 
-                message.append("🛍️ *Produit* : ");
+                default ->
+                        message.append("🛍️ *Produit* : ");
 
             }
 

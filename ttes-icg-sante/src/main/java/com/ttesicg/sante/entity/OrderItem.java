@@ -30,7 +30,7 @@ public class OrderItem {
     /*
      * Produit commandé.
      *
-     * NULL si cette ligne correspond à un pack.
+     * NULL si cette ligne correspond à un pack ou à une cure.
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
@@ -39,11 +39,20 @@ public class OrderItem {
     /*
      * Pack commandé.
      *
-     * NULL si cette ligne correspond à un produit.
+     * NULL si cette ligne correspond à un produit ou à une cure.
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bundle_id")
     private ProductBundle bundle;
+
+    /*
+     * Cure commandée.
+     *
+     * NULL si cette ligne correspond à un produit ou à un pack.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cure_id")
+    private Cure cure;
 
     @Column(nullable = false)
     private Integer quantity;

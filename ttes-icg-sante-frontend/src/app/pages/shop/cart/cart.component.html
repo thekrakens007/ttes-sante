@@ -313,7 +313,21 @@
                                         </span>
 
                                     </div>
+                                    <div>
+                                    <!-- CURE -->
+                                    <span
+                                            *ngIf="isCure(item)"
+                                            class="mr-2 inline-flex rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
+    🌿 Cure
+</span>
 
+                                    <!-- PRODUIT : remplace la condition existante -->
+                                    <span
+                                            *ngIf="!isBundle(item) && !isCure(item)"
+                                            ...>
+    Produit
+</span>
+                                    </div>
 
                                     <h3
                                             class="text-lg font-semibold
@@ -534,5 +548,61 @@
         </div>
 
     </main>
+
+    <!-- BOÎTE DE DIALOGUE : STOCK INSUFFISANT -->
+    <div
+            *ngIf="stockDialogOpen"
+            class="fixed inset-0 z-[100] flex items-center justify-center
+           bg-black/50 px-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="stock-dialog-title">
+
+        <div
+                class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl
+               dark:bg-gray-900">
+
+            <div class="flex items-start gap-4">
+
+                <div
+                        class="flex h-12 w-12 shrink-0 items-center
+                       justify-center rounded-full bg-amber-100
+                       text-2xl dark:bg-amber-900/40">
+                    ⚠️
+                </div>
+
+                <div class="flex-1">
+                    <h2
+                            id="stock-dialog-title"
+                            class="text-xl font-bold text-gray-900
+                           dark:text-white">
+                        Stock insuffisant
+                    </h2>
+
+                    <p
+                            class="mt-2 text-sm leading-6 text-gray-600
+                           dark:text-gray-300">
+                        {{ actionError }}
+                    </p>
+
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        Réduisez la quantité demandée ou choisissez un autre article.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button
+                        type="button"
+                        (click)="stockDialogOpen = false"
+                        class="rounded-lg bg-brand-600 px-5 py-2.5
+                       font-semibold text-white hover:bg-brand-700">
+                    Compris
+                </button>
+            </div>
+
+        </div>
+    </div>
+
 
 </div>

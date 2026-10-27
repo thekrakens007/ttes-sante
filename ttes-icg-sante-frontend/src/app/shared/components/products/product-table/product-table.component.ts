@@ -81,6 +81,13 @@ export class ProductTableComponent implements OnInit {
      */
     selectedProductIds = new Set<number>();
 
+    /**
+     * Produits déjà chargés (toutes les pages visitées).
+     * Sert à transmettre au formulaire de cure les informations
+     * des produits sélectionnés, sans rappeler GET /api/products.
+     */
+    private loadedProducts = new Map<number, Product>();
+
 
     // ============================================================
     // MODE SELECTION DEPUIS UN PACK OU UNE CURE
@@ -343,6 +350,15 @@ export class ProductTableComponent implements OnInit {
                     page.content ?? [];
 
 
+                this.products.forEach(
+                    product =>
+                        this.loadedProducts.set(
+                            product.id,
+                            product
+                        )
+                );
+
+
                 this.totalPages =
                     page.totalPages ?? 0;
 
@@ -602,6 +618,15 @@ export class ProductTableComponent implements OnInit {
         productIds: number[]
     ): void {
 
+        if (this.returnTarget === 'cure') {
+
+            this.storeSelectedProductsForCure(
+                productIds
+            );
+
+        }
+
+
         const base =
             this.returnTarget === 'cure'
                 ? '/admin/cures'
@@ -725,6 +750,11 @@ export class ProductTableComponent implements OnInit {
             return;
 
         }
+
+
+        this.storeSelectedProductsForCure(
+            productIds
+        );
 
 
         this.router.navigate(
@@ -986,6 +1016,49 @@ export class ProductTableComponent implements OnInit {
     // ============================================================
     // UTILITAIRE IDS
     // ============================================================
+
+    /**
+     * Enregistre les informations des produits sélectionnés
+     * pour que le formulaire de cure puisse les afficher
+     * sans charger tout le catalogue.
+     */
+    private storeSelectedProductsForCure(
+        productIds: number[]
+    ): void {
+
+        const payload =
+            productIds
+                .map(id => this.loadedProducts.get(id))
+                .filter(
+                    (product): product is Product =>
+                        !!product
+                )
+                .map(product => ({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price ?? null,
+                    imageUrl: this.getMainImage(product)
+                }));
+
+
+        try {
+
+            sessionStorage.setItem(
+                'cure-selected-products',
+                JSON.stringify(payload)
+            );
+
+        } catch (err) {
+
+            console.error(
+                'Erreur sauvegarde sélection :',
+                err
+            );
+
+        }
+
+    }
+
 
     private parseProductIds(
         value: string

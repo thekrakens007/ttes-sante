@@ -34,7 +34,6 @@ interface CureDraft {
     name: string;
     description: string;
     imageUrl: string;
-    imageProductId: number | null;
     active: boolean;
     items: SelectedCureItem[];
 }
@@ -69,19 +68,9 @@ export class CureFormComponent implements OnInit {
     products: ProductOption[] = [];
     selectedItems: SelectedCureItem[] = [];
 
-    /**
-     * Produit dont l'image sert d'image par défaut de la cure.
-     * null => le premier produit qui a une image.
-     */
-    selectedImageProductId: number | null = null;
-
-    /** Dernière URL d'image qui n'a pas pu être chargée (aperçu). */
-    private failedImageUrl = '';
-
     form = this.fb.nonNullable.group({
         name: ['', [Validators.required, Validators.maxLength(180)]],
         description: ['', Validators.maxLength(10000)],
-        // Image personnalisée (optionnelle). Vide => image d'un produit.
         imageUrl: ['', Validators.maxLength(1000)],
         active: [false]
     });
@@ -108,32 +97,34 @@ export class CureFormComponent implements OnInit {
 
         this.loading = true;
 
-        // Brouillon : les produits déjà choisis sont connus, on ne
-        // recharge le catalogue que si de nouveaux produits arrivent.
-        if (draft) {
-            this.restoreDraft(draft);
-            this.resolveSelection(returnedIds ?? [], () => {
+        this.productService.getProducts().subscribe({
+            next: (products) => {
+                this.products = products as ProductOption[];
+
+                if (draft) {
+                    this.restoreDraft(draft);
+                    this.applySelectedProductIds(returnedIds ?? []);
+                    this.loading = false;
+                    return;
+                }
+
+                if (this.cureId !== null) {
+                    this.loadCure(this.cureId, returnedIds);
+                    return;
+                }
+
+                if (returnedIds !== null) {
+                    this.applySelectedProductIds(returnedIds);
+                }
+
                 this.loading = false;
-            });
-            return;
-        }
-
-        // Modification : on charge d'abord la cure.
-        if (this.cureId !== null) {
-            this.loadCure(this.cureId, returnedIds);
-            return;
-        }
-
-        // Création avec des produits venant du sélecteur.
-        if (returnedIds !== null) {
-            this.resolveSelection(returnedIds, () => {
+            },
+            error: (error) => {
+                console.error('Erreur de chargement des produits', error);
+                this.errorMessage = 'Impossible de charger les produits.';
                 this.loading = false;
-            });
-            return;
-        }
-
-        // Création vide : rien à charger.
-        this.loading = false;
+            }
+        });
     }
 
     loadCure(id: number, returnedIds: number[] | null = null): void {
@@ -142,6 +133,7 @@ export class CureFormComponent implements OnInit {
                 this.form.patchValue({
                     name: cure.name,
                     description: cure.description ?? '',
+                    imageUrl: cure.imageUrl ?? '',
                     active: cure.active
                 });
 
@@ -155,29 +147,8 @@ export class CureFormComponent implements OnInit {
                     })
                 );
 
-                // Si l'image enregistrée est celle d'un produit de la cure,
-                // on la traite comme "image d'un produit" (et pas comme
-                // une URL personnalisée).
-                const savedImage = cure.imageUrl ?? '';
-
-                const match = this.selectedItems.find(
-                    item =>
-                        !!item.productImageUrl &&
-                        item.productImageUrl === savedImage
-                );
-
-                if (match) {
-                    this.selectedImageProductId = match.productId;
-                    this.form.controls.imageUrl.setValue('');
-                } else {
-                    this.form.controls.imageUrl.setValue(savedImage);
-                }
-
                 if (returnedIds !== null) {
-                    this.resolveSelection(returnedIds, () => {
-                        this.loading = false;
-                    });
-                    return;
+                    this.applySelectedProductIds(returnedIds);
                 }
 
                 this.loading = false;
@@ -193,48 +164,6 @@ export class CureFormComponent implements OnInit {
     // ============================================================
     // SELECTION DES PRODUITS (même logique que le pack)
     // ============================================================
-
-    /**
-     * Applique la liste d'ids reçue du sélecteur.
-     *
-     * Le catalogue complet (GET /api/products) n'est chargé QUE si
-     * de nouveaux produits ont été ajoutés : retirer des produits ou
-     * ne rien changer ne demande aucun appel réseau.
-     *
-     * Si le chargement échoue, on conserve les produits déjà présents
-     * et on affiche une erreur, sans bloquer le formulaire.
-     */
-    private resolveSelection(ids: number[], done: () => void): void {
-        const known = new Set(this.selectedItems.map(item => item.productId));
-        const needsCatalog = ids.some(id => !known.has(id));
-
-        if (!needsCatalog) {
-            this.applySelectedProductIds(ids);
-            done();
-            return;
-        }
-
-        this.productService.getProducts().subscribe({
-            next: (products) => {
-                this.products = products as ProductOption[];
-                this.applySelectedProductIds(ids);
-                done();
-            },
-            error: (error) => {
-                console.error('Erreur de chargement des produits', error);
-
-                this.errorMessage =
-                    'Impossible de charger les produits ajoutés. ' +
-                    'Vérifie ta connexion et réessaie en rouvrant la sélection.';
-
-                this.applySelectedProductIds(
-                    ids.filter(id => known.has(id))
-                );
-
-                done();
-            }
-        });
-    }
 
     openProductSelector(): void {
         this.saveDraft();
@@ -287,16 +216,12 @@ export class CureFormComponent implements OnInit {
                 quantity: 1
             }];
         });
-
-        this.syncImageSelection();
     }
 
     removeProduct(productId: number): void {
         this.selectedItems = this.selectedItems.filter(
             item => item.productId !== productId
         );
-
-        this.syncImageSelection();
     }
 
     updateQuantity(productId: number, value: string | number): void {
@@ -321,102 +246,6 @@ export class CureFormComponent implements OnInit {
     }
 
     // ============================================================
-    // IMAGE DE LA CURE : APERCU + IMAGE PAR DEFAUT D'UN PRODUIT
-    // ============================================================
-
-    /** Produits de la cure qui ont une image. */
-    get productsWithImage(): SelectedCureItem[] {
-        return this.selectedItems.filter(item => !!item.productImageUrl);
-    }
-
-    /** URL personnalisée saisie (vide si aucune). */
-    get customImageUrl(): string {
-        return this.form.controls.imageUrl.value.trim();
-    }
-
-    /**
-     * Produit dont l'image est utilisée par défaut :
-     * celui choisi, sinon le premier produit qui a une image.
-     */
-    get effectiveImageProductId(): number | null {
-        const withImage = this.productsWithImage;
-
-        const chosen = withImage.find(
-            item => item.productId === this.selectedImageProductId
-        );
-
-        return (chosen ?? withImage[0])?.productId ?? null;
-    }
-
-    /** Image affichée dans l'aperçu (et enregistrée). */
-    get previewImageUrl(): string {
-        const custom = this.customImageUrl;
-
-        if (custom) {
-            return custom;
-        }
-
-        const productId = this.effectiveImageProductId;
-
-        return this.selectedItems.find(
-            item => item.productId === productId
-        )?.productImageUrl ?? '';
-    }
-
-    get previewSource(): 'custom' | 'product' | 'none' {
-        if (this.customImageUrl) {
-            return 'custom';
-        }
-
-        return this.effectiveImageProductId !== null ? 'product' : 'none';
-    }
-
-    get previewProductName(): string {
-        const productId = this.effectiveImageProductId;
-
-        return this.selectedItems.find(
-            item => item.productId === productId
-        )?.productName ?? '';
-    }
-
-    get previewFailed(): boolean {
-        return !!this.previewImageUrl
-            && this.failedImageUrl === this.previewImageUrl;
-    }
-
-    onPreviewError(): void {
-        this.failedImageUrl = this.previewImageUrl;
-    }
-
-    /** Utiliser l'image d'un produit (efface l'URL personnalisée). */
-    selectProductImage(productId: number): void {
-        this.selectedImageProductId = productId;
-        this.form.controls.imageUrl.setValue('');
-    }
-
-    clearCustomImage(): void {
-        this.form.controls.imageUrl.setValue('');
-    }
-
-    /**
-     * Si le produit choisi a été retiré de la cure (ou n'a plus d'image),
-     * on revient à "premier produit avec image".
-     */
-    private syncImageSelection(): void {
-        if (this.selectedImageProductId === null) {
-            return;
-        }
-
-        const stillValid = this.productsWithImage.some(
-            item => item.productId === this.selectedImageProductId
-        );
-
-        if (!stillValid) {
-            this.selectedImageProductId = null;
-        }
-    }
-
-    // ============================================================
     // BROUILLON
     // ============================================================
 
@@ -426,7 +255,6 @@ export class CureFormComponent implements OnInit {
             name: this.form.controls.name.value,
             description: this.form.controls.description.value,
             imageUrl: this.form.controls.imageUrl.value,
-            imageProductId: this.selectedImageProductId,
             active: this.form.controls.active.value,
             items: this.selectedItems
         };
@@ -458,7 +286,6 @@ export class CureFormComponent implements OnInit {
                 name: data.name ?? '',
                 description: data.description ?? '',
                 imageUrl: data.imageUrl ?? '',
-                imageProductId: data.imageProductId ?? null,
                 active: data.active ?? false,
                 items: data.items ?? []
             };
@@ -477,9 +304,6 @@ export class CureFormComponent implements OnInit {
         });
 
         this.selectedItems = draft.items;
-        this.selectedImageProductId = draft.imageProductId;
-
-        this.syncImageSelection();
     }
 
     private clearDraft(): void {
@@ -512,17 +336,10 @@ export class CureFormComponent implements OnInit {
             return;
         }
 
-        if (this.customImageUrl && this.previewFailed) {
-            this.errorMessage =
-                'L’image personnalisée est introuvable. Corrige l’URL ou utilise l’image d’un produit.';
-            return;
-        }
-
         const request: CureRequest = {
             name: this.form.controls.name.value.trim(),
             description: this.form.controls.description.value.trim(),
-            // URL personnalisée, sinon image du produit choisi par défaut.
-            imageUrl: this.previewImageUrl,
+            imageUrl: this.form.controls.imageUrl.value.trim(),
             active: this.form.controls.active.value,
             items: this.selectedItems.map(item => ({
                 productId: item.productId,

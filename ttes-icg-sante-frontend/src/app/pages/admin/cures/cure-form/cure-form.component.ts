@@ -108,34 +108,32 @@ export class CureFormComponent implements OnInit {
 
         this.loading = true;
 
-        this.productService.getProducts().subscribe({
-            next: (products) => {
-                this.products = products as ProductOption[];
-
-                if (draft) {
-                    this.restoreDraft(draft);
-                    this.applySelectedProductIds(returnedIds ?? []);
-                    this.loading = false;
-                    return;
-                }
-
-                if (this.cureId !== null) {
-                    this.loadCure(this.cureId, returnedIds);
-                    return;
-                }
-
-                if (returnedIds !== null) {
-                    this.applySelectedProductIds(returnedIds);
-                }
-
+        // Brouillon : les produits déjà choisis sont connus, on ne
+        // recharge le catalogue que si de nouveaux produits arrivent.
+        if (draft) {
+            this.restoreDraft(draft);
+            this.resolveSelection(returnedIds ?? [], () => {
                 this.loading = false;
-            },
-            error: (error) => {
-                console.error('Erreur de chargement des produits', error);
-                this.errorMessage = 'Impossible de charger les produits.';
+            });
+            return;
+        }
+
+        // Modification : on charge d'abord la cure.
+        if (this.cureId !== null) {
+            this.loadCure(this.cureId, returnedIds);
+            return;
+        }
+
+        // Création avec des produits venant du sélecteur.
+        if (returnedIds !== null) {
+            this.resolveSelection(returnedIds, () => {
                 this.loading = false;
-            }
-        });
+            });
+            return;
+        }
+
+        // Création vide : rien à charger.
+        this.loading = false;
     }
 
     loadCure(id: number, returnedIds: number[] | null = null): void {
@@ -176,7 +174,10 @@ export class CureFormComponent implements OnInit {
                 }
 
                 if (returnedIds !== null) {
-                    this.applySelectedProductIds(returnedIds);
+                    this.resolveSelection(returnedIds, () => {
+                        this.loading = false;
+                    });
+                    return;
                 }
 
                 this.loading = false;
@@ -192,6 +193,48 @@ export class CureFormComponent implements OnInit {
     // ============================================================
     // SELECTION DES PRODUITS (même logique que le pack)
     // ============================================================
+
+    /**
+     * Applique la liste d'ids reçue du sélecteur.
+     *
+     * Le catalogue complet (GET /api/products) n'est chargé QUE si
+     * de nouveaux produits ont été ajoutés : retirer des produits ou
+     * ne rien changer ne demande aucun appel réseau.
+     *
+     * Si le chargement échoue, on conserve les produits déjà présents
+     * et on affiche une erreur, sans bloquer le formulaire.
+     */
+    private resolveSelection(ids: number[], done: () => void): void {
+        const known = new Set(this.selectedItems.map(item => item.productId));
+        const needsCatalog = ids.some(id => !known.has(id));
+
+        if (!needsCatalog) {
+            this.applySelectedProductIds(ids);
+            done();
+            return;
+        }
+
+        this.productService.getProducts().subscribe({
+            next: (products) => {
+                this.products = products as ProductOption[];
+                this.applySelectedProductIds(ids);
+                done();
+            },
+            error: (error) => {
+                console.error('Erreur de chargement des produits', error);
+
+                this.errorMessage =
+                    'Impossible de charger les produits ajoutés. ' +
+                    'Vérifie ta connexion et réessaie en rouvrant la sélection.';
+
+                this.applySelectedProductIds(
+                    ids.filter(id => known.has(id))
+                );
+
+                done();
+            }
+        });
+    }
 
     openProductSelector(): void {
         this.saveDraft();

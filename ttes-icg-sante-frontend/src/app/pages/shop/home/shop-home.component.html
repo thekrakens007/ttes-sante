@@ -221,64 +221,88 @@
 
 
 
-<!-- HERO SECTION -->
-<section class="relative min-h-[520px] overflow-hidden bg-gradient-to-br from-green-950 via-green-900 to-green-950 py-16 text-white sm:py-24">
 
-    <div class="relative mx-auto flex max-w-7xl flex-col items-center gap-10 px-4 sm:px-6 md:flex-row lg:px-8 lg:gap-12">
 
-        <!-- TEXTE À GAUCHE -->
-        <div class="w-full md:flex-1">
+    <!-- HERO SECTION -->
+    <section class="relative min-h-[520px] overflow-hidden bg-gradient-to-br from-green-950 via-green-900 to-green-950 py-16 text-white sm:py-24">
 
-            <div class="mb-4 inline-flex flex-wrap rounded-full border border-green-300/30 bg-green-900/50 px-3 py-1.5 text-xs font-semibold text-green-100 sm:mb-6 sm:px-4 sm:py-2 sm:text-sm">
-                🌱 La Biothérapie Cellulaire Végétale • PhytoScience
-            </div>
+        <div class="relative mx-auto flex max-w-7xl flex-col items-center gap-10 px-4 sm:px-6 md:flex-row lg:px-8 lg:gap-12">
 
-            <h1 class="text-3xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
-                La Biothérapie Cellulaire,
+            <!-- TEXTE À GAUCHE -->
+            <div class="w-full md:flex-1">
 
-                <span class="mt-2 block text-orange-300">
+                <div class="mb-4 inline-flex flex-wrap rounded-full border border-green-300/30 bg-green-900/50 px-3 py-1.5 text-xs font-semibold text-green-100 sm:mb-6 sm:px-4 sm:py-2 sm:text-sm">
+                    🌱 La Biothérapie Cellulaire Végétale • PhytoScience
+                </div>
+
+                <h1 class="text-3xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
+                    La Biothérapie Cellulaire,
+                    <span class="mt-2 block text-orange-300">
                     Une véritable solution pour les problèmes de santé
                 </span>
-            </h1>
+                </h1>
 
-            <p class="mt-4 max-w-2xl text-sm leading-7 text-green-50 sm:mt-6 sm:text-lg sm:leading-8">
-                Les cellules souches sont des cellules spéciales appelées « cellules mères », avec le pouvoir étonnant de produire de nouvelles cellules qui peuvent se transformer en n’importe quel tissu ou organe dans le corps. C’est grâce à cette merveilleuse capacité qu’elles ont le potentiel de traiter plus de 200 maladies mortelles.
-            </p>
+                <p class="mt-4 max-w-2xl text-sm leading-7 text-green-50 sm:mt-6 sm:text-lg sm:leading-8">
+                    Les cellules souches sont des cellules spéciales appelées « cellules mères », avec le pouvoir étonnant de produire de nouvelles cellules qui peuvent se transformer en n’importe quel tissu ou organe dans le corps. C’est grâce à cette merveilleuse capacité qu’elles ont le potentiel de traiter plus de 200 maladies mortelles.
+                </p>
 
-            <div class="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row">
+                <!-- BOUTONS DE NAVIGATION -->
+                <div class="mt-6 flex flex-wrap gap-3 sm:mt-8">
 
-                <a
-                    routerLink="/products"
-                    class="inline-flex items-center justify-center rounded-xl bg-orange-400 px-6 py-3.5 text-center text-xs font-extrabold uppercase tracking-wide text-green-950 shadow-xl transition hover:bg-orange-300 sm:py-4 sm:text-sm"
+                    <a
+                            routerLink="/products"
+                            class="inline-flex items-center justify-center rounded-xl bg-orange-400 px-5 py-3.5 text-center text-xs font-extrabold uppercase tracking-wide text-green-950 shadow-xl transition hover:bg-orange-300 sm:px-6 sm:py-4 sm:text-sm"
+                    >
+                        🛍️ Produits
+                    </a>
+
+                    <a
+                            routerLink="/bundles"
+                            class="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3.5 text-center text-xs font-extrabold uppercase tracking-wide text-green-950 shadow-xl transition hover:bg-green-100 sm:px-6 sm:py-4 sm:text-sm"
+                    >
+                        🎁 Packs
+                    </a>
+
+                    <a
+                            routerLink="/cures"
+                            class="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3.5 text-center text-xs font-extrabold uppercase tracking-wide text-green-950 shadow-xl transition hover:bg-green-100 sm:px-6 sm:py-4 sm:text-sm"
+                    >
+                        🌿 Cures préventives
+                    </a>
+
+                    <a
+                            routerLink="/companies"
+                            class="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3.5 text-center text-xs font-extrabold uppercase tracking-wide text-green-950 shadow-xl transition hover:bg-green-100 sm:px-6 sm:py-4 sm:text-sm"
+                    >
+                        🏢 Entreprises
+                    </a>
+
+                    <a
+                            href="https://wa.me/237690980866?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20un%20accompagnement."
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="inline-flex items-center justify-center rounded-xl border border-white/40 bg-white/10 px-5 py-3.5 text-center text-xs font-bold uppercase tracking-wide text-white backdrop-blur-sm transition hover:bg-white/20 sm:px-6 sm:py-4 sm:text-sm"
+                    >
+                        💬 Consultation directe
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- GRANDE IMAGE À DROITE -->
+            <div class="flex w-full shrink-0 justify-center md:w-1/2">
+                <img
+                        src="https://static.bio-rad-antibodies.com/2018/stem/pluripotent-stem-cell.jpg"
+                        alt="Illustration de cellules"
+                        class="h-72 w-72 rounded-2xl object-cover shadow-2xl ring-1 ring-green-300/30 sm:h-96 sm:w-96 lg:h-[420px] lg:w-[420px]"
                 >
-                    🛍️ Découvrir la gamme
-                </a>
-
-                <a
-                    href="https://wa.me/237690980866?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20un%20accompagnement."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center justify-center rounded-xl border border-white/40 bg-white/10 px-6 py-3.5 text-center text-xs font-bold uppercase tracking-wide text-white backdrop-blur-sm transition hover:bg-white/20 sm:py-4 sm:text-sm"
-                >
-                    💬 Consultation directe
-                </a>
-
             </div>
 
         </div>
 
-        <!-- GRANDE IMAGE À DROITE -->
-        <div class="flex w-full shrink-0 justify-center md:w-1/2">
-            <img
-                src="https://static.bio-rad-antibodies.com/2018/stem/pluripotent-stem-cell.jpg"
-                alt="Cellule végétale"
-                class="h-72 w-72 rounded-2xl object-cover shadow-2xl ring-1 ring-green-300/30 sm:h-96 sm:w-96 lg:h-[420px] lg:w-[420px]"
-            >
-        </div>
+    </section>
 
-    </div>
-
-</section>
 
 
 

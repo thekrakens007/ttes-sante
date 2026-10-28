@@ -31,8 +31,7 @@ import { CompanyCategoryResponse } from '../../../core/interfaces/company-catego
     imports: [
         CommonModule,
         RouterModule,
-        FormsModule,
-        ProductCardComponent
+        FormsModule
     ],
     templateUrl: './shop-home.component.html'
 })
@@ -75,9 +74,9 @@ export class ShopHomeComponent implements OnInit {
     featuredCompanyProductsError = '';
 
     private readonly featuredCompanyNames = [
-        'das group cameroun',
         'tiens cameroun',
-        'dynace global cameroun'
+        'das group cameroun',
+        'phytoscience cameroun'
     ];
 
     // ===================== BUNDLES =====================
@@ -103,176 +102,8 @@ export class ShopHomeComponent implements OnInit {
     loading = true;
     error = '';
 
-    // ===================== PARTNERS =====================
 
-    partners = [
-        {
-            id: 1,
-            name: 'DAS Group Cameroun',
-            category: 'Laboratoire pharmaceutique',
-            active: false
-        },
-        {
-            id: 2,
-            name: 'PhytoScience Cameroun',
-            category: 'Pharmacies',
-            active: false
-        },
-        {
-            id: 3,
-            name: 'TIENS Cameroun',
-            category: 'Pharmacies',
-            active: false
-        },
-        {
-            id: 4,
-            name: 'VESTIGE Cameroun',
-            category: 'Pharmacies',
-            active: false
-        },
-        {
-            id: 5,
-            name: 'YUPI Global Cameroun',
-            category: 'Pharmacies',
-            active: false
-        },
-        {
-            id: 6,
-            name: 'LONGRICH Cameroun',
-            category: 'Pharmacies',
-            active: false
-        },
-        {
-            id: 7,
-            name: 'Forever Living Cameroun',
-            category: 'Soins à base d\'aloe vera',
-            active: false
-        },
-        {
-            id: 8,
-            name: 'Dynace Global Cameroun',
-            category: 'Bien-être',
-            active: false
-        }
-    ];
 
-    // ===================== REASSURANCE =====================
-
-    reassurance = [
-        {
-            i: '🚚',
-            t: 'Livraison',
-            d: 'Douala, Yaoundé et autres villes'
-        },
-        {
-            i: '💬',
-            t: 'Conseil par WhatsApp',
-            d: 'Une équipe à votre écoute'
-        },
-        {
-            i: '📋',
-            t: 'Produits clairement étiquetés',
-            d: 'Composition et mode d\'emploi'
-        },
-        {
-            i: '🔒',
-            t: 'Paiement sécurisé',
-            d: 'Commande simple depuis votre compte'
-        }
-    ];
-
-    // ===================== STEPS =====================
-
-    steps = [
-        {
-            n: 1,
-            t: 'Échangez avec nous',
-            d: 'Par WhatsApp ou dans l\'une de nos villes de présence.'
-        },
-        {
-            n: 2,
-            t: 'Recevez des conseils personnalisés',
-            d: 'Produits, doses indiquées sur l\'étiquette, durée d\'utilisation.'
-        },
-        {
-            n: 3,
-            t: 'Restez accompagné',
-            d: 'Nous restons disponibles pour répondre à vos questions.'
-        }
-    ];
-
-    // ===================== PACKS STATIQUES =====================
-
-    packs = [
-        {
-            t: 'Pack Découverte',
-            d: 'Pour essayer la gamme et trouver vos produits préférés.',
-            img: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=900&q=85'
-        },
-        {
-            t: 'Pack Routine',
-            d: 'Une sélection pour l\'utilisation quotidienne sur plusieurs semaines.',
-            img: 'https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=900&q=85'
-        },
-        {
-            t: 'Pack Famille',
-            d: 'Plusieurs produits à partager, avec un meilleur prix.',
-            img: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=85'
-        }
-    ];
-
-    // ===================== PRODUITS STATIQUES =====================
-
-    featuredProducts = [
-        {
-            name: 'Double Stemcell',
-            tag: 'Complément alimentaire',
-            desc: 'Sachets de complément alimentaire à base d\'extraits végétaux (pomme, raisin), à intégrer à votre routine.',
-            image: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=900&q=85'
-        },
-        {
-            name: 'Crystal Cell',
-            tag: 'Complément alimentaire',
-            desc: 'Préparation en sachet à base d\'extraits végétaux, pratique à emporter.',
-            image: 'https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=900&q=85'
-        },
-        {
-            name: 'NuLite',
-            tag: 'Boisson botanique',
-            desc: 'Mélange de boisson botanique au psyllium, pour accompagner une alimentation riche en fibres.',
-            image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=85'
-        },
-        {
-            name: 'SnowPhyll Forte',
-            tag: 'Boisson botanique',
-            desc: 'Mélange à base d\'herbe de blé, de chlorophylle et d\'algues des neiges.',
-            image: 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=85'
-        },
-        {
-            name: 'iiQ Plus',
-            tag: 'Boisson aux fruits',
-            desc: 'Mélange de jus de fruits avec lutéine, à savourer au quotidien.',
-            image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=85'
-        },
-        {
-            name: 'Triple Stemcell',
-            tag: 'Soin de la peau',
-            desc: 'Gamme de soins : hydratant H2O et essence intense pour le soin quotidien de la peau.',
-            image: 'https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=900&q=85'
-        },
-        {
-            name: 'NuForte',
-            tag: 'Complément alimentaire',
-            desc: 'Complément alimentaire en sachets. Voir la fiche pour la composition complète.',
-            image: 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&w=900&q=85'
-        },
-        {
-            name: 'Actual Plus',
-            tag: 'Complément alimentaire',
-            desc: 'Complément alimentaire. Voir la fiche pour la composition et le mode d\'emploi.',
-            image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=900&q=85'
-        }
-    ];
 
     // ===================== COMPANY CATEGORIES =====================
 
@@ -473,70 +304,102 @@ export class ShopHomeComponent implements OnInit {
      * de page de 100. Si le backend impose une limite plus faible,
      * utiliser cette limite ou adapter le backend.
      */
-   
-loadFeaturedCompanyProducts(): void {
-    this.featuredCompanyProductsLoading = true;
-    this.featuredCompanyProductsError = '';
 
-    const pageSize = 100;
 
-    this.productService
-        .getProductsPaginated(0, pageSize)
-        .subscribe({
-            next: (firstResponse) => {
-                const totalPages = firstResponse.totalPages ?? 1;
-                const allProducts: Product[] = [
-                    ...(firstResponse.content ?? [])
+    loadFeaturedCompanyProducts(): void {
+        this.featuredCompanyProductsLoading = true;
+        this.featuredCompanyProductsError = '';
+
+        const normalize = (value: string | null | undefined): string =>
+            (value ?? '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, ' ')
+                .trim();
+
+        this.productService.getCompanies().subscribe({
+            next: (companies) => {
+                const targets = [
+                    'tiens cameroun',
+                    'das group cameroun',
+                    'phytoscience cameroun'
                 ];
 
-                if (totalPages <= 1) {
-                    this.finishFeaturedCompanyProducts(allProducts);
+                // Retrouver les vrais identifiants depuis l'API.
+                const selectedCompanies = targets
+                    .map(target =>
+                        companies.find(company =>
+                            normalize(company.name).includes(target) ||
+                            target.includes(normalize(company.name))
+                        )
+                    )
+                    .filter((company): company is NonNullable<typeof company> =>
+                        company !== undefined
+                    );
+
+                if (selectedCompanies.length === 0) {
+                    this.featuredCompanyProducts = [];
+                    this.featuredCompanyProductsError =
+                        'Aucune des trois entreprises n’a été trouvée.';
+                    this.featuredCompanyProductsLoading = false;
                     return;
                 }
 
-                const requests = Array.from(
-                    { length: totalPages - 1 },
-                    (_, index) =>
-                        this.productService.getProductsPaginated(
-                            index + 1,
-                            pageSize
-                        )
+                // Charger uniquement les premiers produits de chaque entreprise.
+                // Huit produits sont examinés pour pouvoir ignorer ceux sans stock.
+                const requests = selectedCompanies.map(company =>
+                    this.productService.getProductsPaginated(
+                        0,
+                        1,
+                        undefined,
+                        undefined,
+                        company.id
+                    )
                 );
 
                 forkJoin(requests).subscribe({
-                    next: (responses) => {
-                        for (const response of responses) {
-                            allProducts.push(
-                                ...(response.content ?? [])
+                    next: responses => {
+                        this.featuredCompanyProducts = responses
+                            .map(response => response.content?.[0])
+                            .filter((product): product is Product =>
+                                product !== undefined && product.stock > 0
                             );
+
+                        if (this.featuredCompanyProducts.length === 0) {
+                            this.featuredCompanyProductsError =
+                                'Aucun produit disponible pour ces entreprises.';
                         }
 
-                        this.finishFeaturedCompanyProducts(allProducts);
+                        this.featuredCompanyProductsLoading = false;
                     },
-                    error: (error) => {
+                    error: error => {
                         console.error(
-                            'Erreur de chargement des pages supplémentaires :',
+                            'Erreur de chargement des produits mis en avant',
                             error
                         );
 
-                        // Au moins, afficher les produits de la première page.
-                        this.finishFeaturedCompanyProducts(allProducts);
+                        this.featuredCompanyProducts = [];
+                        this.featuredCompanyProductsError =
+                            'Impossible de charger les produits mis en avant.';
+                        this.featuredCompanyProductsLoading = false;
                     }
                 });
             },
-            error: (error) => {
+            error: error => {
                 console.error(
-                    'Erreur de chargement des produits :',
+                    'Erreur lors du chargement des entreprises',
                     error
                 );
 
                 this.featuredCompanyProducts = [];
                 this.featuredCompanyProductsError =
-                    'Impossible de charger les produits.';
+                    'Impossible de charger les entreprises.';
                 this.featuredCompanyProductsLoading = false;
             }
         });
-}
+    }
+
 
 private finishFeaturedCompanyProducts(products: Product[]): void {
     const normalize = (value: string | null | undefined): string =>

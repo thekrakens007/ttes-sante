@@ -1,4 +1,3 @@
-
 package com.ttesicg.sante.repository;
 
 import com.ttesicg.sante.entity.Product;
@@ -13,38 +12,23 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    // =========================================================
     // SKU
-    // =========================================================
-
     Optional<Product> findBySku(String sku);
 
     boolean existsBySku(String sku);
 
-    // =========================================================
-    // RECHERCHE SIMPLE SANS SENSIBILITE AUX ACCENTS
-    // =========================================================
-
+    // RECHERCHE SIMPLE (sans accents)
     @Query("""
-        SELECT p
-        FROM Product p
-        WHERE LOWER(FUNCTION('unaccent', p.name))
-            LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+        SELECT p FROM Product p
+        WHERE LOWER(function('unaccent', p.name))
+              LIKE LOWER(function('unaccent', CONCAT('%', :keyword, '%')))
         """)
-    List<Product> findByNameContainingIgnoreCase(
-            @Param("keyword") String keyword
-    );
+    List<Product> findByNameContainingIgnoreCase(@Param("keyword") String keyword);
 
-    // =========================================================
     // PRODUITS PAR ENTREPRISE
-    // =========================================================
-
     List<Product> findByCompanyId(Long companyId);
 
-    // =========================================================
     // PRODUITS DISPONIBLES AVEC FILTRES
-    // =========================================================
-
     @Query("""
         SELECT DISTINCT p
         FROM Product p
@@ -55,33 +39,16 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         WHERE p.active = true
           AND (
                 :keyword = ''
-                OR LOWER(FUNCTION('unaccent', p.name))
-                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
-                OR LOWER(FUNCTION('unaccent', p.sku))
-                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
-                OR LOWER(FUNCTION('unaccent', p.brand))
-                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
-                OR LOWER(FUNCTION('unaccent', p.description))
-                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
-                OR LOWER(FUNCTION('unaccent', c.name))
-                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+                OR LOWER(function('unaccent', p.name))        LIKE LOWER(function('unaccent', CONCAT('%', :keyword, '%')))
+                OR LOWER(function('unaccent', p.sku))         LIKE LOWER(function('unaccent', CONCAT('%', :keyword, '%')))
+                OR LOWER(function('unaccent', p.brand))       LIKE LOWER(function('unaccent', CONCAT('%', :keyword, '%')))
+                OR LOWER(function('unaccent', p.description)) LIKE LOWER(function('unaccent', CONCAT('%', :keyword, '%')))
+                OR LOWER(function('unaccent', c.name))        LIKE LOWER(function('unaccent', CONCAT('%', :keyword, '%')))
               )
-          AND (
-                :categoryId IS NULL
-                OR cat.id = :categoryId
-              )
-          AND (
-                :companyId IS NULL
-                OR c.id = :companyId
-              )
-          AND (
-                :therapeuticAreaId IS NULL
-                OR ta.id = :therapeuticAreaId
-              )
-          AND (
-                i IS NULL
-                OR i.quantity > 0
-              )
+          AND (:categoryId IS NULL OR cat.id = :categoryId)
+          AND (:companyId IS NULL OR c.id = :companyId)
+          AND (:therapeuticAreaId IS NULL OR ta.id = :therapeuticAreaId)
+          AND (i IS NULL OR i.quantity > 0)
         ORDER BY p.id DESC
         """)
     Page<Product> findAvailableProductsWithFilters(
@@ -92,43 +59,29 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             Pageable pageable
     );
 
-    // =========================================================
     // PRODUITS DISPONIBLES SANS FILTRE
-    // =========================================================
-
     @Query("""
         SELECT DISTINCT p
         FROM Product p
         LEFT JOIN p.inventory i
         WHERE p.active = true
-          AND (
-                i IS NULL
-                OR i.quantity > 0
-              )
+          AND (i IS NULL OR i.quantity > 0)
         ORDER BY p.id DESC
         """)
     Page<Product> findAvailableProducts(Pageable pageable);
 
-    // =========================================================
     // RECHERCHE PRODUITS CLIENT
-    // =========================================================
-
     @Query("""
         SELECT DISTINCT p
         FROM Product p
         LEFT JOIN p.company c
         WHERE p.active = true
           AND (
-                LOWER(FUNCTION('unaccent', p.name))
-                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
-                OR LOWER(FUNCTION('unaccent', p.sku))
-                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
-                OR LOWER(FUNCTION('unaccent', p.brand))
-                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
-                OR LOWER(FUNCTION('unaccent', p.description))
-                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
-                OR LOWER(FUNCTION('unaccent', c.name))
-                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+                LOWER(function('unaccent', p.name))        LIKE LOWER(function('unaccent', CONCAT('%', :keyword, '%')))
+                OR LOWER(function('unaccent', p.sku))         LIKE LOWER(function('unaccent', CONCAT('%', :keyword, '%')))
+                OR LOWER(function('unaccent', p.brand))       LIKE LOWER(function('unaccent', CONCAT('%', :keyword, '%')))
+                OR LOWER(function('unaccent', p.description)) LIKE LOWER(function('unaccent', CONCAT('%', :keyword, '%')))
+                OR LOWER(function('unaccent', c.name))        LIKE LOWER(function('unaccent', CONCAT('%', :keyword, '%')))
               )
         ORDER BY p.id DESC
         """)
@@ -137,25 +90,17 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             Pageable pageable
     );
 
-    // =========================================================
     // RECHERCHE ADMIN
-    // =========================================================
-
     @Query("""
         SELECT DISTINCT p
         FROM Product p
         LEFT JOIN p.company c
         WHERE
-            LOWER(FUNCTION('unaccent', p.name))
-                LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
-            OR LOWER(FUNCTION('unaccent', p.sku))
-                LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
-            OR LOWER(FUNCTION('unaccent', p.brand))
-                LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
-            OR LOWER(FUNCTION('unaccent', p.description))
-                LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
-            OR LOWER(FUNCTION('unaccent', c.name))
-                LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+            LOWER(function('unaccent', p.name))        LIKE LOWER(function('unaccent', CONCAT('%', :keyword, '%')))
+            OR LOWER(function('unaccent', p.sku))         LIKE LOWER(function('unaccent', CONCAT('%', :keyword, '%')))
+            OR LOWER(function('unaccent', p.brand))       LIKE LOWER(function('unaccent', CONCAT('%', :keyword, '%')))
+            OR LOWER(function('unaccent', p.description)) LIKE LOWER(function('unaccent', CONCAT('%', :keyword, '%')))
+            OR LOWER(function('unaccent', c.name))        LIKE LOWER(function('unaccent', CONCAT('%', :keyword, '%')))
         ORDER BY p.id DESC
         """)
     Page<Product> searchProducts(

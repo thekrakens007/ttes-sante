@@ -1,3 +1,4 @@
+
 package com.ttesicg.sante.repository;
 
 import com.ttesicg.sante.entity.Product;
@@ -12,131 +13,153 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-// =========================================================
-// SKU
-// =========================================================
+    // =========================================================
+    // SKU
+    // =========================================================
 
-Optional<Product> findBySku(String sku);
+    Optional<Product> findBySku(String sku);
 
-boolean existsBySku(String sku);
+    boolean existsBySku(String sku);
 
-// =========================================================
-// RECHERCHE SIMPLE
-// =========================================================
+    // =========================================================
+    // RECHERCHE SIMPLE SANS SENSIBILITE AUX ACCENTS
+    // =========================================================
 
-List<Product> findByNameContainingIgnoreCase(String keyword);
+    @Query("""
+        SELECT p
+        FROM Product p
+        WHERE LOWER(FUNCTION('unaccent', p.name))
+            LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+        """)
+    List<Product> findByNameContainingIgnoreCase(
+            @Param("keyword") String keyword
+    );
 
-// =========================================================
-// PRODUITS PAR ENTREPRISE
-// =========================================================
+    // =========================================================
+    // PRODUITS PAR ENTREPRISE
+    // =========================================================
 
-List<Product> findByCompanyId(Long companyId);
+    List<Product> findByCompanyId(Long companyId);
 
-// =========================================================
-// PRODUITS DISPONIBLES
-// =========================================================
+    // =========================================================
+    // PRODUITS DISPONIBLES AVEC FILTRES
+    // =========================================================
 
-@Query("""
-    SELECT DISTINCT p
-    FROM Product p
-    LEFT JOIN p.company c
-    LEFT JOIN p.categories cat
-    LEFT JOIN p.therapeuticAreas ta
-    LEFT JOIN p.inventory i
-    WHERE p.active = true
-      AND (
-            :keyword = ''
-            OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(p.brand) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-          )
-      AND (
-            :categoryId IS NULL
-            OR cat.id = :categoryId
-          )
-      AND (
-            :companyId IS NULL
-            OR c.id = :companyId
-          )
-      AND (
-            :therapeuticAreaId IS NULL
-            OR ta.id = :therapeuticAreaId
-          )
-      AND (
-            i IS NULL
-            OR i.quantity > 0
-          )
-    ORDER BY p.id DESC
-    """)
-Page<Product> findAvailableProductsWithFilters(
-        @Param("keyword") String keyword,
-        @Param("categoryId") Long categoryId,
-        @Param("companyId") Long companyId,
-        @Param("therapeuticAreaId") Long therapeuticAreaId,
-        Pageable pageable
-);
+    @Query("""
+        SELECT DISTINCT p
+        FROM Product p
+        LEFT JOIN p.company c
+        LEFT JOIN p.categories cat
+        LEFT JOIN p.therapeuticAreas ta
+        LEFT JOIN p.inventory i
+        WHERE p.active = true
+          AND (
+                :keyword = ''
+                OR LOWER(FUNCTION('unaccent', p.name))
+                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+                OR LOWER(FUNCTION('unaccent', p.sku))
+                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+                OR LOWER(FUNCTION('unaccent', p.brand))
+                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+                OR LOWER(FUNCTION('unaccent', p.description))
+                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+                OR LOWER(FUNCTION('unaccent', c.name))
+                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+              )
+          AND (
+                :categoryId IS NULL
+                OR cat.id = :categoryId
+              )
+          AND (
+                :companyId IS NULL
+                OR c.id = :companyId
+              )
+          AND (
+                :therapeuticAreaId IS NULL
+                OR ta.id = :therapeuticAreaId
+              )
+          AND (
+                i IS NULL
+                OR i.quantity > 0
+              )
+        ORDER BY p.id DESC
+        """)
+    Page<Product> findAvailableProductsWithFilters(
+            @Param("keyword") String keyword,
+            @Param("categoryId") Long categoryId,
+            @Param("companyId") Long companyId,
+            @Param("therapeuticAreaId") Long therapeuticAreaId,
+            Pageable pageable
+    );
 
-// =========================================================
-// PRODUITS DISPONIBLES SANS FILTRE
-// =========================================================
+    // =========================================================
+    // PRODUITS DISPONIBLES SANS FILTRE
+    // =========================================================
 
-@Query("""
-    SELECT DISTINCT p
-    FROM Product p
-    LEFT JOIN p.inventory i
-    WHERE p.active = true
-      AND (
-            i IS NULL
-            OR i.quantity > 0
-          )
-    ORDER BY p.id DESC
-    """)
-Page<Product> findAvailableProducts(Pageable pageable);
+    @Query("""
+        SELECT DISTINCT p
+        FROM Product p
+        LEFT JOIN p.inventory i
+        WHERE p.active = true
+          AND (
+                i IS NULL
+                OR i.quantity > 0
+              )
+        ORDER BY p.id DESC
+        """)
+    Page<Product> findAvailableProducts(Pageable pageable);
 
-// =========================================================
-// RECHERCHE PRODUITS CLIENT
-// =========================================================
+    // =========================================================
+    // RECHERCHE PRODUITS CLIENT
+    // =========================================================
 
-@Query("""
-    SELECT DISTINCT p
-    FROM Product p
-    LEFT JOIN p.company c
-    WHERE p.active = true
-      AND (
-            LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(p.brand) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-          )
-    ORDER BY p.id DESC
-    """)
-Page<Product> searchAvailableProducts(
-        @Param("keyword") String keyword,
-        Pageable pageable
-);
+    @Query("""
+        SELECT DISTINCT p
+        FROM Product p
+        LEFT JOIN p.company c
+        WHERE p.active = true
+          AND (
+                LOWER(FUNCTION('unaccent', p.name))
+                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+                OR LOWER(FUNCTION('unaccent', p.sku))
+                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+                OR LOWER(FUNCTION('unaccent', p.brand))
+                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+                OR LOWER(FUNCTION('unaccent', p.description))
+                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+                OR LOWER(FUNCTION('unaccent', c.name))
+                    LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+              )
+        ORDER BY p.id DESC
+        """)
+    Page<Product> searchAvailableProducts(
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
 
-// =========================================================
-// RECHERCHE ADMIN
-// =========================================================
+    // =========================================================
+    // RECHERCHE ADMIN
+    // =========================================================
 
-@Query("""
-    SELECT DISTINCT p
-    FROM Product p
-    LEFT JOIN p.company c
-    WHERE
-        LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-        OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :keyword, '%'))
-        OR LOWER(p.brand) LIKE LOWER(CONCAT('%', :keyword, '%'))
-        OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
-        OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-    ORDER BY p.id DESC
-    """)
-Page<Product> searchProducts(
-        @Param("keyword") String keyword,
-        Pageable pageable
-);
-
+    @Query("""
+        SELECT DISTINCT p
+        FROM Product p
+        LEFT JOIN p.company c
+        WHERE
+            LOWER(FUNCTION('unaccent', p.name))
+                LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+            OR LOWER(FUNCTION('unaccent', p.sku))
+                LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+            OR LOWER(FUNCTION('unaccent', p.brand))
+                LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+            OR LOWER(FUNCTION('unaccent', p.description))
+                LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+            OR LOWER(FUNCTION('unaccent', c.name))
+                LIKE LOWER(CONCAT('%', FUNCTION('unaccent', :keyword), '%'))
+        ORDER BY p.id DESC
+        """)
+    Page<Product> searchProducts(
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
 }

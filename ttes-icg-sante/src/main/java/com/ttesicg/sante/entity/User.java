@@ -78,8 +78,19 @@ public class User {
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
+    @Column(name = "referral_code", unique = true, length = 20)
+    private String referralCode;
+
+    @Column(name = "referred_by_id")
+    private Long referredById;
+
     @PrePersist
     protected void onCreate() {
+        if (referralCode == null) {
+            referralCode = java.util.UUID.randomUUID()
+                    .toString().replace("-", "")
+                    .substring(0, 8).toUpperCase();
+        }
         LocalDateTime now = LocalDateTime.now();
         createdAt = now;
         updatedAt = now;

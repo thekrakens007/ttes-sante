@@ -29,7 +29,19 @@ export class AuthService {
 
   constructor(
       private router: Router
-  ) {}
+  ) {
+    const ref = new URLSearchParams(window.location.search).get('ref');
+
+    if (ref) {
+      localStorage.setItem(this.REFERRAL_KEY, ref);
+    }
+  }
+
+  private readonly REFERRAL_KEY = 'ttes_icg_sante_referral';
+
+  getReferralCode(): string | null {
+    return localStorage.getItem(this.REFERRAL_KEY);
+  }
 
   // =========================================================
   // GOOGLE LOGIN
@@ -41,7 +53,8 @@ export class AuthService {
         .post<any>(
             `${this.API_URL}/google`,
             {
-              idToken: idToken
+              idToken: idToken,
+              referralCode: this.getReferralCode()
             }
         )
         .pipe(
@@ -122,7 +135,7 @@ export class AuthService {
 
     return this.http.post<MessageResponse>(
         `${this.API_URL}/register`,
-        request
+        { ...request, referralCode: this.getReferralCode() }
     );
   }
 

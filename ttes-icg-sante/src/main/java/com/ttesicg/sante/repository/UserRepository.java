@@ -11,6 +11,9 @@ public interface UserRepository
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
 
+    Optional<User> findByReferralCode(String referralCode);
+    long countByReferredById(Long referrerId);
+
     Optional<User> findByVerificationToken(String token);
     Optional<User> findByResetPasswordToken(String token);
 

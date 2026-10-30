@@ -10,4 +10,6 @@ import lombok.Setter;
 public class GoogleAuthRequest {
 
     private String idToken;
+
+    private String referralCode;
 }

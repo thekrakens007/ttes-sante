@@ -70,6 +70,14 @@ export const routes: Routes = [
             .then(m => m.SearchComponent)
 },
   {
+    path: 'referral',
+    loadComponent: () =>
+        import('./pages/client/referral/referral.component')
+            .then(m => m.ReferralComponent),
+    canActivate: [authGuard],
+    title: 'Parrainage'
+  },
+  {
     path: 'profile',
     component: ProfileComponent,
     canActivate: [authGuard]
@@ -174,6 +182,13 @@ export const routes: Routes = [
         path: 'orders',
         component: OrdersComponent,
         title: 'Gestion des commandes'
+      },
+      {
+        path: 'referral-tiers',
+        loadComponent: () =>
+            import('./pages/admin/referral-tiers.component')
+                .then(m => m.AdminReferralTiersComponent),
+        title: 'Récompenses de parrainage'
       },
       {
         path: 'inventories',

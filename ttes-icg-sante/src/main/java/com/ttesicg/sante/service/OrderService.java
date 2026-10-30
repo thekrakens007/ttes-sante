@@ -22,6 +22,8 @@ public class OrderService {
 
     private final UserRepository userRepository;
 
+    private final ReferralService referralService;
+
     private final CartRepository cartRepository;
 
     private final CartItemRepository cartItemRepository;
@@ -707,6 +709,10 @@ public class OrderService {
         );
 
         orderRepository.save(order);
+
+        if (order.getStatus() == OrderStatus.DELIVERED) {
+            referralService.awardPurchase(order);
+        }
 
         return map(order);
     }

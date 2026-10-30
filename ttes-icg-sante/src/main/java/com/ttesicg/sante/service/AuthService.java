@@ -30,6 +30,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final GoogleTokenVerifier googleTokenVerifier;
+    private final ReferralService referralService;
 
     private static final long VERIFICATION_VALIDITY_HOURS = 24;
     private static final long RESET_VALIDITY_MINUTES = 60;
@@ -110,7 +111,10 @@ public class AuthService {
                                 .roles(Set.of(clientRole))
                                 .build();
 
-                        return userRepository.save(newUser);
+                        referralService.attachReferrer(newUser, request.getReferralCode());
+                        User saved = userRepository.save(newUser);
+                        referralService.awardSignup(saved);
+                        return saved;
                     });
 
             // Si un compte existe déjà avec cet email,
@@ -163,6 +167,7 @@ public class AuthService {
                 .roles(Set.of(clientRole))
                 .build();
 
+        referralService.attachReferrer(user, request.getReferralCode());
         userRepository.save(user);
 
         emailService.sendVerificationEmail(user.getEmail(), verificationToken);
@@ -185,6 +190,8 @@ public class AuthService {
         user.setVerificationToken(null);
         user.setVerificationTokenExpiry(null);
         userRepository.save(user);
+
+        referralService.awardSignup(user);
 
         return new MessageResponse("Email vérifié avec succès. Vous pouvez maintenant vous connecter.");
     }

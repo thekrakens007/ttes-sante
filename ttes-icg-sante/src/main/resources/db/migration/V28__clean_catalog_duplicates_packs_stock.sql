@@ -72,31 +72,33 @@ ORDER BY m.keep_id, i.is_main DESC, i.display_order;
 DELETE FROM products WHERE id IN (SELECT drop_id FROM tmp_dup_map);
 
 -- Forever packs: products -> product_bundles.
-CREATE TEMP TABLE tmp_pack_move (product_id BIGINT PRIMARY KEY, bundle_id BIGINT) ON COMMIT DROP;
+CREATE TEMP TABLE tmp_pack_move (product_id BIGINT PRIMARY KEY, bundle_id BIGINT, bname TEXT) ON COMMIT DROP;
 
-INSERT INTO tmp_pack_move (product_id)
-SELECT id FROM products
-WHERE id IN (315, 316, 317, 318, 319, 320)
-  AND name IN ('Mini Touch Nutritional', 'Mini Touch Personal', 'Vital 5 with Gel',
-               'Vital 5 with Berry Nectar', 'Vital 5 with Bits N Peaches', 'Vital 5 with Freedom');
+INSERT INTO tmp_pack_move (product_id, bname)
+SELECT id, CASE WHEN id IN (479, 481) THEN 'Pack Longrich ' ELSE 'Pack Forever ' END || trim(name) FROM products
+WHERE id IN (315, 316, 317, 318, 319, 320, 299, 300, 321, 322, 325, 479, 481);
 
 WITH ins AS (
   INSERT INTO product_bundles (name, description, price, active, created_at, updated_at)
-  SELECT 'Pack Forever ' || p.name, p.description, p.price, p.active, NOW(), NOW()
+  SELECT t.bname, p.description, p.price, p.active, NOW(), NOW()
   FROM products p JOIN tmp_pack_move t ON t.product_id = p.id
-  WHERE NOT EXISTS (SELECT 1 FROM product_bundles b WHERE b.name = 'Pack Forever ' || p.name)
+  WHERE NOT EXISTS (SELECT 1 FROM product_bundles b WHERE b.name = t.bname)
   RETURNING id, name
 )
 SELECT 1 FROM ins;
 
 UPDATE tmp_pack_move t SET bundle_id = b.id
-FROM products p, product_bundles b
-WHERE p.id = t.product_id AND b.name = 'Pack Forever ' || p.name;
+FROM product_bundles b WHERE b.name = t.bname;
 
 UPDATE order_items oi SET bundle_id = t.bundle_id, product_id = NULL
 FROM tmp_pack_move t WHERE oi.product_id = t.product_id;
 UPDATE cart_items ci SET bundle_id = t.bundle_id, product_id = NULL
 FROM tmp_pack_move t WHERE ci.product_id = t.product_id;
+INSERT INTO bundle_images (bundle_id, image_url, is_main, display_order, created_at)
+SELECT t.bundle_id, i.image_url, i.is_main, i.display_order, NOW()
+FROM tmp_pack_move t JOIN product_images i ON i.product_id = t.product_id
+WHERE NOT EXISTS (SELECT 1 FROM bundle_images x WHERE x.bundle_id = t.bundle_id);
+
 DELETE FROM cure_items WHERE product_id IN (SELECT product_id FROM tmp_pack_move);
 DELETE FROM bundle_items WHERE product_id IN (SELECT product_id FROM tmp_pack_move);
 DELETE FROM products WHERE id IN (SELECT product_id FROM tmp_pack_move);
@@ -168,6 +170,13 @@ JOIN product_bundles b ON b.name = k.name
 CROSS JOIN LATERAL unnest(string_to_array(k.items, ',')) AS e
 WHERE EXISTS (SELECT 1 FROM products p WHERE p.id = split_part(e, ':', 1)::BIGINT)
   AND NOT EXISTS (SELECT 1 FROM bundle_items x WHERE x.bundle_id = b.id);
+
+-- Yupi membership packs.
+INSERT INTO product_bundles (name, description, price, active, created_at, updated_at)
+SELECT v.name, 'Pack d''adhésion Yupi ' || v.name, v.price, TRUE, NOW(), NOW()
+FROM (VALUES ('Pack YUPI', 10500), ('Pack ÉLITE', 48000), ('Pack SUCCESS', 78000), ('Pack PRESTIGE', 123000),
+             ('Pack VISIONARY', 303000), ('Pack TRIOMPH', 603000), ('Pack PROSPERITY', 1203000)) AS v(name, price)
+WHERE NOT EXISTS (SELECT 1 FROM product_bundles b WHERE b.name = v.name);
 
 -- Stock: every product has an inventory row, all at 200.
 INSERT INTO inventory (product_id, quantity, minimum_quantity)

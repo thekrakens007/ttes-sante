@@ -65,6 +65,8 @@ public class SecurityConfig {
                  .requestMatchers("/api/company-categories/**")
                         .permitAll()
 
+                 .requestMatchers("/api/chat/**")
+                 .permitAll()
 
                         .anyRequest()
                 .authenticated()

@@ -1,6 +1,8 @@
+
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { GlobalThemeToggleComponent } from './shared/components/common/global-theme-toggle/global-theme-toggle.component';
+import { ChatWidgetComponent } from './shared/components/chat-widget/chat-widget.component';
 
 @Component({
   selector: 'app-root',
@@ -8,10 +10,11 @@ import { GlobalThemeToggleComponent } from './shared/components/common/global-th
   imports: [
     RouterModule,
     GlobalThemeToggleComponent,
+    ChatWidgetComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
 export class AppComponent {
-  title = 'Angular Ecommerce Dashboard | TailAdmin';
+  title = 'TTES-ICG-ACADEMY VENTE DES PRODUITS';
 }

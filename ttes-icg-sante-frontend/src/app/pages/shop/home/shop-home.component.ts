@@ -167,9 +167,9 @@ export class ShopHomeComponent implements OnInit {
         this.bundlesLoading = true;
         this.bundlesError = '';
 
-        this.bundleService.getBundles().subscribe({
-            next: (bundles) => {
-                this.bundles = (bundles ?? []).slice(0, 4);
+        this.bundleService.getBundles(0, 4).subscribe({
+            next: (response) => {
+                this.bundles = response?.content ?? [];
                 this.bundlesLoading = false;
             },
             error: (error) => {

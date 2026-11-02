@@ -1,54 +1,39 @@
+
 import {
     Component,
     OnInit,
     inject
 } from '@angular/core';
 
-import {
-    CommonModule
-} from '@angular/common';
-
-import {
-    FormsModule
-} from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import {
     Router,
     RouterModule
 } from '@angular/router';
 
-import {
-    BundleService
-} from '../../../../core/services/bundle.service';
+import { BundleService } from '../../../../core/services/bundle.service';
 
 import {
     BundleResponse
 } from '../../../../core/interfaces/bundle-response.interface';
 
-import {
-    AuthService
-} from '../../../../core/services/auth.service';
-
-import {
-    CartService
-} from '../../../../core/services/cart.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { CartService } from '../../../../core/services/cart.service';
 
 import {
     Cart
 } from '../../../../core/interfaces/cart.interface';
 
-
 @Component({
     selector: 'app-bundle-list',
-
     standalone: true,
-
     imports: [
         CommonModule,
         FormsModule,
         RouterModule
     ],
-
     templateUrl: './bundle-list.component.html'
 })
 export class BundleListComponent implements OnInit {
@@ -57,76 +42,42 @@ export class BundleListComponent implements OnInit {
     // SERVICES
     // ============================================================
 
-    private bundleService =
-        inject(BundleService);
-
-    private authService =
-        inject(AuthService);
-
-    private router =
-        inject(Router);
-
-    private cartService =
-        inject(CartService);
-
+    private bundleService = inject(BundleService);
+    private authService = inject(AuthService);
+    private router = inject(Router);
+    private cartService = inject(CartService);
 
     // ============================================================
     // CART
     // ============================================================
 
-    /**
-     * Panier courant de l'utilisateur.
-     */
     cart: Cart | null = null;
-
-    /**
-     * Nombre total d'articles dans le panier.
-     */
     cartCount = 0;
-
-    /**
-     * ID du pack actuellement en cours d'ajout.
-     */
     addingBundleId: number | null = null;
 
-    /**
-     * Message de succès.
-     */
     cartMessage = '';
-
-    /**
-     * Message d'erreur.
-     */
     cartError = '';
-
 
     // ============================================================
     // GENERAL
     // ============================================================
 
-    currentYear =
-        new Date().getFullYear();
-
+    currentYear = new Date().getFullYear();
     mobileMenuOpen = false;
-
 
     // ============================================================
     // BUNDLES
     // ============================================================
 
     bundles: BundleResponse[] = [];
-
     filteredBundles: BundleResponse[] = [];
-
 
     // ============================================================
     // LOADING / ERROR
     // ============================================================
 
     loading = true;
-
     error = '';
-
 
     // ============================================================
     // SEARCH
@@ -134,92 +85,69 @@ export class BundleListComponent implements OnInit {
 
     searchTerm = '';
 
-
     // ============================================================
     // FILTERS
     // ============================================================
 
     /**
-     * Valeurs possibles :
-     *
      * ''            = tous
      * 'available'   = disponibles
      * 'unavailable' = rupture
      */
-    stockFilter = '';
-
+    stockFilter: '' | 'available' | 'unavailable' = '';
 
     // ============================================================
-    // PAGINATION
+    // BACKEND PAGINATION
     // ============================================================
-
-    currentPage = 0;
 
     /**
-     * Nombre de packs affichés par page.
+     * La pagination Spring Boot commence à 0.
      */
+    currentPage = 0;
+
     pageSize = 12;
 
     totalPages = 0;
+    totalElements = 0;
 
     pages: number[] = [];
-
 
     // ============================================================
     // INIT
     // ============================================================
 
     ngOnInit(): void {
-
         this.loadBundles();
-
-        /*
-         * Charger le panier uniquement si
-         * l'utilisateur est connecté.
-         */
         this.loadCart();
     }
-
 
     // ============================================================
     // MOBILE MENU
     // ============================================================
 
     toggleMobileMenu(): void {
-
-        this.mobileMenuOpen =
-            !this.mobileMenuOpen;
+        this.mobileMenuOpen = !this.mobileMenuOpen;
     }
-
 
     closeMobileMenu(): void {
-
         this.mobileMenuOpen = false;
     }
-
 
     // ============================================================
     // AUTHENTICATION
     // ============================================================
 
     isLoggedIn(): boolean {
-
         return this.authService.isLoggedIn();
     }
 
-
     isAdmin(): boolean {
-
         if (!this.isLoggedIn()) {
-
             return false;
         }
 
-        return this.authService.hasRole(
-            'ROLE_ADMIN'
-        );
+        return this.authService.hasRole('ROLE_ADMIN');
     }
-
 
     // ============================================================
     // LOAD CART
@@ -227,53 +155,31 @@ export class BundleListComponent implements OnInit {
 
     loadCart(): void {
 
-        /*
-         * Pas de panier à charger si
-         * l'utilisateur n'est pas connecté.
-         */
-        if (
-            !this.authService.isLoggedIn()
-        ) {
-
+        if (!this.authService.isLoggedIn()) {
             this.cart = null;
-
             this.cartCount = 0;
-
             return;
         }
 
+        this.cartService.getCart().subscribe({
 
-        this.cartService
-            .getCart()
-            .subscribe({
+            next: (cart: Cart) => {
+                this.cart = cart;
+                this.updateCartCount();
+            },
 
-                next: (
-                    cart: Cart
-                ) => {
+            error: (error: unknown) => {
+                console.error(
+                    'Erreur chargement panier :',
+                    error
+                );
 
-                    this.cart = cart;
+                this.cart = null;
+                this.cartCount = 0;
+            }
 
-                    this.updateCartCount();
-                },
-
-
-                error: (
-                    error: unknown
-                ) => {
-
-                    console.error(
-                        'Erreur chargement panier :',
-                        error
-                    );
-
-                    this.cart = null;
-
-                    this.cartCount = 0;
-                }
-
-            });
+        });
     }
-
 
     // ============================================================
     // CART COUNT
@@ -281,67 +187,38 @@ export class BundleListComponent implements OnInit {
 
     updateCartCount(): void {
 
-        if (
-            !this.cart?.items
-        ) {
-
+        if (!this.cart?.items) {
             this.cartCount = 0;
-
             return;
         }
 
-
-        this.cartCount =
-            this.cart.items.reduce(
-                (
-                    total,
-                    item
-                ) =>
-                    total +
-                    (
-                        item.quantity ?? 0
-                    ),
-                0
-            );
+        this.cartCount = this.cart.items.reduce(
+            (total, item) => total + (item.quantity ?? 0),
+            0
+        );
     }
-
 
     // ============================================================
     // QUANTITE D'UN PACK DANS LE PANIER
     // ============================================================
 
-    getBundleCartQuantity(
-        bundleId: number
-    ): number {
+    getBundleCartQuantity(bundleId: number): number {
 
-        if (
-            !this.cart?.items
-        ) {
-
+        if (!this.cart?.items) {
             return 0;
         }
 
-
-        const item =
-            this.cart.items.find(
-                (cartItem: any) => {
-
-                    return (
-                        cartItem.bundleId ===
-                            bundleId
-
-                        ||
-
-                        cartItem.bundle?.id ===
-                            bundleId
-                    );
-                }
-            );
-
+        const item = this.cart.items.find(
+            (cartItem: any) => {
+                return (
+                    cartItem.bundleId === bundleId ||
+                    cartItem.bundle?.id === bundleId
+                );
+            }
+        );
 
         return item?.quantity ?? 0;
     }
-
 
     // ============================================================
     // LOAD BUNDLES
@@ -350,52 +227,45 @@ export class BundleListComponent implements OnInit {
     loadBundles(): void {
 
         this.loading = true;
-
         this.error = '';
 
-
         this.bundleService
-            .getBundles()
+            .getBundles(this.currentPage, this.pageSize)
             .subscribe({
 
-                next: (
-                    bundles
-                ) => {
+                next: (response) => {
 
-                    this.bundles =
-                        bundles ?? [];
+                    this.bundles = response.content ?? [];
 
-                    this.currentPage = 0;
+                    this.totalPages = response.totalPages ?? 0;
+                    this.totalElements = response.totalElements ?? 0;
 
+                    // Générer les numéros de pages.
+                    this.updatePagination();
+
+                    // Appliquer les filtres sur la page reçue.
                     this.search();
 
                     this.loading = false;
                 },
 
-
-                error: (
-                    error
-                ) => {
+                error: (error) => {
 
                     console.error(
                         'Erreur chargement packs :',
                         error
                     );
 
-
                     this.bundles = [];
-
                     this.filteredBundles = [];
-
                     this.pages = [];
 
                     this.totalPages = 0;
-
+                    this.totalElements = 0;
 
                     this.error =
                         error?.error?.message ??
                         'Impossible de charger les packs.';
-
 
                     this.loading = false;
                 }
@@ -403,34 +273,22 @@ export class BundleListComponent implements OnInit {
             });
     }
 
-
     // ============================================================
     // NORMALISATION DU TEXTE
     // ============================================================
 
-    private normalizeSearchText(
-        value: unknown
-    ): string {
+    private normalizeSearchText(value: unknown): string {
 
-        if (
-            value === null ||
-            value === undefined
-        ) {
-
+        if (value === null || value === undefined) {
             return '';
         }
 
-
         return String(value)
             .normalize('NFD')
-            .replace(
-                /[\u0300-\u036f]/g,
-                ''
-            )
+            .replace(/[\u0300-\u036f]/g, '')
             .toLowerCase()
             .trim();
     }
-
 
     // ============================================================
     // SEARCH
@@ -438,55 +296,34 @@ export class BundleListComponent implements OnInit {
 
     search(): void {
 
-        const term =
-            this.normalizeSearchText(
-                this.searchTerm
-            );
+        const term = this.normalizeSearchText(
+            this.searchTerm
+        );
 
+        this.filteredBundles = this.bundles.filter(
+            bundle => {
 
-        this.filteredBundles =
-            this.bundles.filter(
-                bundle => {
+                const matchesSearch =
+                    !term ||
+                    this.bundleMatchesSearch(bundle, term);
 
-                    const matchesSearch =
-                        !term ||
-                        this.bundleMatchesSearch(
-                            bundle,
-                            term
-                        );
+                const matchesStock =
+                    !this.stockFilter ||
 
+                    (
+                        this.stockFilter === 'available' &&
+                        this.isBundleAvailable(bundle)
+                    ) ||
 
-                    const matchesStock =
-                        !this.stockFilter ||
-
-                        (
-                            this.stockFilter === 'available' &&
-                            this.isBundleAvailable(
-                                bundle
-                            )
-                        ) ||
-
-                        (
-                            this.stockFilter === 'unavailable' &&
-                            !this.isBundleAvailable(
-                                bundle
-                            )
-                        );
-
-
-                    return (
-                        matchesSearch &&
-                        matchesStock
+                    (
+                        this.stockFilter === 'unavailable' &&
+                        !this.isBundleAvailable(bundle)
                     );
-                }
-            );
 
-
-        this.currentPage = 0;
-
-        this.updatePagination();
+                return matchesSearch && matchesStock;
+            }
+        );
     }
-
 
     // ============================================================
     // SEARCH DANS LE PACK
@@ -498,114 +335,62 @@ export class BundleListComponent implements OnInit {
     ): boolean {
 
         const bundleValues: unknown[] = [
-
             bundle.id,
-
             bundle.name,
-
             bundle.description,
-
             bundle.price,
-
             bundle.stock,
-
             bundle.active
-
         ];
 
+        const bundleText = bundleValues
+            .map(value => this.normalizeSearchText(value))
+            .join(' ');
 
-        const bundleText =
-            bundleValues
-                .map(
-                    value =>
-                        this.normalizeSearchText(
-                            value
-                        )
-                )
-                .join(' ');
-
-
-        if (
-            bundleText.includes(term)
-        ) {
-
+        if (bundleText.includes(term)) {
             return true;
         }
 
-
-        if (
-            !bundle.items ||
-            bundle.items.length === 0
-        ) {
-
+        if (!bundle.items || bundle.items.length === 0) {
             return false;
         }
 
+        return bundle.items.some(item => {
 
-        return bundle.items.some(
-            item => {
+            const productValues: unknown[] = [
 
-                const productValues: unknown[] = [
+                item.id,
+                item.productId,
+                item.productName,
+                item.sku,
+                item.description,
+                item.brand,
+                item.activeIngredient,
+                item.dosage,
+                item.form,
+                item.ingredients,
+                item.companyId,
+                item.companyName,
 
-                    item.id,
+                ...(item.categoryIds ?? []),
+                ...(item.categories ?? []),
 
-                    item.productId,
+                ...(item.therapeuticAreaIds ?? []),
+                ...(item.therapeuticAreas ?? []),
 
-                    item.productName,
+                item.unitPrice,
+                item.quantity,
+                item.availableStock
 
-                    item.sku,
+            ];
 
-                    item.description,
+            const productText = productValues
+                .map(value => this.normalizeSearchText(value))
+                .join(' ');
 
-                    item.brand,
-
-                    item.activeIngredient,
-
-                    item.dosage,
-
-                    item.form,
-
-                    item.ingredients,
-
-                    item.companyId,
-
-                    item.companyName,
-
-                    ...(item.categoryIds ?? []),
-
-                    ...(item.categories ?? []),
-
-                    ...(item.therapeuticAreaIds ?? []),
-
-                    ...(item.therapeuticAreas ?? []),
-
-                    item.unitPrice,
-
-                    item.quantity,
-
-                    item.availableStock
-
-                ];
-
-
-                const productText =
-                    productValues
-                        .map(
-                            value =>
-                                this.normalizeSearchText(
-                                    value
-                                )
-                        )
-                        .join(' ');
-
-
-                return productText.includes(
-                    term
-                );
-            }
-        );
+            return productText.includes(term);
+        });
     }
-
 
     // ============================================================
     // RESET FILTERS
@@ -614,18 +399,10 @@ export class BundleListComponent implements OnInit {
     resetFilters(): void {
 
         this.searchTerm = '';
-
         this.stockFilter = '';
 
-        this.filteredBundles = [
-            ...this.bundles
-        ];
-
-        this.currentPage = 0;
-
-        this.updatePagination();
+        this.search();
     }
-
 
     // ============================================================
     // CLEAR SEARCH
@@ -634,106 +411,55 @@ export class BundleListComponent implements OnInit {
     clearSearch(): void {
 
         this.searchTerm = '';
-
         this.search();
     }
 
-
     // ============================================================
-    // PAGINATION
+    // BACKEND PAGINATION
     // ============================================================
 
     updatePagination(): void {
 
-        this.totalPages =
-            Math.ceil(
-                this.filteredBundles.length /
-                this.pageSize
-            );
-
-
-        if (
-            this.totalPages === 0
-        ) {
-
-            this.pages = [];
-
-            return;
-        }
-
-
-        this.pages =
-            Array.from(
-                {
-                    length: this.totalPages
-                },
-                (_, index) => index
-            );
-
-
-        if (
-            this.currentPage >=
-            this.totalPages
-        ) {
-
-            this.currentPage =
-                this.totalPages - 1;
-        }
+        this.pages = Array.from(
+            { length: this.totalPages },
+            (_, index) => index
+        );
     }
-
 
     // ============================================================
     // PACKS DE LA PAGE COURANTE
     // ============================================================
 
+    /**
+     * Le backend effectue déjà le découpage.
+     * Aucun slice() supplémentaire n'est nécessaire.
+     */
     get paginatedBundles(): BundleResponse[] {
-
-        const start =
-            this.currentPage *
-            this.pageSize;
-
-
-        const end =
-            start +
-            this.pageSize;
-
-
-        return this.filteredBundles.slice(
-            start,
-            end
-        );
+        return this.filteredBundles;
     }
-
 
     // ============================================================
     // ALLER À UNE PAGE
     // ============================================================
 
-    goToPage(
-        page: number
-    ): void {
+    goToPage(page: number): void {
 
         if (
             page < 0 ||
             page >= this.totalPages ||
             page === this.currentPage
         ) {
-
             return;
         }
 
-
         this.currentPage = page;
-
+        this.loadBundles();
 
         window.scrollTo({
-
             top: 0,
-
             behavior: 'smooth'
         });
     }
-
 
     // ============================================================
     // PAGE SUIVANTE
@@ -741,23 +467,17 @@ export class BundleListComponent implements OnInit {
 
     nextPage(): void {
 
-        if (
-            this.currentPage <
-            this.totalPages - 1
-        ) {
+        if (this.currentPage < this.totalPages - 1) {
 
             this.currentPage++;
-
+            this.loadBundles();
 
             window.scrollTo({
-
                 top: 0,
-
                 behavior: 'smooth'
             });
         }
     }
-
 
     // ============================================================
     // PAGE PRECEDENTE
@@ -765,22 +485,27 @@ export class BundleListComponent implements OnInit {
 
     previousPage(): void {
 
-        if (
-            this.currentPage > 0
-        ) {
+        if (this.currentPage > 0) {
 
             this.currentPage--;
-
+            this.loadBundles();
 
             window.scrollTo({
-
                 top: 0,
-
                 behavior: 'smooth'
             });
         }
     }
 
+    // ============================================================
+    // CHANGEMENT DU NOMBRE DE PACKS PAR PAGE
+    // ============================================================
+
+    onPageSizeChange(): void {
+
+        this.currentPage = 0;
+        this.loadBundles();
+    }
 
     // ============================================================
     // BUNDLE IMAGE
@@ -790,20 +515,13 @@ export class BundleListComponent implements OnInit {
         bundle: BundleResponse
     ): string | null {
 
-        if (
-            !bundle.images ||
-            bundle.images.length === 0
-        ) {
-
+        if (!bundle.images || bundle.images.length === 0) {
             return '/images/products/default-product.png';
         }
 
-
-        const mainImage =
-            bundle.images.find(
-                image => image.main
-            );
-
+        const mainImage = bundle.images.find(
+            image => image.main
+        );
 
         return (
             mainImage?.imageUrl ??
@@ -811,7 +529,6 @@ export class BundleListComponent implements OnInit {
             '/images/products/default-product.png'
         );
     }
-
 
     // ============================================================
     // BUNDLE AVAILABILITY
@@ -827,16 +544,11 @@ export class BundleListComponent implements OnInit {
         );
     }
 
-
     isOutOfStock(
         bundle: BundleResponse
     ): boolean {
-
-        return !this.isBundleAvailable(
-            bundle
-        );
+        return !this.isBundleAvailable(bundle);
     }
-
 
     // ============================================================
     // BUNDLE ITEM COUNT
@@ -845,37 +557,23 @@ export class BundleListComponent implements OnInit {
     getBundleItemCount(
         bundle: BundleResponse
     ): number {
-
         return bundle.items?.length ?? 0;
     }
-
 
     // ============================================================
     // ADD TO CART
     // ============================================================
 
-    addToCart(
-        bundle: BundleResponse
-    ): void {
+    addToCart(bundle: BundleResponse): void {
 
-        /*
-         * ========================================================
-         * NON CONNECTÉ
-         * ========================================================
-         *
-         * Comme pour les produits :
-         * on redirige directement vers la connexion.
-         */
-        if (
-            !this.authService.isLoggedIn()
-        ) {
+        // NON CONNECTÉ
+        if (!this.authService.isLoggedIn()) {
 
             this.router.navigate(
                 ['/signin'],
                 {
                     queryParams: {
-                        returnUrl:
-                            this.router.url
+                        returnUrl: this.router.url
                     }
                 }
             );
@@ -883,160 +581,89 @@ export class BundleListComponent implements OnInit {
             return;
         }
 
-
-        /*
-         * ========================================================
-         * STOCK
-         * ========================================================
-         */
-
-        if (
-            bundle.stock <= 0
-        ) {
+        // STOCK
+        if (bundle.stock <= 0) {
 
             this.cartError =
                 'Ce pack est actuellement en rupture de stock.';
 
             this.cartMessage = '';
 
-
             setTimeout(() => {
-
                 this.cartError = '';
-
             }, 4000);
 
-
             return;
         }
 
-
-        /*
-         * ========================================================
-         * EVITER DOUBLE CLIC
-         * ========================================================
-         */
-
-        if (
-            this.addingBundleId !== null
-        ) {
-
+        // ÉVITER DOUBLE CLIC
+        if (this.addingBundleId !== null) {
             return;
         }
 
-
-        this.addingBundleId =
-            bundle.id;
+        this.addingBundleId = bundle.id;
 
         this.cartMessage = '';
-
         this.cartError = '';
 
-
-        /*
-         * ========================================================
-         * AJOUT DU PACK
-         * ========================================================
-         *
-         * Le backend retourne le panier mis à jour.
-         */
         this.cartService
-            .addBundle(
-                bundle.id,
-                1
-            )
+            .addBundle(bundle.id, 1)
             .subscribe({
 
-                next: (
-                    cart: Cart
-                ) => {
+                next: (cart: Cart) => {
 
-                    /*
-                     * Remplacer le panier local
-                     * par celui retourné par le backend.
-                     */
                     this.cart = cart;
-
-
-                    /*
-                     * Recalculer le compteur global.
-                     */
                     this.updateCartCount();
-
 
                     this.cartMessage =
                         `${bundle.name} a été ajouté au panier.`;
 
-
-                    this.addingBundleId =
-                        null;
-
+                    this.addingBundleId = null;
 
                     setTimeout(() => {
-
                         this.cartMessage = '';
-
                     }, 3000);
                 },
 
-
-                error: (
-                    error: any
-                ) => {
+                error: (error: any) => {
 
                     console.error(
                         'Erreur ajout pack au panier :',
                         error
                     );
 
+                    this.addingBundleId = null;
 
-                    this.addingBundleId =
-                        null;
-
-
-                    /*
-                     * Session expirée.
-                     */
-                    if (
-                        error?.status === 401
-                    ) {
+                    // SESSION EXPIRÉE
+                    if (error?.status === 401) {
 
                         this.authService.logout();
-
 
                         this.router.navigate(
                             ['/signin'],
                             {
                                 queryParams: {
-                                    returnUrl:
-                                        this.router.url
+                                    returnUrl: this.router.url
                                 }
                             }
                         );
 
-
                         return;
                     }
-
 
                     this.cartError =
                         error?.error?.message ??
                         'Impossible d’ajouter le pack au panier.';
 
-
                     this.cartMessage = '';
 
-
                     setTimeout(() => {
-
                         this.cartError = '';
-
                     }, 4000);
                 }
 
             });
     }
-
 
     // ============================================================
     // PRICE
@@ -1047,15 +674,11 @@ export class BundleListComponent implements OnInit {
     ): string {
 
         return (
-            new Intl.NumberFormat(
-                'fr-FR'
-            ).format(
+            new Intl.NumberFormat('fr-FR').format(
                 price ?? 0
-            ) +
-            ' FCFA'
+            ) + ' FCFA'
         );
     }
-
 
     // ============================================================
     // FOCUS SEARCH
@@ -1065,18 +688,12 @@ export class BundleListComponent implements OnInit {
 
         setTimeout(() => {
 
-            const input =
-                document.querySelector(
-                    'input[type="text"]'
-                ) as HTMLInputElement | null;
+            const input = document.querySelector(
+                'input[type="text"]'
+            ) as HTMLInputElement | null;
 
-
-            if (input) {
-
-                input.focus();
-            }
+            input?.focus();
 
         });
     }
-
 }

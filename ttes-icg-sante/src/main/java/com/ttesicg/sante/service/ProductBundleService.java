@@ -20,11 +20,15 @@ import com.ttesicg.sante.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Service
 @RequiredArgsConstructor
@@ -122,6 +126,36 @@ public class ProductBundleService {
         }
 
         return map(bundle);
+    }
+
+
+    @Transactional
+    public Page<BundleResponse> findAllActive(Pageable pageable) {
+
+        return bundleRepository
+                .findByActiveTrue(
+                        org.springframework.data.domain.PageRequest.of(
+                                pageable.getPageNumber(),
+                                pageable.getPageSize(),
+                                Sort.by(Sort.Direction.DESC, "createdAt")
+                        )
+                )
+                .map(this::map);
+    }
+
+
+    @Transactional
+    public Page<BundleResponse> findAll(Pageable pageable) {
+
+        return bundleRepository
+                .findAll(
+                        PageRequest.of(
+                                pageable.getPageNumber(),
+                                pageable.getPageSize(),
+                                Sort.by(Sort.Direction.DESC, "createdAt")
+                        )
+                )
+                .map(this::map);
     }
 
 

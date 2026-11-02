@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { BundleResponse } from '../interfaces/bundle-response.interface';
 import { BundleRequest } from '../interfaces/bundle-request.interface';
+import {PageResponse} from "../interfaces/page-response.interface";
 
 @Injectable({
     providedIn: 'root'
@@ -22,13 +23,7 @@ export class BundleService {
      * =====================================================
      */
 
-    getBundles(): Observable<BundleResponse[]> {
 
-        return this.http.get<BundleResponse[]>(
-            this.API_URL
-        );
-
-    }
 
 
     getBundle(id: number): Observable<BundleResponse> {
@@ -46,13 +41,6 @@ export class BundleService {
      * =====================================================
      */
 
-    getAdminBundles(): Observable<BundleResponse[]> {
-
-        return this.http.get<BundleResponse[]>(
-            this.ADMIN_API_URL
-        );
-
-    }
 
 
     getAdminBundle(id: number): Observable<BundleResponse> {
@@ -97,6 +85,24 @@ export class BundleService {
             `${this.ADMIN_API_URL}/${id}`
         );
 
+    }
+
+    getBundles(
+        page = 0,
+        size = 8
+    ): Observable<PageResponse<BundleResponse>> {
+        return this.http.get<PageResponse<BundleResponse>>(
+            `${this.API_URL}?page=${page}&size=${size}`
+        );
+    }
+
+    getAdminBundles(
+        page = 0,
+        size = 8
+    ): Observable<PageResponse<BundleResponse>> {
+        return this.http.get<PageResponse<BundleResponse>>(
+            `${this.ADMIN_API_URL}?page=${page}&size=${size}`
+        );
     }
 
 }

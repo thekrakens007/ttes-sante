@@ -1,625 +1,341 @@
-<div
-    class="min-h-screen bg-gray-50
-           text-gray-900
-           dark:bg-gray-950
-           dark:text-white">
 
-    <!-- ===================================================== -->
-    <!-- HEADER -->
-    <!-- ===================================================== -->
+<!-- ====================================================== -->
+<!-- HEADER -->
+<!-- ====================================================== -->
 
-    <header
-        class="sticky top-0 z-50
-               border-b border-gray-200
-               bg-white/95 backdrop-blur
-               dark:border-gray-800
-               dark:bg-gray-950/95">
+<header class="sticky top-0 z-50 bg-white shadow-md">
 
-        <div
-            class="mx-auto flex max-w-7xl
-                   items-center justify-between
-                   px-4 py-4
-                   sm:px-6 lg:px-8">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
 
-            <!-- LOGO -->
-
-            <a
-                routerLink="/"
-                class="flex items-center gap-3">
-
-                <img
-                    src="/images/logo/logo.svg"
+        <!-- LOGO -->
+        <a routerLink="/" class="flex items-center gap-2">
+            <img
+                    src="/images/logo.png"
                     alt="TTES-ICG Santé"
-                    class="h-10 w-auto dark:hidden">
+                    class="h-12 w-auto"
+            />
 
-                <img
-                    src="/images/logo/logo-dark.svg"
-                    alt="TTES-ICG Santé"
-                    class="hidden h-10 w-auto dark:block">
+            <span class="text-xl font-bold text-green-700">
+                TTES-ICG Santé
+            </span>
+        </a>
 
+        <!-- DESKTOP NAVIGATION -->
+        <nav class="hidden items-center gap-6 md:flex">
+
+            <a routerLink="/" class="text-gray-700 hover:text-green-700">
+                Accueil
             </a>
 
-            <!-- DESKTOP NAV -->
+            <a routerLink="/products" class="text-gray-700 hover:text-green-700">
+                Produits
+            </a>
 
-            <nav
-                class="hidden items-center gap-6
-                       md:flex">
+            <a routerLink="/bundles" class="font-semibold text-green-700">
+                Packs
+            </a>
 
+            <a routerLink="/companies" class="text-gray-700 hover:text-green-700">
+                Entreprises
+            </a>
+
+            @if (isAdmin()) {
                 <a
-                    routerLink="/"
-                    class="text-sm font-medium
-                           text-gray-700
-                           transition hover:text-green-600
-                           dark:text-gray-300
-                           dark:hover:text-green-400">
-
-                    Accueil
-
-                </a>
-
-                <a
-                    routerLink="/products"
-                    class="text-sm font-medium
-                           text-gray-700
-                           transition hover:text-green-600
-                           dark:text-gray-300
-                           dark:hover:text-green-400">
-
-                    Produits
-
-                </a>
-
-                <a
-                    routerLink="/bundles"
-                    class="text-sm font-semibold
-                           text-green-600
-                           dark:text-green-400">
-
-                    Packs
-
-                </a>
-
-                <!-- desktop -->
-                <a routerLink="/cures"
-                   class="text-sm font-medium
-                           text-gray-700
-                           transition hover:text-green-600
-                           dark:text-gray-300
-                           dark:hover:text-green-400">
-                    Cures preventives
-                </a>
-
-                <a
-                    routerLink="/companies"
-                    class="text-sm font-medium
-                           text-gray-700
-                           transition hover:text-green-600
-                           dark:text-gray-300
-                           dark:hover:text-green-400">
-
-                    Entreprises
-
-                </a>
-
-                @if (isAdmin()) {
-
-                    <a
                         routerLink="/admin"
-                        class="text-sm font-medium
-                               text-gray-700
-                               transition hover:text-green-600
-                               dark:text-gray-300
-                               dark:hover:text-green-400">
+                        class="text-gray-700 hover:text-green-700"
+                >
+                    Administration
+                </a>
+            }
 
-                        Administration
+        </nav>
 
-                    </a>
+        <!-- ACTIONS -->
+        <div class="hidden items-center gap-4 md:flex">
 
+            @if (isLoggedIn()) {
+
+                <a
+                        routerLink="/cart"
+                        class="relative rounded-lg bg-green-50 px-4 py-2 font-medium text-green-700 hover:bg-green-100"
+                >
+                    <span>Panier</span>
+
+                    @if (cartCount > 0) {
+                        <span
+                                class="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1 text-xs font-bold text-white"
+                        >
+                            {{ cartCount }}
+                        </span>
+                    }
+                </a>
+
+                <a
+                        routerLink="/profile"
+                        class="rounded-lg border border-green-600 px-4 py-2 text-green-700 hover:bg-green-50"
+                >
+                    Mon compte
+                </a>
+
+            } @else {
+
+                <a
+                        routerLink="/signin"
+                        class="text-gray-700 hover:text-green-700"
+                >
+                    Connexion
+                </a>
+
+                <a
+                        routerLink="/signup"
+                        class="rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700"
+                >
+                    Inscription
+                </a>
+
+            }
+
+        </div>
+
+        <!-- MOBILE MENU BUTTON -->
+        <button
+                type="button"
+                class="rounded-lg p-2 text-gray-700 hover:bg-gray-100 md:hidden"
+                (click)="toggleMobileMenu()"
+                aria-label="Ouvrir le menu"
+        >
+            <svg
+                    class="h-7 w-7"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+            >
+                @if (!mobileMenuOpen) {
+                    <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"
+                    />
+                } @else {
+                    <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"
+                    />
                 }
+            </svg>
+        </button>
 
-            </nav>
+    </div>
 
-            <!-- ACTIONS -->
+    <!-- MOBILE NAVIGATION -->
+    @if (mobileMenuOpen) {
 
-            <div
-                class="hidden items-center gap-3 md:flex">
+        <div class="border-t border-gray-100 bg-white px-4 py-4 md:hidden">
+
+            <nav class="flex flex-col gap-4">
+
+                <a
+                        routerLink="/"
+                        (click)="closeMobileMenu()"
+                        class="text-gray-700"
+                >
+                    Accueil
+                </a>
+
+                <a
+                        routerLink="/products"
+                        (click)="closeMobileMenu()"
+                        class="text-gray-700"
+                >
+                    Produits
+                </a>
+
+                <a
+                        routerLink="/bundles"
+                        (click)="closeMobileMenu()"
+                        class="font-semibold text-green-700"
+                >
+                    Packs
+                </a>
+
+                <a
+                        routerLink="/companies"
+                        (click)="closeMobileMenu()"
+                        class="text-gray-700"
+                >
+                    Entreprises
+                </a>
 
                 @if (isLoggedIn()) {
 
                     <a
-                        routerLink="/profile"
-                        class="rounded-lg border
-                               border-gray-200
-                               px-4 py-2
-                               text-sm font-medium
-                               text-gray-700
-                               transition
-                               hover:bg-gray-50
-                               dark:border-gray-700
-                               dark:text-gray-300
-                               dark:hover:bg-gray-800">
+                            routerLink="/cart"
+                            (click)="closeMobileMenu()"
+                            class="text-gray-700"
+                    >
+                        Panier ({{ cartCount }})
+                    </a>
 
-                        Mon profil
-
+                    <a
+                            routerLink="/profile"
+                            (click)="closeMobileMenu()"
+                            class="text-gray-700"
+                    >
+                        Mon compte
                     </a>
 
                 } @else {
 
                     <a
-                        routerLink="/signin"
-                        class="rounded-lg border
-                               border-green-600
-                               px-4 py-2
-                               text-sm font-semibold
-                               text-green-600
-                               transition
-                               hover:bg-green-50
-                               dark:border-green-500
-                               dark:text-green-400
-                               dark:hover:bg-green-900/20">
-
+                            routerLink="/signin"
+                            (click)="closeMobileMenu()"
+                            class="text-gray-700"
+                    >
                         Connexion
+                    </a>
 
+                    <a
+                            routerLink="/signup"
+                            (click)="closeMobileMenu()"
+                            class="text-gray-700"
+                    >
+                        Inscription
                     </a>
 
                 }
 
-                <a
-                    routerLink="/cart"
-                    class="flex items-center gap-2
-                           rounded-lg
-                           bg-green-600
-                           px-4 py-2
-                           text-sm font-semibold
-                           text-white
-                           transition
-                           hover:bg-green-700
-                           dark:bg-green-500
-                           dark:hover:bg-green-400">
-
-                    🛒
-
-                    <span>
-                        Panier
-                    </span>
-
-                    @if (cartCount > 0) {
-
-                        <span
-                            class="flex h-6 min-w-6
-                                   items-center justify-center
-                                   rounded-full
-                                   bg-white px-1.5
-                                   text-xs font-bold
-                                   text-green-700">
-
-                            {{ cartCount }}
-
-                        </span>
-
-                    }
-
-                </a>
-
-            </div>
-
-            <!-- MOBILE MENU BUTTON -->
-
-            <button
-                type="button"
-                class="rounded-lg p-2
-                       text-gray-700
-                       hover:bg-gray-100
-                       md:hidden
-                       dark:text-gray-300
-                       dark:hover:bg-gray-800"
-                (click)="toggleMobileMenu()">
-
-                @if (mobileMenuOpen) {
-                    ✕
-                } @else {
-                    ☰
+                @if (isAdmin()) {
+                    <a
+                            routerLink="/admin"
+                            (click)="closeMobileMenu()"
+                            class="text-gray-700"
+                    >
+                        Administration
+                    </a>
                 }
 
-            </button>
+            </nav>
 
         </div>
 
-        <!-- MOBILE MENU -->
+    }
 
-        @if (mobileMenuOpen) {
+</header>
 
-            <div
-                class="border-t border-gray-200
-                       bg-white px-4 py-4
-                       md:hidden
-                       dark:border-gray-800
-                       dark:bg-gray-950">
 
-                <nav
-                    class="flex flex-col gap-2">
+<!-- ====================================================== -->
+<!-- MAIN CONTENT -->
+<!-- ====================================================== -->
 
-                    <a
-                        routerLink="/"
-                        (click)="closeMobileMenu()"
-                        class="rounded-lg px-4 py-3
-                               text-sm font-medium
-                               text-gray-700
-                               hover:bg-gray-100
-                               dark:text-gray-300
-                               dark:hover:bg-gray-800">
+<main class="min-h-screen bg-gray-50">
 
-                        Accueil
+    <!-- HERO -->
+    <section class="bg-gradient-to-r from-green-700 to-green-500 px-4 py-16 text-white">
 
-                    </a>
+        <div class="mx-auto max-w-7xl text-center">
 
-                    <a
-                        routerLink="/products"
-                        (click)="closeMobileMenu()"
-                        class="rounded-lg px-4 py-3
-                               text-sm font-medium
-                               text-gray-700
-                               hover:bg-gray-100
-                               dark:text-gray-300
-                               dark:hover:bg-gray-800">
+            <p class="mb-3 font-semibold uppercase tracking-wider text-green-100">
+                TTES-ICG Santé
+            </p>
 
-                        Produits
+            <h1 class="mb-4 text-3xl font-bold md:text-5xl">
+                Découvrez nos packs santé
+            </h1>
 
-                    </a>
+            <p class="mx-auto max-w-2xl text-green-50">
+                Retrouvez nos sélections de produits regroupés
+                pour répondre à vos besoins en matière de santé
+                et de bien-être.
+            </p>
 
-                    <a
-                        routerLink="/bundles"
-                        (click)="closeMobileMenu()"
-                        class="rounded-lg bg-green-50
-                               px-4 py-3
-                               text-sm font-semibold
-                               text-green-700
-                               dark:bg-green-900/20
-                               dark:text-green-400">
+        </div>
 
-                        Packs
+    </section>
 
-                    </a>
 
-                    <!-- mobile -->
-                    <a routerLink="/cures" (click)="closeMobileMenu()"
-                       class="rounded-lg px-4 py-3
-                               text-sm font-medium
-                               text-gray-700
-                               hover:bg-gray-100
-                               dark:text-gray-300
-                               dark:hover:bg-gray-800">
-                        Cures preventives
-                    </a>
+    <!-- ====================================================== -->
+    <!-- BUNDLES SECTION -->
+    <!-- ====================================================== -->
 
-                    <a
-                        routerLink="/companies"
-                        (click)="closeMobileMenu()"
-                        class="rounded-lg px-4 py-3
-                               text-sm font-medium
-                               text-gray-700
-                               hover:bg-gray-100
-                               dark:text-gray-300
-                               dark:hover:bg-gray-800">
+    <section class="mx-auto max-w-7xl px-4 py-12">
 
-                        Entreprises
+        <!-- TITLE -->
+        <div class="mb-8">
 
-                    </a>
+            <h2 class="text-2xl font-bold text-gray-800 md:text-3xl">
+                Nos packs disponibles
+            </h2>
 
-                    @if (isAdmin()) {
+            <p class="mt-2 text-gray-500">
+                Explorez nos différentes compositions.
+            </p>
 
-                        <a
-                            routerLink="/admin"
-                            (click)="closeMobileMenu()"
-                            class="rounded-lg px-4 py-3
-                                   text-sm font-medium
-                                   text-gray-700
-                                   hover:bg-gray-100
-                                   dark:text-gray-300
-                                   dark:hover:bg-gray-800">
+        </div>
 
-                            Administration
 
-                        </a>
+        <!-- ====================================================== -->
+        <!-- CART MESSAGES -->
+        <!-- ====================================================== -->
 
-                    }
+        @if (cartMessage) {
 
-                    <div
-                        class="mt-2
-                               border-t border-gray-200
-                               pt-3
-                               dark:border-gray-800">
-
-                        @if (isLoggedIn()) {
-
-                            <a
-                                routerLink="/profile"
-                                (click)="closeMobileMenu()"
-                                class="mb-2 block rounded-lg
-                                       border border-gray-200
-                                       px-4 py-3
-                                       text-center text-sm
-                                       font-medium
-                                       text-gray-700
-                                       dark:border-gray-700
-                                       dark:text-gray-300">
-
-                                Mon profil
-
-                            </a>
-
-                        } @else {
-
-                            <a
-                                routerLink="/signin"
-                                (click)="closeMobileMenu()"
-                                class="mb-2 block rounded-lg
-                                       border border-green-600
-                                       px-4 py-3
-                                       text-center text-sm
-                                       font-semibold
-                                       text-green-600
-                                       dark:border-green-500
-                                       dark:text-green-400">
-
-                                Connexion
-
-                            </a>
-
-                        }
-
-                        <a
-                            routerLink="/cart"
-                            (click)="closeMobileMenu()"
-                            class="flex items-center
-                                   justify-center gap-2
-                                   rounded-lg
-                                   bg-green-600
-                                   px-4 py-3
-                                   text-center text-sm
-                                   font-semibold
-                                   text-white
-                                   dark:bg-green-500">
-
-                            🛒
-
-                            <span>
-                                Panier
-                            </span>
-
-                            @if (cartCount > 0) {
-
-                                <span
-                                    class="flex h-6 min-w-6
-                                           items-center
-                                           justify-center
-                                           rounded-full
-                                           bg-white px-1.5
-                                           text-xs font-bold
-                                           text-green-700">
-
-                                    {{ cartCount }}
-
-                                </span>
-
-                            }
-
-                        </a>
-
-                    </div>
-
-                </nav>
-
+            <div class="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-green-700">
+                {{ cartMessage }}
             </div>
 
         }
 
-    </header>
+        @if (cartError) {
 
-
-    <!-- ===================================================== -->
-    <!-- MAIN -->
-    <!-- ===================================================== -->
-
-    <main
-        class="mx-auto max-w-7xl
-               px-4 py-8
-               sm:px-6
-               lg:px-8">
-
-        <!-- TITLE -->
-
-        <div
-            class="mb-8">
-
-            <div
-                class="mb-2 flex items-center
-                       gap-2 text-sm
-                       text-gray-500
-                       dark:text-gray-400">
-
-                <a
-                    routerLink="/"
-                    class="hover:text-green-600
-                           dark:hover:text-green-400">
-
-                    Accueil
-
-                </a>
-
-                <span>
-                    /
-                </span>
-
-                <span
-                    class="font-medium
-                           text-gray-700
-                           dark:text-gray-300">
-
-                    Packs
-
-                </span>
-
+            <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+                {{ cartError }}
             </div>
 
-            <div
-                class="flex flex-col
-                       gap-4
-                       sm:flex-row
-                       sm:items-end
-                       sm:justify-between">
-
-                <div>
-
-                    <h1
-                        class="text-3xl font-bold
-                               tracking-tight
-                               text-gray-900
-                               dark:text-white
-                               sm:text-4xl">
-
-                        Nos packs santé
-
-                    </h1>
-
-                    <p
-                        class="mt-2 max-w-2xl
-                               text-gray-600
-                               dark:text-gray-400">
-
-                        Découvrez nos packs de produits
-                        sélectionnés pour répondre à
-                        différents besoins de santé.
-
-                    </p>
-
-                </div>
-
-                <a
-                    routerLink="/cart"
-                    class="inline-flex items-center
-                           justify-center gap-2
-                           rounded-xl
-                           bg-green-600
-                           px-5 py-3
-                           text-sm font-semibold
-                           text-white
-                           transition
-                           hover:bg-green-700
-                           dark:bg-green-500
-                           dark:hover:bg-green-400">
-
-                    🛒
-
-                    <span>
-                        Voir le panier
-                    </span>
-
-                    @if (cartCount > 0) {
-
-                        <span
-                            class="flex h-6 min-w-6
-                                   items-center
-                                   justify-center
-                                   rounded-full
-                                   bg-white px-1.5
-                                   text-xs font-bold
-                                   text-green-700">
-
-                            {{ cartCount }}
-
-                        </span>
-
-                    }
-
-                </a>
-
-            </div>
-
-        </div>
+        }
 
 
-        <!-- ================================================= -->
-        <!-- SEARCH + FILTERS -->
-        <!-- ================================================= -->
+        <!-- ====================================================== -->
+        <!-- SEARCH AND FILTERS -->
+        <!-- ====================================================== -->
 
-        <section
-            class="mb-8 rounded-2xl
-                   border border-gray-200
-                   bg-white p-4
-                   shadow-sm
-                   dark:border-gray-800
-                   dark:bg-gray-900
-                   sm:p-6">
+        <div class="mb-8 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
 
-            <div
-                class="grid gap-4
-                       md:grid-cols-[1fr_auto]">
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 
                 <!-- SEARCH -->
-
-                <div>
+                <div class="md:col-span-2">
 
                     <label
-                        class="mb-2 block
-                               text-sm font-semibold
-                               text-gray-700
-                               dark:text-gray-300">
-
+                            for="bundleSearch"
+                            class="mb-2 block text-sm font-semibold text-gray-700"
+                    >
                         Rechercher un pack
-
                     </label>
 
-                    <div
-                        class="relative">
-
-                        <span
-                            class="pointer-events-none
-                                   absolute inset-y-0
-                                   left-4 flex
-                                   items-center
-                                   text-gray-400">
-
-                            🔍
-
-                        </span>
+                    <div class="relative">
 
                         <input
-                            type="text"
-                            [(ngModel)]="searchTerm"
-                            (ngModelChange)="search()"
-                            placeholder="Nom, description, produit..."
-                            class="w-full rounded-xl
-                                   border border-gray-300
-                                   bg-white
-                                   py-3 pl-11 pr-4
-                                   text-sm
-                                   text-gray-900
-                                   outline-none
-                                   transition
-                                   focus:border-green-500
-                                   focus:ring-2
-                                   focus:ring-green-500/20
-                                   dark:border-gray-700
-                                   dark:bg-gray-950
-                                   dark:text-white
-                                   dark:placeholder-gray-500">
+                                id="bundleSearch"
+                                type="text"
+                                [(ngModel)]="searchTerm"
+                                (ngModelChange)="search()"
+                                (focus)="focusSearch()"
+                                placeholder="Nom, description, produit, marque..."
+                                class="w-full rounded-xl border border-gray-300 px-4 py-3 pr-10 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100"
+                        />
 
                         @if (searchTerm) {
 
                             <button
-                                type="button"
-                                (click)="clearSearch()"
-                                class="absolute inset-y-0
-                                       right-3 flex
-                                       items-center
-                                       px-2
-                                       text-gray-400
-                                       hover:text-gray-700
-                                       dark:hover:text-gray-200">
-
+                                    type="button"
+                                    (click)="clearSearch()"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
+                                    aria-label="Effacer la recherche"
+                            >
                                 ✕
-
                             </button>
 
                         }
@@ -630,44 +346,27 @@
 
 
                 <!-- STOCK FILTER -->
-
-                <div
-                    class="min-w-[200px]">
+                <div>
 
                     <label
-                        class="mb-2 block
-                               text-sm font-semibold
-                               text-gray-700
-                               dark:text-gray-300">
-
+                            for="stockFilter"
+                            class="mb-2 block text-sm font-semibold text-gray-700"
+                    >
                         Disponibilité
-
                     </label>
 
                     <select
-                        [(ngModel)]="stockFilter"
-                        (ngModelChange)="search()"
-                        class="w-full rounded-xl
-                               border border-gray-300
-                               bg-white
-                               px-4 py-3
-                               text-sm
-                               text-gray-900
-                               outline-none
-                               transition
-                               focus:border-green-500
-                               focus:ring-2
-                               focus:ring-green-500/20
-                               dark:border-gray-700
-                               dark:bg-gray-950
-                               dark:text-white">
-
+                            id="stockFilter"
+                            [(ngModel)]="stockFilter"
+                            (ngModelChange)="search()"
+                            class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
+                    >
                         <option value="">
-                            Tous les packs
+                            Toutes les disponibilités
                         </option>
 
                         <option value="available">
-                            Disponibles
+                            En stock
                         </option>
 
                         <option value="unavailable">
@@ -681,287 +380,78 @@
             </div>
 
 
-            <!-- FILTER ACTIONS -->
+            <!-- FILTER FOOTER -->
+            <div class="mt-5 flex flex-wrap items-center justify-between gap-3">
 
-            @if (searchTerm || stockFilter) {
-
-                <div
-                    class="mt-4 flex
-                           justify-end">
-
-                    <button
-                        type="button"
-                        (click)="resetFilters()"
-                        class="rounded-lg
-                               border border-gray-300
-                               px-4 py-2
-                               text-sm font-medium
-                               text-gray-700
-                               transition
-                               hover:bg-gray-50
-                               dark:border-gray-700
-                               dark:text-gray-300
-                               dark:hover:bg-gray-800">
-
-                        Réinitialiser les filtres
-
-                    </button>
-
-                </div>
-
-            }
-
-        </section>
-
-
-        <!-- ================================================= -->
-        <!-- MESSAGES -->
-        <!-- ================================================= -->
-
-        @if (cartMessage) {
-
-            <div
-                class="mb-6 flex items-center
-                       gap-3 rounded-xl
-                       border border-green-200
-                       bg-green-50
-                       px-4 py-3
-                       text-sm font-medium
-                       text-green-700
-                       dark:border-green-800
-                       dark:bg-green-900/20
-                       dark:text-green-400">
-
-                <span>
-                    ✓
-                </span>
-
-                <span>
-                    {{ cartMessage }}
-                </span>
-
-            </div>
-
-        }
-
-        @if (cartError) {
-
-            <div
-                class="mb-6 flex items-center
-                       gap-3 rounded-xl
-                       border border-red-200
-                       bg-red-50
-                       px-4 py-3
-                       text-sm font-medium
-                       text-red-700
-                       dark:border-red-800
-                       dark:bg-red-900/20
-                       dark:text-red-400">
-
-                <span>
-                    ⚠️
-                </span>
-
-                <span>
-                    {{ cartError }}
-                </span>
-
-            </div>
-
-        }
-
-
-        <!-- ================================================= -->
-        <!-- RESULT HEADER -->
-        <!-- ================================================= -->
-
-        @if (!loading && !error) {
-
-            <div
-                class="mb-6 flex flex-col
-                       gap-3
-                       sm:flex-row
-                       sm:items-center
-                       sm:justify-between">
-
-                <p
-                    class="text-sm
-                           text-gray-600
-                           dark:text-gray-400">
-
-                    <span
-                        class="font-semibold
-                               text-gray-900
-                               dark:text-white">
-
-                        {{ filteredBundles.length }}
-
-                    </span>
-
+                <p class="text-sm text-gray-500">
+                    {{ filteredBundles.length }}
                     pack{{ filteredBundles.length > 1 ? 's' : '' }}
-                    disponible{{ filteredBundles.length > 1 ? 's' : '' }}
-
+                    affiché{{ filteredBundles.length > 1 ? 's' : '' }}
+                    sur cette page
                 </p>
 
-                @if (cartCount > 0) {
+                @if (searchTerm || stockFilter) {
 
-                    <a
-                        routerLink="/cart"
-                        class="inline-flex items-center
-                               gap-2 text-sm
-                               font-semibold
-                               text-green-600
-                               hover:text-green-700
-                               dark:text-green-400
-                               dark:hover:text-green-300">
-
-                        🛒
-
-                        <span>
-                            {{ cartCount }}
-                            article{{ cartCount > 1 ? 's' : '' }}
-                            dans le panier
-                        </span>
-
-                    </a>
+                    <button
+                            type="button"
+                            (click)="resetFilters()"
+                            class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-red-300 hover:bg-red-50 hover:text-red-600"
+                    >
+                        Réinitialiser les filtres
+                    </button>
 
                 }
 
             </div>
 
-        }
+        </div>
 
 
-        <!-- ================================================= -->
+        <!-- ====================================================== -->
         <!-- LOADING -->
-        <!-- ================================================= -->
+        <!-- ====================================================== -->
 
         @if (loading) {
 
-            <div
-                class="grid grid-cols-1 gap-6
-                       sm:grid-cols-2
-                       lg:grid-cols-3
-                       xl:grid-cols-4">
+            <div class="flex flex-col items-center justify-center py-20">
 
-                @for (
-                    skeleton of [1,2,3,4,5,6,7,8];
-                    track skeleton
-                ) {
+                <div class="h-12 w-12 animate-spin rounded-full border-4 border-green-200 border-t-green-600"></div>
 
-                    <div
-                        class="overflow-hidden
-                               rounded-2xl
-                               border border-gray-200
-                               bg-white
-                               shadow-sm
-                               dark:border-gray-800
-                               dark:bg-gray-900">
-
-                        <div
-                            class="h-52 animate-pulse
-                                   bg-gray-200
-                                   dark:bg-gray-800">
-                        </div>
-
-                        <div
-                            class="space-y-4 p-5">
-
-                            <div
-                                class="h-5 w-3/4
-                                       animate-pulse
-                                       rounded
-                                       bg-gray-200
-                                       dark:bg-gray-800">
-                            </div>
-
-                            <div
-                                class="h-4 w-full
-                                       animate-pulse
-                                       rounded
-                                       bg-gray-200
-                                       dark:bg-gray-800">
-                            </div>
-
-                            <div
-                                class="h-4 w-2/3
-                                       animate-pulse
-                                       rounded
-                                       bg-gray-200
-                                       dark:bg-gray-800">
-                            </div>
-
-                            <div
-                                class="h-11 w-full
-                                       animate-pulse
-                                       rounded-xl
-                                       bg-gray-200
-                                       dark:bg-gray-800">
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                }
+                <p class="mt-4 text-gray-500">
+                    Chargement des packs...
+                </p>
 
             </div>
 
         }
 
 
-        <!-- ================================================= -->
+        <!-- ====================================================== -->
         <!-- ERROR -->
-        <!-- ================================================= -->
+        <!-- ====================================================== -->
 
         @if (!loading && error) {
 
-            <div
-                class="rounded-2xl
-                       border border-red-200
-                       bg-red-50 p-8
-                       text-center
-                       dark:border-red-800
-                       dark:bg-red-900/20">
+            <div class="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
 
-                <div
-                    class="mb-4 text-4xl">
-
+                <div class="mb-3 text-4xl">
                     ⚠️
-
                 </div>
 
-                <h2
-                    class="text-lg font-bold
-                           text-red-800
-                           dark:text-red-300">
+                <h3 class="text-lg font-bold text-red-700">
+                    Une erreur est survenue
+                </h3>
 
-                    Impossible de charger les packs
-
-                </h2>
-
-                <p
-                    class="mt-2 text-sm
-                           text-red-700
-                           dark:text-red-400">
-
+                <p class="mt-2 text-red-600">
                     {{ error }}
-
                 </p>
 
                 <button
-                    type="button"
-                    (click)="loadBundles()"
-                    class="mt-5 rounded-xl
-                           bg-red-600
-                           px-5 py-3
-                           text-sm font-semibold
-                           text-white
-                           transition
-                           hover:bg-red-700">
-
+                        type="button"
+                        (click)="loadBundles()"
+                        class="mt-5 rounded-lg bg-red-600 px-6 py-3 font-semibold text-white hover:bg-red-700"
+                >
                     Réessayer
-
                 </button>
 
             </div>
@@ -969,181 +459,108 @@
         }
 
 
-        <!-- ================================================= -->
-        <!-- EMPTY -->
-        <!-- ================================================= -->
+        <!-- ====================================================== -->
+        <!-- EMPTY DATABASE -->
+        <!-- ====================================================== -->
 
-        @if (
-            !loading &&
-            !error &&
-            filteredBundles.length === 0
-        ) {
+        @if (!loading && !error && bundles.length === 0) {
 
-            <div
-                class="rounded-2xl
-                       border border-gray-200
-                       bg-white p-10
-                       text-center
-                       shadow-sm
-                       dark:border-gray-800
-                       dark:bg-gray-900">
+            <div class="rounded-2xl bg-white px-6 py-16 text-center shadow-sm">
 
-                <div
-                    class="mb-4 text-5xl">
-
+                <div class="mb-4 text-5xl">
                     📦
-
                 </div>
 
-                <h2
-                    class="text-xl font-bold
-                           text-gray-900
-                           dark:text-white">
+                <h3 class="text-xl font-bold text-gray-800">
+                    Aucun pack disponible
+                </h3>
 
-                    Aucun pack trouvé
-
-                </h2>
-
-                <p
-                    class="mx-auto mt-2
-                           max-w-md
-                           text-sm
-                           text-gray-600
-                           dark:text-gray-400">
-
-                    Aucun pack ne correspond
-                    aux critères de recherche
-                    sélectionnés.
-
+                <p class="mt-2 text-gray-500">
+                    Nos packs seront bientôt disponibles.
                 </p>
-
-                @if (searchTerm || stockFilter) {
-
-                    <button
-                        type="button"
-                        (click)="resetFilters()"
-                        class="mt-5 rounded-xl
-                               bg-green-600
-                               px-5 py-3
-                               text-sm font-semibold
-                               text-white
-                               transition
-                               hover:bg-green-700
-                               dark:bg-green-500
-                               dark:hover:bg-green-400">
-
-                        Réinitialiser les filtres
-
-                    </button>
-
-                }
 
             </div>
 
         }
 
 
-        <!-- ================================================= -->
-        <!-- BUNDLES GRID -->
-        <!-- ================================================= -->
+        <!-- ====================================================== -->
+        <!-- EMPTY FILTER RESULT -->
+        <!-- ====================================================== -->
 
         @if (
             !loading &&
             !error &&
-            paginatedBundles.length > 0
-        ) {
-
-            <div
-                class="grid grid-cols-1 gap-6
-                       sm:grid-cols-2
-                       lg:grid-cols-3
-                       xl:grid-cols-4">
-
-                @for (
-                    bundle of paginatedBundles;
-                    track bundle.id
+            bundles.length > 0 &&
+            filteredBundles.length === 0
                 ) {
 
-                    <article
-                        class="group flex h-full
-                               flex-col overflow-hidden
-                               rounded-2xl
-                               border border-gray-200
-                               bg-white
-                               shadow-sm
-                               transition
-                               duration-300
-                               hover:-translate-y-1
-                               hover:shadow-xl
-                               dark:border-gray-800
-                               dark:bg-gray-900">
+            <div class="rounded-2xl bg-white px-6 py-16 text-center shadow-sm">
 
-                        <!-- =============================== -->
+                <div class="mb-4 text-5xl">
+                    🔍
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-800">
+                    Aucun résultat trouvé
+                </h3>
+
+                <p class="mt-2 text-gray-500">
+                    Aucun pack ne correspond à vos critères de recherche.
+                </p>
+
+                <button
+                        type="button"
+                        (click)="resetFilters()"
+                        class="mt-5 rounded-lg bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700"
+                >
+                    Réinitialiser les filtres
+                </button>
+
+            </div>
+
+        }
+
+
+        <!-- ====================================================== -->
+        <!-- BUNDLE CARDS -->
+        <!-- ====================================================== -->
+
+        @if (
+            !loading &&
+            !error &&
+            filteredBundles.length > 0
+                ) {
+
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+                @for (bundle of paginatedBundles; track bundle.id) {
+
+                    <article class="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+
                         <!-- IMAGE -->
-                        <!-- =============================== -->
+                        <div class="relative h-56 overflow-hidden bg-gray-100">
 
-                        <div
-                            class="relative
-                                   overflow-hidden
-                                   bg-gray-100
-                                   dark:bg-gray-800">
-
-                            <a
-                                [routerLink]="[
-                                    '/bundles',
-                                    bundle.id
-                                ]">
-
-                                <img
+                            <img
                                     [src]="getMainImage(bundle)"
                                     [alt]="bundle.name"
-                                    class="h-52 w-full
-                                           object-cover
-                                           transition
-                                           duration-500
-                                           group-hover:scale-105">
-
-                            </a>
+                                    class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                            />
 
 
                             <!-- STOCK BADGE -->
-
-                            <div
-                                class="absolute
-                                       left-3 top-3">
+                            <div class="absolute left-3 top-3">
 
                                 @if (isBundleAvailable(bundle)) {
 
-                                    <span
-                                        class="inline-flex
-                                               items-center
-                                               rounded-full
-                                               bg-green-600
-                                               px-3 py-1
-                                               text-xs
-                                               font-bold
-                                               text-white
-                                               shadow-sm">
-
+                                    <span class="rounded-full bg-green-600 px-3 py-1 text-xs font-bold text-white shadow">
                                         En stock
-
                                     </span>
 
                                 } @else {
 
-                                    <span
-                                        class="inline-flex
-                                               items-center
-                                               rounded-full
-                                               bg-red-600
-                                               px-3 py-1
-                                               text-xs
-                                               font-bold
-                                               text-white
-                                               shadow-sm">
-
-                                        Rupture
-
+                                    <span class="rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white shadow">
+                                        Rupture de stock
                                     </span>
 
                                 }
@@ -1151,394 +568,112 @@
                             </div>
 
 
-                            <!-- PACK BADGE -->
+                            <!-- CART QUANTITY -->
+                            @if (isLoggedIn() && getBundleCartQuantity(bundle.id) > 0) {
 
-                            <div
-                                class="absolute
-                                       right-3 top-3">
+                                <div class="absolute right-3 top-3 rounded-full bg-orange-500 px-3 py-1 text-xs font-bold text-white shadow">
+                                    {{ getBundleCartQuantity(bundle.id) }} dans le panier
+                                </div>
 
-                                <span
-                                    class="inline-flex
-                                           items-center
-                                           rounded-full
-                                           bg-white/95
-                                           px-3 py-1
-                                           text-xs
-                                           font-bold
-                                           text-green-700
-                                           shadow-sm
-                                           dark:bg-gray-950/95
-                                           dark:text-green-400">
-
-                                    PACK
-
-                                </span>
-
-                            </div>
+                            }
 
                         </div>
 
 
-                        <!-- =============================== -->
                         <!-- CONTENT -->
-                        <!-- =============================== -->
-
-                        <div
-                            class="flex flex-1
-                                   flex-col p-5">
+                        <div class="flex flex-1 flex-col p-5">
 
                             <!-- NAME -->
-
-                            <a
-                                [routerLink]="[
-                                    '/bundles',
-                                    bundle.id
-                                ]"
-                                class="line-clamp-2
-                                       text-lg font-bold
-                                       text-gray-900
-                                       transition
-                                       hover:text-green-600
-                                       dark:text-white
-                                       dark:hover:text-green-400">
-
+                            <h3 class="mb-2 text-xl font-bold text-gray-800 transition group-hover:text-green-700">
                                 {{ bundle.name }}
-
-                            </a>
+                            </h3>
 
 
                             <!-- DESCRIPTION -->
-
-                            @if (bundle.description) {
-
-                                <p
-                                    class="mt-2 line-clamp-3
-                                           text-sm
-                                           leading-6
-                                           text-gray-600
-                                           dark:text-gray-400">
-
-                                    {{ bundle.description }}
-
-                                </p>
-
-                            }
+                            <p class="mb-4 line-clamp-3 text-sm leading-relaxed text-gray-500">
+                                {{ bundle.description || 'Découvrez la composition de ce pack.' }}
+                            </p>
 
 
-                            <!-- ITEM COUNT -->
+                            <!-- ITEMS COUNT -->
+                            <div class="mb-4 flex items-center gap-2 text-sm text-gray-500">
 
-                            <div
-                                class="mt-4 flex
-                                       items-center gap-2
-                                       text-sm
-                                       text-gray-600
-                                       dark:text-gray-400">
+                                <span>📦</span>
 
                                 <span>
-                                    📦
-                                </span>
-
-                                <span>
-
-                                    {{
-                                        getBundleItemCount(bundle)
-                                    }}
-
-                                    produit{{
-                                        getBundleItemCount(bundle) > 1
-                                            ? 's'
-                                            : ''
-                                    }}
-
+                                    {{ getBundleItemCount(bundle) }}
+                                    produit{{ getBundleItemCount(bundle) > 1 ? 's' : '' }}
                                     dans ce pack
-
                                 </span>
 
                             </div>
 
 
-                            <!-- PRICE + STOCK -->
+                            <!-- PRICE AND STOCK -->
+                            <div class="mt-auto border-t border-gray-100 pt-4">
 
-                            <div
-                                class="mt-5
-                                       flex items-end
-                                       justify-between
-                                       gap-3">
+                                <div class="mb-4 flex items-center justify-between gap-3">
 
-                                <div>
+                                    <div>
+                                        <p class="text-xs text-gray-400">
+                                            Prix du pack
+                                        </p>
 
-                                    <p
-                                        class="text-2xl
-                                               font-extrabold
-                                               text-green-600
-                                               dark:text-green-400">
+                                        <p class="text-2xl font-extrabold text-green-700">
+                                            {{ formatPrice(bundle.price) }}
+                                        </p>
+                                    </div>
 
-                                        {{ formatPrice(bundle.price) }}
+                                    <div class="text-right">
 
-                                    </p>
+                                        <p class="text-xs text-gray-400">
+                                            Stock
+                                        </p>
 
-                                </div>
+                                        <p
+                                                class="font-semibold"
+                                                [class.text-green-600]="isBundleAvailable(bundle)"
+                                                [class.text-red-600]="isOutOfStock(bundle)"
+                                        >
+                                            {{ bundle.stock ?? 0 }}
+                                        </p>
 
-                                <div
-                                    class="text-right">
-
-                                    <p
-                                        class="text-xs
-                                               text-gray-500
-                                               dark:text-gray-500">
-
-                                        Stock
-
-                                    </p>
-
-                                    <p
-                                        class="text-sm
-                                               font-semibold
-                                               text-gray-700
-                                               dark:text-gray-300">
-
-                                        {{ bundle.stock }}
-
-                                    </p>
+                                    </div>
 
                                 </div>
 
-                            </div>
 
+                                <!-- ADD TO CART -->
+                                <button
+                                        type="button"
+                                        (click)="addToCart(bundle)"
+                                        [disabled]="
+                                        !isBundleAvailable(bundle) ||
+                                        addingBundleId === bundle.id
+                                    "
+                                        class="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-white transition disabled:cursor-not-allowed disabled:bg-gray-300"
+                                        [class.bg-green-600]="isBundleAvailable(bundle)"
+                                        [class.hover:bg-green-700]="isBundleAvailable(bundle)"
+                                >
 
-                            <!-- =============================== -->
-                            <!-- QUANTITÉ DU PACK DANS LE PANIER -->
-                            <!-- =============================== -->
+                                    @if (addingBundleId === bundle.id) {
 
-                            @if (
-                                getBundleCartQuantity(bundle.id) > 0
-                            ) {
+                                        <span class="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
 
-                                <div
-                                    class="mt-4 flex
-                                           items-center
-                                           justify-center
-                                           gap-2 rounded-xl
-                                           bg-green-50
-                                           px-3 py-2.5
-                                           text-sm font-medium
-                                           text-green-700
-                                           dark:bg-green-900/30
-                                           dark:text-green-400">
+                                        Ajout en cours...
 
-                                    <span
-                                        class="text-base">
+                                    } @else if (!isBundleAvailable(bundle)) {
 
-                                        🛒
+                                        Indisponible
 
-                                    </span>
+                                    } @else {
 
-                                    <span>
-
-                                        <span
-                                            class="font-bold">
-
-                                            {{
-                                                getBundleCartQuantity(
-                                                    bundle.id
-                                                )
-                                            }}
-
-                                        </span>
-
-                                        {{
-                                            getBundleCartQuantity(
-                                                bundle.id
-                                            ) > 1
-                                                ? 'packs'
-                                                : 'pack'
-                                        }}
-
-                                        dans le panier
-
-                                    </span>
-
-                                </div>
-
-                            }
-
-
-                            <!-- =============================== -->
-                            <!-- ACTION PRINCIPALE -->
-                            <!-- =============================== -->
-
-                            <button
-                                type="button"
-                                (click)="addToCart(bundle)"
-                                [disabled]="
-                                    isOutOfStock(bundle) ||
-                                    addingBundleId === bundle.id
-                                "
-                                class="mt-5 flex w-full
-                                       items-center
-                                       justify-center
-                                       gap-2 rounded-xl
-                                       bg-green-600
-                                       px-4 py-3
-                                       text-sm font-semibold
-                                       text-white
-                                       transition
-                                       hover:bg-green-700
-                                       disabled:cursor-not-allowed
-                                       disabled:opacity-50
-                                       dark:bg-green-500
-                                       dark:hover:bg-green-400">
-
-                                @if (
-                                    addingBundleId === bundle.id
-                                ) {
-
-                                    <span
-                                        class="animate-spin">
-
-                                        ⏳
-
-                                    </span>
-
-                                    <span>
-                                        Ajout...
-                                    </span>
-
-                                } @else {
-
-                                    <span>
-                                        🛒
-                                    </span>
-
-                                    <span>
-
-                                        {{
-                                            isOutOfStock(bundle)
-                                                ? 'Rupture de stock'
-                                                : 'Ajouter au panier'
-                                        }}
-
-                                    </span>
-
-                                    @if (
-                                        getBundleCartQuantity(
-                                            bundle.id
-                                        ) > 0
-                                    ) {
-
-                                        <span
-                                            class="flex h-6 min-w-6
-                                                   items-center
-                                                   justify-center
-                                                   rounded-full
-                                                   bg-white
-                                                   px-1.5
-                                                   text-xs font-bold
-                                                   text-green-700">
-
-                                            {{
-                                                getBundleCartQuantity(
-                                                    bundle.id
-                                                )
-                                            }}
-
-                                        </span>
+                                        <span>🛒</span>
+                                        Ajouter au panier
 
                                     }
 
-                                }
-
-                            </button>
-
-
-                            <!-- =============================== -->
-                            <!-- ACTIONS SECONDAIRES -->
-                            <!-- =============================== -->
-
-                            <div
-                                class="mt-3 grid
-                                       grid-cols-2 gap-2">
-
-                                <!-- DETAILS -->
-
-                                <a
-                                    [routerLink]="[
-                                        '/bundles',
-                                        bundle.id
-                                    ]"
-                                    class="flex items-center
-                                           justify-center
-                                           gap-2 rounded-xl
-                                           border
-                                           border-green-600
-                                           bg-white px-3 py-2.5
-                                           text-sm font-semibold
-                                           text-green-700
-                                           transition
-                                           hover:bg-green-50
-                                           dark:border-green-500
-                                           dark:bg-gray-900
-                                           dark:text-green-400
-                                           dark:hover:bg-green-900/30">
-
-                                    👁️
-
-                                    <span>
-                                        Détails
-                                    </span>
-
-                                </a>
-
-
-                                <!-- CART -->
-
-                                <a
-                                    routerLink="/cart"
-                                    class="flex items-center
-                                           justify-center
-                                           gap-2 rounded-xl
-                                           bg-green-600
-                                           px-3 py-2.5
-                                           text-sm font-semibold
-                                           text-white
-                                           transition
-                                           hover:bg-green-700
-                                           dark:bg-green-500
-                                           dark:hover:bg-green-400">
-
-                                    🛒
-
-                                    <span>
-                                        Panier
-                                    </span>
-
-                                    @if (
-                                        getBundleCartQuantity(
-                                            bundle.id
-                                        ) > 0
-                                    ) {
-
-                                        <span
-                                            class="flex h-6 min-w-6
-                                                   items-center
-                                                   justify-center
-                                                   rounded-full
-                                                   bg-white
-                                                   px-1.5
-                                                   text-xs font-bold
-                                                   text-green-700">
-
-                                            {{
-                                                getBundleCartQuantity(
-                                                    bundle.id
-                                                )
-                                            }}
-
-                                        </span>
-
-                                    }
-
-                                </a>
+                                </button>
 
                             </div>
 
@@ -1550,172 +685,181 @@
 
             </div>
 
-        }
+
+            <!-- ====================================================== -->
+                    <!-- PAGINATION -->
+                    <!-- ====================================================== -->
+
+            @if (totalPages > 1) {
+
+                <div class="mt-12 flex flex-col items-center gap-5">
+
+                    <!-- INFORMATION -->
+                    <p class="text-sm text-gray-500">
+                        Page {{ currentPage + 1 }} sur {{ totalPages }}
+                        · {{ totalElements }} packs au total
+                    </p>
 
 
-        <!-- ================================================= -->
-        <!-- PAGINATION -->
-        <!-- ================================================= -->
+                    <!-- PAGE BUTTONS -->
+                    <div class="flex flex-wrap items-center justify-center gap-2">
 
-        @if (
-            !loading &&
-            !error &&
-            totalPages > 1
-        ) {
-
-            <div
-                class="mt-10 flex flex-wrap
-                       items-center
-                       justify-center gap-2">
-
-                <!-- PREVIOUS -->
-
-                <button
-                    type="button"
-                    (click)="previousPage()"
-                    [disabled]="currentPage === 0"
-                    class="flex items-center
-                           gap-2 rounded-lg
-                           border
-                           border-gray-300
-                           bg-white px-4 py-2.5
-                           text-sm font-medium
-                           text-gray-700
-                           transition
-                           hover:bg-gray-50
-                           disabled:cursor-not-allowed
-                           disabled:opacity-40
-                           dark:border-gray-700
-                           dark:bg-gray-900
-                           dark:text-gray-300
-                           dark:hover:bg-gray-800">
-
-                    ←
-
-                    <span>
-                        Précédent
-                    </span>
-
-                </button>
+                        <!-- PREVIOUS -->
+                        <button
+                                type="button"
+                                (click)="previousPage()"
+                                [disabled]="currentPage === 0 || loading"
+                                class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                            ← Précédent
+                        </button>
 
 
-                <!-- PAGE NUMBERS -->
+                        <!-- PAGE NUMBERS -->
+                        @for (page of pages; track page) {
 
-                @for (
-                    page of pages;
-                    track page
-                ) {
+                            <button
+                                    type="button"
+                                    (click)="goToPage(page)"
+                                    [disabled]="loading"
+                                    class="h-10 min-w-10 rounded-lg border px-3 text-sm font-semibold transition disabled:cursor-not-allowed"
+                                    [class.border-green-600]="currentPage === page"
+                                    [class.bg-green-600]="currentPage === page"
+                                    [class.text-white]="currentPage === page"
+                                    [class.border-gray-300]="currentPage !== page"
+                                    [class.bg-white]="currentPage !== page"
+                                    [class.text-gray-600]="currentPage !== page"
+                                    [class.hover:bg-green-50]="currentPage !== page"
+                            >
+                                {{ page + 1 }}
+                            </button>
 
-                    <button
-                        type="button"
-                        (click)="goToPage(page)"
-                        [class.bg-green-600]="
-                            currentPage === page
-                        "
-                        [class.text-white]="
-                            currentPage === page
-                        "
-                        [class.border-green-600]="
-                            currentPage === page
-                        "
-                        [class.dark:bg-green-500]="
-                            currentPage === page
-                        "
-                        [class.dark:border-green-500]="
-                            currentPage === page
-                        "
-                        class="flex h-10 min-w-10
-                               items-center
-                               justify-center
-                               rounded-lg
-                               border
-                               border-gray-300
-                               bg-white px-3
-                               text-sm font-semibold
-                               text-gray-700
-                               transition
-                               hover:bg-gray-50
-                               dark:border-gray-700
-                               dark:bg-gray-900
-                               dark:text-gray-300
-                               dark:hover:bg-gray-800">
-
-                        {{ page + 1 }}
-
-                    </button>
-
-                }
+                        }
 
 
-                <!-- NEXT -->
+                        <!-- NEXT -->
+                        <button
+                                type="button"
+                                (click)="nextPage()"
+                                [disabled]="
+                                currentPage >= totalPages - 1 ||
+                                loading
+                            "
+                                class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                            Suivant →
+                        </button>
 
-                <button
-                    type="button"
-                    (click)="nextPage()"
-                    [disabled]="
-                        currentPage === totalPages - 1
-                    "
-                    class="flex items-center
-                           gap-2 rounded-lg
-                           border
-                           border-gray-300
-                           bg-white px-4 py-2.5
-                           text-sm font-medium
-                           text-gray-700
-                           transition
-                           hover:bg-gray-50
-                           disabled:cursor-not-allowed
-                           disabled:opacity-40
-                           dark:border-gray-700
-                           dark:bg-gray-900
-                           dark:text-gray-300
-                           dark:hover:bg-gray-800">
+                    </div>
 
-                    <span>
-                        Suivant
-                    </span>
+                </div>
 
-                    →
-
-                </button>
-
-            </div>
+            }
 
         }
 
-    </main>
+    </section>
+
+</main>
 
 
-    <!-- ===================================================== -->
-    <!-- FOOTER -->
-    <!-- ===================================================== -->
+<!-- ====================================================== -->
+<!-- FOOTER -->
+<!-- ====================================================== -->
 
-    <footer
-        class="mt-16 border-t
-               border-gray-200
-               bg-white
-               dark:border-gray-800
-               dark:bg-gray-950">
+<footer class="bg-gray-900 px-4 py-10 text-white">
 
-        <div
-            class="mx-auto max-w-7xl
-                   px-4 py-8
-                   text-center
-                   sm:px-6 lg:px-8">
+    <div class="mx-auto grid max-w-7xl grid-cols-1 gap-8 md:grid-cols-3">
 
-            <p
-                class="text-sm
-                       text-gray-500
-                       dark:text-gray-400">
+        <!-- BRAND -->
+        <div>
 
-                © {{ currentYear }}
-                TTES-ICG Santé.
-                Tous droits réservés.
+            <h3 class="mb-3 text-xl font-bold text-green-400">
+                TTES-ICG Santé
+            </h3>
 
+            <p class="text-sm leading-relaxed text-gray-400">
+                Votre partenaire pour découvrir des produits
+                de santé et de bien-être.
             </p>
 
         </div>
 
-    </footer>
 
-</div>
+        <!-- LINKS -->
+        <div>
+
+            <h4 class="mb-3 font-semibold">
+                Navigation
+            </h4>
+
+            <div class="flex flex-col gap-2 text-sm text-gray-400">
+
+                <a routerLink="/" class="hover:text-green-400">
+                    Accueil
+                </a>
+
+                <a routerLink="/products" class="hover:text-green-400">
+                    Produits
+                </a>
+
+                <a routerLink="/bundles" class="hover:text-green-400">
+                    Packs
+                </a>
+
+                <a routerLink="/companies" class="hover:text-green-400">
+                    Entreprises
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACCOUNT -->
+        <div>
+
+            <h4 class="mb-3 font-semibold">
+                Mon compte
+            </h4>
+
+            <div class="flex flex-col gap-2 text-sm text-gray-400">
+
+                @if (isLoggedIn()) {
+
+                    <a routerLink="/profile" class="hover:text-green-400">
+                        Mon profil
+                    </a>
+
+                    <a routerLink="/cart" class="hover:text-green-400">
+                        Mon panier
+                    </a>
+
+                } @else {
+
+                    <a routerLink="/signin" class="hover:text-green-400">
+                        Connexion
+                    </a>
+
+                    <a routerLink="/signup" class="hover:text-green-400">
+                        Inscription
+                    </a>
+
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- COPYRIGHT -->
+    <div class="mx-auto mt-8 max-w-7xl border-t border-gray-700 pt-6 text-center text-sm text-gray-500">
+
+        © {{ currentYear }} TTES-ICG Santé.
+        Tous droits réservés.
+
+    </div>
+
+</footer>

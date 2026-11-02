@@ -1,17 +1,11 @@
-import {
-    Component,
-    OnInit,
-    inject
-} from '@angular/core';
 
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import { BundleService } from '../../../core/services/bundle.service';
 import { BundleResponse } from '../../../core/interfaces/bundle-response.interface';
-
-
 @Component({
     selector: 'app-bundles',
     standalone: true,
@@ -24,1036 +18,436 @@ import { BundleResponse } from '../../../core/interfaces/bundle-response.interfa
 })
 export class BundlesComponent implements OnInit {
 
-    private bundleService = inject(BundleService);
-
-
-    // ============================================================
-    // DONNÉES
-    // ============================================================
-
     bundles: BundleResponse[] = [];
-
     filteredBundles: BundleResponse[] = [];
 
-    paginatedBundles: BundleResponse[] = [];
-
-
-    // ============================================================
-    // ÉTAT
-    // ============================================================
-
     loading = true;
-
     error = '';
-
     deletingBundleId: number | null = null;
-
-
-    // ============================================================
-    // RECHERCHE
-    // ============================================================
 
     searchTerm = '';
 
+    statusFilter: 'all' | 'active' | 'inactive' = 'all';
+    stockFilter: 'all' | 'available' | 'low' | 'out' = 'all';
 
-    // ============================================================
-    // FILTRES
-    // ============================================================
-
-    statusFilter:
-        'all' |
-        'active' |
-        'inactive' = 'all';
-
-    stockFilter:
-        'all' |
-        'available' |
-        'low' |
-        'out' = 'all';
-
-
-    // ============================================================
-    // PAGINATION
-    // ============================================================
-
+    // Pagination gérée par le backend
     currentPage = 1;
-
     pageSize = 9;
+    pageSizeOptions = [6, 9, 12, 24];
 
-    pageSizeOptions = [
-        6,
-        9,
-        12,
-        24
-    ];
+    totalItems = 0;
+    totalPages = 0;
 
-
-    // ============================================================
-    // INITIALISATION
-    // ============================================================
+    constructor(private bundleService: BundleService) {}
 
     ngOnInit(): void {
-
         this.loadBundles();
-
     }
 
-
-    // ============================================================
-    // CHARGEMENT
-    // ============================================================
-
+    /**
+     * Charge les packs depuis le backend.
+     * Le backend utilise une pagination commençant à 0.
+     */
     loadBundles(): void {
-
         this.loading = true;
-
         this.error = '';
 
         this.bundleService
-            .getAdminBundles()
+            .getAdminBundles(this.currentPage - 1, this.pageSize)
             .subscribe({
+                next: (response) => {
+                    this.totalItems = response.totalElements ?? 0;
+                    this.totalPages = response.totalPages ?? 0;
 
-                next: (bundles) => {
+                    // Si la page demandée n'existe plus,
+                    // revenir à la dernière page disponible.
+                    if (this.totalPages > 0 && this.currentPage > this.totalPages) {
+                        this.currentPage = this.totalPages;
+                        this.loadBundles();
+                        return;
+                    }
 
-                    this.bundles =
-                        bundles ?? [];
+                    if (this.totalPages === 0) {
+                        this.currentPage = 1;
+                    }
+
+                    this.bundles = response.content ?? [];
 
                     this.applyFilters();
-
                     this.loading = false;
-
                 },
+                error: (err) => {
+                    console.error('Erreur lors du chargement des packs :', err);
 
-                error: (error) => {
-
-                    console.error(
-                        'Erreur chargement packs :',
-                        error
-                    );
-
-                    this.error =
-                        error?.error?.message ??
-                        'Impossible de charger les packs.';
-
+                    this.bundles = [];
+                    this.filteredBundles = [];
+                    this.totalItems = 0;
+                    this.totalPages = 0;
                     this.loading = false;
 
+                    this.error = 'Impossible de charger les packs.';
                 }
-
             });
-
     }
 
-
-    // ============================================================
-    // RECHERCHE
-    // ============================================================
-
+    /**
+     * Recherche sur les packs de la page chargée.
+     */
     onSearch(): void {
-
-        this.currentPage = 1;
-
-        this.applyFilters();
-
+        this.resetPageAndApplyFilters();
     }
-
 
     clearSearch(): void {
-
         this.searchTerm = '';
-
-        this.currentPage = 1;
-
-        this.applyFilters();
-
+        this.resetPageAndApplyFilters();
     }
 
+    /**
+     * Filtre par statut.
+     */
+    onStatusFilterChange(): void {
+        this.resetPageAndApplyFilters();
+    }
 
     /**
-     * Recherche dans toutes les caractéristiques
-     * du pack et de ses produits.
+     * Filtre par stock.
      */
-    private matchesSearch(
-        bundle: BundleResponse,
-        search: string
-    ): boolean {
+    onStockFilterChange(): void {
+        this.resetPageAndApplyFilters();
+    }
 
-        if (!search) {
+    /**
+     * Revient à la première page lorsque les filtres changent.
+     * Évite de refaire un appel HTTP à chaque frappe si on est
+     * déjà sur la première page.
+     */
+    private resetPageAndApplyFilters(): void {
+        if (this.currentPage !== 1) {
+            this.currentPage = 1;
+            this.loadBundles();
+        } else {
+            this.applyFilters();
+        }
+    }
 
-            return true;
+    /**
+     * Applique les filtres localement aux éléments de la page actuelle.
+     */
+    applyFilters(): void {
+        let result = [...this.bundles];
 
+        const search = this.normalizeSearchText(this.searchTerm);
+
+        if (search) {
+            result = result.filter(bundle =>
+                this.matchesSearch(bundle, search)
+            );
         }
 
+        if (this.statusFilter === 'active') {
+            result = result.filter(bundle => this.isActive(bundle));
+        } else if (this.statusFilter === 'inactive') {
+            result = result.filter(bundle => !this.isActive(bundle));
+        }
 
-        /*
-         * --------------------------------------------------------
-         * CARACTÉRISTIQUES DU PACK
-         * --------------------------------------------------------
-         */
+        if (this.stockFilter !== 'all') {
+            result = result.filter(bundle => {
+                const stock = this.getStock(bundle);
 
-        const bundleFields: string[] = [
+                switch (this.stockFilter) {
+                    case 'available':
+                        return stock > 5;
 
-            // Nom
-            bundle.name,
+                    case 'low':
+                        return stock > 0 && stock <= 5;
 
-            // Description
-            bundle.description,
+                    case 'out':
+                        return stock <= 0;
 
-            // ID
-            String(bundle.id),
+                    default:
+                        return true;
+                }
+            });
+        }
 
-            // Prix
-            String(bundle.price),
+        this.filteredBundles = result;
+    }
 
-            // Stock
-            String(bundle.stock)
+    /**
+     * Recherche textuelle avec normalisation des accents.
+     */
+    private matchesSearch(bundle: BundleResponse, search: string): boolean {
+        const item = bundle as any;
 
+        const values: unknown[] = [
+            item.id,
+            item.name,
+            item.description,
+            item.price,
+            item.stock,
+            item.quantity,
+            item.active,
+
+            ...(Array.isArray(item.products)
+                ? item.products.flatMap((product: any) => [
+                    product.id,
+                    product.name,
+                    product.sku,
+                    product.description,
+                    product.brand,
+                    product.activeIngredient,
+                    product.dosage,
+                    product.form,
+                    product.ingredients,
+                    product.companyName,
+                    product.companyId,
+                    product.price,
+                    product.stock,
+                    product.quantity,
+                    product.categories,
+                    product.categoryNames,
+                    product.therapeuticAreas,
+                    product.therapeuticAreaNames
+                ])
+                : []),
+
+            ...(Array.isArray(item.items)
+                ? item.items.flatMap((entry: any) => {
+                    const product = entry.product ?? entry;
+
+                    return [
+                        product.id,
+                        product.name,
+                        product.sku,
+                        product.description,
+                        product.brand,
+                        product.activeIngredient,
+                        product.dosage,
+                        product.form,
+                        product.ingredients,
+                        product.companyName,
+                        product.companyId,
+                        product.categories,
+                        product.categoryNames,
+                        product.therapeuticAreas,
+                        product.therapeuticAreaNames
+                    ];
+                })
+                : [])
         ];
 
-
-        /*
-         * --------------------------------------------------------
-         * CARACTÉRISTIQUES DES PRODUITS
-         * --------------------------------------------------------
-         */
-
-        const productFields: string[] = [];
-
-
-        if (
-            bundle.items &&
-            bundle.items.length > 0
-        ) {
-
-            bundle.items.forEach(
-                (item: any) => {
-
-                    /*
-                     * Le backend peut renvoyer
-                     * directement les informations du produit
-                     * ou un objet product imbriqué.
-                     */
-
-                    const product =
-                        item.product ??
-                        item;
-
-
-                    if (!product) {
-
-                        return;
-
-                    }
-
-
-                    // =================================================
-                    // IDENTIFIANTS
-                    // =================================================
-
-                    productFields.push(
-                        String(
-                            product.id ??
-                            ''
-                        )
-                    );
-
-                    productFields.push(
-                        String(
-                            item.productId ??
-                            ''
-                        )
-                    );
-
-
-                    // =================================================
-                    // INFORMATIONS GÉNÉRALES
-                    // =================================================
-
-                    productFields.push(
-                        product.name ??
-                        item.productName ??
-                        ''
-                    );
-
-                    productFields.push(
-                        product.sku ??
-                        ''
-                    );
-
-                    productFields.push(
-                        product.description ??
-                        ''
-                    );
-
-
-                    // =================================================
-                    // CARACTÉRISTIQUES PHARMACEUTIQUES
-                    // =================================================
-
-                    productFields.push(
-                        product.brand ??
-                        ''
-                    );
-
-                    productFields.push(
-                        product.activeIngredient ??
-                        ''
-                    );
-
-                    productFields.push(
-                        product.dosage ??
-                        ''
-                    );
-
-                    productFields.push(
-                        product.form ??
-                        ''
-                    );
-
-                    productFields.push(
-                        product.ingredients ??
-                        ''
-                    );
-
-
-                    // =================================================
-                    // ENTREPRISE
-                    // =================================================
-
-                    productFields.push(
-                        product.companyName ??
-                        ''
-                    );
-
-
-                    productFields.push(
-                        String(
-                            product.companyId ??
-                            ''
-                        )
-                    );
-
-
-                    // =================================================
-                    // CATÉGORIES
-                    // =================================================
-
-                    if (
-                        Array.isArray(
-                            product.categories
-                        )
-                    ) {
-
-                        productFields.push(
-                            ...product.categories
-                        );
-
-                    }
-
-
-                    /*
-                     * Dans certains retours API,
-                     * les catégories peuvent être des objets.
-                     */
-
-                    if (
-                        Array.isArray(
-                            product.categoryNames
-                        )
-                    ) {
-
-                        productFields.push(
-                            ...product.categoryNames
-                        );
-
-                    }
-
-
-                    // =================================================
-                    // DOMAINES THÉRAPEUTIQUES
-                    // =================================================
-
-                    if (
-                        Array.isArray(
-                            product.therapeuticAreas
-                        )
-                    ) {
-
-                        productFields.push(
-                            ...product.therapeuticAreas
-                        );
-
-                    }
-
-
-                    if (
-                        Array.isArray(
-                            product.therapeuticAreaNames
-                        )
-                    ) {
-
-                        productFields.push(
-                            ...product.therapeuticAreaNames
-                        );
-
-                    }
-
-
-                    // =================================================
-                    // PRIX / STOCK
-                    // =================================================
-
-                    productFields.push(
-                        String(
-                            product.price ??
-                            ''
-                        )
-                    );
-
-                    productFields.push(
-                        String(
-                            product.stock ??
-                            item.stock ??
-                            ''
-                        )
-                    );
-
-
-                    // =================================================
-                    // QUANTITÉ DANS LE PACK
-                    // =================================================
-
-                    productFields.push(
-                        String(
-                            item.quantity ??
-                            ''
-                        )
-                    );
-
-                }
-            );
-
-        }
-
-
-        /*
-         * --------------------------------------------------------
-         * CONSTRUCTION DU TEXTE DE RECHERCHE
-         * --------------------------------------------------------
-         */
-
-        const searchableText = [
-            ...bundleFields,
-            ...productFields
-        ]
-            .filter(
-                value =>
-                    value !== null &&
-                    value !== undefined &&
-                    String(value).trim() !== ''
-            )
-            .map(
-                value =>
-                    this.normalizeSearchText(
-                        String(value)
-                    )
-            )
-            .join(' ');
-
-
-        /*
-         * --------------------------------------------------------
-         * RECHERCHE
-         * --------------------------------------------------------
-         */
-
-        const normalizedSearch =
-            this.normalizeSearchText(
-                search
-            );
-
-
-        return searchableText.includes(
-            normalizedSearch
+        return values.some(value =>
+            this.normalizeSearchText(String(value ?? '')).includes(search)
         );
-
     }
-
 
     /**
-     * Normalise le texte afin que :
-     *
-     * "Paracétamol"
-     *
-     * puisse être trouvé avec :
-     *
-     * "paracetamol"
-     *
-     * et inversement.
+     * Supprime les accents et normalise le texte.
      */
-    private normalizeSearchText(
-        value: string
-    ): string {
-
+    private normalizeSearchText(value: string): string {
         return value
             .normalize('NFD')
-            .replace(
-                /[\u0300-\u036f]/g,
-                ''
-            )
+            .replace(/[\u0300-\u036f]/g, '')
             .toLowerCase()
             .trim();
-
     }
 
-
-    // ============================================================
-    // FILTRES
-    // ============================================================
-
-    onStatusFilterChange(): void {
-
-        this.currentPage = 1;
-
-        this.applyFilters();
-
+    /**
+     * Vérifie si le pack est actif.
+     */
+    private isActive(bundle: BundleResponse): boolean {
+        return Boolean((bundle as any).active);
     }
 
-
-    onStockFilterChange(): void {
-
-        this.currentPage = 1;
-
-        this.applyFilters();
-
+    /**
+     * Récupère le stock du pack.
+     */
+    private getStock(bundle: BundleResponse): number {
+        const stock = Number((bundle as any).stock ?? 0);
+        return Number.isFinite(stock) ? stock : 0;
     }
 
-
-    applyFilters(): void {
-
-        const search =
-            this.searchTerm.trim();
-
-
-        this.filteredBundles =
-            this.bundles.filter(
-                bundle => {
-
-                    // =================================================
-                    // RECHERCHE GLOBALE
-                    // =================================================
-
-                    if (
-                        search &&
-                        !this.matchesSearch(
-                            bundle,
-                            search
-                        )
-                    ) {
-
-                        return false;
-
-                    }
-
-
-                    // =================================================
-                    // STATUT
-                    // =================================================
-
-                    if (
-                        this.statusFilter ===
-                        'active' &&
-                        !bundle.active
-                    ) {
-
-                        return false;
-
-                    }
-
-
-                    if (
-                        this.statusFilter ===
-                        'inactive' &&
-                        bundle.active
-                    ) {
-
-                        return false;
-
-                    }
-
-
-                    // =================================================
-                    // STOCK
-                    // =================================================
-
-                    const stock =
-                        Number(
-                            bundle.stock ?? 0
-                        );
-
-
-                    if (
-                        this.stockFilter ===
-                        'available' &&
-                        stock <= 5
-                    ) {
-
-                        return false;
-
-                    }
-
-
-                    if (
-                        this.stockFilter ===
-                        'low' &&
-                        (
-                            stock <= 0 ||
-                            stock > 5
-                        )
-                    ) {
-
-                        return false;
-
-                    }
-
-
-                    if (
-                        this.stockFilter ===
-                        'out' &&
-                        stock > 0
-                    ) {
-
-                        return false;
-
-                    }
-
-
-                    return true;
-
-                }
-            );
-
-
-        /*
-         * Corriger la page actuelle si nécessaire.
-         */
-
-        const totalPages =
-            this.totalPages;
-
-
-        if (
-            totalPages > 0 &&
-            this.currentPage > totalPages
-        ) {
-
-            this.currentPage =
-                totalPages;
-
-        }
-
-
-        if (
-            totalPages === 0
-        ) {
-
-            this.currentPage = 1;
-
-        }
-
-
-        this.updatePagination();
-
-    }
-
-
-    // ============================================================
-    // PAGINATION
-    // ============================================================
-
-    get totalItems(): number {
-
-        return this.filteredBundles.length;
-
-    }
-
-
-    get totalPages(): number {
-
-        if (
-            this.filteredBundles.length === 0
-        ) {
-
-            return 0;
-
-        }
-
-
-        return Math.ceil(
-            this.filteredBundles.length /
-            this.pageSize
-        );
-
-    }
-
-
+    /**
+     * Pagination : pages disponibles.
+     */
     get pages(): number[] {
-
         return Array.from(
-            {
-                length:
-                    this.totalPages
-            },
-            (_, index) =>
-                index + 1
+            { length: this.totalPages },
+            (_, index) => index + 1
         );
-
     }
 
-
-    updatePagination(): void {
-
-        const start =
-            (this.currentPage - 1) *
-            this.pageSize;
-
-        const end =
-            start +
-            this.pageSize;
-
-
-        this.paginatedBundles =
-            this.filteredBundles.slice(
-                start,
-                end
-            );
-
-    }
-
-
-    goToPage(
-        page: number
-    ): void {
-
+    goToPage(page: number): void {
         if (
             page < 1 ||
-            page > this.totalPages
+            page > this.totalPages ||
+            page === this.currentPage
         ) {
-
             return;
-
         }
 
-
-        this.currentPage =
-            page;
-
-        this.updatePagination();
-
+        this.currentPage = page;
+        this.loadBundles();
         this.scrollToTop();
-
     }
-
 
     previousPage(): void {
-
-        if (
-            this.currentPage <= 1
-        ) {
-
-            return;
-
+        if (this.currentPage > 1) {
+            this.currentPage--;
+            this.loadBundles();
+            this.scrollToTop();
         }
-
-
-        this.currentPage--;
-
-        this.updatePagination();
-
-        this.scrollToTop();
-
     }
-
 
     nextPage(): void {
-
-        if (
-            this.currentPage >=
-            this.totalPages
-        ) {
-
-            return;
-
+        if (this.currentPage < this.totalPages) {
+            this.currentPage++;
+            this.loadBundles();
+            this.scrollToTop();
         }
-
-
-        this.currentPage++;
-
-        this.updatePagination();
-
-        this.scrollToTop();
-
     }
-
 
     onPageSizeChange(): void {
-
         this.currentPage = 1;
-
-        this.updatePagination();
-
+        this.loadBundles();
     }
 
-
-    private scrollToTop(): void {
-
-        window.scrollTo({
-
-            top: 0,
-
-            behavior: 'smooth'
-
-        });
-
-    }
-
-
-    // ============================================================
-    // INFORMATIONS PAGINATION
-    // ============================================================
-
+    /**
+     * Première ligne affichée dans la pagination.
+     */
     get paginationStart(): number {
-
-        if (
-            this.totalItems === 0
-        ) {
-
+        if (this.totalItems === 0) {
             return 0;
-
         }
 
-
-        return (
-            (this.currentPage - 1) *
-            this.pageSize
-        ) + 1;
-
+        return (this.currentPage - 1) * this.pageSize + 1;
     }
 
-
+    /**
+     * Dernière ligne affichée dans la pagination.
+     */
     get paginationEnd(): number {
-
         return Math.min(
-            this.currentPage *
-                this.pageSize,
+            this.currentPage * this.pageSize,
             this.totalItems
         );
-
     }
 
-
-    // ============================================================
-    // PRIX
-    // ============================================================
-
-    formatPrice(
-        price: number
-    ): string {
-
-        return new Intl.NumberFormat(
-            'fr-FR'
-        ).format(
-            price ?? 0
-        ) + ' FCFA';
-
+    private scrollToTop(): void {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     }
 
+    /**
+     * Formatage du prix.
+     */
+    formatPrice(price: number | null | undefined): string {
+        return new Intl.NumberFormat('fr-FR').format(price ?? 0);
+    }
 
-    // ============================================================
-    // IMAGE PRINCIPALE
-    // ============================================================
+    /**
+     * Récupération de l'image principale.
+     */
+    getMainImage(bundle: BundleResponse): string {
+        const item = bundle as any;
 
-    getMainImage(
-        bundle: BundleResponse
-    ): string | null {
+        return (
+            item.imageUrl ||
+            item.image ||
+            item.products?.[0]?.imageUrl ||
+            item.items?.[0]?.product?.imageUrl ||
+            'assets/images/default-product.png'
+        );
+    }
 
-        if (
-            !bundle.images ||
-            bundle.images.length === 0
-        ) {
+    /**
+     * Nombre de produits dans le pack.
+     */
+    getProductCount(bundle: BundleResponse): number {
+        const item = bundle as any;
 
-            return null;
-
+        if (Array.isArray(item.products)) {
+            return item.products.length;
         }
 
-
-        const mainImage =
-            bundle.images.find(
-                image =>
-                    image.main === true
-            );
-
-
-        return mainImage?.imageUrl ??
-            bundle.images[0]?.imageUrl ??
-            null;
-
-    }
-
-
-    // ============================================================
-    // NOMBRE DE PRODUITS
-    // ============================================================
-
-    getProductCount(
-        bundle: BundleResponse
-    ): number {
-
-        return bundle.items?.length ?? 0;
-
-    }
-
-
-    // ============================================================
-    // STOCK
-    // ============================================================
-
-    getStockClass(
-        stock: number
-    ): string {
-
-        if (
-            stock <= 0
-        ) {
-
-            return [
-                'bg-red-100',
-                'text-red-700',
-                'dark:bg-red-900/20',
-                'dark:text-red-400'
-            ].join(' ');
-
+        if (Array.isArray(item.items)) {
+            return item.items.length;
         }
 
-
-        if (
-            stock <= 5
-        ) {
-
-            return [
-                'bg-orange-100',
-                'text-orange-700',
-                'dark:bg-orange-900/20',
-                'dark:text-orange-400'
-            ].join(' ');
-
-        }
-
-
-        return [
-            'bg-green-100',
-            'text-green-700',
-            'dark:bg-green-900/20',
-            'dark:text-green-400'
-        ].join(' ');
-
+        return 0;
     }
 
-
-    getStockLabel(
-        stock: number
-    ): string {
-
-        if (
-            stock <= 0
-        ) {
-
-            return 'Rupture';
-
+    /**
+     * Classe CSS correspondant au stock.
+     */
+    getStockClass(stock: number): string {
+        if (stock <= 0) {
+            return 'text-red-600 bg-red-100';
         }
 
+        if (stock <= 5) {
+            return 'text-orange-600 bg-orange-100';
+        }
 
-        if (
-            stock <= 5
-        ) {
+        return 'text-green-600 bg-green-100';
+    }
 
+    /**
+     * Libellé correspondant au stock.
+     */
+    getStockLabel(stock: number): string {
+        if (stock <= 0) {
+            return 'Rupture de stock';
+        }
+
+        if (stock <= 5) {
             return 'Stock faible';
-
         }
-
 
         return 'Disponible';
-
     }
 
+    resetFilters(): void {
+        this.searchTerm = '';
+        this.statusFilter = 'all';
+        this.stockFilter = 'all';
 
-    // ============================================================
-    // SUPPRESSION
-    // ============================================================
+        if (this.currentPage !== 1) {
+            this.currentPage = 1;
+            this.loadBundles();
+        } else {
+            this.applyFilters();
+        }
+    }
+    /**
+     * Suppression d'un pack.
+     */
+    deleteBundle(bundle: BundleResponse): void {
+        const item = bundle as any;
 
-    deleteBundle(
-        bundle: BundleResponse
-    ): void {
-
-        const confirmed =
-            confirm(
-                `Voulez-vous vraiment supprimer le pack "${bundle.name}" ?`
-            );
-
-
-        if (!confirmed) {
-
+        if (!confirm(`Voulez-vous vraiment supprimer le pack "${item.name}" ?`)) {
             return;
-
         }
 
+        this.deletingBundleId = item.id;
 
-        this.deletingBundleId =
-            bundle.id;
+        this.bundleService.deleteBundle(item.id).subscribe({
+            next: () => {
+                this.deletingBundleId = null;
 
+                // Recharger les données depuis le backend
+                // pour actualiser correctement la pagination.
+                this.loadBundles();
+            },
+            error: (err) => {
+                console.error('Erreur lors de la suppression du pack :', err);
 
-        this.bundleService
-            .deleteBundle(bundle.id)
-            .subscribe({
+                this.deletingBundleId = null;
 
-                next: () => {
-
-                    this.bundles =
-                        this.bundles.filter(
-                            item =>
-                                item.id !==
-                                bundle.id
-                        );
-
-
-                    this.deletingBundleId =
-                        null;
-
-
-                    this.applyFilters();
-
-                },
-
-                error: (error) => {
-
-                    console.error(
-                        'Erreur suppression pack :',
-                        error
-                    );
-
-
-                    this.deletingBundleId =
-                        null;
-
-
-                    alert(
-                        error?.error?.message ??
-                        'Impossible de supprimer le pack.'
-                    );
-
-                }
-
-            });
-
+                alert('Une erreur est survenue lors de la suppression du pack.');
+            }
+        });
     }
-
 }

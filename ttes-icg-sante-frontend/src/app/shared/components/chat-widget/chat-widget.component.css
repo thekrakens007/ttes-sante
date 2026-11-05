@@ -3,63 +3,121 @@
     font-family: inherit;
 }
 
+/* =========================================
+   BOUTON FLOTTANT DU CHATBOT
+========================================= */
 
 .chat-launcher {
     position: fixed;
     right: 24px;
     bottom: 100px;
     z-index: 10000;
+
     display: grid;
     place-items: center;
-    width: 62px;
+
+    width: 70px;
     height: 62px;
-    border: none;
-    border-radius: 50%;
-    background: #16834a;
-    color: white;
+    padding: 9px;
+
+    border: 2px solid #16834a;
+    border-radius: 18px 18px 18px 5px;
+
+    background: white;
     box-shadow: 0 8px 24px rgb(0 0 0 / 22%);
+
     cursor: pointer;
-    transition: transform 0.2s, background 0.2s;
+    overflow: visible;
+
+    transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
 }
 
+/* Queue de la bulle */
+.chat-launcher::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 8px;
 
+    width: 16px;
+    height: 16px;
+
+    background: white;
+    border-left: 2px solid #16834a;
+    border-bottom: 2px solid #16834a;
+
+    transform: rotate(-45deg);
+    border-radius: 2px;
+}
+
+/* Logo dans la bulle */
+.chat-launcher-logo {
+    position: relative;
+    z-index: 1;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+
+/* Effet au survol */
 .chat-launcher:hover {
-    background: #106b3b;
     transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgb(0 0 0 / 25%);
 }
 
-.chat-launcher svg {
-    width: 29px;
-    height: 29px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+/* Effet au clic */
+.chat-launcher:active {
+    transform: scale(0.95);
 }
+
+/* Accessibilité */
+.chat-launcher:focus-visible {
+    outline: 3px solid #16a34a;
+    outline-offset: 4px;
+}
+
+/* =========================================
+   FENÊTRE DE DISCUSSION
+========================================= */
 
 .chat-panel {
     position: fixed;
     right: 24px;
     bottom: 24px;
     z-index: 10000;
+
     display: flex;
     flex-direction: column;
+
     width: min(380px, calc(100vw - 32px));
     height: min(560px, calc(100dvh - 48px));
+
     overflow: hidden;
+
     border: 1px solid #e2e8e4;
     border-radius: 18px;
+
     background: #fff;
     color: #20342a;
+
     box-shadow: 0 15px 50px rgb(0 0 0 / 20%);
 }
+
+/* =========================================
+   EN-TÊTE
+========================================= */
 
 .chat-header {
     display: flex;
     align-items: center;
     gap: 12px;
+
     padding: 17px;
+
     background: #16834a;
     color: white;
 }
@@ -68,13 +126,20 @@
     display: grid;
     flex-shrink: 0;
     place-items: center;
+
     width: 42px;
     height: 42px;
+
+    overflow: hidden;
+
     border-radius: 50%;
     background: white;
-    color: #16834a;
-    font-size: 21px;
-    font-weight: 800;
+}
+
+.assistant-avatar-logo {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
 }
 
 .assistant-info {
@@ -96,20 +161,29 @@
 
 .online-dot {
     display: inline-block;
+
     width: 7px;
     height: 7px;
     margin-right: 5px;
+
     border-radius: 50%;
     background: #a7f3c1;
 }
 
+/* =========================================
+   BOUTON FERMER
+========================================= */
+
 .close-button {
     width: 34px;
     height: 34px;
+
     border: none;
     border-radius: 50%;
+
     background: transparent;
     color: white;
+
     font-size: 27px;
     cursor: pointer;
 }
@@ -118,13 +192,19 @@
     background: rgb(255 255 255 / 15%);
 }
 
+/* =========================================
+   MESSAGES
+========================================= */
+
 .chat-messages {
     display: flex;
     flex: 1;
     flex-direction: column;
     gap: 14px;
+
     overflow-y: auto;
     padding: 18px 14px;
+
     background: #f7faf8;
 }
 
@@ -140,11 +220,15 @@
 .message-bubble {
     max-width: 85%;
     padding: 11px 13px;
+
     border: 1px solid #e2e8e4;
     border-radius: 14px 14px 14px 4px;
+
     background: white;
+
     font-size: 14px;
     line-height: 1.55;
+
     overflow-wrap: anywhere;
     white-space: pre-wrap;
 }
@@ -152,6 +236,7 @@
 .user-bubble {
     border-color: #16834a;
     border-radius: 14px 14px 4px 14px;
+
     background: #16834a;
     color: white;
 }
@@ -161,20 +246,33 @@
     font-style: italic;
 }
 
+/* =========================================
+   ERREURS
+========================================= */
+
 .chat-error {
     margin: 0;
     padding: 10px;
+
     border-radius: 8px;
+
     background: #fff1f0;
     color: #b42318;
+
     font-size: 12px;
 }
+
+/* =========================================
+   ZONE DE SAISIE
+========================================= */
 
 .chat-input-area {
     display: flex;
     align-items: center;
     gap: 9px;
+
     padding: 12px;
+
     border-top: 1px solid #e5eae6;
     background: white;
 }
@@ -182,12 +280,17 @@
 .chat-input-area input {
     flex: 1;
     min-width: 0;
+
     padding: 12px;
+
     border: 1px solid #d6ded8;
     border-radius: 12px;
+
     outline: none;
+
     background: white;
     color: #20342a;
+
     font: inherit;
     font-size: 14px;
 }
@@ -201,16 +304,24 @@
     opacity: 0.65;
 }
 
+/* =========================================
+   BOUTON ENVOYER
+========================================= */
+
 .send-button {
     display: grid;
     flex-shrink: 0;
     place-items: center;
+
     width: 43px;
     height: 43px;
+
     border: none;
     border-radius: 12px;
+
     background: #16834a;
     color: white;
+
     cursor: pointer;
 }
 
@@ -222,6 +333,7 @@
 .send-button svg {
     width: 20px;
     height: 20px;
+
     fill: none;
     stroke: currentColor;
     stroke-width: 1.8;
@@ -229,28 +341,122 @@
     stroke-linejoin: round;
 }
 
+/* =========================================
+   PIED DE PAGE
+========================================= */
+
 .chat-footer {
     padding: 8px;
+
     background: white;
     color: #77857c;
+
     text-align: center;
     font-size: 11px;
 }
 
+/* =========================================
+   RESPONSIVE MOBILE
+========================================= */
+
 @media (max-width: 480px) {
     .chat-launcher {
         right: 16px;
-        bottom:84px;
-        width: 56px;
+        bottom: 84px;
+
+        width: 64px;
         height: 56px;
     }
 
     .chat-panel {
         right: 8px;
         bottom: 8px;
+
         width: calc(100vw - 16px);
         height: calc(100dvh - 16px);
+
         max-height: 680px;
+
         border-radius: 16px;
+    }
+}
+/* =========================================
+   ANIMATIONS DU BOUTON CHATBOT
+========================================= */
+
+/* Flottement permanent */
+@keyframes chatbot-float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-7px);
+    }
+}
+
+/* Halo lumineux */
+@keyframes chatbot-pulse {
+    0% {
+        box-shadow:
+                0 8px 24px rgb(0 0 0 / 22%),
+                0 0 0 0 rgb(22 131 74 / 45%);
+    }
+    70% {
+        box-shadow:
+                0 8px 24px rgb(0 0 0 / 22%),
+                0 0 0 13px rgb(22 131 74 / 0%);
+    }
+    100% {
+        box-shadow:
+                0 8px 24px rgb(0 0 0 / 22%),
+                0 0 0 0 rgb(22 131 74 / 0%);
+    }
+}
+
+/* Animation du logo */
+@keyframes chatbot-logo {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.07);
+    }
+}
+
+/* Application des animations */
+.chat-launcher {
+    animation:
+            chatbot-float 3s ease-in-out infinite,
+            chatbot-pulse 2.5s ease-out infinite;
+}
+
+/* Animation du logo */
+.chat-launcher-logo {
+    animation: chatbot-logo 3s ease-in-out infinite;
+}
+
+/* Interaction au survol */
+.chat-launcher:hover {
+    animation: none;
+    transform: translateY(-5px) scale(1.08);
+    box-shadow: 0 12px 28px rgb(0 0 0 / 25%);
+}
+
+/* Arrêt des animations lors du clic */
+.chat-launcher:active {
+    animation: none;
+    transform: scale(0.95);
+}
+
+/* Respect des préférences d'accessibilité */
+@media (prefers-reduced-motion: reduce) {
+    .chat-launcher,
+    .chat-launcher-logo {
+        animation: none;
+    }
+
+    .chat-launcher:hover,
+    .chat-launcher:active {
+        transform: none;
     }
 }

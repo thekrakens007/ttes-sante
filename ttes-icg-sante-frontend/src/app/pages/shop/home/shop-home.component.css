@@ -1,0 +1,51 @@
+.btn-consult {
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 0 0 rgba(251, 146, 60, 0.7);
+    animation: consult-pulse 2s infinite;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-consult:hover {
+    background-color: #fdba74;
+    transform: scale(1.05);
+    animation-play-state: paused;
+}
+
+/* Reflet lumineux qui traverse le bouton */
+.btn-consult::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+            120deg,
+            transparent,
+            rgba(255, 255, 255, 0.6),
+            transparent
+    );
+    transform: skewX(-20deg);
+    animation: consult-shine 3s infinite;
+}
+
+@keyframes consult-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(251, 146, 60, 0.7); }
+    70%  { box-shadow: 0 0 0 18px rgba(251, 146, 60, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(251, 146, 60, 0); }
+}
+
+@keyframes consult-shine {
+    0%   { left: -75%; }
+    60%  { left: 130%; }
+    100% { left: 130%; }
+}
+
+/* Respecte les utilisateurs qui désactivent les animations */
+@media (prefers-reduced-motion: reduce) {
+    .btn-consult,
+    .btn-consult::after {
+        animation: none;
+    }
+}

@@ -49,18 +49,18 @@
 
                 <a routerLink="/products"
                    class="rounded-lg px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200 dark:hover:bg-green-900/30 dark:hover:text-green-400">
-                    Produits
+                    Acheter un produit
                 </a>
 
                 <a routerLink="/bundles"
                    class="rounded-lg px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200 dark:hover:bg-green-900/30 dark:hover:text-green-400">
-                    Packs
+                    Acheter un Pack
                 </a>
 
                 <!-- desktop -->
                 <a routerLink="/cures"
                    class="rounded-lg px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200 dark:hover:bg-green-900/30 dark:hover:text-green-400">
-                    Cures preventives
+                    Acheter une cure
                 </a>
 
 
@@ -75,13 +75,6 @@
 
             <!-- ACTIONS DESKTOP -->
             <div class="hidden items-center gap-2 lg:flex">
-
-                <a href="https://wa.me/237690980866?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20une%20consultation."
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   class="rounded-xl bg-orange-400 px-4 py-2.5 text-sm font-bold text-green-950 shadow-sm transition hover:bg-orange-300">
-                    💬 Consultation
-                </a>
 
                 @if (!isLoggedIn()) {
 
@@ -185,18 +178,14 @@
         <div class="border-t border-gray-200 bg-white px-4 py-4 shadow-xl dark:border-gray-800 dark:bg-gray-900 md:hidden">
             <div class="flex flex-col gap-2">
                 <a routerLink="/" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">🏠 Accueil</a>
-                <a routerLink="/products" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">🛍️ Produits</a>
-                <a routerLink="/bundles" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">📦 Packs</a>
+                <a routerLink="/products" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">Acheter un produit</a>
+                <a routerLink="/bundles" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">Acheter un pack</a>
                 <!-- mobile -->
                 <a routerLink="/cures" (click)="closeMobileMenu()"
                    class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
-                    Cures preventives
+                    Acheter un cure
                 </a>
                 <a routerLink="/companies" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">🏢 Entreprises</a>
-
-                <a href="https://wa.me/237690980866?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20une%20consultation." target="_blank" rel="noopener noreferrer" class="rounded-xl bg-orange-400 px-4 py-3 text-center text-sm font-bold text-green-950">
-                    💬 Consultation WhatsApp
-                </a>
 
                 @if (!isLoggedIn()) {
                 <a routerLink="/signin" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">🔐 Se connecter</a>
@@ -253,37 +242,28 @@
                             routerLink="/products"
                             class="inline-flex items-center justify-center rounded-xl bg-orange-400 px-5 py-3.5 text-center text-xs font-extrabold uppercase tracking-wide text-green-950 shadow-xl transition hover:bg-orange-300 sm:px-6 sm:py-4 sm:text-sm"
                     >
-                        🛍️ Produits
+                        Acheter un produit
                     </a>
 
                     <a
                             routerLink="/bundles"
                             class="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3.5 text-center text-xs font-extrabold uppercase tracking-wide text-green-950 shadow-xl transition hover:bg-green-100 sm:px-6 sm:py-4 sm:text-sm"
                     >
-                        🎁 Packs
+                        Acheter un pack
                     </a>
 
                     <a
                             routerLink="/cures"
                             class="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3.5 text-center text-xs font-extrabold uppercase tracking-wide text-green-950 shadow-xl transition hover:bg-green-100 sm:px-6 sm:py-4 sm:text-sm"
                     >
-                        🌿 Cures préventives
+                        Acheter une cure
                     </a>
 
                     <a
                             routerLink="/companies"
                             class="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3.5 text-center text-xs font-extrabold uppercase tracking-wide text-green-950 shadow-xl transition hover:bg-green-100 sm:px-6 sm:py-4 sm:text-sm"
                     >
-                        🏢 Entreprises
-                    </a>
-
-                    <a
-                            href="https://wa.me/237690980866?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20un%20accompagnement."
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="inline-flex items-center justify-center rounded-xl border border-white/40 bg-white/10 px-5 py-3.5 text-center text-xs font-bold uppercase tracking-wide text-white backdrop-blur-sm transition hover:bg-white/20 sm:px-6 sm:py-4 sm:text-sm"
-                    >
-                        💬 Consultation directe
+                        Entreprises
                     </a>
 
                 </div>
@@ -303,7 +283,28 @@
 
     </section>
 
+    <!-- MESSAGE D'ACCUEIL + CONSULTATION -->
+    <section class="border-b border-green-900 bg-green-900 py-10 text-white sm:py-14">
+        <div class="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
 
+            <p class="text-base font-extrabold uppercase leading-relaxed tracking-wide text-orange-300 sm:text-xl lg:text-2xl">
+                Vous souffrez d’une maladie grave, compliquée, génétique ou rare, vous ne savez plus à quel saint vous vouer.
+            </p>
+
+            <p class="mt-3 text-base font-bold uppercase leading-relaxed text-white sm:text-xl lg:text-2xl">
+                Pas de panique, des docteurs spécialisés en thérapie cellulaire vous reçoivent.
+            </p>
+
+            <a href="https://wa.me/237690980866?text=Bonjour%20TES-ICG%20Sant%C3%A9%2C%20je%20souhaite%20r%C3%A9server%20une%20consultation%20%C3%A0%203000%20FCFA."
+               target="_blank"
+               rel="noopener noreferrer"
+               class="btn-consult mt-8 inline-flex items-center justify-center gap-2 rounded-2xl bg-orange-400 px-6 py-4 text-sm font-extrabold uppercase tracking-wide text-green-950 sm:px-8 sm:text-base">
+                <span aria-hidden="true">💬</span>
+                Consultation : 3 000 FCFA
+            </a>
+
+        </div>
+    </section>
 
 
 
@@ -895,7 +896,7 @@
     <!-- FOOTER -->
     <footer class="bg-green-950 py-10 sm:py-12 text-green-100 border-t border-green-900">
 
-        <div class="mx-auto grid max-w-7xl gap-8 sm:gap-10 px-4 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
+        <div class="mx-auto grid max-w-7xl gap-8 sm:gap-10 px-4 sm:px-6 md:grid-cols-2 lg:grid-cols-3 lg:px-8">
 
             <div>
 
@@ -918,30 +919,16 @@
                 <div class="mt-3 sm:mt-4 space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
 
                     <a routerLink="/" class="block hover:text-orange-300">Accueil</a>
-                    <a routerLink="/products" class="block hover:text-orange-300">Produits PhytoScience</a>
+                    <a routerLink="/products" class="block hover:text-orange-300">Produits</a>
                     <a routerLink="/bundles" class="block hover:text-orange-300">Packs</a>
+                    <a routerLink="/cures" class="block hover:text-orange-300">Cures</a>
                     <a routerLink="/companies" class="block hover:text-orange-300">Entreprises</a>
 
-                </div>
-
-            </div>
-
-            <div>
-
-                <h3 class="font-bold text-white text-sm sm:text-base">
-                    Nos Spécialités
-                </h3>
-
-                <div class="mt-3 sm:mt-4 space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
-
-                    <p>🧬 Double Stemcell / Crystal Cell</p>
-                    <p>🧪 SnowphyllForte</p>
-                    <p>🩺 Informations sur la santé</p>
-                    <p>👶 Santé reproductive</p>
 
                 </div>
 
             </div>
+
 
             <div>
 
@@ -977,4 +964,6 @@
 
     </footer>
 
+</div>
+    </section>
 </div>

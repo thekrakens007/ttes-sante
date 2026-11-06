@@ -17,39 +17,36 @@
 
             <!-- DESKTOP NAV -->
 
-            <nav class="hidden items-center gap-6 md:flex">
+            <!-- NAVIGATION DESKTOP -->
+            <nav class="hidden items-center gap-1 md:flex">
 
                 <a routerLink="/"
-                   class="text-sm font-medium text-gray-700 transition hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400">
+                   class="rounded-lg px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200 dark:hover:bg-green-900/30 dark:hover:text-green-400">
                     Accueil
                 </a>
 
                 <a routerLink="/products"
-                   class="text-sm font-medium text-gray-700 transition hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400">
-                    Produits
+                   class="rounded-lg px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200 dark:hover:bg-green-900/30 dark:hover:text-green-400">
+                    Acheter un produit
                 </a>
 
                 <a routerLink="/bundles"
-                   class="text-sm font-medium text-gray-700 transition hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400">
-                    Packs
+                   class="rounded-lg px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200 dark:hover:bg-green-900/30 dark:hover:text-green-400">
+                    Acheter un Pack
                 </a>
 
+                <!-- desktop -->
                 <a routerLink="/cures"
-                   class="text-sm font-semibold text-green-600 dark:text-green-400">
-                    Cures preventives
+                   class="rounded-lg px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200 dark:hover:bg-green-900/30 dark:hover:text-green-400">
+                    Acheter une cure
                 </a>
+
 
                 <a routerLink="/companies"
-                   class="text-sm font-medium text-gray-700 transition hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400">
+                   class="rounded-lg px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200 dark:hover:bg-green-900/30 dark:hover:text-green-400">
                     Entreprises
                 </a>
 
-                @if (isAdmin()) {
-                <a routerLink="/admin"
-                   class="text-sm font-medium text-gray-700 transition hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400">
-                    Administration
-                </a>
-                }
 
             </nav>
 
@@ -104,30 +101,16 @@
 
             <nav class="flex flex-col gap-2">
 
-                <a routerLink="/" (click)="closeMobileMenu()"
-                   class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
-                    Accueil
-                </a>
-
-                <a routerLink="/products" (click)="closeMobileMenu()"
-                   class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
-                    Produits
-                </a>
-
-                <a routerLink="/bundles" (click)="closeMobileMenu()"
-                   class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
-                    Packs
-                </a>
-
+                <a routerLink="/" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">🏠 Accueil</a>
+                <a routerLink="/products" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">Acheter un produit</a>
+                <a routerLink="/bundles" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">Acheter un pack</a>
+                <!-- mobile -->
                 <a routerLink="/cures" (click)="closeMobileMenu()"
-                   class="rounded-lg bg-green-50 px-4 py-3 text-sm font-semibold text-green-700 dark:bg-green-900/20 dark:text-green-400">
-                    Cures preventives
-                </a>
-
-                <a routerLink="/companies" (click)="closeMobileMenu()"
                    class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
-                    Entreprises
+                    Acheter un cure
                 </a>
+                <a routerLink="/companies" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">🏢 Entreprises</a>
+
 
                 @if (isAdmin()) {
                 <a routerLink="/admin" (click)="closeMobileMenu()"

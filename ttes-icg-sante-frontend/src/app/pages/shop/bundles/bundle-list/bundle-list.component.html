@@ -14,32 +14,36 @@
         </a>
 
         <!-- DESKTOP NAVIGATION -->
-        <nav class="hidden items-center gap-6 md:flex">
+        <!-- NAVIGATION DESKTOP -->
+        <nav class="hidden items-center gap-1 md:flex">
 
-            <a routerLink="/" class="text-gray-700 hover:text-green-700">
+            <a routerLink="/"
+               class="rounded-lg px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200 dark:hover:bg-green-900/30 dark:hover:text-green-400">
                 Accueil
             </a>
 
-            <a routerLink="/products" class="text-gray-700 hover:text-green-700">
-                Produits
+            <a routerLink="/products"
+               class="rounded-lg px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200 dark:hover:bg-green-900/30 dark:hover:text-green-400">
+                Acheter un produit
             </a>
 
-            <a routerLink="/bundles" class="font-semibold text-green-700">
-                Packs
+            <a routerLink="/bundles"
+               class="rounded-lg px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200 dark:hover:bg-green-900/30 dark:hover:text-green-400">
+                Acheter un Pack
             </a>
 
-            <a routerLink="/companies" class="text-gray-700 hover:text-green-700">
+            <!-- desktop -->
+            <a routerLink="/cures"
+               class="rounded-lg px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200 dark:hover:bg-green-900/30 dark:hover:text-green-400">
+                Acheter une cure
+            </a>
+
+
+            <a routerLink="/companies"
+               class="rounded-lg px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-700 transition hover:bg-green-50 hover:text-green-700 dark:text-gray-200 dark:hover:bg-green-900/30 dark:hover:text-green-400">
                 Entreprises
             </a>
 
-            @if (isAdmin()) {
-                <a
-                        routerLink="/admin"
-                        class="text-gray-700 hover:text-green-700"
-                >
-                    Administration
-                </a>
-            }
 
         </nav>
 
@@ -130,37 +134,16 @@
 
             <nav class="flex flex-col gap-4">
 
-                <a
-                        routerLink="/"
-                        (click)="closeMobileMenu()"
-                        class="text-gray-700"
-                >
-                    Accueil
+                <a routerLink="/" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">🏠 Accueil</a>
+                <a routerLink="/products" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">Acheter un produit</a>
+                <a routerLink="/bundles" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">Acheter un pack</a>
+                <!-- mobile -->
+                <a routerLink="/cures" (click)="closeMobileMenu()"
+                   class="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
+                    Acheter un cure
                 </a>
+                <a routerLink="/companies" (click)="closeMobileMenu()" class="rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-green-50 dark:text-gray-200">🏢 Entreprises</a>
 
-                <a
-                        routerLink="/products"
-                        (click)="closeMobileMenu()"
-                        class="text-gray-700"
-                >
-                    Produits
-                </a>
-
-                <a
-                        routerLink="/bundles"
-                        (click)="closeMobileMenu()"
-                        class="font-semibold text-green-700"
-                >
-                    Packs
-                </a>
-
-                <a
-                        routerLink="/companies"
-                        (click)="closeMobileMenu()"
-                        class="text-gray-700"
-                >
-                    Entreprises
-                </a>
 
                 @if (isLoggedIn()) {
 

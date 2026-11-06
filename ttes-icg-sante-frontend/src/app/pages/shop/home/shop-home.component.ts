@@ -33,7 +33,8 @@ import { CompanyCategoryResponse } from '../../../core/interfaces/company-catego
         RouterModule,
         FormsModule
     ],
-    templateUrl: './shop-home.component.html'
+    templateUrl: './shop-home.component.html',
+    styleUrl: './shop-home.component.css'
 })
 export class ShopHomeComponent implements OnInit {
 

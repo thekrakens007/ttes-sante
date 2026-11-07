@@ -1,7 +1,7 @@
-
 package com.ttesicg.sante.controller;
 
 import com.ttesicg.sante.dto.CureResponse;
+import com.ttesicg.sante.entity.CureType;
 import com.ttesicg.sante.service.CureService;
 
 import lombok.RequiredArgsConstructor;
@@ -21,13 +21,15 @@ public class CureController {
 
     @GetMapping
     public Page<CureResponse> getCures(
+            @RequestParam(required = false) CureType type,
+
             @PageableDefault(
                     size = 8,
                     sort = {"createdAt", "id"},
                     direction = Sort.Direction.DESC
             ) Pageable pageable
     ) {
-        return cureService.findPublicCures(pageable);
+        return cureService.findPublicCures(pageable, type);
     }
 
     @GetMapping("/{id}")

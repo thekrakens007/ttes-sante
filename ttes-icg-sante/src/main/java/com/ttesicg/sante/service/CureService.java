@@ -3,6 +3,7 @@ package com.ttesicg.sante.service;
 import com.ttesicg.sante.dto.CureRequest;
 import com.ttesicg.sante.dto.CureResponse;
 import com.ttesicg.sante.entity.Cure;
+import com.ttesicg.sante.entity.CureType;
 import com.ttesicg.sante.repository.CureRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -33,6 +34,20 @@ public class CureService {
                 .map(this::toResponse);
     }
 
+    @Transactional(readOnly = true)
+    public Page<CureResponse> findPublicCures(
+            Pageable pageable,
+            CureType type
+    ) {
+
+        if (type == null) {
+            return cureRepository.findByActiveTrue(pageable)
+                    .map(this::toResponse);
+        }
+
+        return cureRepository.findByActiveTrueAndType(type, pageable)
+                .map(this::toResponse);
+    }
     @Transactional(readOnly = true)
     public CureResponse findPublicCure(Long id) {
 

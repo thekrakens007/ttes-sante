@@ -6,9 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "cures")
@@ -30,15 +29,15 @@ public class Cure {
     @Column(name = "image_url", length = 1000)
     private String imageUrl;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private CureType type;
+
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal price;
+
     @Column(nullable = false)
     private boolean active = false;
-
-    @OneToMany(
-            mappedBy = "cure",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<CureItem> items = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -56,10 +55,5 @@ public class Cure {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-
-    public void addItem(CureItem item) {
-        item.setCure(this);
-        items.add(item);
     }
 }

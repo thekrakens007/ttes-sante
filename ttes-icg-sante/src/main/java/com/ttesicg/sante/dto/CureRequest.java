@@ -1,11 +1,12 @@
-
 package com.ttesicg.sante.dto;
 
-import jakarta.validation.Valid;
+import com.ttesicg.sante.entity.CureType;
 import jakarta.validation.constraints.*;
-import java.util.List;
+
+import java.math.BigDecimal;
 
 public record CureRequest(
+
         @NotBlank
         @Size(max = 180)
         String name,
@@ -16,19 +17,13 @@ public record CureRequest(
         @Size(max = 1000)
         String imageUrl,
 
-        Boolean active,
+        @NotNull
+        CureType type,
 
-        @NotEmpty
-        List<@Valid CureItemRequest> items
-) {
-    public record CureItemRequest(
-            @NotNull
-            @Positive
-            Long productId,
+        @NotNull
+        @DecimalMin(value = "0.00")
+        @Digits(integer = 10, fraction = 2)
+        BigDecimal price,
 
-            @NotNull
-            @Positive
-            @Max(10000)
-            Integer quantity
-    ) {}
-}
+        Boolean active
+) {}

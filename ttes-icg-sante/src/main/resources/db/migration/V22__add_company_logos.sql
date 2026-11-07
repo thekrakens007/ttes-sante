@@ -19,3 +19,4 @@ WHERE (logo_url IS NULL OR BTRIM(logo_url) = '')
       'forever living cameroun',
       'dynace global cameroun'
   );
+

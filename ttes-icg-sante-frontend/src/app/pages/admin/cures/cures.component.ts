@@ -1,3 +1,4 @@
+
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -7,6 +8,17 @@ import { Cure } from '../../../core/models/cure.model';
 
 type StatusFilter = 'all' | 'active' | 'inactive';
 
+interface PageResponse<T> {
+    content: T[];
+    totalElements: number;
+    totalPages: number;
+    number: number;
+    size: number;
+    first: boolean;
+    last: boolean;
+    empty: boolean;
+}
+
 @Component({
     selector: 'app-cures',
     standalone: true,
@@ -14,12 +26,10 @@ type StatusFilter = 'all' | 'active' | 'inactive';
     templateUrl: './cures.component.html'
 })
 export class CuresComponent implements OnInit {
+
     private readonly cureService = inject(CureService);
 
-    // ============================================================
-    // DONNEES
-    // ============================================================
-
+    // DONNÉES
     cures: Cure[] = [];
     filteredCures: Cure[] = [];
     paginatedCures: Cure[] = [];
@@ -30,17 +40,11 @@ export class CuresComponent implements OnInit {
 
     deletingCureId: number | null = null;
 
-    // ============================================================
     // FILTRES
-    // ============================================================
-
     searchTerm = '';
     statusFilter: StatusFilter = 'all';
 
-    // ============================================================
-    // PAGINATION (côté client, pages numérotées à partir de 1)
-    // ============================================================
-
+    // PAGINATION BACKEND
     currentPage = 1;
     pageSize = 9;
     pageSizeOptions = [6, 9, 12, 24];
@@ -64,10 +68,7 @@ export class CuresComponent implements OnInit {
         );
     }
 
-    // ============================================================
     // INITIALISATION
-    // ============================================================
-
     ngOnInit(): void {
         this.loadCures();
     }
@@ -76,56 +77,61 @@ export class CuresComponent implements OnInit {
         this.loading = true;
         this.errorMessage = '';
 
-        this.cureService.getAdminCures().subscribe({
-            next: (cures) => {
-                this.cures = cures ?? [];
+        this.cureService.getAdminCures(
+            this.currentPage - 1,
+            this.pageSize
+        ).subscribe({
+            next: (response: PageResponse<Cure>) => {
+                this.cures = response.content ?? [];
+
+                this.totalItems = response.totalElements ?? 0;
+                this.totalPages = response.totalPages ?? 0;
+
+                this.currentPage = response.number + 1;
+
                 this.applyFilters();
                 this.loading = false;
             },
             error: (error) => {
                 console.error('Erreur de chargement des cures', error);
+
                 this.errorMessage = 'Impossible de charger les cures.';
                 this.loading = false;
             }
         });
     }
 
-    // ============================================================
-    // RECHERCHE / FILTRES
-    // ============================================================
-
+    // RECHERCHE ET FILTRES
     onSearch(): void {
-        this.currentPage = 1;
         this.applyFilters();
     }
 
     clearSearch(): void {
         this.searchTerm = '';
-        this.onSearch();
+        this.applyFilters();
     }
 
     onStatusFilterChange(): void {
-        this.currentPage = 1;
         this.applyFilters();
     }
 
     onPageSizeChange(): void {
         this.currentPage = 1;
-        this.applyFilters();
+        this.loadCures();
     }
 
     resetFilters(): void {
         this.searchTerm = '';
         this.statusFilter = 'all';
         this.currentPage = 1;
-        this.applyFilters();
+        this.loadCures();
     }
 
     applyFilters(): void {
         const term = this.normalize(this.searchTerm);
 
         this.filteredCures = this.cures.filter(cure => {
-            // Statut
+
             if (this.statusFilter === 'active' && !cure.active) {
                 return false;
             }
@@ -134,13 +140,12 @@ export class CuresComponent implements OnInit {
                 return false;
             }
 
-            // Recherche : nom, description, produits de la cure
             if (term) {
                 const haystack = this.normalize(
                     [
                         cure.name,
                         cure.description ?? '',
-                        ...(cure.items ?? []).map(item => item.productName)
+                        cure.type ?? ''
                     ].join(' ')
                 );
 
@@ -152,16 +157,10 @@ export class CuresComponent implements OnInit {
             return true;
         });
 
-        this.totalItems = this.filteredCures.length;
-        this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-
-        // Si la page courante n'existe plus (suppression, filtre...), on la ramène.
-        if (this.currentPage > this.totalPages) {
-            this.currentPage = Math.max(1, this.totalPages);
-        }
+        // Le backend fournit déjà la page demandée.
+        this.paginatedCures = [...this.filteredCures];
 
         this.buildPages();
-        this.updatePaginatedCures();
     }
 
     private normalize(value: string): string {
@@ -172,23 +171,11 @@ export class CuresComponent implements OnInit {
             .trim();
     }
 
-    // ============================================================
     // PAGINATION
-    // ============================================================
-
     private buildPages(): void {
         this.pages = Array.from(
             { length: this.totalPages },
             (_, index) => index + 1
-        );
-    }
-
-    private updatePaginatedCures(): void {
-        const start = (this.currentPage - 1) * this.pageSize;
-
-        this.paginatedCures = this.filteredCures.slice(
-            start,
-            start + this.pageSize
         );
     }
 
@@ -201,25 +188,26 @@ export class CuresComponent implements OnInit {
     }
 
     goToPage(page: number): void {
-        if (page < 1 || page > this.totalPages) {
+        if (
+            page < 1 ||
+            page > this.totalPages ||
+            page === this.currentPage
+        ) {
             return;
         }
 
         this.currentPage = page;
-        this.updatePaginatedCures();
+        this.loadCures();
     }
 
-    // ============================================================
     // SUPPRESSION
-    // ============================================================
-
     deleteCure(cure: Cure): void {
         if (!cure.id) {
             return;
         }
 
         const confirmed = window.confirm(
-            `Voulez-vous vraiment supprimer la cure « ${cure.name} » ?`
+            `Voulez-vous vraiment désactiver la cure « ${cure.name} » ?`
         );
 
         if (!confirmed) {
@@ -232,47 +220,41 @@ export class CuresComponent implements OnInit {
 
         this.cureService.deleteCure(cure.id).subscribe({
             next: () => {
-                this.cures = this.cures.filter(item => item.id !== cure.id);
                 this.deletingCureId = null;
-                this.successMessage = 'Cure supprimée avec succès.';
-                this.applyFilters();
+                this.successMessage = 'Cure désactivée avec succès.';
+
+                // Recharge la page pour actualiser les données.
+                this.loadCures();
             },
             error: (error) => {
                 console.error('Erreur de suppression', error);
+
                 this.deletingCureId = null;
+
                 this.errorMessage =
                     error?.error?.message ??
-                    'La suppression de la cure a échoué.';
+                    'La désactivation de la cure a échoué.';
             }
         });
     }
 
-    // ============================================================
     // AFFICHAGE
-    // ============================================================
-
     getMainImage(cure: Cure): string {
-        if (cure.imageUrl) {
-            return cure.imageUrl;
-        }
-
-        // À défaut, on utilise l'image du premier produit de la cure.
-        return (cure.items ?? []).find(item => item.productImageUrl)
-            ?.productImageUrl ?? '';
-    }
-
-    getProductCount(cure: Cure): number {
-        return cure.items?.length ?? 0;
-    }
-
-    getTotalQuantity(cure: Cure): number {
-        return (cure.items ?? []).reduce(
-            (total, item) => total + (item.quantity ?? 0),
-            0
-        );
+        return cure.imageUrl ?? '';
     }
 
     formatPrice(price?: number | null): string {
         return `${(price ?? 0).toLocaleString('fr-FR')} FCFA`;
+    }
+
+    getTypeLabel(type: string): string {
+        switch (type) {
+            case 'PREVENTIVE':
+                return 'Préventive';
+            case 'CURATIVE':
+                return 'Curative';
+            default:
+                return type;
+        }
     }
 }

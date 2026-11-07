@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { CureService } from '../../../../core/services/cure.service';
-import { Cure, CureProduct } from '../../../../core/models/cure.model';
+import { Cure } from '../../../../core/models/cure.model';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CartService } from '../../../../core/services/cart.service';
 
@@ -15,26 +15,22 @@ import { CartService } from '../../../../core/services/cart.service';
 })
 export class CureDetailComponent implements OnInit {
 
-    private route = inject(ActivatedRoute);
-    private router = inject(Router);
-    private cureService = inject(CureService);
-    private authService = inject(AuthService);
-    private cartService = inject(CartService);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+    private readonly cureService = inject(CureService);
+    private readonly authService = inject(AuthService);
+    private readonly cartService = inject(CartService);
 
     cure: Cure | null = null;
 
     loading = true;
     error = '';
 
-    /**
-     * Image affichée en grand dans la galerie.
-     */
-    selectedImage: string | null = null;
+    // ============================================================
+    // IMAGE
+    // ============================================================
 
-    /**
-     * Images disponibles : image de la cure puis images
-     * de ses produits (sans doublons).
-     */
+    selectedImage: string | null = null;
     images: string[] = [];
 
     // ============================================================
@@ -45,15 +41,14 @@ export class CureDetailComponent implements OnInit {
     cartMessage = '';
     cartError = '';
 
-
     // ============================================================
-    // INIT
+    // INITIALISATION
     // ============================================================
 
     ngOnInit(): void {
         const id = Number(this.route.snapshot.paramMap.get('id'));
 
-        if (!id) {
+        if (!Number.isInteger(id) || id <= 0) {
             this.error = 'Identifiant de la cure invalide.';
             this.loading = false;
             return;
@@ -69,8 +64,11 @@ export class CureDetailComponent implements OnInit {
         this.cureService.getCure(id).subscribe({
             next: (cure) => {
                 this.cure = cure;
+
+                // Une cure possède désormais sa propre image.
                 this.images = this.buildImages(cure);
                 this.selectedImage = this.images[0] ?? null;
+
                 this.loading = false;
             },
             error: (error) => {
@@ -87,60 +85,19 @@ export class CureDetailComponent implements OnInit {
         });
     }
 
-
     // ============================================================
-    // IMAGES
+    // IMAGE
     // ============================================================
 
     private buildImages(cure: Cure): string[] {
-        const urls = [
-            cure.imageUrl ?? '',
-            ...(cure.items ?? []).map(item => item.productImageUrl ?? '')
-        ].filter(url => !!url);
+        const imageUrl = cure.imageUrl?.trim();
 
-        return Array.from(new Set(urls));
+        return imageUrl ? [imageUrl] : [];
     }
 
     selectImage(imageUrl: string): void {
         this.selectedImage = imageUrl;
     }
-
-
-    // ============================================================
-    // CONTENU
-    // ============================================================
-
-    get items(): CureProduct[] {
-        return this.cure?.items ?? [];
-    }
-
-    get totalQuantity(): number {
-        return this.items.reduce(
-            (total, item) => total + (item.quantity ?? 0),
-            0
-        );
-    }
-
-    getSubtotal(item: CureProduct): number {
-        return item.subtotal ?? (item.unitPrice ?? 0) * item.quantity;
-    }
-
-
-    // ============================================================
-    // STOCK
-    // ============================================================
-
-    /**
-     * Une cure n'a pas de stock propre : le backend peut fournir
-     * availableStock (nombre de cures réalisables). S'il est absent,
-     * on ne bloque pas côté client.
-     */
-    isOutOfStock(): boolean {
-        const stock = this.cure?.availableStock;
-
-        return stock !== undefined && stock !== null && stock <= 0;
-    }
-
 
     // ============================================================
     // AJOUT AU PANIER
@@ -151,7 +108,7 @@ export class CureDetailComponent implements OnInit {
             return;
         }
 
-        // Non connecté : redirection vers la connexion
+        // L'utilisateur doit être connecté.
         if (!this.authService.isLoggedIn()) {
             this.router.navigate(['/signin'], {
                 queryParams: { returnUrl: this.router.url }
@@ -159,13 +116,7 @@ export class CureDetailComponent implements OnInit {
             return;
         }
 
-        if (this.isOutOfStock()) {
-            this.cartError = 'Cette cure est actuellement en rupture de stock.';
-            this.cartMessage = '';
-            return;
-        }
-
-        // Éviter le double clic
+        // Éviter les doubles clics.
         if (this.addingToCart) {
             return;
         }
@@ -181,14 +132,17 @@ export class CureDetailComponent implements OnInit {
             },
             error: (error: any) => {
                 console.error('Erreur ajout cure au panier :', error);
+
                 this.addingToCart = false;
 
-                // Session expirée
+                // Session expirée.
                 if (error?.status === 401) {
                     this.authService.logout();
+
                     this.router.navigate(['/signin'], {
                         queryParams: { returnUrl: this.router.url }
                     });
+
                     return;
                 }
 
@@ -200,6 +154,22 @@ export class CureDetailComponent implements OnInit {
         });
     }
 
+    // ============================================================
+    // TYPE DE CURE
+    // ============================================================
+
+    getTypeLabel(type: string): string {
+        switch (type) {
+            case 'PREVENTIVE':
+                return 'Préventive';
+
+            case 'CURATIVE':
+                return 'Curative';
+
+            default:
+                return type;
+        }
+    }
 
     // ============================================================
     // PRIX

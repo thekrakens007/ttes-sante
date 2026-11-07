@@ -94,40 +94,36 @@ public class OrderService {
          */
         for (CartItem cartItem : cart.getItems()) {
 
-            /*
-             * Vérifier et décrémenter le stock.
-             */
+            // Vérification des stocks des produits et des packs.
             checkAndUpdateStock(cartItem);
 
-            /*
-             * Créer la ligne de commande.
-             */
-            OrderItem item =
-                    OrderItem.builder()
-                            .order(order)
-                            .product(cartItem.getProduct())
-                            .bundle(cartItem.getBundle())
-                            .cure(cartItem.getCure())
-                            .quantity(cartItem.getQuantity())
-                            .price(cartItem.getPrice())
-                            .build();
+            // Prix enregistré dans le panier.
+            BigDecimal itemPrice = cartItem.getPrice();
 
-            order.getItems()
-                    .add(item);
+            // Pour une cure, utiliser le prix actuel du catalogue.
+            if (cartItem.getCure() != null) {
+                itemPrice = cartItem.getCure().getPrice();
+                cartItem.setPrice(itemPrice);
+            }
 
-            /*
-             * Calcul du sous-total.
-             */
-            BigDecimal subtotal =
-                    cartItem.getPrice()
-                            .multiply(
-                                    BigDecimal.valueOf(
-                                            cartItem.getQuantity()
-                                    )
-                            );
+            // Création de la ligne de commande.
+            OrderItem item = OrderItem.builder()
+                    .order(order)
+                    .product(cartItem.getProduct())
+                    .bundle(cartItem.getBundle())
+                    .cure(cartItem.getCure())
+                    .quantity(cartItem.getQuantity())
+                    .price(itemPrice)
+                    .build();
 
-            total =
-                    total.add(subtotal);
+            order.getItems().add(item);
+
+            // Calcul du sous-total.
+            BigDecimal subtotal = itemPrice.multiply(
+                    BigDecimal.valueOf(cartItem.getQuantity())
+            );
+
+            total = total.add(subtotal);
         }
 
         order.setTotalAmount(total);
@@ -187,9 +183,7 @@ public class OrderService {
      *   stock produit -=
      *       quantité dans la cure × quantité commandée
      */
-    private void checkAndUpdateStock(
-            CartItem cartItem
-    ) {
+    private void checkAndUpdateStock(CartItem cartItem) {
 
         /*
          * ==========================
@@ -198,37 +192,25 @@ public class OrderService {
          */
         if (cartItem.getProduct() != null) {
 
-            Product product =
-                    cartItem.getProduct();
+            Product product = cartItem.getProduct();
 
-            Inventory inventory =
-                    inventoryRepository
-                            .findByProductId(
-                                    product.getId()
-                            )
-                            .orElseThrow(
-                                    () -> new RuntimeException(
-                                            "Stock introuvable pour "
-                                                    + product.getName()
-                                    )
-                            );
+            Inventory inventory = inventoryRepository
+                    .findByProductId(product.getId())
+                    .orElseThrow(() -> new RuntimeException(
+                            "Stock introuvable pour " + product.getName()
+                    ));
 
-            if (inventory.getQuantity()
-                    < cartItem.getQuantity()) {
-
+            if (inventory.getQuantity() < cartItem.getQuantity()) {
                 throw new RuntimeException(
-                        "Stock insuffisant pour "
-                                + product.getName()
+                        "Stock insuffisant pour " + product.getName()
                 );
             }
 
             inventory.setQuantity(
-                    inventory.getQuantity()
-                            - cartItem.getQuantity()
+                    inventory.getQuantity() - cartItem.getQuantity()
             );
 
             inventoryRepository.save(inventory);
-
             return;
         }
 
@@ -239,90 +221,55 @@ public class OrderService {
          */
         if (cartItem.getBundle() != null) {
 
-            ProductBundle bundle =
-                    cartItem.getBundle();
+            ProductBundle bundle = cartItem.getBundle();
 
-            List<BundleItem> bundleItems =
-                    bundleItemRepository
-                            .findByBundleId(
-                                    bundle.getId()
-                            );
+            List<BundleItem> bundleItems = bundleItemRepository
+                    .findByBundleId(bundle.getId());
 
             if (bundleItems.isEmpty()) {
-
                 throw new RuntimeException(
-                        "Le pack "
-                                + bundle.getName()
-                                + " ne contient aucun produit"
+                        "Le pack " + bundle.getName() + " ne contient aucun produit"
                 );
             }
 
-            /*
-             * Première étape :
-             * vérifier TOUT le stock avant
-             * de modifier quoi que ce soit.
-             */
+            // Vérifier tous les stocks avant de les modifier.
             for (BundleItem bundleItem : bundleItems) {
 
-                Product product =
-                        bundleItem.getProduct();
+                Product product = bundleItem.getProduct();
 
-                Inventory inventory =
-                        inventoryRepository
-                                .findByProductId(
-                                        product.getId()
-                                )
-                                .orElseThrow(
-                                        () -> new RuntimeException(
-                                                "Stock introuvable pour "
-                                                        + product.getName()
-                                        )
-                                );
+                Inventory inventory = inventoryRepository
+                        .findByProductId(product.getId())
+                        .orElseThrow(() -> new RuntimeException(
+                                "Stock introuvable pour " + product.getName()
+                        ));
 
                 int requiredQuantity =
-                        bundleItem.getQuantity()
-                                * cartItem.getQuantity();
+                        bundleItem.getQuantity() * cartItem.getQuantity();
 
-                if (inventory.getQuantity()
-                        < requiredQuantity) {
-
+                if (inventory.getQuantity() < requiredQuantity) {
                     throw new RuntimeException(
-                            "Stock insuffisant pour "
-                                    + product.getName()
-                                    + " dans le pack "
-                                    + bundle.getName()
+                            "Stock insuffisant pour " + product.getName()
+                                    + " dans le pack " + bundle.getName()
                     );
                 }
             }
 
-            /*
-             * Deuxième étape :
-             * décrémenter les stocks.
-             */
+            // Décrémenter les stocks après vérification.
             for (BundleItem bundleItem : bundleItems) {
 
-                Product product =
-                        bundleItem.getProduct();
+                Product product = bundleItem.getProduct();
 
-                Inventory inventory =
-                        inventoryRepository
-                                .findByProductId(
-                                        product.getId()
-                                )
-                                .orElseThrow(
-                                        () -> new RuntimeException(
-                                                "Stock introuvable pour "
-                                                        + product.getName()
-                                        )
-                                );
+                Inventory inventory = inventoryRepository
+                        .findByProductId(product.getId())
+                        .orElseThrow(() -> new RuntimeException(
+                                "Stock introuvable pour " + product.getName()
+                        ));
 
                 int requiredQuantity =
-                        bundleItem.getQuantity()
-                                * cartItem.getQuantity();
+                        bundleItem.getQuantity() * cartItem.getQuantity();
 
                 inventory.setQuantity(
-                        inventory.getQuantity()
-                                - requiredQuantity
+                        inventory.getQuantity() - requiredQuantity
                 );
 
                 inventoryRepository.save(inventory);
@@ -333,111 +280,20 @@ public class OrderService {
 
         /*
          * ==========================
-         * CURE
+         * CURE AUTONOME
          * ==========================
          */
         if (cartItem.getCure() != null) {
 
-            Cure cure =
-                    cartItem.getCure();
+            Cure cure = cartItem.getCure();
 
-            /*
-             * Une cure désactivée depuis son ajout
-             * au panier ne peut plus être commandée.
-             */
             if (!cure.isActive()) {
-
                 throw new RuntimeException(
-                        "La cure "
-                                + cure.getName()
-                                + " n'est plus disponible"
+                        "La cure " + cure.getName() + " n'est plus disponible"
                 );
             }
 
-            List<CureItem> cureItems =
-                    cure.getItems();
-
-            if (cureItems == null
-                    || cureItems.isEmpty()) {
-
-                throw new RuntimeException(
-                        "La cure "
-                                + cure.getName()
-                                + " ne contient aucun produit"
-                );
-            }
-
-            /*
-             * Première étape :
-             * vérifier TOUT le stock avant
-             * de modifier quoi que ce soit.
-             */
-            for (CureItem cureItem : cureItems) {
-
-                Product product =
-                        cureItem.getProduct();
-
-                Inventory inventory =
-                        inventoryRepository
-                                .findByProductId(
-                                        product.getId()
-                                )
-                                .orElseThrow(
-                                        () -> new RuntimeException(
-                                                "Stock introuvable pour "
-                                                        + product.getName()
-                                        )
-                                );
-
-                int requiredQuantity =
-                        cureItem.getQuantity()
-                                * cartItem.getQuantity();
-
-                if (inventory.getQuantity()
-                        < requiredQuantity) {
-
-                    throw new RuntimeException(
-                            "Stock insuffisant pour "
-                                    + product.getName()
-                                    + " dans la cure "
-                                    + cure.getName()
-                    );
-                }
-            }
-
-            /*
-             * Deuxième étape :
-             * décrémenter les stocks.
-             */
-            for (CureItem cureItem : cureItems) {
-
-                Product product =
-                        cureItem.getProduct();
-
-                Inventory inventory =
-                        inventoryRepository
-                                .findByProductId(
-                                        product.getId()
-                                )
-                                .orElseThrow(
-                                        () -> new RuntimeException(
-                                                "Stock introuvable pour "
-                                                        + product.getName()
-                                        )
-                                );
-
-                int requiredQuantity =
-                        cureItem.getQuantity()
-                                * cartItem.getQuantity();
-
-                inventory.setQuantity(
-                        inventory.getQuantity()
-                                - requiredQuantity
-                );
-
-                inventoryRepository.save(inventory);
-            }
-
+            // Une cure autonome ne possède aucun stock.
             return;
         }
 
@@ -446,9 +302,7 @@ public class OrderService {
          * ARTICLE INVALIDE
          * ==========================
          */
-        throw new RuntimeException(
-                "Article du panier invalide"
-        );
+        throw new RuntimeException("Article du panier invalide");
     }
 
     private OrderResponse map(

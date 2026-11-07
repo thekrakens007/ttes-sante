@@ -6,9 +6,11 @@ import com.ttesicg.sante.service.CureService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/cures")
@@ -18,8 +20,14 @@ public class CureController {
     private final CureService cureService;
 
     @GetMapping
-    public List<CureResponse> getCures() {
-        return cureService.findPublicCures();
+    public Page<CureResponse> getCures(
+            @PageableDefault(
+                    size = 8,
+                    sort = {"createdAt", "id"},
+                    direction = Sort.Direction.DESC
+            ) Pageable pageable
+    ) {
+        return cureService.findPublicCures(pageable);
     }
 
     @GetMapping("/{id}")

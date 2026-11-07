@@ -1,10 +1,11 @@
+
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
-import { CureService } from '../../../../core/services/cure.service';
-import { Cure, CureProduct } from '../../../../core/models/cure.model';
+import { CureService, PageResponse } from '../../../../core/services/cure.service';
+import { Cure } from '../../../../core/models/cure.model';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CartService } from '../../../../core/services/cart.service';
 import { Cart } from '../../../../core/interfaces/cart.interface';
@@ -19,93 +20,47 @@ type SortOption = '' | 'price-asc' | 'price-desc' | 'name';
 })
 export class CureListComponent implements OnInit {
 
-    // ============================================================
-    // SERVICES
-    // ============================================================
-
-    private cureService = inject(CureService);
-    private authService = inject(AuthService);
-    private cartService = inject(CartService);
-    private router = inject(Router);
-
-
-    // ============================================================
-    // GENERAL
-    // ============================================================
+    private readonly cureService = inject(CureService);
+    private readonly authService = inject(AuthService);
+    private readonly cartService = inject(CartService);
+    private readonly router = inject(Router);
 
     currentYear = new Date().getFullYear();
     mobileMenuOpen = false;
 
-
-    // ============================================================
-    // PANIER (compteur du header uniquement)
-    // ============================================================
-
+    // PANIER
     cart: Cart | null = null;
     cartCount = 0;
 
-    /** Cure en cours d'ajout au panier. */
     addingCureId: number | null = null;
-
     cartMessage = '';
     cartError = '';
 
-    stockDialogOpen = false;
-    stockDialogMessage = '';
-
-
-    // ============================================================
     // CURES
-    // ============================================================
-
     cures: Cure[] = [];
     filteredCures: Cure[] = [];
+    paginatedCures: Cure[] = [];
 
-    /**
-     * Cure dont le contenu (liste des produits) est déplié.
-     */
-    expandedCureId: number | null = null;
-
-
-    // ============================================================
-    // LOADING / ERROR
-    // ============================================================
-
+    // CHARGEMENT
     loading = true;
     error = '';
 
-
-    // ============================================================
-    // RECHERCHE / TRI
-    // ============================================================
-
+    // RECHERCHE ET TRI
     searchTerm = '';
     sortOption: SortOption = '';
 
-
-    // ============================================================
-    // PAGINATION
-    // ============================================================
-
+    // PAGINATION BACKEND
     currentPage = 0;
-    pageSize = 12;
+    pageSize = 8;
     totalPages = 0;
-    pages: number[] = [];
-
-
-    // ============================================================
-    // INIT
-    // ============================================================
+    totalElements = 0;
 
     ngOnInit(): void {
         this.loadCures();
         this.loadCart();
     }
 
-
-    // ============================================================
     // MENU MOBILE
-    // ============================================================
 
     toggleMobileMenu(): void {
         this.mobileMenuOpen = !this.mobileMenuOpen;
@@ -115,37 +70,18 @@ export class CureListComponent implements OnInit {
         this.mobileMenuOpen = false;
     }
 
-
-    // ============================================================
     // AUTHENTIFICATION
-    // ============================================================
 
     isLoggedIn(): boolean {
         return this.authService.isLoggedIn();
     }
 
     isAdmin(): boolean {
-        if (!this.isLoggedIn()) {
-            return false;
-        }
-
-        return this.authService.hasRole('ROLE_ADMIN');
+        return this.isLoggedIn() &&
+            this.authService.hasRole('ROLE_ADMIN');
     }
 
-    private showStockDialog(message: string): void {
-        this.stockDialogMessage = message;
-        this.stockDialogOpen = true;
-        this.cartError = '';
-        this.cartMessage = '';
-    }
-
-    closeStockDialog(): void {
-        this.stockDialogOpen = false;
-    }
-
-    // ============================================================
     // PANIER
-    // ============================================================
 
     loadCart(): void {
         if (!this.authService.isLoggedIn()) {
@@ -155,13 +91,7 @@ export class CureListComponent implements OnInit {
         }
 
         this.cartService.getCart().subscribe({
-            next: (cart: Cart) => {
-                this.cart = cart;
-                this.cartCount = (cart.items ?? []).reduce(
-                    (total, item) => total + (item.quantity ?? 0),
-                    0
-                );
-            },
+            next: (cart: Cart) => this.applyCart(cart),
             error: (error: unknown) => {
                 console.error('Erreur chargement panier :', error);
                 this.cart = null;
@@ -169,223 +99,6 @@ export class CureListComponent implements OnInit {
             }
         });
     }
-
-
-    // ============================================================
-    // CHARGEMENT DES CURES
-    // ============================================================
-
-    loadCures(): void {
-        this.loading = true;
-        this.error = '';
-
-        this.cureService.getCures().subscribe({
-            next: (cures) => {
-                // L'endpoint public renvoie déjà les cures publiques ;
-                // ce filtre n'est qu'une sécurité supplémentaire.
-                this.cures = (cures ?? []).filter(cure => cure.active !== false);
-                this.expandedCureId = null;
-                this.applyFilters();
-                this.loading = false;
-            },
-            error: (error) => {
-                console.error('Erreur chargement cures :', error);
-
-                this.cures = [];
-                this.filteredCures = [];
-                this.pages = [];
-                this.totalPages = 0;
-
-                this.error =
-                    error?.error?.message ??
-                    'Impossible de charger les cures.';
-
-                this.loading = false;
-            }
-        });
-    }
-
-
-    // ============================================================
-    // RECHERCHE / TRI
-    // ============================================================
-
-    private normalize(value: unknown): string {
-        if (value === null || value === undefined) {
-            return '';
-        }
-
-        return String(value)
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .trim();
-    }
-
-    search(): void {
-        this.currentPage = 0;
-        this.applyFilters();
-    }
-
-    applyFilters(): void {
-        const term = this.normalize(this.searchTerm);
-
-        let result = this.cures.filter(cure => {
-            if (!term) {
-                return true;
-            }
-
-            const text = this.normalize(
-                [
-                    cure.name,
-                    cure.description ?? '',
-                    ...(cure.items ?? []).map(item => item.productName)
-                ].join(' ')
-            );
-
-            return text.includes(term);
-        });
-
-        switch (this.sortOption) {
-            case 'price-asc':
-                result = [...result].sort(
-                    (a, b) => (a.totalPrice ?? 0) - (b.totalPrice ?? 0)
-                );
-                break;
-
-            case 'price-desc':
-                result = [...result].sort(
-                    (a, b) => (b.totalPrice ?? 0) - (a.totalPrice ?? 0)
-                );
-                break;
-
-            case 'name':
-                result = [...result].sort(
-                    (a, b) => a.name.localeCompare(b.name, 'fr')
-                );
-                break;
-        }
-
-        this.filteredCures = result;
-        this.updatePagination();
-    }
-
-    clearSearch(): void {
-        this.searchTerm = '';
-        this.search();
-    }
-
-    resetFilters(): void {
-        this.searchTerm = '';
-        this.sortOption = '';
-        this.search();
-    }
-
-
-    // ============================================================
-    // PAGINATION
-    // ============================================================
-
-    updatePagination(): void {
-        this.totalPages = Math.ceil(
-            this.filteredCures.length / this.pageSize
-        );
-
-        if (this.totalPages === 0) {
-            this.pages = [];
-            this.currentPage = 0;
-            return;
-        }
-
-        this.pages = Array.from(
-            { length: this.totalPages },
-            (_, index) => index
-        );
-
-        if (this.currentPage >= this.totalPages) {
-            this.currentPage = this.totalPages - 1;
-        }
-    }
-
-    get paginatedCures(): Cure[] {
-        const start = this.currentPage * this.pageSize;
-
-        return this.filteredCures.slice(
-            start,
-            start + this.pageSize
-        );
-    }
-
-    goToPage(page: number): void {
-        if (
-            page < 0 ||
-            page >= this.totalPages ||
-            page === this.currentPage
-        ) {
-            return;
-        }
-
-        this.currentPage = page;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    nextPage(): void {
-        this.goToPage(this.currentPage + 1);
-    }
-
-    previousPage(): void {
-        this.goToPage(this.currentPage - 1);
-    }
-
-
-    // ============================================================
-    // CONTENU D'UNE CURE
-    // ============================================================
-
-    isExpanded(cure: Cure): boolean {
-        return cure.id !== undefined && this.expandedCureId === cure.id;
-    }
-
-    toggleContent(cure: Cure): void {
-        if (cure.id === undefined) {
-            return;
-        }
-
-        this.expandedCureId =
-            this.expandedCureId === cure.id
-                ? null
-                : cure.id;
-    }
-
-    getItems(cure: Cure): CureProduct[] {
-        return cure.items ?? [];
-    }
-
-    getProductCount(cure: Cure): number {
-        return cure.items?.length ?? 0;
-    }
-
-
-    // ============================================================
-    // IMAGE
-    // ============================================================
-
-    getMainImage(cure: Cure): string {
-        if (cure.imageUrl) {
-            return cure.imageUrl;
-        }
-
-        return (
-            (cure.items ?? []).find(item => item.productImageUrl)
-                ?.productImageUrl ??
-            '/images/products/default-product.png'
-        );
-    }
-
-
-    // ============================================================
-    // AJOUT AU PANIER
-    // ============================================================
 
     private applyCart(cart: Cart): void {
         this.cart = cart;
@@ -404,25 +117,12 @@ export class CureListComponent implements OnInit {
             ?.quantity ?? 0;
     }
 
-    /**
-     * Une cure n'a pas de stock propre : le backend peut fournir
-     * availableStock (nombre de cures réalisables avec le stock des
-     * produits). S'il est absent, on ne bloque pas côté client.
-     */
-    isOutOfStock(cure: Cure): boolean {
-        return (
-            cure.availableStock !== undefined &&
-            cure.availableStock !== null &&
-            cure.availableStock <= 0
-        );
-    }
 
     addToCart(cure: Cure): void {
-        if (cure.id === undefined) {
+        if (cure.id === undefined || !cure.active) {
             return;
         }
 
-        // Non connecté : redirection vers la connexion
         if (!this.authService.isLoggedIn()) {
             this.router.navigate(['/signin'], {
                 queryParams: { returnUrl: this.router.url }
@@ -430,12 +130,6 @@ export class CureListComponent implements OnInit {
             return;
         }
 
-        if (this.isOutOfStock(cure)) {
-            this.showCartError('Cette cure est actuellement en rupture de stock.');
-            return;
-        }
-
-        // Éviter le double clic
         if (this.addingCureId !== null) {
             return;
         }
@@ -458,7 +152,6 @@ export class CureListComponent implements OnInit {
                 console.error('Erreur ajout cure au panier :', error);
                 this.addingCureId = null;
 
-                // Session expirée
                 if (error?.status === 401) {
                     this.authService.logout();
                     this.router.navigate(['/signin'], {
@@ -472,20 +165,6 @@ export class CureListComponent implements OnInit {
                     error?.error?.error ??
                     'Impossible d’ajouter la cure au panier.';
 
-                const messageLower = String(message).toLowerCase();
-
-                // Afficher une boîte de dialogue si le problème concerne le stock.
-                if (
-                    messageLower.includes('stock') ||
-                    messageLower.includes('quantité disponible') ||
-                    messageLower.includes('quantite disponible') ||
-                    messageLower.includes('insuffisant')
-                ) {
-                    this.showStockDialog(message);
-                    return;
-                }
-
-                // Les autres erreurs restent affichées comme auparavant.
                 this.showCartError(message);
             }
         });
@@ -500,15 +179,158 @@ export class CureListComponent implements OnInit {
         }, 4000);
     }
 
+    // CHARGEMENT DES CURES
 
-    // ============================================================
+    loadCures(): void {
+        this.loading = true;
+        this.error = '';
+
+        this.cureService.getCures(this.currentPage, this.pageSize)
+            .subscribe({
+                next: (response: PageResponse<Cure>) => {
+                    this.cures = response.content ?? [];
+                    this.totalPages = response.totalPages;
+                    this.totalElements = response.totalElements;
+                    this.currentPage = response.number;
+
+                    this.applyFilters();
+                    this.loading = false;
+                },
+                error: (error) => {
+                    console.error('Erreur chargement cures :', error);
+
+                    this.cures = [];
+                    this.filteredCures = [];
+                    this.totalPages = 0;
+                    this.totalElements = 0;
+
+                    this.error =
+                        error?.error?.message ??
+                        'Impossible de charger les cures.';
+
+                    this.loading = false;
+                }
+            });
+    }
+
+    // RECHERCHE ET TRI
+
+    private normalize(value: unknown): string {
+        if (value === null || value === undefined) {
+            return '';
+        }
+
+        return String(value)
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+    }
+
+    search(): void {
+        this.applyFilters();
+    }
+
+    applyFilters(): void {
+        const term = this.normalize(this.searchTerm);
+
+        let result = this.cures.filter(cure => {
+            const text = this.normalize(
+                `${cure.name} ${cure.description ?? ''} ${cure.type}`
+            );
+
+            return !term || text.includes(term);
+        });
+
+        switch (this.sortOption) {
+            case 'price-asc':
+                result = [...result].sort(
+                    (a, b) => a.price - b.price
+                );
+                break;
+
+            case 'price-desc':
+                result = [...result].sort(
+                    (a, b) => b.price - a.price
+                );
+                break;
+
+            case 'name':
+                result = [...result].sort(
+                    (a, b) => a.name.localeCompare(b.name, 'fr')
+                );
+                break;
+        }
+
+        this.filteredCures = result;
+        this.paginatedCures = result;
+    }
+
+    clearSearch(): void {
+        this.searchTerm = '';
+        this.applyFilters();
+    }
+
+    resetFilters(): void {
+        this.searchTerm = '';
+        this.sortOption = '';
+        this.applyFilters();
+    }
+
+    // PAGINATION
+
+    goToPage(page: number): void {
+        if (
+            page < 0 ||
+            page >= this.totalPages ||
+            page === this.currentPage
+        ) {
+            return;
+        }
+
+        this.currentPage = page;
+        this.loadCures();
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+
+    nextPage(): void {
+        this.goToPage(this.currentPage + 1);
+    }
+
+    previousPage(): void {
+        this.goToPage(this.currentPage - 1);
+    }
+
+    get pages(): number[] {
+        return Array.from(
+            { length: this.totalPages },
+            (_, index) => index
+        );
+    }
+
+    // IMAGES
+
+    getMainImage(cure: Cure): string {
+        return cure.imageUrl ||
+            '/images/products/default-product.png';
+    }
+
     // PRIX
-    // ============================================================
 
     formatPrice(price?: number | null): string {
-        return (
-            new Intl.NumberFormat('fr-FR').format(price ?? 0) +
-            ' FCFA'
-        );
+        return new Intl.NumberFormat('fr-FR').format(price ?? 0)
+            + ' FCFA';
+    }
+
+    // TYPE
+
+    getCureTypeLabel(type: Cure['type']): string {
+        return type === 'PREVENTIVE'
+            ? 'Préventive'
+            : 'Curative';
     }
 }

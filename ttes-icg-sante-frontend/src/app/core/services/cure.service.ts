@@ -1,4 +1,3 @@
-
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -15,6 +14,8 @@ export interface PageResponse<T> {
     empty: boolean;
 }
 
+export type CureType = 'PREVENTIVE' | 'CURATIVE';
+
 @Injectable({
     providedIn: 'root'
 })
@@ -25,13 +26,25 @@ export class CureService {
     private readonly apiUrl = '/api/cures';
     private readonly adminUrl = '/api/admin/cures';
 
-    // Partie publique avec pagination
-    getCures(page: number = 0, size: number = 8): Observable<PageResponse<Cure>> {
-        const params = new HttpParams()
+    // Catalogue public avec pagination et filtre par type
+    getCures(
+        page: number = 0,
+        size: number = 8,
+        type?: CureType
+    ): Observable<PageResponse<Cure>> {
+
+        let params = new HttpParams()
             .set('page', page)
             .set('size', size);
 
-        return this.http.get<PageResponse<Cure>>(this.apiUrl, { params });
+        if (type) {
+            params = params.set('type', type);
+        }
+
+        return this.http.get<PageResponse<Cure>>(
+            this.apiUrl,
+            { params }
+        );
     }
 
     getCure(id: number): Observable<Cure> {
@@ -39,12 +52,19 @@ export class CureService {
     }
 
     // Administration avec pagination
-    getAdminCures(page: number = 0, size: number = 8): Observable<PageResponse<Cure>> {
+    getAdminCures(
+        page: number = 0,
+        size: number = 8
+    ): Observable<PageResponse<Cure>> {
+
         const params = new HttpParams()
             .set('page', page)
             .set('size', size);
 
-        return this.http.get<PageResponse<Cure>>(this.adminUrl, { params });
+        return this.http.get<PageResponse<Cure>>(
+            this.adminUrl,
+            { params }
+        );
     }
 
     getAdminCure(id: number): Observable<Cure> {
@@ -56,7 +76,10 @@ export class CureService {
     }
 
     updateCure(id: number, request: CureRequest): Observable<Cure> {
-        return this.http.put<Cure>(`${this.adminUrl}/${id}`, request);
+        return this.http.put<Cure>(
+            `${this.adminUrl}/${id}`,
+            request
+        );
     }
 
     deleteCure(id: number): Observable<void> {

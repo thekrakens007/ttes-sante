@@ -4,7 +4,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
-import { CureService, PageResponse } from '../../../../core/services/cure.service';
+import {
+    CureService,
+    PageResponse,
+    CureType
+} from '../../../../core/services/cure.service';
+
 import { Cure } from '../../../../core/models/cure.model';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CartService } from '../../../../core/services/cart.service';
@@ -15,7 +20,11 @@ type SortOption = '' | 'price-asc' | 'price-desc' | 'name';
 @Component({
     selector: 'app-cure-list',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        RouterModule
+    ],
     templateUrl: './cure-list.component.html'
 })
 export class CureListComponent implements OnInit {
@@ -26,30 +35,33 @@ export class CureListComponent implements OnInit {
     private readonly router = inject(Router);
 
     currentYear = new Date().getFullYear();
+
     mobileMenuOpen = false;
 
-    // PANIER
+    // Type sélectionné : PREVENTIVE par défaut
+    selectedType: CureType = 'PREVENTIVE';
+
+    // Panier
     cart: Cart | null = null;
     cartCount = 0;
-
     addingCureId: number | null = null;
     cartMessage = '';
     cartError = '';
 
-    // CURES
+    // Cures
     cures: Cure[] = [];
     filteredCures: Cure[] = [];
     paginatedCures: Cure[] = [];
 
-    // CHARGEMENT
+    // Chargement
     loading = true;
     error = '';
 
-    // RECHERCHE ET TRI
+    // Recherche et tri
     searchTerm = '';
     sortOption: SortOption = '';
 
-    // PAGINATION BACKEND
+    // Pagination backend
     currentPage = 0;
     pageSize = 8;
     totalPages = 0;
@@ -60,72 +72,104 @@ export class CureListComponent implements OnInit {
         this.loadCart();
     }
 
-    // MENU MOBILE
+    // =========================================================
+    // NAVIGATION
+    // =========================================================
 
     toggleMobileMenu(): void {
         this.mobileMenuOpen = !this.mobileMenuOpen;
+    }
+
+    logout(): void {
+        this.authService.logout();
+        this.cart = null;
+        this.cartCount = 0;
+        this.mobileMenuOpen = false;
+
+        this.router.navigate(['/']);
     }
 
     closeMobileMenu(): void {
         this.mobileMenuOpen = false;
     }
 
-    // AUTHENTIFICATION
-
     isLoggedIn(): boolean {
         return this.authService.isLoggedIn();
     }
 
     isAdmin(): boolean {
-        return this.isLoggedIn() &&
-            this.authService.hasRole('ROLE_ADMIN');
+        return this.authService.isAdmin();
     }
 
+    // =========================================================
+    // SÉLECTION DU TYPE DE CURE
+    // =========================================================
+
+    selectType(type: CureType): void {
+        if (this.selectedType === type) {
+            return;
+        }
+
+        this.selectedType = type;
+
+        // Chaque catégorie recommence à la première page
+        this.currentPage = 0;
+
+        this.loadCures();
+    }
+
+    // =========================================================
     // PANIER
+    // =========================================================
 
     loadCart(): void {
-        if (!this.authService.isLoggedIn()) {
+        if (!this.isLoggedIn()) {
             this.cart = null;
             this.cartCount = 0;
             return;
         }
 
         this.cartService.getCart().subscribe({
-            next: (cart: Cart) => this.applyCart(cart),
-            error: (error: unknown) => {
-                console.error('Erreur chargement panier :', error);
-                this.cart = null;
-                this.cartCount = 0;
+            next: (cart: Cart) => {
+                this.applyCart(cart);
+            },
+            error: (err) => {
+                console.error('Erreur chargement panier :', err);
             }
         });
     }
 
-    private applyCart(cart: Cart): void {
+    applyCart(cart: Cart): void {
         this.cart = cart;
+
         this.cartCount = (cart.items ?? []).reduce(
-            (total, item) => total + (item.quantity ?? 0),
+            (total, item) => total + item.quantity,
             0
         );
     }
 
     getCureCartQuantity(cureId?: number): number {
-        if (cureId === undefined || !this.cart?.items) {
+        if (!cureId || !this.cart?.items) {
             return 0;
         }
 
-        return this.cart.items.find(item => item.cureId === cureId)
-            ?.quantity ?? 0;
+        const item = this.cart.items.find(
+            item => item.cureId === cureId
+        );
+
+        return item?.quantity ?? 0;
     }
 
-
     addToCart(cure: Cure): void {
-        if (cure.id === undefined || !cure.active) {
+        if (!cure.id || !cure.active) {
             return;
         }
 
-        if (!this.authService.isLoggedIn()) {
+        if (!this.isLoggedIn()) {
             this.router.navigate(['/signin'], {
-                queryParams: { returnUrl: this.router.url }
+                queryParams: {
+                    returnUrl: this.router.url
+                }
             });
             return;
         }
@@ -141,86 +185,82 @@ export class CureListComponent implements OnInit {
         this.cartService.addCure(cure.id, 1).subscribe({
             next: (cart: Cart) => {
                 this.applyCart(cart);
+                this.cartMessage = `${cure.name} ajoutée au panier.`;
                 this.addingCureId = null;
-                this.cartMessage = `${cure.name} a été ajoutée au panier.`;
 
                 setTimeout(() => {
                     this.cartMessage = '';
-                }, 3000);
+                }, 4000);
             },
-            error: (error: any) => {
-                console.error('Erreur ajout cure au panier :', error);
+            error: (err) => {
+                console.error('Erreur ajout panier :', err);
+
                 this.addingCureId = null;
 
-                if (error?.status === 401) {
-                    this.authService.logout();
-                    this.router.navigate(['/signin'], {
-                        queryParams: { returnUrl: this.router.url }
-                    });
-                    return;
+                if (err.status === 401) {
+                    this.cartError = 'Votre session a expiré. Veuillez vous reconnecter.';
+                } else {
+                    this.cartError =
+                        err.error?.message ??
+                        "Impossible d'ajouter cette cure au panier.";
                 }
 
-                const message =
-                    error?.error?.message ??
-                    error?.error?.error ??
-                    'Impossible d’ajouter la cure au panier.';
-
-                this.showCartError(message);
+                setTimeout(() => {
+                    this.cartError = '';
+                }, 5000);
             }
         });
     }
 
-    private showCartError(message: string): void {
-        this.cartError = message;
-        this.cartMessage = '';
-
-        setTimeout(() => {
-            this.cartError = '';
-        }, 4000);
-    }
-
+    // =========================================================
     // CHARGEMENT DES CURES
+    // =========================================================
 
     loadCures(): void {
         this.loading = true;
         this.error = '';
 
-        this.cureService.getCures(this.currentPage, this.pageSize)
-            .subscribe({
-                next: (response: PageResponse<Cure>) => {
-                    this.cures = response.content ?? [];
-                    this.totalPages = response.totalPages;
-                    this.totalElements = response.totalElements;
-                    this.currentPage = response.number;
+        this.cureService.getCures(
+            this.currentPage,
+            this.pageSize,
+            this.selectedType
+        ).subscribe({
+            next: (response: PageResponse<Cure>) => {
+                this.cures = response.content ?? [];
 
-                    this.applyFilters();
-                    this.loading = false;
-                },
-                error: (error) => {
-                    console.error('Erreur chargement cures :', error);
+                this.totalPages = response.totalPages;
+                this.totalElements = response.totalElements;
+                this.currentPage = response.number;
 
-                    this.cures = [];
-                    this.filteredCures = [];
-                    this.totalPages = 0;
-                    this.totalElements = 0;
+                this.applyFilters();
 
-                    this.error =
-                        error?.error?.message ??
-                        'Impossible de charger les cures.';
+                this.loading = false;
+            },
+            error: (err) => {
+                console.error('Erreur chargement cures :', err);
 
-                    this.loading = false;
-                }
-            });
+                this.cures = [];
+                this.filteredCures = [];
+                this.paginatedCures = [];
+
+                this.totalPages = 0;
+                this.totalElements = 0;
+
+                this.error =
+                    err.error?.message ??
+                    'Impossible de charger les cures. Veuillez réessayer.';
+
+                this.loading = false;
+            }
+        });
     }
 
-    // RECHERCHE ET TRI
+    // =========================================================
+    // RECHERCHE ET FILTRAGE
+    // =========================================================
 
-    private normalize(value: unknown): string {
-        if (value === null || value === undefined) {
-            return '';
-        }
-
-        return String(value)
+    normalize(value: string | null | undefined): string {
+        return (value ?? '')
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
             .toLowerCase()
@@ -234,30 +274,37 @@ export class CureListComponent implements OnInit {
     applyFilters(): void {
         const term = this.normalize(this.searchTerm);
 
+        // Toujours filtrer selon le type sélectionné
         let result = this.cures.filter(cure => {
-            const text = this.normalize(
-                `${cure.name} ${cure.description ?? ''} ${cure.type}`
-            );
 
-            return !term || text.includes(term);
+            const matchesType = cure.type === this.selectedType;
+
+            const matchesSearch =
+                !term ||
+                this.normalize(cure.name).includes(term) ||
+                this.normalize(cure.description).includes(term) ||
+                this.normalize(cure.type).includes(term);
+
+            return matchesType && matchesSearch;
         });
 
+        // Tri
         switch (this.sortOption) {
             case 'price-asc':
                 result = [...result].sort(
-                    (a, b) => a.price - b.price
+                    (a, b) => Number(a.price) - Number(b.price)
                 );
                 break;
 
             case 'price-desc':
                 result = [...result].sort(
-                    (a, b) => b.price - a.price
+                    (a, b) => Number(b.price) - Number(a.price)
                 );
                 break;
 
             case 'name':
                 result = [...result].sort(
-                    (a, b) => a.name.localeCompare(b.name, 'fr')
+                    (a, b) => a.name.localeCompare(b.name)
                 );
                 break;
         }
@@ -277,7 +324,9 @@ export class CureListComponent implements OnInit {
         this.applyFilters();
     }
 
-    // PAGINATION
+    // =========================================================
+    // PAGINATION BACKEND
+    // =========================================================
 
     goToPage(page: number): void {
         if (
@@ -298,11 +347,15 @@ export class CureListComponent implements OnInit {
     }
 
     nextPage(): void {
-        this.goToPage(this.currentPage + 1);
+        if (this.currentPage < this.totalPages - 1) {
+            this.goToPage(this.currentPage + 1);
+        }
     }
 
     previousPage(): void {
-        this.goToPage(this.currentPage - 1);
+        if (this.currentPage > 0) {
+            this.goToPage(this.currentPage - 1);
+        }
     }
 
     get pages(): number[] {
@@ -312,23 +365,19 @@ export class CureListComponent implements OnInit {
         );
     }
 
-    // IMAGES
+    // =========================================================
+    // AFFICHAGE
+    // =========================================================
 
     getMainImage(cure: Cure): string {
-        return cure.imageUrl ||
-            '/images/products/default-product.png';
+        return cure.imageUrl || 'assets/images/default-cure.jpg';
     }
 
-    // PRIX
-
-    formatPrice(price?: number | null): string {
-        return new Intl.NumberFormat('fr-FR').format(price ?? 0)
-            + ' FCFA';
+    formatPrice(price: number | null | undefined): string {
+        return new Intl.NumberFormat('fr-FR').format(price ?? 0) + ' FCFA';
     }
 
-    // TYPE
-
-    getCureTypeLabel(type: Cure['type']): string {
+    getCureTypeLabel(type: string): string {
         return type === 'PREVENTIVE'
             ? 'Préventive'
             : 'Curative';
